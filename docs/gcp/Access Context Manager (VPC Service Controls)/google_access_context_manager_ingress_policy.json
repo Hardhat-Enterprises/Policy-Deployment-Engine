@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-"rationale": "This field controls Terraform deletion behaviour rather than access control or data protection. It is a lifecycle management setting and is not enforced as a generic platform security control."
+      "security_impact": true,
+      "rationale": "This setting controls whether destructive deletion of the resource is prevented. Because it can protect the resource from accidental or unauthorized destruction, it is a security-relevant lifecycle control."
     },
     "ingress_policy_name": {
       "description": "The name of the Service Perimeter to add this resource to.",
@@ -20,8 +20,8 @@
       "description": "A GCP resource that is inside of the service perimeter.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Identifies the GCP resource referenced by the ingress policy; it is a pointer to a specific project/resource and cannot be constrained by a generic platform policy without hardcoding identifiers."
+      "security_impact": true,
+"rationale": "This argument identifies the GCP resource governed by the ingress policy. Because ingress rules define which resources may be reached across the service perimeter, constraining the target resource is part of enforcing the access boundary."
     }
   }
 }
