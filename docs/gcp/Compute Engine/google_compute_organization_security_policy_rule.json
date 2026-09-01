@@ -6,8 +6,8 @@
       "description": "The Action to perform when the client connection triggers the rule. Valid actions are:\n\"allow\": allow access to target.\n\"deny\": deny access to target.\n\"goto_next\": forward the request to the next hierarchical policy for evaluation.\n\"redirect\": redirect to a different target. Parameters for this action can be configured via redirectOptions. Only EXTERNAL_302 redirect type is supported for organization security policies.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Allow/deny is a direct access-control decision — it determines whether matching traffic is permitted or blocked, the core enforcement outcome of the rule. This is functionally equivalent to other access-gating arguments already marked true (e.g. deletion_policy)."
+      "security_impact": false,
+      "rationale": "The action a rule takes (allow/deny/redirect) is a functional/operational choice required for different traffic routing needs (e.g. allow-listing vs deny-listing architectures), not an inherently secure-vs-insecure switch. Enforcing one value globally would break legitimate network designs. Unlike deletion_policy or preview, there is no universal "safe" value here — the security posture comes from how the rule is used within the broader policy set, not from the action value itself."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -34,8 +34,8 @@
       "description": "If set to true, the specified action is not enforced.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "When true, the rule's action is not enforced — this is a kill switch that can silently disable an active security control while appearing configured correctly, the same class of risk as deletion_policy."
+      "security_impact": false,
+      "rationale": "Preview is a temporary operational/staging toggle used during rule authoring to test impact before live enforcement, not a fixed security posture. Unlike deletion_policy, a platform-level policy on this field is structurally unworkable: enforcing it to always false would block the mandatory staging step for every rule, while allowing true makes the policy unenforceable. The functional risk of an enforcement rule being left in preview is a deployment-process concern (should be checked before go-live), not something a generic security policy can meaningfully constrain."
     },
     "priority": {
       "description": "An integer indicating the priority of a rule in the list. The priority must be a value\nbetween 0 and 2147483647. Rules are evaluated from highest to lowest priority where 0 is the\nhighest priority and 2147483647 is the lowest prority.",
