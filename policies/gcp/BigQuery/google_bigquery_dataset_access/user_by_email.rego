@@ -9,11 +9,13 @@ conditions := [
         {
             "condition": "Check for correct user_by_email",
             "attribute_path" : ["user_by_email"],
-            "values" : ["user@example.com"],
-            "policy_type" : "whitelist"  
+            "values" : ["*@*", [["user"], ["example.com"]]],
+            "policy_type" : "pattern whitelist"  
         }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
