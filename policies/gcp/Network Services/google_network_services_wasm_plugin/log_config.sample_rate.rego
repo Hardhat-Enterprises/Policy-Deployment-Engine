@@ -8,21 +8,19 @@ conditions := [
         {
             "situation_description": "The Wasm Plugin should log sufficient activity for auditing.",
             "remedies": [
-                "Set log_config.sample_rate to 1.0."
+                "Set log_config.sample_rate to a value greater than 0."
             ]
         },
         {
-            "condition": "The log_config.sample_rate attribute must be set to 1.0.",
-            "attribute_path": [
-                "log_config",
-                0,
-                "sample_rate"
-            ],
-            "values": [
-                1.0
-            ],
-            "policy_type": "whitelist"
-        }
+    "condition": "The log_config.sample_rate attribute must be greater than 0.",
+    "attribute_path": [
+        "log_config",
+        0,
+        "sample_rate"
+    ],
+    "values": [ 0.000001, 1.0],
+    "policy_type": "range"
+}
     ]
 ]
 
