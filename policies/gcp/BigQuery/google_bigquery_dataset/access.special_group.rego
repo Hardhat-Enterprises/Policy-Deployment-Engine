@@ -15,7 +15,7 @@ conditions := [
             "condition": "Reject public authenticated-user access",
             "attribute_path": ["access", "special_group"],
             "values": ["allAuthenticatedUsers"],
-            "policy_type": "blacklist"
+            "policy_type": "element blacklist"
         }
     ]
 ]
