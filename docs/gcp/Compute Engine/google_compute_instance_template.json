@@ -112,7 +112,7 @@
       "required": false,
       "type": "set(string)",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Network tags determine which firewall rules apply to an instance, since GCP firewall rules are commonly scoped by target tag rather than instance name. Incorrect or missing tags can cause instances to inherit unintended firewall exposure or miss protective rules that should apply."
     },
     "advanced_machine_features": {
       "type": "block",
@@ -295,21 +295,21 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Specifying an existing disk as the source lets the template attach pre-provisioned storage that may already contain data, configuration, or embedded credentials; using an unreviewed or untrusted existing disk can bypass the hardening and patching applied to approved base images, so the source disk's provenance should be reviewed."
     },
     "disk.source_image": {
       "description": "The image from which to initialize this disk. This can be one of: the image's self_link, projects/{project}/global/images/{image}, projects/{project}/global/images/family/{family}, global/images/{image}, global/images/family/{family}, family/{family}, {project}/{family}, {project}/{image}, {family}, or {image}. ~> Note: Either source or source_image is required when creating a new instance except for when creating a local SSD.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Determines which base OS image the disk boots from. Using an unapproved, outdated, or public/community image instead of an organization-approved hardened image can introduce unpatched vulnerabilities or untrusted software into the instance from creation."
     },
     "disk.source_snapshot": {
       "description": "The source snapshot to create this disk. When creating\na new instance, one of initializeParams.sourceSnapshot,\ninitializeParams.sourceImage, or disks.source is\nrequired except for local SSD.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Creating a disk from a snapshot carries forward the exact data and configuration state captured at snapshot time; restoring from an unreviewed or stale snapshot can reintroduce previously remediated vulnerabilities or expose data that should have been purged, so the snapshot origin and freshness should be reviewed."
     },
     "disk.storage_pool": {
       "description": "The self_link or ID of the Storage Pool to create this disk in.",
@@ -446,14 +446,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Determines which VPC network the interface attaches to. Attaching an instance to the wrong or an overly permissive network can expose it to unintended peer traffic or bypass network-level segmentation controls."
     },
     "network_interface.network_attachment": {
       "description": "The URL of the network attachment that this interface should connect to in the following format: projects/{projectNumber}/regions/{region_name}/networkAttachments/{network_attachment_name}.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Connects the interface via a Network Connectivity Center attachment rather than a direct VPC network/subnetwork; an incorrect or unauthorized attachment can expose the instance to traffic from an unintended external network."
     },
     "network_interface.network_ip": {
       "description": "The private IP address to assign to the instance. If empty, the address will be automatically assigned.",
@@ -488,7 +488,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": ""
+      "rationale": "Determines which subnetwork the interface attaches to, which governs the instance's IP range, regional placement, and applicable firewall/routing rules; attaching to the wrong subnetwork can place the instance outside its intended network segmentation boundary."
     },
     "network_interface.subnetwork_project": {
       "description": "The ID of the project in which the subnetwork belongs. If it is not provided, the provider project is used.",
