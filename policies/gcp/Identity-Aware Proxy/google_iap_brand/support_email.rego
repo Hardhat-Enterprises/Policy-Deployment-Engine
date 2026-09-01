@@ -18,8 +18,8 @@ conditions := [
     {
       "condition": "support_email must be corporate",
       "attribute_path": ["support_email"],
-      "values": ["support@example.com"],
-      "policy_type": "whitelist"
+      "values": ["*@*", [["support"], ["example.com"]]],
+      "policy_type": "pattern whitelist"
     }
   ],
   [
@@ -32,11 +32,15 @@ conditions := [
     {
       "condition": "support_email must not be public/external/malformed",
       "attribute_path": ["support_email"],
-      "values": ["support@gmail.com", "help@vendor.io", "support@example.com "],
-      "policy_type": "blacklist"
+      # By domain, not by address: the trailing space is the "example.com "
+      # entry, which is how the whitespace case is caught.
+      "values": ["*@*", [[], ["gmail.com", "vendor.io", "example.com "]]],
+      "policy_type": "pattern blacklist"
     }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
