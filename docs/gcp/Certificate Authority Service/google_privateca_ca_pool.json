@@ -6,15 +6,15 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy or abandon the CA pool. Enforcing PREVENT protects the certificate authority infrastructure and its issuance controls from accidental deletion."
     },
     "labels": {
       "description": "Labels with user-defined metadata.\n\nAn object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\":\n\"1.3kg\", \"count\": \"3\" }.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "User-defined metadata used to organise and identify resources; labels do not change CA pool access controls, cryptographic settings, or certificate issuance behaviour."
     },
     "location": {
       "description": "Location of the CaPool. A full list of valid locations can be found by\nrunning 'gcloud privateca locations list'.",
@@ -27,22 +27,22 @@
       "description": "The name for this CaPool.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the CA pool within its project and location. The name does not control cryptographic strength, access permissions, or certificate issuance behaviour."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Google Cloud project that contains the CA pool. Project selection is a resource placement and ownership choice, so a generic platform policy should not constrain which project is used."
     },
     "tier": {
       "description": "The Tier of this CaPool. Possible values: [\"ENTERPRISE\", \"DEVOPS\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "CA Pool must use the ENTERPRISE tier to enforce admin approval controls and audit logging for all certificate operations. The DEVOPS tier lacks HSM-backed keys and granular audit logging required by organisational policy."
+      "security_impact": false,
+      "rationale": "It selects the CA pool service tier and its associated operational capabilities. Tier selection is an architectural and workload-specific choice that should be left to the responsible team rather than mandated by a generic platform policy."
     },
     "encryption_spec": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "The resource name for an existing Cloud KMS key in the format\n'projects/*/locations/*/keyRings/*/cryptoKeys/*'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "It controls whether the CA pool uses a customer-managed encryption key. A policy should require this field to be set and non-empty to enforce CMEK protection without restricting it to a particular key name or identifier."
     },
     "issuance_policy": {
       "type": "block",
@@ -65,8 +65,8 @@
       "description": "The duration to backdate all certificates issued from this CaPool. If not set, the\ncertificates will be issued with a not_before_time of the issuance time (i.e. the current\ntime). If set, the certificates will be issued with a not_before_time of the issuance\ntime minus the backdate_duration. The not_after_time will be adjusted to preserve the\nrequested lifetime. The backdate_duration must be less than or equal to 48 hours.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how far a certificate’s validity start time is moved into the past. Restricting the backdate duration prevents certificates from being treated as valid for an unnecessarily extended historical period."
     },
     "issuance_policy.maximum_lifetime": {
       "description": "The maximum lifetime allowed for issued Certificates. Note that if the issuing CertificateAuthority\nexpires before a Certificate's requested maximumLifetime, the effective lifetime will be explicitly truncated to match it.",
@@ -84,8 +84,8 @@
       "description": "When true, allows callers to create Certificates by specifying a CertificateConfig.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether certificates can be issued directly from a CertificateConfig instead of a caller-generated CSR. Restricting config-based issuance helps ensure private keys remain under the requestor’s control and are not generated through an unapproved issuance workflow."
     },
     "issuance_policy.allowed_issuance_modes.allow_csr_based_issuance": {
       "description": "When true, allows callers to create Certificates by specifying a CSR.",
@@ -109,7 +109,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Elliptic curve signature algorithm must be restricted to OS-approved types to enforce cryptographic compliance across all certificates issued by the pool."
+      "rationale": "Controls which elliptic-curve signature algorithms may be used for issued certificates. Restricting this setting to robust algorithms such as ECDSA P-256 or P-384 prevents the use of weaker or non-approved curve options."
     },
     "issuance_policy.allowed_key_types.rsa": {
       "type": "block",
@@ -120,15 +120,15 @@
       "description": "The maximum allowed RSA modulus size, in bits. If this is not set, or if set to zero, the\nservice will not enforce an explicit upper bound on RSA modulus sizes.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the maximum permitted RSA modulus size for certificates issued by the pool. Enforcing an approved upper bound or valid structural range prevents improperly sized or non-standard RSA keys."
     },
     "issuance_policy.allowed_key_types.rsa.min_modulus_size": {
       "description": "The minimum allowed RSA modulus size, in bits. If this is not set, or if set to zero, the\nservice-level min RSA modulus size will continue to apply.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the minimum permitted RSA key size for certificates issued by the pool. Enforcing an approved minimum prevents the use of weak RSA keys that may be vulnerable to practical cryptographic attacks. "
     },
     "issuance_policy.baseline_values": {
       "type": "block",
@@ -139,8 +139,8 @@
       "description": "Describes Online Certificate Status Protocol (OCSP) endpoint addresses that appear in the\n\"Authority Information Access\" extension in the certificate.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the OCSP responder endpoints included in issued certificates. These URLs depend on each team’s PKI and responder infrastructure, so they cannot be generically constrained without hardcoding environment-specific values."
     },
     "issuance_policy.baseline_values.additional_extensions": {
       "type": "block",
@@ -151,15 +151,15 @@
       "description": "Indicates whether or not this extension is critical (i.e., if the client does not know how to\nhandle this extension, the client should consider this to be an error).",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Indicates whether a custom additional extension is marked critical. Because additional extensions are arbitrary and application-specific, their criticality cannot be meaningfully constrained by a generic platform-level policy."
     },
     "issuance_policy.baseline_values.additional_extensions.value": {
       "description": "The value of this X.509 extension. A base64-encoded string.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains the free-form encoded value of a custom X.509 extension. Its meaning depends on the selected extension and application requirements, so it cannot be generically constrained by a platform policy."
     },
     "issuance_policy.baseline_values.additional_extensions.object_id": {
       "type": "block",
@@ -170,8 +170,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a custom X.509 extension through an object identifier. The appropriate OID depends on the team’s certificate profile and application architecture, so mandating specific identifiers would overreach a generic platform policy."
     },
     "issuance_policy.baseline_values.ca_options": {
       "type": "block",
@@ -182,29 +182,29 @@
       "description": "When true, the \"CA\" in Basic Constraints extension will be set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether issued certificates can act as certificate authorities. Restricting this setting prevents unauthorised certificates from gaining the ability to issue and sign subordinate certificates."
     },
     "issuance_policy.baseline_values.ca_options.max_issuer_path_length": {
       "description": "Refers to the \"path length constraint\" in Basic Constraints extension. For a CA certificate, this value describes the depth of\nsubordinate CA certificates that are allowed. If this value is less than 0, the request will fail.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Limits the permitted depth of subordinate certificate authorities beneath an issued CA certificate. Enforcing an approved maximum prevents uncontrolled expansion of the certificate trust hierarchy."
     },
     "issuance_policy.baseline_values.ca_options.non_ca": {
       "description": "When true, the \"CA\" in Basic Constraints extension will be set to false.\nIf both 'is_ca' and 'non_ca' are unset, the extension will be omitted from the CA certificate.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether issued certificates are explicitly restricted from acting as certificate authorities. Enforcing the appropriate value prevents end-entity certificates from being used to issue subordinate certificates."
     },
     "issuance_policy.baseline_values.ca_options.zero_max_issuer_path_length": {
       "description": "When true, the \"path length constraint\" in Basic Constraints extension will be set to 0.\nif both 'max_issuer_path_length' and 'zero_max_issuer_path_length' are unset,\nthe max path length will be omitted from the CA certificate.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether an issued CA certificate is prohibited from creating subordinate certificate authorities. Enforcing this restriction limits trust-chain expansion and prevents unauthorised delegation of certificate-issuing authority."
     },
     "issuance_policy.baseline_values.key_usage": {
       "type": "block",
@@ -220,64 +220,64 @@
       "description": "The key may be used to sign certificates.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether an issued certificate’s key can sign other certificates. Restricting this capability prevents unauthorised certificate issuance and protects the intended CA trust hierarchy."
     },
     "issuance_policy.baseline_values.key_usage.base_key_usage.content_commitment": {
       "description": "The key may be used for cryptographic commitments. Note that this may also be referred to as \"non-repudiation\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the certificate supports content commitment or non-repudiation. This is a functional certificate-profile choice based on the intended workload rather than a generic platform-level security control."
     },
     "issuance_policy.baseline_values.key_usage.base_key_usage.crl_sign": {
       "description": "The key may be used sign certificate revocation lists.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the certificate key can sign certificate revocation lists. This capability is a functional PKI architecture choice rather than a generic platform-level security policy target."
     },
     "issuance_policy.baseline_values.key_usage.base_key_usage.data_encipherment": {
       "description": "The key may be used to encipher data.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the certificate key can encrypt application data. This is a functional cryptographic capability selected for the certificate’s intended use rather than a generic platform security control."
     },
     "issuance_policy.baseline_values.key_usage.base_key_usage.decipher_only": {
       "description": "The key may be used to decipher only.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether a key-agreement certificate is restricted to deciphering operations. This is an application-specific certificate-profile choice rather than a universal platform security requirement."
     },
     "issuance_policy.baseline_values.key_usage.base_key_usage.digital_signature": {
       "description": "The key may be used for digital signatures.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the certificate key can create digital signatures. This capability depends on the certificate’s intended workload and is a functional profile setting rather than a generic platform security policy target."
     },
     "issuance_policy.baseline_values.key_usage.base_key_usage.encipher_only": {
       "description": "The key may be used to encipher only.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether a key-agreement certificate is restricted to enciphering operations. This is a workload-specific cryptographic profile choice rather than a universal platform-level security control."
     },
     "issuance_policy.baseline_values.key_usage.base_key_usage.key_agreement": {
       "description": "The key may be used in a key agreement protocol.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the certificate key can participate in a key-agreement protocol. This capability is determined by the workload’s cryptographic design and is not a generic platform security policy target."
     },
     "issuance_policy.baseline_values.key_usage.base_key_usage.key_encipherment": {
       "description": "The key may be used to encipher other keys.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the certificate key can encrypt or transport other cryptographic keys. This is a functional key-usage choice based on the certificate’s intended workload rather than a universal security policy target."
     },
     "issuance_policy.baseline_values.key_usage.extended_key_usage": {
       "type": "block",
@@ -288,43 +288,43 @@
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.2. Officially described as \"TLS WWW client authentication\", though regularly used for non-WWW TLS.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the certificate can be used for TLS client authentication. This extended key usage depends on the workload and certificate profile, making it an architectural choice rather than a generic platform security control."
     },
     "issuance_policy.baseline_values.key_usage.extended_key_usage.code_signing": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.3. Officially described as \"Signing of downloadable executable code client authentication\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether issued certificates can sign executable code. Restricting this capability prevents unauthorised software from appearing trusted through a valid code-signing certificate."
     },
     "issuance_policy.baseline_values.key_usage.extended_key_usage.email_protection": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.4. Officially described as \"Email protection\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether issued certificates can secure and authenticate email. Restricting this usage prevents certificates from being used for unauthorised email signing or encryption."
     },
     "issuance_policy.baseline_values.key_usage.extended_key_usage.ocsp_signing": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.9. Officially described as \"Signing OCSP responses\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether issued certificates can sign OCSP responses. Restricting this capability prevents unauthorised parties from producing trusted certificate-revocation status information."
     },
     "issuance_policy.baseline_values.key_usage.extended_key_usage.server_auth": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.1. Officially described as \"TLS WWW server authentication\", though regularly used for non-WWW TLS.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether issued certificates can authenticate TLS servers. Restricting this usage prevents unauthorised systems from presenting certificates as trusted server identities."
     },
     "issuance_policy.baseline_values.key_usage.extended_key_usage.time_stamping": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.8. Officially described as \"Binding the hash of an object to a time\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether issued certificates can create trusted timestamps for digital objects. Restricting this capability prevents unauthorised certificates from asserting trusted evidence about when data or signatures existed."
     },
     "issuance_policy.baseline_values.key_usage.unknown_extended_key_usages": {
       "type": "block",
@@ -335,8 +335,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines custom extended key usages through object identifiers. Restricting permitted OIDs prevents certificates from receiving unauthorised or security-sensitive capabilities."
     },
     "issuance_policy.baseline_values.name_constraints": {
       "type": "block",
@@ -347,64 +347,64 @@
       "description": "Indicates whether or not the name constraints are marked critical.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether clients must reject certificates when they cannot process the name constraints. Marking the constraints critical prevents certificate identity-scope restrictions from being silently ignored."
     },
     "issuance_policy.baseline_values.name_constraints.excluded_dns_names": {
       "description": "Contains excluded DNS names. Any DNS name that can be\nconstructed by simply adding zero or more labels to\nthe left-hand side of the name satisfies the name constraint.\nFor example, 'example.com', 'www.example.com', 'www.sub.example.com'\nwould satisfy 'example.com' while 'example1.com' does not.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines DNS namespaces that issued certificates must not represent. Enforcing approved exclusions prevents certificates from being issued for prohibited or sensitive domains."
     },
     "issuance_policy.baseline_values.name_constraints.excluded_email_addresses": {
       "description": "Contains the excluded email addresses. The value can be a particular\nemail address, a hostname to indicate all email addresses on that host or\na domain with a leading period (e.g. '.example.com') to indicate\nall email addresses in that domain.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines email identities and domains excluded from the CA’s certificate scope. These constraints depend on each team’s intended PKI boundaries, so they cannot be universally mandated by a generic platform policy."
     },
     "issuance_policy.baseline_values.name_constraints.excluded_ip_ranges": {
       "description": "Contains the excluded IP ranges. For IPv4 addresses, the ranges\nare expressed using CIDR notation as specified in RFC 4632.\nFor IPv6 addresses, the ranges are expressed in similar encoding as IPv4\naddresses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines IP ranges excluded from the CA’s certificate scope. These ranges depend on each team’s network architecture and PKI boundaries, so they cannot be universally mandated by a generic platform policy."
     },
     "issuance_policy.baseline_values.name_constraints.excluded_uris": {
       "description": "Contains the excluded URIs that apply to the host part of the name.\nThe value can be a hostname or a domain with a\nleading period (like '.example.com')",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines URI hostnames and domains excluded from the CA’s certificate scope. These constraints are application-specific architectural choices rather than universal platform security controls."
     },
     "issuance_policy.baseline_values.name_constraints.permitted_dns_names": {
       "description": "Contains permitted DNS names. Any DNS name that can be\nconstructed by simply adding zero or more labels to\nthe left-hand side of the name satisfies the name constraint.\nFor example, 'example.com', 'www.example.com', 'www.sub.example.com'\nwould satisfy 'example.com' while 'example1.com' does not.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the DNS namespaces that the CA may represent in issued certificates. These namespaces depend on the team’s intended PKI domain scope and cannot be generically mandated across the platform."
     },
     "issuance_policy.baseline_values.name_constraints.permitted_email_addresses": {
       "description": "Contains the permitted email addresses. The value can be a particular\nemail address, a hostname to indicate all email addresses on that host or\na domain with a leading period (e.g. '.example.com') to indicate\nall email addresses in that domain.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the email identities and domains permitted within the CA’s certificate scope. These values are application-specific PKI design choices rather than generic platform-level security controls."
     },
     "issuance_policy.baseline_values.name_constraints.permitted_ip_ranges": {
       "description": "Contains the permitted IP ranges. For IPv4 addresses, the ranges\nare expressed using CIDR notation as specified in RFC 4632.\nFor IPv6 addresses, the ranges are expressed in similar encoding as IPv4\naddresses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the IP ranges permitted within the CA’s certificate scope. These ranges depend on the team’s network architecture and cannot be universally mandated by a generic platform policy."
     },
     "issuance_policy.baseline_values.name_constraints.permitted_uris": {
       "description": "Contains the permitted URIs that apply to the host part of the name.\nThe value can be a hostname or a domain with a\nleading period (like '.example.com')",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the URI hostnames and domains permitted within the CA’s certificate scope. These constraints depend on the application and service architecture, so they cannot be generically mandated across the platform."
     },
     "issuance_policy.baseline_values.policy_ids": {
       "type": "block",
@@ -415,8 +415,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies an applicable certificate policy through an object identifier. The correct OID depends on the organisation’s PKI policy and cannot be universally mandated as a platform security value."
     },
     "issuance_policy.identity_constraints": {
       "type": "block",
@@ -427,15 +427,15 @@
       "description": "If this is set, the SubjectAltNames extension may be copied from a certificate request into the signed certificate.\nOtherwise, the requested SubjectAltNames will be discarded.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether requested Subject Alternative Names are copied into issued certificates. Restricting passthrough prevents requestors from inserting unauthorised DNS names, IP addresses, email addresses, or other identities."
     },
     "issuance_policy.identity_constraints.allow_subject_passthrough": {
       "description": "If this is set, the Subject field may be copied from a certificate request into the signed certificate.\nOtherwise, the requested Subject will be discarded.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether a requestor-supplied subject is copied into the issued certificate. Restricting passthrough prevents requestors from claiming unauthorised or misleading certificate identities."
     },
     "issuance_policy.identity_constraints.cel_expression": {
       "type": "block",
@@ -446,29 +446,29 @@
       "description": "Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Documents the purpose and expected behaviour of the CEL identity-validation rule. Requiring this field supports auditable and securely managed validation-policy definitions."
     },
     "issuance_policy.identity_constraints.cel_expression.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the CEL rule used to validate certificate identities and issuance requests. Enforcing an approved expression prevents certificates from being issued when their requested identities violate organisational requirements."
     },
     "issuance_policy.identity_constraints.cel_expression.location": {
       "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This records the source location of the CEL identity-validation rule for traceability and error reporting. Requiring this metadata supports auditable management of the security policy definition."
     },
     "issuance_policy.identity_constraints.cel_expression.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Provides an identifiable title for the CEL identity-validation rule. Requiring this metadata supports consistent governance, review, and auditing of security policy definitions."
     },
     "publishing_options": {
       "type": "block",
@@ -479,15 +479,15 @@
       "description": "Specifies the encoding format of each CertificateAuthority's CA\ncertificate and CRLs. If this is omitted, CA certificates and CRLs\nwill be published in PEM. Possible values: [\"PEM\", \"DER\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether CA certificates and revocation lists are encoded as PEM or DER. Both formats can represent the same cryptographic information, so this setting affects compatibility rather than security enforcement."
     },
     "publishing_options.publish_ca_cert": {
       "description": "When true, publishes each CertificateAuthority's CA certificate and includes its URL in the \"Authority Information Access\"\nX.509 extension in all issued Certificates. If this is false, the CA certificate will not be published and the corresponding\nX.509 extension will not be written in issued certificates.",
       "required": true,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "CA Pool must publish CA certificates so that clients can establish trust with the CA hierarchy. Without this, relying parties cannot validate the chain of trust for issued certificates."
+      "security_impact": false,
+      "rationale": "Controls whether CA certificates are published for use in trust-chain validation. This is an operational PKI distribution requirement rather than a generic security-hardening or exposure-prevention control."
     },
     "publishing_options.publish_crl": {
       "description": "When true, publishes each CertificateAuthority's CRL and includes its URL in the \"CRL Distribution Points\" X.509 extension\nin all issued Certificates. If this is false, CRLs will not be published and the corresponding X.509 extension will not\nbe written in issued certificates. CRLs will expire 7 days from their creation. However, we will rebuild daily. CRLs are\nalso rebuilt shortly after a certificate is revoked.",
