@@ -13,7 +13,7 @@ conditions := [
         },
         {
             "condition": "Reject clearly unconditional access conditions",
-            "attribute_path": ["access", "condition", "expression"],
+            "attribute_path": ["access", 0, "condition", 0, "expression"],
             "values": ["", "true", "1 == 1"],
             "policy_type": "blacklist"
         }
