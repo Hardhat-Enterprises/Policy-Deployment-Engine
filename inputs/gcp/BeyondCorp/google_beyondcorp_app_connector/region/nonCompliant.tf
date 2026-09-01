@@ -4,7 +4,7 @@ resource "google_beyondcorp_app_connector" "non_compliant_example_1" {
   region = "us-central1"
   principal_info {
     service_account { 
-      email = "nc-connector-sa-bad@smooth-verve-467716-v1.iam.gserviceaccount.com" 
+      email = "c-connector-sa@smooth-verve-467716-v1.iam.gserviceaccount.com" 
     }
   }
 }
