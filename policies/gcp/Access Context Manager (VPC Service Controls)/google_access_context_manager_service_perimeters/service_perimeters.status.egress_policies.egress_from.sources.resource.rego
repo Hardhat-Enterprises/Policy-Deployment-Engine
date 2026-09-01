@@ -1,0 +1,22 @@
+package terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_service_perimeters.service_perimeters_status_egress_policies_egress_from_sources_resource
+
+import data.terraform.helpers
+import data.terraform.gcp.security.access_context_manager_vpc_service_controls.google_access_context_manager_service_perimeters.vars
+
+conditions := [[
+    {
+        "situation_description": "Enforced egress source resources must not use a wildcard resource.",
+        "remedies": ["Reference an explicit Google Cloud project resource."]
+    },
+    {
+        "condition": "Enforced egress source resources must not use a wildcard resource.",
+        "attribute_path": ["service_perimeters", 0, "status", 0, "egress_policies", 0, "egress_from", 0, "sources", 0, "resource"],
+        "values": ["*"],
+        "policy_type": "Blacklist"
+    }
+]]
+
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
