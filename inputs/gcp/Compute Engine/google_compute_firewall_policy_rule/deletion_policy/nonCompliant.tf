@@ -3,7 +3,7 @@ resource "google_compute_firewall_policy_rule" "non_compliant_example_1" {
   priority        = 1000
   action          = "allow"
   direction       = "INGRESS"
-  deletion_policy = "DELETE"
+  deletion_policy = "ABANDON"
 
   match {
     layer4_configs {

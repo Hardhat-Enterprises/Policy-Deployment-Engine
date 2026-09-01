@@ -14,7 +14,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls whether Terraform can destroy this rule via IaC (DELETE/ABANDON/PREVENT). This maps directly to the prevent-destructive-loss archetype (the same mechanism as force_destroy): PREVENT blocks hard-destroy of the resource, and a policy should enforce that value."
+      "rationale": "Controls how Terraform handles removal of the firewall rule. ABANDON removes the rule from Terraform state without deleting it in GCP, leaving an active firewall rule outside IaC governance where it can drift unnoticed. A generic policy can prohibit ABANDON while still allowing DELETE or PREVENT."
     },
     "description": {
       "description": "An optional description for this resource.",
