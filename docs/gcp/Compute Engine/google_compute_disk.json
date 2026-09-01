@@ -20,8 +20,8 @@
       "description": "If set to true, a snapshot of the disk will be created before it is destroyed.\nIf your disk is encrypted with customer managed encryption keys these will be reused for the snapshot creation.\nThe name of the snapshot by default will be '{{disk-name}}-YYYYMMDD-HHmm'",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "When set to true, automatically creates a snapshot before the disk is destroyed, preventing irreversible data loss on deletion. Leaving this at the default (false) means a terraform destroy permanently removes all data with no recovery option. Policy should require this to be enabled for disks holding important data to ensure a safety net exists before destructive operations."
+      "security_impact": false,
+      "rationale":"Controls whether a snapshot is taken before disk destruction. This is an operational backup and disaster-recovery workflow decision left to teams, not a platform-level security control. It does not affect confidentiality, integrity, or access control of the disk."
     },
     "create_snapshot_before_destroy_prefix": {
       "description": "This will set a custom name prefix for the snapshot that's created when the disk is deleted.",
@@ -268,7 +268,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "A pointer/reference to a specific KMS key for the source snapshot. As guidance states, platform policy does not pin or constrain specific resource names, paths, or keys. This is an external key reference whose validity is governed by KMS IAM, not by disk-level policy."
+      "rationale": "A pointer/reference to an external KMS key resource used to decrypt the source snapshot. Platform policy does not constrain specific resource references — the security of the key itself is governed at the KMS IAM level, not through the disk-level pointer that references it."
     },
     "source_snapshot_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
