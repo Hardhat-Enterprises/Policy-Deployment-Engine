@@ -6,57 +6,57 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls Terraform lifecycle behaviour but does not directly control NCC connectivity, routing, route propagation, or network access."
     },
     "description": {
       "description": "An optional description of the spoke.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive metadata only and does not directly affect network connectivity, routing, or access."
     },
     "group": {
       "description": "The name of the group that this spoke is associated with.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the spoke group and therefore its routing domain. Restricting spokes to approved groups helps preserve intended network segmentation and connectivity boundaries."
     },
     "hub": {
       "description": "Immutable. The URI of the hub that this spoke is attached to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which Network Connectivity Center hub the spoke joins. An unapproved hub can connect the spoke to unintended networks and routing domains, so only approved hubs should be allowed."
     },
     "labels": {
       "description": "Optional labels in key:value format. For more information about labels, see [Requirements for labels](https://docs.cloud.google.com/resource-manager/docs/creating-managing-labels#requirements).\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels provide resource metadata and governance information but do not directly control NCC connectivity, routing, or traffic flow."
     },
     "location": {
       "description": "The location for the resource",
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "Determines the region or zone where the resource is created. Restricting deployment to approved locations supports data residency and controlled infrastructure placement."
     },
     "name": {
       "description": "Immutable. The name of the spoke. Spoke names must be unique.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the spoke resource but does not directly control connectivity, routing, route propagation, or network access."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines resource ownership and governance scope, but without an organisation-specific approved-project requirement it does not need a standalone security policy for this resource."
     },
     "linked_interconnect_attachments": {
       "type": "block",
@@ -67,43 +67,43 @@
       "description": "Dynamic routes overlapped/encompassed by exclude export ranges are excluded during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects route filtering, but the correct exclusions depend on organisation-specific CIDR and routing design; a generic standalone security policy would be arbitrary."
     },
     "linked_interconnect_attachments.exclude_import_ranges": {
       "description": "Hub routes overlapped/encompassed by exclude import ranges are excluded during import from hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects route filtering, but the correct exclusions depend on organisation-specific routing requirements and are not suitable for a generic standalone security policy."
     },
     "linked_interconnect_attachments.include_export_ranges": {
       "description": "Dynamic routes fully encompassed by include export ranges are included during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls route export scope, but safe values depend on the organisation's network design and approved prefixes, so no generic policy is defined here."
     },
     "linked_interconnect_attachments.include_import_ranges": {
       "description": "Hub routes fully encompassed by include import ranges are included during import from hub.\n\"ALL_IPV4_RANGES\" or IPv4 CIDR ranges are allowed.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which hub routes can enter the Interconnect spoke. Broad imports such as ALL_IPV4_RANGES can significantly expand reachability, so imported ranges should be restricted."
     },
     "linked_interconnect_attachments.site_to_site_data_transfer": {
       "description": "A value that controls whether site-to-site data transfer is enabled for these resources. Note that data transfer is available only in supported locations.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables transit connectivity between external sites through the NCC hub. Because this increases network reachability, it should only be enabled when explicitly approved."
     },
     "linked_interconnect_attachments.uris": {
       "description": "The URIs of linked interconnect attachment resources",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which Interconnect VLAN attachments participate in the spoke. Unapproved attachments could introduce unintended external network connectivity."
     },
     "linked_producer_vpc_network": {
       "type": "block",
@@ -114,29 +114,29 @@
       "description": "IP ranges encompassing the subnets to be excluded from peering.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects peering route selection, but correct excluded ranges depend on organisation-specific network architecture and do not justify a generic standalone security policy."
     },
     "linked_producer_vpc_network.include_export_ranges": {
       "description": "IP ranges allowed to be included from peering.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects peering route selection, but approved ranges are organisation-specific and should not be enforced through a generic standalone policy without defined CIDR requirements."
     },
     "linked_producer_vpc_network.network": {
       "description": "The URI of the Service Consumer VPC that the Producer VPC is peered with.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which Service Consumer VPC participates in the producer VPC spoke. Restricting this reference helps prevent unintended VPC connectivity."
     },
     "linked_producer_vpc_network.peering": {
       "description": "The name of the VPC peering between the Service Consumer VPC and the Producer VPC (defined in the Tenant project) which is added to the NCC hub. This peering must be in ACTIVE state.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which VPC peering relationship is added to the NCC hub. An unapproved peering relationship could introduce unintended network connectivity."
     },
     "linked_router_appliance_instances": {
       "type": "block",
@@ -147,36 +147,36 @@
       "description": "Dynamic routes overlapped/encompassed by exclude export ranges are excluded during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects route filtering, but correct exclusions depend on the organisation's routing design and are not suitable for a generic standalone policy."
     },
     "linked_router_appliance_instances.exclude_import_ranges": {
       "description": "Hub routes overlapped/encompassed by exclude import ranges are excluded during import from hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects route filtering, but correct exclusions depend on organisation-specific routing requirements and do not need a generic standalone policy."
     },
     "linked_router_appliance_instances.include_export_ranges": {
       "description": "Dynamic routes fully encompassed by include export ranges are included during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls route export scope, but safe values depend on approved network prefixes and organisation-specific routing design."
     },
     "linked_router_appliance_instances.include_import_ranges": {
       "description": "Hub routes fully encompassed by include import ranges are included during import from hub.\n\"ALL_IPV4_RANGES\" or IPv4 CIDR ranges are allowed.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which hub routes can enter the Router appliance spoke. Broad imports such as ALL_IPV4_RANGES can significantly expand reachability and should be restricted."
     },
     "linked_router_appliance_instances.site_to_site_data_transfer": {
       "description": "A value that controls whether site-to-site data transfer is enabled for these resources. Note that data transfer is available only in supported locations.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables transit connectivity between external sites through Router appliance spokes. Because this broadens network reachability, it should only be enabled when explicitly approved."
     },
     "linked_router_appliance_instances.instances": {
       "type": "block",
@@ -187,15 +187,15 @@
       "description": "The IP address on the VM to use for peering.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Configures the peering address for the selected Router appliance VM. Without an organisation-specific approved CIDR requirement, the stronger control is restricting which VM may act as the appliance."
     },
     "linked_router_appliance_instances.instances.virtual_machine": {
       "description": "The URI of the virtual machine resource",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which VM functions as the Router appliance and participates in NCC route exchange. Only approved appliance VMs should be allowed."
     },
     "linked_vpc_network": {
       "type": "block",
@@ -206,22 +206,22 @@
       "description": "IP ranges encompassing the subnets to be excluded from peering.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects which VPC routes are excluded from export, but correct values depend on organisation-specific CIDR and routing design."
     },
     "linked_vpc_network.include_export_ranges": {
       "description": "IP ranges allowed to be included from peering.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects which VPC ranges are exported, but approved CIDRs are organisation-specific and do not justify a generic policy without defined requirements."
     },
     "linked_vpc_network.uri": {
       "description": "The URI of the VPC network resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which VPC network is attached to the NCC hub. Restricting this URI helps prevent unintended VPC networks from entering the NCC routing domain."
     },
     "linked_vpn_tunnels": {
       "type": "block",
@@ -232,43 +232,43 @@
       "description": "Dynamic routes overlapped/encompassed by exclude export ranges are excluded during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects route filtering, but correct exclusions depend on organisation-specific routing requirements and are not suitable for a generic standalone security policy."
     },
     "linked_vpn_tunnels.exclude_import_ranges": {
       "description": "Hub routes overlapped/encompassed by exclude import ranges are excluded during import from hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Affects route filtering, but correct exclusions depend on the organisation's network design and do not require a generic standalone policy."
     },
     "linked_vpn_tunnels.include_export_ranges": {
       "description": "Dynamic routes fully encompassed by include export ranges are included during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls route export scope, but approved exported prefixes are organisation-specific and should not be guessed in a generic policy."
     },
     "linked_vpn_tunnels.include_import_ranges": {
       "description": "Hub routes fully encompassed by include import ranges are included during import from hub.\n\"ALL_IPV4_RANGES\" or IPv4 CIDR ranges are allowed.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which hub routes can enter the VPN spoke. Broad imports such as ALL_IPV4_RANGES can significantly increase reachability and should be restricted."
     },
     "linked_vpn_tunnels.site_to_site_data_transfer": {
       "description": "A value that controls whether site-to-site data transfer is enabled for these resources. Note that data transfer is available only in supported locations.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables site-to-site transit through VPN tunnel spokes. Because this increases connectivity between external sites, it should only be enabled when explicitly approved."
     },
     "linked_vpn_tunnels.uris": {
       "description": "The URIs of linked VPN tunnel resources.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which VPN tunnels participate in the NCC spoke. Restricting tunnel URIs helps prevent unintended external networks from entering the NCC routing domain."
     }
   }
 }
