@@ -110,7 +110,24 @@ def ensure_cache_ready() -> None:
     if CLI_CONFIG_FILE.exists() and any(MIRROR_DIR.rglob("terraform-provider-*")):
         return
     print("⏳ Provider cache not found — running cache_setup.sh (one-time setup)…")
-    result = subprocess.run(["bash", str(CACHE_SETUP_SCRIPT)], cwd=str(REPO_ROOT))
+    # Pass the script as a RELATIVE forward-slash path: absolute Windows paths
+    # (C:\...) get their backslashes eaten by bash, and MSYS/WSL bash resolve
+    # a relative path correctly from cwd on every platform. On Windows, prefer
+    # Git Bash over the WSL shim so the cache is built for the same platform
+    # as the terraform.exe that will consume it.
+    bash = None
+    if os.name == "nt":
+        for candidate in (r"C:\Program Files\Git\bin\bash.exe",
+                          r"C:\Program Files (x86)\Git\bin\bash.exe"):
+            if Path(candidate).exists():
+                bash = candidate
+                break
+    if bash is None:
+        bash = shutil.which("bash")
+    if bash is None:
+        sys.exit("❌ bash not found. Install Git Bash (Windows) or run inside WSL.")
+    script_rel = CACHE_SETUP_SCRIPT.relative_to(REPO_ROOT).as_posix()
+    result = subprocess.run([bash, script_rel], cwd=str(REPO_ROOT))
     if result.returncode != 0 or not CLI_CONFIG_FILE.exists() \
             or not any(MIRROR_DIR.rglob("terraform-provider-*")):
         sys.exit("❌ Could not set up the Terraform provider cache. "
@@ -351,6 +368,28 @@ def match_names_in_messages(messages: list[str], candidate_names: set[str]) -> s
     return matched
 
 
+# policies/_helpers/helpers.rego refuses to evaluate a policy whose conditions name
+# a policy_type it cannot dispatch, and says so with a message carrying this prefix.
+# Treating that as a plain summary would leave it to chance whether the check went
+# red (it would depend on whether the fixture happened to have compliant examples),
+# and the reported reason would be the wrong one, so it is matched explicitly.
+POLICY_ERROR_PREFIX = "POLICY ERROR:"
+
+
+def find_policy_error(messages: list[str]) -> str | None:
+    """The helper's own hard-error text, if the policy declared something unevaluatable.
+
+    Searched for anywhere in a message rather than only at the start: OPA returns the
+    message rule as a nested array and normalize_messages stringifies it, so the marker
+    can sit inside a Python repr rather than at position 0.
+    """
+    for message in messages:
+        index = message.find(POLICY_ERROR_PREFIX)
+        if index != -1:
+            return message[index:].strip().rstrip("]'\"")
+    return None
+
+
 def normalize_messages(messages_value) -> list[str]:
     if isinstance(messages_value, list):
         return [str(m) for m in messages_value]
@@ -456,6 +495,16 @@ def thread_safe_print(*args, **kwargs):
 def validate_policy_output(attribute: str, resource_type: str | None, plan_path: Path, messages: list[str],
                            verbose: bool, service: str, resource: str,
                            resource_value_name: str | None = None) -> dict:
+    # A policy the engine refused to evaluate fails outright, with the helper's own
+    # text as the reason. This must come first: without it the run would fall through
+    # to name-matching against an error string, and report "non-compliant resources
+    # were not flagged" — true, but it hides why, and it would report nothing at all
+    # for a fixture that has no non-compliant examples.
+    policy_error = find_policy_error(messages)
+    if policy_error:
+        thread_safe_print(f"Check failed: {policy_error}\n")
+        return make_failure(attribute, policy_error, service, resource)
+
     # Map each label to the identifier the OPA message uses (the resource_value_name
     # value). A label counts as flagged if EITHER the label OR its identifier appears
     # in the messages — so fixtures whose id field rejects the underscore example-name
