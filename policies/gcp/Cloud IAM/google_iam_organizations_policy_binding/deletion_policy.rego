@@ -6,10 +6,8 @@ import data.terraform.gcp.security.cloud_iam.google_iam_organizations_policy_bin
 conditions := [
     [
         {
-            "situation_description": "The organization IAM policy binding can be deleted by Terraform, increasing the risk of accidentally removing an organization-level access-control restriction.",
-            "remedies": [
-                "Set 'deletion_policy' to 'PREVENT' to block accidental deletion."
-            ]
+            "situation_description": "The organization policy binding can be destroyed by Terraform, increasing the risk of accidental destructive loss of the binding and its security configuration.",
+            "remedies": ["Set deletion_policy to PREVENT to block accidental Terraform destruction of the organization policy binding."]
         },
         {
             "condition": "Check whether deletion of the organization policy binding is prevented",
