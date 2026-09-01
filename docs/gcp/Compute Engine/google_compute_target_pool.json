@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This controls whether Terraform deletes, prevents deletion, or abandons the target pool. It affects resource lifecycle and Terraform state, but it does not change the target pool's runtime security posture, so a generic security policy is not needed."
+      "security_impact": true,
+      "rationale": "ABANDON can leave the target pool active after Terraform stops managing it. This can leave old backend routing or access settings outside normal security updates. PREVENT can also stop accidental or malicious destruction of the target pool. Because this setting affects the control and availability of load-balancing infrastructure, it has a security impact."
     },
     "description": {
       "description": "Textual description field.",
