@@ -4,10 +4,10 @@ import data.terraform.gcp.security.compute_engine.google_compute_interconnect_at
 
 conditions := [
     [
-    {"situation_description" : "Attachment can be destroyed by Terraform, risking loss of connectivity.",
-    "remedies":[ "Set deletion_policy to PREVENT."]},
+    {"situation_description" : "Terraform can destroy this attachment, creating a direct risk of service disruption and loss of secure connectivity.",
+    "remedies":[ "Set deletion_policy to PREVENT to enforce secure lifecycle protection against accidental or malicious deletion."]},
     {
-        "condition": "deletion_policy must be PREVENT.",
+        "condition": "deletion_policy must be PREVENT to protect critical connectivity infrastructure.",
         "attribute_path" : ["deletion_policy"],
         "values" : ["PREVENT"],
         "policy_type" : "whitelist"
