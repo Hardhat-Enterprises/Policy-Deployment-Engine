@@ -1,5 +1,5 @@
 resource "google_privileged_access_manager_entitlement" "non_compliant_example_1" {
-  entitlement_id       = "non-compliant-example-1"
+  entitlement_id       = "compliant-example-1"
   location             = "global"
   max_request_duration = "3600s"
   parent               = "projects/my-project-name"
