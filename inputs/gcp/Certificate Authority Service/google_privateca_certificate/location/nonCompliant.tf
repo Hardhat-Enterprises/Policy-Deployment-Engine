@@ -13,7 +13,7 @@ resource "google_privateca_certificate" "non_compliant_example_1" {
     subject_config {
       subject {
         organization = "ACME"
-        common_name  = "non-compliant.example.com"
+        common_name  = "compliant.example.com"
       }
     }
 
