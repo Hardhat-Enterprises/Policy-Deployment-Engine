@@ -1,4 +1,4 @@
-package terraform.gcp.security.network_services.google_network_services_lb_route_extension.forward_headers
+package terraform.gcp.security.network_services.google_network_services_lb_route_extension.extension_chains_extensions_forward_headers
 
 import data.terraform.gcp.security.network_services.google_network_services_lb_route_extension.vars
 
