@@ -174,8 +174,8 @@
       "description": "The name of the API whose methods or permissions the 'IngressPolicy' or\n'EgressPolicy' want to allow. A single 'ApiOperation' with serviceName\nfield set to '*' will allow all methods AND permissions for all services.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument identifies the target API service used by the workload's dry-run egress rule. The service name is an architecture-specific reference that varies by application design, so a generic platform policy should not prescribe which service identifier teams must use."
+      "security_impact": true,
+      "rationale": "This argument defines the destination API service reachable by a dry-run egress rule. Constraining egress targets is a core perimeter security control because unrestricted service destinations can create data-exfiltration paths to unapproved APIs. Enforcing explicit service targets reduces outbound exposure across the perimeter boundary."
     },
     "service_perimeters.spec.egress_policies.egress_to.operations.method_selectors": {
       "type": "block",
@@ -274,8 +274,8 @@
       "description": "The name of the API whose methods or permissions the 'IngressPolicy' or\n'EgressPolicy' want to allow. A single 'ApiOperation' with 'serviceName'\nfield set to '*' will allow all methods AND permissions for all services.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument identifies the target API service used by the workload's dry-run ingress rule. The service name is an architecture-specific reference determined by application design, so a generic platform policy should not constrain the specific service identifier."
+      "security_impact": true,
+      "rationale": "This argument defines the target API service reachable through a dry-run ingress rule. Restricting inbound service targets is a core perimeter defense because it limits which exposure paths cross the perimeter boundary. Enforcing explicit service targets reduces unintended inbound access to protected services."
     },
     "service_perimeters.spec.ingress_policies.ingress_to.operations.method_selectors": {
       "type": "block",
