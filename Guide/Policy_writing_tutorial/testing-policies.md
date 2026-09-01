@@ -42,6 +42,6 @@ if you are having trouble with this section please return to [Common Errors](com
 
 [⬅️ Previous: policy.rego](policy-rego.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
 [📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-[Next: Raising a pull request ➡️](raising-pull-request.md#top) 
+[Next: policy_lint — content-quality rules ➡️](policy-lint.md#top) 
 
 </div>

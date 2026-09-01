@@ -4,7 +4,7 @@ resource "google_alloydb_cluster" "non_compliant_example_1" {
   project = "123"
 
   network_config {
-    network = "projects/pde-demo/global/networks/default"
+    network = "projects/p/global/networks/prod-vpc"
   }
 
   continuous_backup_config {
