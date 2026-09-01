@@ -19,8 +19,8 @@ conditions := [
     {
         "condition": "Validating email",
         "attribute_path" : ["member"],
-        "values" : ["user:user@external.com"], 
-        "policy_type" : "blacklist"
+        "values" : ["*:*@*", [[], [], ["external.com"]]],
+        "policy_type" : "pattern blacklist"
     }
     ],
     [
@@ -35,5 +35,7 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

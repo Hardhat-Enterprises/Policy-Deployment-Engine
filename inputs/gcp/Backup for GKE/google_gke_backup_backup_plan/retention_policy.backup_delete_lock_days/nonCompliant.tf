@@ -7,7 +7,9 @@ resource "google_gke_backup_backup_plan" "non_compliant_example_1" {
   backup_config {
     include_volume_data = true
     include_secrets     = false
-    all_namespaces      = true
+    selected_namespaces {
+      namespaces = ["production"]
+    }
   }
 
   retention_policy {
