@@ -1,7 +1,7 @@
 resource "google_gkeonprem_vmware_cluster" "non_compliant_example_1" {
   name = "non_compliant_example_1"
   project = "PDE"
-  location = "us-west1"
+  location = "australia_southeast1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   on_prem_version = "1.13.1-gke.35"
   annotations = {}
@@ -44,8 +44,8 @@ resource "google_gkeonprem_vmware_cluster" "non_compliant_example_1" {
   }
   load_balancer {
     vip_config {
-      control_plane_vip = "8.8.8.8"
-      ingress_vip = "17.5.7.3"
+      control_plane_vip = "10.251.133.5"
+      ingress_vip = "10.251.135.19"
     }
     manual_lb_config {
       ingress_http_node_port = 30005
@@ -61,7 +61,7 @@ resource "google_gkeonprem_vmware_cluster" "non_compliant_example_1" {
   }
   authorization {
     admin_users {
-      username = "testuser@apple.com"
+      username = "testuser@gmail.com"
     }
   }
   anti_affinity_groups {
@@ -70,4 +70,5 @@ resource "google_gkeonprem_vmware_cluster" "non_compliant_example_1" {
   auto_repair_config {
     enabled = true
   }
+  description = "test cluster"
 }
