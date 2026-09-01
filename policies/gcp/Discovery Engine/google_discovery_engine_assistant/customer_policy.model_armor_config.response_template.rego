@@ -15,8 +15,8 @@ conditions := [
       "condition": "Model Armor response template is not approved",
       "attribute_path": ["customer_policy", 0, "model_armor_config", 0, "response_template"],
       "values": [
-                "projects/[^/]+/locations/eu/templates/*",
-                [["approved-response-template"]]
+                "projects/*/locations/eu/templates/*",
+                [["735927692082"], ["approved-response-template"]]
             ],
             "policy_type": "pattern whitelist"
     }
