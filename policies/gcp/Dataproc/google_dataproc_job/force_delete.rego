@@ -6,7 +6,7 @@ import data.terraform.gcp.security.dataproc.google_dataproc_job.vars
 conditions := [
   [
     {
-      "situation_description": "force_delete is set to true, which allows an active Dataproc job to be force-cancelled and deleted instead of being blocked while it is still running",
+      "situation_description": "force_delete is set to true, allowing Terraform to cancel an active Dataproc job before deleting it instead of preserving the default restriction to inactive jobs",
       "remedies": ["Set force_delete to false or remove the attribute"]
     },
     {

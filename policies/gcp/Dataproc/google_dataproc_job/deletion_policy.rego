@@ -6,7 +6,7 @@ import data.terraform.gcp.security.dataproc.google_dataproc_job.vars
 conditions := [
   [
     {
-      "situation_description": "deletion_policy is set to ABANDON, which removes the job from Terraform's management without deleting it via the API, leaving it running unmanaged and unmonitored",
+      "situation_description": "deletion_policy is set to ABANDON, so Terraform removes the Dataproc job from state without deleting it through the API, leaving it unmanaged by Terraform",
       "remedies": ["Set deletion_policy to DELETE or PREVENT"]
     },
     {
