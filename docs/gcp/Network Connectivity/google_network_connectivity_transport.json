@@ -6,99 +6,99 @@
       "description": "List of IP Prefixes that will be advertised to the remote provider. Both IPv4 and IPv6 addresses are supported.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which IP prefixes are advertised to the remote provider. Overly broad or unauthorized route advertisements can expose unintended internal networks, so advertised prefixes should be restricted to approved ranges."
     },
     "bandwidth": {
       "description": "Bandwidth of the Transport. This must be one of the supported bandwidths for the remote profile.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls transport capacity and performance but does not directly determine network trust, routing authorization, or access."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls Terraform lifecycle behavior but does not directly control transport connectivity, routing, or remote network access."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive metadata only and does not directly affect connectivity, routing, or access."
     },
     "labels": {
       "description": "Optional labels in key:value format. For more information about labels, see [Requirements for labels](https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements).\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels provide resource metadata and governance information but do not directly control transport connectivity, routing, or traffic flow."
     },
     "mtu_limit": {
       "description": "[Output only] The maximum transmission unit (MTU) of a packet that can be sent over this transport.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is an output-only value describing the maximum packet size and is not a user-controlled security configuration."
     },
     "name": {
       "description": "Name of the resource, see google.aip.dev/122 for resource naming.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Transport resource but does not directly control connectivity, route advertisement, or remote access."
     },
     "network": {
       "description": "Resource URL of the Network that will be peered with this Transport. This field must be provided during resource creation and cannot be changed.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which VPC network is peered with the Transport. Connecting an unapproved network can cross intended trust boundaries, so the network should be restricted to approved resources."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines resource ownership and governance scope, but without an explicit organization-specific approved-project requirement it does not need a standalone security policy."
     },
     "provided_activation_key": {
       "description": "Key used for establishing a connection with the remote transport. This key can only be provided if the profile supports an INPUT key flow and the resource is in the PENDING_KEY state.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The activation key is sensitive connection material, but it is connection-specific and should be protected as a secret rather than compared against a hardcoded allowlist or generic policy value."
     },
     "region": {
       "description": "The region of this resource. This is required to construct the resource name, but is not sent to the API since the region is already contained in the parent field.",
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "Determines the region where the Transport is created. Restricting deployment to approved regions supports data residency and controlled infrastructure placement."
     },
     "remote_account_id": {
       "description": "The user supplied account id for the CSP associated with the remote profile.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Identifies the remote cloud service provider account associated with the Transport. Restricting this value helps prevent connectivity from being established with an unauthorized remote account."
     },
     "remote_profile": {
       "description": "Resource URL of the remoteTransportProfile that this Transport is\nconnecting to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which remote transport profile the Transport connects to. An unapproved remote profile could establish connectivity with an unintended provider or endpoint, so only approved profiles should be allowed."
     },
     "stack_type": {
       "description": "IP version stack for the established connectivity. Possible values: [\"IPV4_IPV6\", \"IPV4_ONLY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects IPv4-only or dual-stack connectivity. The appropriate value depends on network architecture and neither option is inherently insecure, so no generic standalone security policy is required."
     }
   }
 }
