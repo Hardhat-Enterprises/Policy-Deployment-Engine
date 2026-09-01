@@ -7,7 +7,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "A reference to another resource (a Certificate Manager certificate). We secure the referenced resource itself, not this pointer to it."
+      "rationale": "Supplies the client's certificate for mTLS backend authentication. Pinning one specific certificate instance would be overreaching for a generic policy; the referenced certificate itself is what should be secured, not this reference."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -56,7 +56,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "A reference to another resource (a Certificate Manager TrustConfig). We secure the referenced resource itself, not this pointer to it."
+      "rationale": "Points to the Certificate Manager TrustConfig used to validate server certificates for backend mTLS. Pinning a specific trust config is team-specific; the referenced TrustConfig itself is what should be secured, not this reference."
     },
     "well_known_roots": {
       "description": "Well known roots to use for server certificate validation. If set to NONE, the BackendService will only validate server certificates against roots specified in TrustConfig.\nIf set to PUBLIC_ROOTS, the BackendService uses a set of well-known public roots, in addition to any roots specified in the trustConfig field, when validating the server certificates presented by the backend.\nValidation with these roots is only considered when the TlsSettings.sni field in the BackendService is set. The well-known roots are a set of root CAs managed by Google. CAs in this set can be added or removed without notice. Possible values: [\"NONE\", \"PUBLIC_ROOTS\"]",
