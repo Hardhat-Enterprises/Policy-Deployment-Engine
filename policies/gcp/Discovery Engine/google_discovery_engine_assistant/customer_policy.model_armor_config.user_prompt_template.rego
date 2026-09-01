@@ -14,12 +14,17 @@ conditions := [
     {
       "condition": "Model Armor user-prompt template is not approved",
       "attribute_path": ["customer_policy", 0, "model_armor_config", 0, "user_prompt_template"],
-      "values": ["projects/735927692082/locations/eu/templates/approved-prompt-template"],
-      "policy_type": "whitelist"
+      "values": [
+                "projects/[^/]+/locations/eu/templates/*",
+                [["approved-prompt-template"]]
+            ],
+            "policy_type": "pattern whitelist"
     }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := result.message
+
+details := result.details
