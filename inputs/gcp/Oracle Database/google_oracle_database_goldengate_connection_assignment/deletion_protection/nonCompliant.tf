@@ -1,5 +1,5 @@
 resource "google_oracle_database_goldengate_connection_assignment" "non_compliant_example_1" {
-  goldengate_connection_assignment_id = "non-compliant-example-1"
+  goldengate_connection_assignment_id = "test-assignment-1"
   location                            = "australia-southeast1"
   deletion_protection                 = false
   deletion_policy                     = "PREVENT"
