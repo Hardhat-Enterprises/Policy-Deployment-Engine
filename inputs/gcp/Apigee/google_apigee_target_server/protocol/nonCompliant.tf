@@ -4,7 +4,7 @@
 resource "google_apigee_target_server" "non_compliant_example_1" {
   name     = "unapproved-protocol-target-server"
   host     = "backend.example.com"
-  port     = 80
+  port     = 443
   protocol = "HTTP"
   env_id   = "organizations/example-org/environments/test"
 }

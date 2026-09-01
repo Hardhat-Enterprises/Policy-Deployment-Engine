@@ -26,8 +26,11 @@ conditions := [
     ]
 ]
 
+# Evaluates the conditions once and stores the summary
+result := helpers.get_multi_summary(conditions, vars.variables)
+
 # Displays a general message about policy compliance
-message := helpers.get_multi_summary(conditions, vars.variables).message
+message := result.message
 
 # Displays detailed compliance results for each resource
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := result.details
