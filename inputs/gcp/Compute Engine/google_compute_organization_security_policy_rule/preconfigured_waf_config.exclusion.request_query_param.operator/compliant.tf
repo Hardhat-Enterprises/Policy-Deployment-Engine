@@ -1,11 +1,5 @@
-resource "google_compute_organization_security_policy" "policy" {
-  short_name = "tf-test-policy"
-  parent     = "organizations/123456789"
-  type       = "CLOUD_ARMOR"
-}
-
 resource "google_compute_organization_security_policy_rule" "compliant_example_1" {
-  policy_id   = google_compute_organization_security_policy.policy.id
+  policy_id   = "organizations/123456789/securityPolicies/1234567890"
   action      = "allow"
   description = "compliant_example_1"
 
