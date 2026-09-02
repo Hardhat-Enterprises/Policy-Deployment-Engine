@@ -59,7 +59,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the Cloud KMS key used to encrypt the workload. The selected encryption key is security-relevant because it determines the encryption protection applied to workload data."
+      "rationale": "Encryption keys require a policy to ensure they are set and customer-managed. The policy should require the key to be non-empty without pinning a specific key."
     },
     "environment_config.execution_config.network_tags": {
       "description": "Tags used for network traffic control.",
@@ -167,8 +167,8 @@
       "description": "A mapping of property names to values, which are used to configure workload execution.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Controls runtime properties that can change workload execution behavior. Some properties can affect security-sensitive runtime configuration, so this argument can be a valid platform security policy target."
+      "security_impact": false,
+      "rationale": "Runtime properties are free-form configuration values used to customize workload execution. A generic platform policy cannot meaningfully constrain arbitrary property names and values without being overly broad, so this argument is not a useful platform policy target."
     },
     "runtime_config.version": {
       "description": "Version of the session runtime.",
