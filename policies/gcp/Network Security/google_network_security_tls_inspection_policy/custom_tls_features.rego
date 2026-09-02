@@ -5,16 +5,16 @@ import data.terraform.gcp.security.network_security.google_network_security_tls_
 conditions := [
   [
     {
-      "situation_description" : "Custom TLS cipher suite list should not include known weak or deprecated ciphers",
+      "situation_description" : "Custom TLS cipher suite list should not include known weak or deprecated cryptographic algorithms",
       "remedies":[
-        "Remove weak/deprecated cipher suites such as RC4 and 3DES from custom_tls_features"
+        "Remove any cipher suite containing RC4, 3DES, DES, MD5, NULL, EXPORT, or anonymous key exchange from custom_tls_features"
       ]
     },
     {
-      "condition": "c1 custom_tls_features does not include known-weak cipher suites",
+      "condition": "c1 custom_tls_features does not contain any weak-crypto pattern",
       "attribute_path" : ["custom_tls_features"],
-      "values" : ["TLS_RSA_WITH_RC4_128_SHA", "TLS_RSA_WITH_3DES_EDE_CBC_SHA"],
-      "policy_type" : "blacklist"
+      "values" : ["RC4", "3DES", "DES", "MD5", "NULL", "EXPORT", "anon"],
+      "policy_type" : "element blacklist"
     }
   ]
 ]

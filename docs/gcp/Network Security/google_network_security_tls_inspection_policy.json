@@ -14,7 +14,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Matches the secure-protocol-minimums archetype: when a custom cipher list is used, a generic policy can require it only contain vetted, strong cipher suites and exclude known weak/deprecated ones. This is a structural whitelist shape, not team-specific data."
+      "rationale": "Matches the secure-protocol-minimums archetype: a generic policy can require this list not contain any cipher suite matching known weak-crypto substrings (RC4, 3DES, DES, MD5, NULL, EXPORT, anonymous key exchange), rather than a narrow list of only two named weak ciphers, so other unvetted weak ciphers sharing these characteristics are also caught."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
