@@ -20,8 +20,8 @@
       "description": "If set to 'true', the service will be deleted if it is the last version.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Matches the prevent-destructive-loss archetype: if true, the entire underlying service (not just this version) can be deleted when the last version is destroyed. A generic policy can require this be false to prevent accidental service-wide deletion."
+      "security_impact": false,
+      "rationale": "Controls service lifecycle behaviour during version destruction; an operational/data-management preference rather than a destructive-loss control of the resource itself (which deletion_policy already handles)."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -76,8 +76,8 @@
       "description": "Desired runtime. Example python27.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selecting a deprecated or end-of-life runtime (e.g. python27) means the application runs on an unsupported, unpatched platform. A generic policy can require an approved runtime list, excluding known-deprecated values."
+      "security_impact": false,
+      "rationale": "Runtime selection is an architectural/functional choice; the platform only offers currently-supported releases, making a generic minimum-version policy impractical and prone to drift."
     },
     "runtime_api_version": {
       "description": "The version of the API in the given runtime environment.\nPlease see the app.yaml reference for valid values at 'https://cloud.google.com/appengine/docs/standard/<language>/config/appref'\\\nSubstitute '<language>' with 'python', 'java', 'php', 'ruby', 'go' or 'nodejs'.",
@@ -392,8 +392,8 @@
       "description": "Source URL",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Team-specific source URL for a deployed file."
+      "security_impact": true,
+      "rationale": "Matches the secure-protocol-minimums archetype: a generic policy can require this URL be constrained to https:// to prevent insecure, unencrypted transport of deployment files."
     },
     "deployment.zip": {
       "type": "block",
@@ -411,8 +411,8 @@
       "description": "Source URL",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Team-specific source URL for the zip deployment artifact."
+      "security_impact": true,
+      "rationale": "Matches the secure-protocol-minimums archetype: a generic policy can require this URL be constrained to https:// to prevent insecure, unencrypted transport of the deployment archive."
     },
     "endpoints_api_service": {
       "type": "block",
@@ -539,8 +539,8 @@
       "description": "Whether files should also be uploaded as code data. By default, files declared in static file handlers are\nuploaded as static data and are only served to end users; they cannot be read by the application. If enabled,\nuploads are charged against both your code and static data storage resource quotas.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Functional toggle for whether static files are also readable as code data; a niche functional choice, not a clear structural security control."
+      "security_impact": true,
+      "rationale": "Matches the information-disclosure-prevention archetype: a generic policy can require this stay false (the default), preventing static files from also being exposed as readable application code."
     },
     "handlers.static_files.expiration": {
       "description": "Time a static file served by this handler should be cached by web proxies and browsers.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example \"3.5s\".\nDefault is '0s'",
