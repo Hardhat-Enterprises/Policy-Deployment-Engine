@@ -269,7 +269,7 @@
       "required": true,
       "type": "bool",
       "security_impact": false,
-      "rationale": "The service requires a valid CA certificate configuration, making an additional generic policy redundant."
+      "rationale": "Defines whether the certificate is a CA certificate; the CA role is an architectural choice."
     },
     "config.x509_config.ca_options.max_issuer_path_length": {
       "description": "Refers to the \"path length constraint\" in Basic Constraints extension. For a CA certificate, this value describes the depth of\nsubordinate CA certificates that are allowed. If this value is less than 0, the request will fail. Setting the value to 0\nrequires setting 'zero_max_issuer_path_length = true'.",
@@ -283,7 +283,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "The service requires a valid CA certificate configuration, making an additional generic policy redundant."
+      "rationale": "Defines whether the certificate may act as a CA; the role is determined by the PKI architecture."
     },
     "config.x509_config.ca_options.zero_max_issuer_path_length": {
       "description": "When true, the \"path length constraint\" in Basic Constraints extension will be set to 0.\nIf both 'max_issuer_path_length' and 'zero_max_issuer_path_length' are unset,\nthe max path length will be omitted from the CA certificate.",
@@ -307,7 +307,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "CA-required key usage is validated by the service and does not need a duplicate policy."
+      "rationale": "Enables the inherent certificate-signing capability required for a Certificate Authority."
     },
     "config.x509_config.key_usage.base_key_usage.content_commitment": {
       "description": "The key may be used for cryptographic commitments. Note that this may also be referred to as \"non-repudiation\".",
@@ -321,7 +321,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "CA-required key usage is validated by the service and does not need a duplicate policy."
+      "rationale": "Enables the inherent CRL-signing capability required for a Certificate Authority that publishes revocations."
     },
     "config.x509_config.key_usage.base_key_usage.data_encipherment": {
       "description": "The key may be used to encipher data.",
