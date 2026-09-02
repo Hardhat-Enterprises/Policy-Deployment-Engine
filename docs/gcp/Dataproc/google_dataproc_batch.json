@@ -6,7 +6,7 @@
       "description": "The ID to use for the batch, which will become the final component of the batch's resource name.\nThis value must be 4-63 characters. Valid characters are /[a-z][0-9]-/.",
       "required": false,
       "type": "string",
-      "security_impact": true,
+      "security_impact": false,
       "rationale": "Identifies the Dataproc Batch resource. Because the resource identifier determines which workload resource is targeted and can affect resource identity and lifecycle operations, it has a security impact."
     },
     "deletion_policy": {
@@ -162,22 +162,22 @@
       "description": "HCFS URIs of jar files to add to the classpath of the Spark driver and tasks.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "These URIs reference JAR artifacts loaded into the PySpark execution environment. A platform policy can require secure HTTPS transport to reduce the risk of insecure artifact retrieval."
+      "security_impact": false,
+      "rationale": "File URIs reference external artifacts and act as pointers to other resources. These are team managed references rather than direct platform security policy targets."
     },
     "pyspark_batch.main_python_file_uri": {
       "description": "The HCFS URI of the main Python file to use as the Spark driver. Must be a .py file.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This URI identifies the primary Python execution script for the PySpark workload. Because it references executable workload code, a platform policy can require secure HTTPS transport."
+      "security_impact": false,
+      "rationale": "This argument points to an external script artifact. It is a resource reference, and we do not constrain pointers to external scripts through platform security policy."
     },
     "pyspark_batch.python_file_uris": {
       "description": "HCFS file URIs of Python files to pass to the PySpark framework.\nSupported file types: .py, .egg, and .zip.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "These URIs reference supporting Python dependencies used by the PySpark workload. A platform policy can require secure HTTPS transport to reduce the risk of insecure artifact retrieval."
+      "security_impact": false,
+      "rationale": "These values reference external dependency files. They are team managed artifact references rather than direct platform security policy targets."
     },
     "runtime_config": {
       "type": "block",
@@ -188,7 +188,7 @@
       "description": "Optional. Cohort identifier. Identifies families of the workloads having the same shape, e.g. daily ETL jobs.",
       "required": false,
       "type": "string",
-      "security_impact": true,
+      "security_impact": false,
       "rationale": "The cohort identifies a family or class of workloads with the same runtime shape. A platform security policy can use this classification to restrict workloads to stable and security-supported enterprise runtime tiers."
     },
     "runtime_config.container_image": {
@@ -209,7 +209,7 @@
       "description": "Version of the batch runtime.",
       "required": false,
       "type": "string",
-      "security_impact": true,
+      "security_impact": false,
       "rationale": "The runtime version determines the execution engine used by the workload. A security policy can enforce a minimum supported version to prevent use of deprecated or vulnerable runtime versions."
     },
     "runtime_config.autotuning_config": {
@@ -221,7 +221,7 @@
       "description": "Optional. Scenarios for which tunings are applied. Possible values: [\"AUTO\", \"SCALING\", \"BROADCAST_HASH_JOIN\", \"MEMORY\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
+      "security_impact": false,
       "rationale": "Autotuning scenarios control runtime performance-tuning behavior. A platform policy can constrain these settings where required to ensure workload configuration remains within approved operational and security boundaries."
     },
     "spark_batch": {
@@ -240,8 +240,8 @@
       "description": "The arguments to pass to the driver. Do not include arguments that can be set as batch\nproperties, such as --conf, since a collision can occur that causes an incorrect batch submission.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Spark job arguments can contain sensitive parameters such as credentials, API keys, or connection strings. A platform policy can scan or restrict argument values to reduce credential leakage."
+      "security_impact": false,
+      "rationale": "These are workload specific job arguments used to configure execution. They are operational inputs rather than practical targets for static platform security policy."
     },
     "spark_batch.file_uris": {
       "description": "HCFS URIs of files to be placed in the working directory of each executor.",
@@ -287,8 +287,8 @@
       "description": "The arguments to pass to the driver. Do not include arguments that can be set as batch\nproperties, such as --conf, since a collision can occur that causes an incorrect batch submission.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "R workload arguments can contain sensitive values or credentials in cleartext. A platform security policy can restrict argument values to reduce the risk of credential exposure."
+      "security_impact": false,
+      "rationale": "These are free form command line arguments for the R workload. They are workload inputs rather than viable targets for static platform security policy."
     },
     "spark_r_batch.file_uris": {
       "description": "HCFS URIs of files to be placed in the working directory of each executor.",
