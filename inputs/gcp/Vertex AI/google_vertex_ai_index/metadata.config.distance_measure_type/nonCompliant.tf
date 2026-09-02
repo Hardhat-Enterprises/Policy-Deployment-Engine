@@ -1,5 +1,5 @@
 resource "google_vertex_ai_index" "non_compliant_example_1" {
-  display_name = "non-compliant-index-1"
+  display_name = "sample-index"
   region       = "us-central1"
   
   metadata {
@@ -8,4 +8,5 @@ resource "google_vertex_ai_index" "non_compliant_example_1" {
       distance_measure_type = ""
     }
   }
+  
 }

@@ -1,5 +1,5 @@
 resource "google_vertex_ai_index" "compliant_example_1" {
-  display_name = "compliant-index"
+  display_name = "sample-index"
   region       = "us-central1"
   
   encryption_spec {
