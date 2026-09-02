@@ -4,9 +4,9 @@ resource "google_gkeonprem_bare_metal_node_pool" "non_compliant_example_1" {
   location = "asia1"
   bare_metal_cluster =  "my-cluster"
   node_pool_config {
-    operating_system = "WINDOWS"
+    operating_system = "LINUX"
     node_configs {
-      node_ip = "8.8.8.8"
+      node_ip = "10.200.0.11"
     }
   }
 }
