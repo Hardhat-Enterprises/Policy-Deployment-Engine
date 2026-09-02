@@ -6,14 +6,14 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_index.vars
 conditions := [
     [
         {
-            "situation_description": "Ensure Vertex AI Endpoints are deployed in approved locations.",
-            "remedies": ["Set `region` to an approved value."]
+            "situation_description": "Ensure Vertex AI Endpoints are deployed in approved locations for data residency.",
+            "remedies": ["Set `region` to an approved region whitelist (e.g., us-central1)."]
         },
         {
-            "condition": "region is empty",
+            "condition": "region must be in the approved-region whitelist",
             "attribute_path": ["region"],
-            "values": [""],
-            "policy_type": "blacklist"
+            "values": ["us-central1", "us-east1", "europe-west4", "asia-southeast1", "australia-southeast1"],
+            "policy_type": "whitelist"
         }
     ]
 ]
