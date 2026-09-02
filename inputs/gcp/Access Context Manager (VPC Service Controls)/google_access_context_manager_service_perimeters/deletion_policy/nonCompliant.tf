@@ -3,7 +3,7 @@ resource "google_access_context_manager_service_perimeters" "non_compliant_examp
   deletion_policy = "DELETE"
 
   service_perimeters {
-    name  = "accessPolicies/123456789/servicePerimeters/non_compliant_example_1"
-    title = "non_compliant_example_1"
+    name  = "accessPolicies/123456789/servicePerimeters/deletion_policy_test"
+    title = "deletion_policy_test"
   }
 }
