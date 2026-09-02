@@ -1,6 +1,6 @@
 resource "google_app_engine_flexible_app_version" "non_compliant_example_1" {
-  version_id      = "non-compliant-example-1"
-  service         = "non-compliant-example-1"
+  version_id      = "v1"
+  service         = "non_compliant_example_1"
   runtime         = "python"
   noop_on_destroy = false
 
