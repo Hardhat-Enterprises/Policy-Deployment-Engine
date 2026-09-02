@@ -2,6 +2,11 @@ package terraform.gcp.security.backup_for_gke.google_gke_backup_backup_channel.l
 import data.terraform.helpers
 import data.terraform.gcp.security.backup_for_gke.google_gke_backup_backup_channel.vars
 
+# 'owner', 'cost-center' and 'bandwidth-limit' are checked for PRESENCE only, by
+# blacklisting the empty values. The docs rationale for `labels` makes presence the
+# control ("required for cost allocation and ownership tracking") and states no shape
+# for the values, so there is no pattern to pair the check with. This is the same
+# idiom google_gke_backup_backup_plan/labels.rego uses for the same labels.
 conditions := [
   [
     {
@@ -23,14 +28,14 @@ conditions := [
     {
       "condition": "Must have owner label",
       "attribute_path": ["labels", "owner"],
-      "values": ["^.+$"],
-      "policy_type": "pattern_whitelist"
+      "values": [null, ""],
+      "policy_type": "blacklist"
     },
     {
       "condition": "Must have cost-center label",
       "attribute_path": ["labels", "cost-center"],
-      "values": ["^.+$"],
-      "policy_type": "pattern_whitelist"
+      "values": [null, ""],
+      "policy_type": "blacklist"
     }
   ],
   [
@@ -41,11 +46,13 @@ conditions := [
     {
       "condition": "Must have bandwidth-limit label",
       "attribute_path": ["labels", "bandwidth-limit"],
-      "values": ["^.+$"],
-      "policy_type": "pattern_whitelist"
+      "values": [null, ""],
+      "policy_type": "blacklist"
     }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

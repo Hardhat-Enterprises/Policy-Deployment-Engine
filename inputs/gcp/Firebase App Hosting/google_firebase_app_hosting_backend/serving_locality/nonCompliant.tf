@@ -1,6 +1,6 @@
 resource "google_firebase_app_hosting_backend" "non_compliant_example_1" {
   project = "grounded-jetty-469512-j6"
-  location = "australia-southeastb-a"
+  location = "australia-southeast2-a"
   backend_id = "non_compliant_example_1"
   app_id = "1:0000000000:web:abc123456789"
   serving_locality = "GLOBAL_ACCESS" # Non-Compliant: Only REGIONAL_STRICT is approved
