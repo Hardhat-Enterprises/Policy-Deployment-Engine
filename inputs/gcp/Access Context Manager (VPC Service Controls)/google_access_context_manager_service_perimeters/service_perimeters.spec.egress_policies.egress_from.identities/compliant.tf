@@ -9,7 +9,7 @@ resource "google_access_context_manager_service_perimeters" "compliant_example_1
     spec {
       egress_policies {
         egress_from {
-          identities = ["serviceAccount:svc@example-project.iam.gserviceaccount.com"]
+          identities = ["serviceAccount:service-account@project-id.iam.gserviceaccount.com"]
         }
       }
     }
