@@ -14,11 +14,13 @@ conditions := [
     {
       "condition": "Restrict hive_options.location_uri to approved GCS prefixes",
       "attribute_path": ["hive_options", 0, "location_uri"],
-      "values": ["gs://org-au-biglake-metadata/metadata/"],
-      "policy_type": "whitelist"
+      "values": ["*://*/metadata/", [["gs"], ["org-au-biglake-metadata"]]],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
