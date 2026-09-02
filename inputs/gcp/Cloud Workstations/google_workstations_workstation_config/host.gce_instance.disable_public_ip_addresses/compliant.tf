@@ -1,6 +1,6 @@
 resource "google_workstations_workstation_config" "compliant_example_1" {
   project                = "925810350503"
-  workstation_config_id  = "workstation-config"
+  workstation_config_id  = "compliant_example_1"
   workstation_cluster_id = "workstation-cluster"
   location               = "us-central1"
 
