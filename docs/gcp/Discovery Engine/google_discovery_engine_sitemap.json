@@ -6,15 +6,15 @@
       "description": "The unique id of the data store.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Does not constrain resource identifiers, thus does not require a policy target"
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the terraform lifcycle behaviour thus it is a infrastructure management setting, does nto grant access to data or authorisation"
     },
     "location": {
       "description": "The geographic location where the data store should reside. The value can\nonly be one of \"global\", \"us\" and \"eu\".",
@@ -27,15 +27,15 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selector that idenifies the GCP project that owns the resource, doews not grant access to data or chang authorisations"
     },
     "uri": {
       "description": "Public URI for the sitemap, e.g. \"www.example.com/sitemap.xml\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Is used to specify te public URL of the sitemap file that the Discovery Engine will fetch. A URL could be used to index unauthorised content. A generic policy should require a https:// scheme"
     }
   }
 }
