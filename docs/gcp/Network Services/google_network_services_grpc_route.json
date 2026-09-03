@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls whether Terraform can tear down live routing rules. The `ABANDON` value risks orphaning routes in GCP, leaving unmanaged traffic outside Terraform state. Policy should enforce `PREVENT` and reject `ABANDON`—equivalent to `force_destroy = false` but at the enum level, making it generic and reusable across resource types."
+      "security_impact": flase,
+      "rationale": "This argument controls Terraform resource lifecycle behaviour. PREVENT, DELETE and ABANDON determine whether Terraform can destroy the resource or remove it from state, but they do not directly affect authentication, authorization, encryption, confidentiality, integrity, or exposure of the GRPC route. Therefore, this argument is operational rather than security impacting."
     },
     "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
