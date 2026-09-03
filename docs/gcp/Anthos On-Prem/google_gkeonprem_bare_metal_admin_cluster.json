@@ -42,7 +42,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Project is not important enough to have security implications."
+      "rationale": "A resource identifier/pointer to the GCP project the cluster belongs to; project-level access is governed by IAM bindings elsewhere, not by this attribute."
     },
     "cluster_operations": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "Whether collection of application logs/metrics should be enabled (in addition to system logs/metrics).",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "enable_application_logs does not have security impact on the service."
+      "security_impact": true,
+      "rationale": "Toggles collection of application logs/metrics (in addition to system logs/metrics). This is security telemetry: without application-level logging, the cluster lacks the audit/visibility trail needed to detect or investigate anomalous workload behaviour. It should default to enabled rather than left off."
     },
     "control_plane": {
       "type": "block",
@@ -71,7 +71,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "argument does not have security impact on the service."
+      "rationale": "Names one entry in an arbitrary key-value argument list; a generic platform policy cannot meaningfully constrain which flag names a customer chooses to pass without hardcoding an exhaustive allow/deny list of kube-apiserver flags, which is not a viable policy target here."
     },
     "control_plane.api_server_args.value": {
       "description": "The value of the arg as it will be passed to the API Server command line.",
@@ -366,7 +366,7 @@
       "required": true,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "maintenance_address_cidr_blocks does not require specific security considerations."
+      "rationale": "The CIDR ranges that place matching nodes into maintenance mode are an operational networking assignment (which nodes get cordoned/drained for maintenance), not a security control."
     },
     "network_config": {
       "type": "block",
@@ -390,7 +390,7 @@
       "required": true,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Pod address CIDR blocks are not important enough to have security implications."
+      "rationale": "The RFC1918 CIDR ranges pods are assigned from are an operational addressing choice for the cluster's internal network plan, outside the scope of a security policy."
     },
     "network_config.island_mode_cidr.service_address_cidr_blocks": {
       "description": "All services in the cluster are assigned an RFC1918 IPv4 address from these ranges. This field cannot be changed after creation.",
@@ -433,7 +433,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "max_pods_per_node does not require specific security considerations."
+      "rationale": "Controls pod density/resource allocation per node; an operational sizing choice, not an access or exposure control."
     },
     "proxy": {
       "type": "block",
@@ -445,14 +445,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "no_proxy does not require specific security considerations."
+      "rationale": "Defines the endpoints excluded from proxy routing; a network configuration choice, not an access-control setting."
     },
     "proxy.uri": {
       "description": "Specifies the address of your proxy server.\nFor Example: http://domain\nWARNING: Do not provide credentials in the format\nof http://(username:password@)domain these will be rejected by the server.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "uri does not require specific security considerations."
+      "rationale": "Points at the customer's own proxy server; an environment-specific infrastructure reference with no universal 'safe' value, the same reasoning already applied to other environment-specific endpoints on this resource."
     },
     "security_config": {
       "type": "block",
@@ -473,8 +473,8 @@
       "description": "The name of the user, e.g. 'my-gcp-id@gmail.com'.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Names a principal granted cluster admin access. As an access-granting principal it is a valid policy target: enforce against public/wildcard principals so admin access is never granted broadly; the policy must not pin specific user identities."
+      "security_impact": false,
+      "rationale": "Names a single admin principal as an arbitrary identity string (e.g. 'my-gcp-id@gmail.com'), not a collection of IAM principals with a wildcard/public-member risk (unlike a members list that can include 'allUsers'/'allAuthenticatedUsers'). There is no generically 'unsafe' username value to blacklist and no wildcard concept to guard against here, so a platform policy cannot meaningfully police which specific identity a customer names as admin."
     },
     "storage": {
       "type": "block",
@@ -490,8 +490,8 @@
       "description": "The host machine path.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The host machine filesystem path mounted into the cluster as a local PersistentVolume - functionally a hostPath-style mount. Pointing it at a sensitive system path (e.g. '/', '/etc', '/root', '/boot', '/proc', '/sys', '/var/run/docker.sock') exposes host filesystem content or control-plane sockets to workloads, a well-established Kubernetes container-escape/privilege-escalation vector. Unlike a customer's own IP addressing, dangerous path roots are identifiable in the abstract, so a blacklist of known-sensitive host paths is a meaningful policy target even though the full safe path space is customer-specific."
+      "security_impact": false,
+      "rationale": "While mounting a sensitive host root path (e.g. '/', '/etc', '/root', '/boot', '/proc', '/sys', '/var/run/docker.sock') is a documented risk, a platform-level policy here cannot structurally validate host filesystem layouts across disparate node architectures - what counts as a safe or sensitive mount point depends on each deployment's own host provisioning and storage design. This makes it an environment-dependent storage design choice rather than a platform-enforceable control."
     },
     "storage.lvp_node_mounts_config.storage_class": {
       "description": "The StorageClass name that PVs will be created with.",
@@ -510,7 +510,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "shared_path_pv_count does not have security impact on the service."
+      "rationale": "The number of subdirectories to create under the shared path; numeric capacity sizing, an operational choice with no access-control implication."
     },
     "storage.lvp_share_config.lvp_config": {
       "type": "block",
