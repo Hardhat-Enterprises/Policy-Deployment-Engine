@@ -79,8 +79,8 @@
       "description": "VLAN tags for the interconnect.",
       "required": false,
       "type": "list(number)",
-      "security_impact": true,
-      "rationale": "VLAN tags define network segmentation boundaries for the interconnect. A misconfigured or overly broad VLAN tag can bridge traffic across segments that should remain isolated, a direct access/exposure concern analogous to src_ip_ranges scoping."
+      "security_impact": false,
+      "rationale": "VLAN tagging is architectural networking segmentation chosen by teams, not a security policy target. VLAN IDs are network identifiers and architectural choices rather than security boundaries that a platform policy can generically constrain."
     },
     "wire_properties": {
       "type": "block",
@@ -105,8 +105,8 @@
       "description": "Response when a fault is detected in a pseudowire:\nNONE: default.\nDISABLE_PORT: set the port line protocol down when inline probes detect a fault. This setting is only permitted on port mode pseudowires.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "fault_response determines whether the port is disabled on fault detection (fail-secure) or left running (fail-open, the default). This is a fail-secure vs fail-open enforcement decision directly affecting whether faulty/compromised links continue passing traffic."
+      "security_impact": false,
+      "rationale": "Fault response behavior is an operational availability tuning choice rather than a security enforcement control. Hardware fault handling on a dedicated interconnect wire is an operational availability concern rather than a platform security policy target."
     }
   }
 }
