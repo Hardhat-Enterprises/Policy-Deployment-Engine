@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the Dataproc Session Template can be destroyed or removed from Terraform management. Preventing unintended deletion can protect resource availability and prevent destructive loss."
     },
     "labels": {
       "description": "The labels to associate with this session template.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are descriptive key-value metadata used to organize resources. They do not directly control access, identity, encryption, networking, or other security controls."
     },
     "location": {
       "description": "The location in which the session template will be created in.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "Determines the region where the Dataproc Session Template is created. Restricting deployment to approved regions supports data residency and platform security requirements."
     },
     "name": {
       "description": "The resource name of the session template in the following format:\nprojects/{project}/locations/{location}/sessionTemplates/{template_id}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Dataproc Session Template resource but does not directly control access, identity, encryption, networking, or other security settings."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Google Cloud project that owns the resource. It is a resource reference and does not directly configure the resource's security controls."
     },
     "environment_config": {
       "type": "block",
@@ -51,50 +51,50 @@
       "description": "The duration to keep the session alive while it's idling.\nExceeding this threshold causes the session to terminate. Minimum value is 10 minutes; maximum value is 14 day.\nDefaults to 1 hour if not set. If both ttl and idleTtl are specified for an interactive session, the conditions\nare treated as OR conditions: the workload will be terminated when it has been idle for idleTtl or when ttl has\nbeen exceeded, whichever occurs first.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how long an idle session can remain active before termination. It affects session lifetime but does not directly control access, identity, encryption, or networking."
     },
     "environment_config.execution_config.kms_key": {
       "description": "The Cloud KMS key to use for encryption.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the Cloud KMS key used to encrypt the workload. The selected encryption key directly affects protection of workload data."
     },
     "environment_config.execution_config.network_tags": {
       "description": "Tags used for network traffic control.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Network tags associate the workload with network traffic-control rules. Their selection is a team architectural choice rather than a platform security policy target."
     },
     "environment_config.execution_config.service_account": {
       "description": "Service account that used to execute workload.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the identity used by the workload. The service account determines the permissions available to the workload and therefore directly affects access control."
     },
     "environment_config.execution_config.staging_bucket": {
       "description": "A Cloud Storage bucket used to stage workload dependencies, config files, and store\nworkload output and other ephemeral data, such as Spark history files. If you do not specify a staging bucket,\nCloud Dataproc will determine a Cloud Storage location according to the region where your workload is running,\nand then create and manage project-level, per-location staging and temporary buckets.\nThis field requires a Cloud Storage bucket name, not a gs://... URI to a Cloud Storage bucket.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the Cloud Storage bucket used to stage workload dependencies, configuration, output, and ephemeral data. The selected bucket can therefore affect protection of workload data."
     },
     "environment_config.execution_config.subnetwork_uri": {
       "description": "Subnetwork configuration for workload execution.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the subnetwork used for workload execution. It identifies a network resource but is not itself a platform security policy target."
     },
     "environment_config.execution_config.ttl": {
       "description": "The duration after which the workload will be terminated.\nWhen the workload exceeds this duration, it will be unconditionally terminated without waiting for ongoing\nwork to finish. If ttl is not specified for a session workload, the workload will be allowed to run until it\nexits naturally (or run forever without exiting). If ttl is not specified for an interactive session,\nit defaults to 24 hours. If ttl is not specified for a batch that uses 2.1+ runtime version, it defaults to 4 hours.\nMinimum value is 10 minutes; maximum value is 14 days. If both ttl and idleTtl are specified (for an interactive session),\nthe conditions are treated as OR conditions: the workload will be terminated when it has been idle for idleTtl or\nwhen ttl has been exceeded, whichever occurs first.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the maximum workload lifetime but does not directly configure access, identity, encryption, or network security."
     },
     "environment_config.execution_config.authentication_config": {
       "type": "block",
@@ -105,8 +105,8 @@
       "description": "Authentication type for the user workload running in containers. Possible values: [\"SERVICE_ACCOUNT\", \"END_USER_CREDENTIALS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how the user workload authenticates during execution. The authentication method directly affects workload identity and access control."
     },
     "environment_config.peripherals_config": {
       "type": "block",
@@ -117,8 +117,8 @@
       "description": "Resource name of an existing Dataproc Metastore service.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies an existing Dataproc Metastore service available to the workload but does not directly configure its access or security controls."
     },
     "environment_config.peripherals_config.spark_history_server_config": {
       "type": "block",
@@ -129,8 +129,8 @@
       "description": "Resource name of an existing Dataproc Cluster to act as a Spark History Server for the workload.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Dataproc cluster used for Spark History Server functionality but does not directly configure security controls for the workload."
     },
     "jupyter_session": {
       "type": "block",
@@ -141,15 +141,15 @@
       "description": "Display name, shown in the Jupyter kernelspec card.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls only the name displayed for the Jupyter session and does not directly affect access, identity, encryption, networking, or data protection."
     },
     "jupyter_session.kernel": {
       "description": "Kernel to be used with Jupyter interactive session. Possible values: [\"PYTHON\", \"SCALA\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the Jupyter kernel used by the session. It determines the execution language but does not directly configure access, identity, encryption, or networking."
     },
     "runtime_config": {
       "type": "block",
@@ -160,22 +160,22 @@
       "description": "Optional custom container image for the job runtime environment. If not specified, a default container image will be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the container image used for the workload runtime. The image determines the software and dependencies executed by the workload and can therefore affect security."
     },
     "runtime_config.properties": {
       "description": "A mapping of property names to values, which are used to configure workload execution.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Runtime properties can change workload execution behavior, including settings that can affect security and data handling."
     },
     "runtime_config.version": {
       "description": "Version of the session runtime.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the runtime software environment used by the workload. Restricting runtime versions can help prevent use of unsupported or vulnerable software environments."
     },
     "spark_connect_session": {
       "type": "block",
