@@ -1,0 +1,27 @@
+package terraform.gcp.security.document_ai_warehouse.google_document_ai_warehouse_document_schema.property_definitions_is_searchable
+
+import data.terraform.helpers
+import data.terraform.gcp.security.document_ai_warehouse.google_document_ai_warehouse_document_schema.vars
+
+conditions := [
+    [
+        {
+            "situation_description": "A schema property is included in the warehouse-wide global search index.",
+            "remedies": [
+                "Set property_definitions.is_searchable to false unless the property has been confirmed non-sensitive.",
+                "A searchable property is discoverable via global search by any principal with query access to the corpus - across every document that uses this schema - regardless of whether they would otherwise be shown that field."
+            ]
+        },
+        {
+            "condition": "property_definitions.is_searchable must not be true",
+            "attribute_path": ["property_definitions", 0, "is_searchable"],
+            "values": [true],
+            "policy_type": "blacklist"
+        }
+    ]
+]
+
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

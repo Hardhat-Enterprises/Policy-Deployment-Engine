@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is prevented from destroying the document schema. Setting this to 'PREVENT' guards against accidental or unauthorised deletion via 'terraform destroy'/'apply' - the same destructive-loss-prevention pattern already enforced on google_compute_interconnect and google_compute_node_group's deletion_policy. Losing the schema breaks is_required/type validation for every document that depends on it, and the default 'DELETE' allows that with no safeguard."
     },
     "display_name": {
       "description": "Name of the schema given by the user.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable label with no bearing on access, exposure, or data handling."
     },
     "document_is_folder": {
       "description": "Tells whether the document is a folder or a typical document.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Structural flag distinguishing a folder-type document from a regular one; it does not alter who can access it or how it is indexed."
     },
     "location": {
       "description": "The location of the resource.",
@@ -34,8 +34,8 @@
       "description": "The unique identifier of the project.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A resource identifier/scoping value; project-level access is governed by IAM bindings elsewhere, not by this attribute."
     },
     "property_definitions": {
       "type": "block",
@@ -46,57 +46,57 @@
       "description": "The display-name for the property, used for front-end.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A front-end label for the property, no access or exposure implication."
     },
     "property_definitions.is_filterable": {
       "description": "Whether the property can be filtered. If this is a sub-property, all the parent properties must be marked filterable.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Setting this true lets the property's value be used as a structured query filter across the corpus, which lets a caller with query access probe for or enumerate documents by a specific property value (e.g. whether any document has property = X) even without full-text search or direct view of the field. That is a data-exposure/enumeration side-channel like is_searchable, so it should default to false for sensitive properties."
     },
     "property_definitions.is_metadata": {
       "description": "Whether the property is user supplied metadata.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An internal tagging flag for derived properties; interpretation is left to the API caller and has no access-control effect."
     },
     "property_definitions.is_repeatable": {
       "description": "Whether the property can have multiple values.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls cardinality (single vs. multiple values), not visibility or access."
     },
     "property_definitions.is_required": {
       "description": "Whether the property is mandatory.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A data-completeness/validation rule (must the value be populated), not an access or exposure control."
     },
     "property_definitions.is_searchable": {
       "description": "Indicates that the property should be included in a global search.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Setting this true includes the property's value in the warehouse-wide global search index, so any principal with query access to the corpus can discover it in search results across every document that uses this schema - independent of whether they would otherwise be shown that specific field. For a property holding sensitive content this materially widens the exposure surface, so it should default to false and only be enabled for properties confirmed non-sensitive."
     },
     "property_definitions.name": {
       "description": "The name of the metadata property.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The property's identifier; naming does not affect who can see its value."
     },
     "property_definitions.retrieval_importance": {
       "description": "Stores the retrieval importance. Possible values: [\"HIGHEST\", \"HIGHER\", \"HIGH\", \"MEDIUM\", \"LOW\", \"LOWEST\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Only weights ranking of a property among search results that are already returned; it does not gate whether the property is exposed via search (that is is_searchable)."
     },
     "property_definitions.date_time_type_options": {
       "type": "block",
@@ -112,15 +112,15 @@
       "description": "List of possible enum values.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The controlled vocabulary for an enum property - defines valid content, not who can see it."
     },
     "property_definitions.enum_type_options.validation_check_disabled": {
       "description": "Make sure the enum property value provided in the document is in the possile value list during document creation. The validation check runs by default.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A data-quality validation toggle (does the value have to match the enum list); it does not grant or widen access to the property's value."
     },
     "property_definitions.float_type_options": {
       "type": "block",
@@ -151,57 +151,57 @@
       "description": "The display-name for the property, used for front-end.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A front-end label for the property, no access or exposure implication."
     },
     "property_definitions.property_type_options.property_definitions.is_filterable": {
       "description": "Whether the property can be filtered. If this is a sub-property, all the parent properties must be marked filterable.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Setting this true lets the property's value be used as a structured query filter across the corpus, which lets a caller with query access probe for or enumerate documents by a specific property value (e.g. whether any document has property = X) even without full-text search or direct view of the field. That is a data-exposure/enumeration side-channel like is_searchable, so it should default to false for sensitive properties."
     },
     "property_definitions.property_type_options.property_definitions.is_metadata": {
       "description": "Whether the property is user supplied metadata.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An internal tagging flag for derived properties; interpretation is left to the API caller and has no access-control effect."
     },
     "property_definitions.property_type_options.property_definitions.is_repeatable": {
       "description": "Whether the property can have multiple values.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls cardinality (single vs. multiple values), not visibility or access."
     },
     "property_definitions.property_type_options.property_definitions.is_required": {
       "description": "Whether the property is mandatory.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A data-completeness/validation rule (must the value be populated), not an access or exposure control."
     },
     "property_definitions.property_type_options.property_definitions.is_searchable": {
       "description": "Indicates that the property should be included in a global search.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Setting this true includes the property's value in the warehouse-wide global search index, so any principal with query access to the corpus can discover it in search results across every document that uses this schema - independent of whether they would otherwise be shown that specific field. For a property holding sensitive content this materially widens the exposure surface, so it should default to false and only be enabled for properties confirmed non-sensitive."
     },
     "property_definitions.property_type_options.property_definitions.name": {
       "description": "The name of the metadata property.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The property's identifier; naming does not affect who can see its value."
     },
     "property_definitions.property_type_options.property_definitions.retrieval_importance": {
       "description": "Stores the retrieval importance. Possible values: [\"HIGHEST\", \"HIGHER\", \"HIGH\", \"MEDIUM\", \"LOW\", \"LOWEST\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Only weights ranking of a property among search results that are already returned; it does not gate whether the property is exposed via search (that is is_searchable)."
     },
     "property_definitions.property_type_options.property_definitions.date_time_type_options": {
       "type": "block",
@@ -217,15 +217,15 @@
       "description": "List of possible enum values.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The controlled vocabulary for an enum property - defines valid content, not who can see it."
     },
     "property_definitions.property_type_options.property_definitions.enum_type_options.validation_check_disabled": {
       "description": "Make sure the enum property value provided in the document is in the possile value list during document creation. The validation check runs by default.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A data-quality validation toggle (does the value have to match the enum list); it does not grant or widen access to the property's value."
     },
     "property_definitions.property_type_options.property_definitions.float_type_options": {
       "type": "block",
@@ -251,15 +251,15 @@
       "description": "The schema name in the source.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the mapped source schema; descriptive metadata only."
     },
     "property_definitions.property_type_options.property_definitions.schema_sources.processor_type": {
       "description": "The Doc AI processor type name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the originating Doc AI processor type; descriptive metadata only."
     },
     "property_definitions.property_type_options.property_definitions.text_type_options": {
       "type": "block",
@@ -280,15 +280,15 @@
       "description": "The schema name in the source.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier of the mapped source schema; descriptive metadata only."
     },
     "property_definitions.schema_sources.processor_type": {
       "description": "The Doc AI processor type name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the originating Doc AI processor type; descriptive metadata only."
     },
     "property_definitions.text_type_options": {
       "type": "block",
