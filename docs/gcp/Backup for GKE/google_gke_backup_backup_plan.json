@@ -6,15 +6,15 @@
       "description": "The source cluster from which Backups will be created via this BackupPlan.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the Kubernetes cluster whose data is protected by the backup."
+      "security_impact": false,
+      "rationale": "References the source Kubernetes cluster. Resource identifiers and references are environment-specific and are not suitable targets for a generic platform security policy."
     },
     "deactivated": {
       "description": "This flag indicates whether this BackupPlan has been deactivated.\nSetting this field to True locks the BackupPlan such that no further updates will be allowed\n(except deletes), including the deactivated field itself. It also prevents any new Backups\nfrom being created via this BackupPlan (including scheduled Backups).",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Deactivated plans do not create backups, putting data at risk."
+      "security_impact": false,
+      "rationale": "Controls the operational lifecycle state of the BackupPlan. Activating or deactivating a backup plan is an operational data-management decision rather than a platform security control."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -55,8 +55,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the project containing the resource and its applicable access controls."
+      "security_impact": false,
+      "rationale": "Identifies the Google Cloud project containing the resource. Project identifiers are environment-specific resource references and are not suitable targets for a generic platform security policy."
     },
     "backup_config": {
       "type": "block",
@@ -67,29 +67,29 @@
       "description": "If True, include all namespaced resources.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether resources across all namespaces are included in backups."
+      "security_impact": false,
+      "rationale": "Controls the operational scope of resources included in backups. Whether all namespaces are backed up is a workload-specific data-management decision rather than a generic platform security control."
     },
     "backup_config.include_secrets": {
       "description": "This flag specifies whether Kubernetes Secret resources should be included\nwhen they fall into the scope of Backups.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Controls whether sensitive Kubernetes Secrets are included in backups."
+      "rationale": "A platform security policy should require Kubernetes Secrets within the backup scope to be included rather than omitted, helping ensure sensitive configuration required for complete recovery is protected."
     },
     "backup_config.include_volume_data": {
       "description": "This flag specifies whether volume data should be backed up when PVCs are\nincluded in the scope of a Backup.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Controls whether persistent volume data is protected by backups."
+      "rationale": "A platform security policy should require persistent volume data within the backup scope to be included, helping ensure persistent application data is available for complete disaster recovery."
     },
     "backup_config.permissive_mode": {
       "description": "This flag specifies whether Backups will not fail when\nBackup for GKE detects Kubernetes configuration that is\nnon-standard or requires additional setup to restore.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Allows backups despite non-standard configurations, affecting backup protection."
+      "rationale": "A platform security policy should forbid permissive mode so backups do not silently tolerate non-standard or potentially unrestorable Kubernetes configurations and strict backup validation is maintained."
     },
     "backup_config.encryption_key": {
       "type": "block",
@@ -117,15 +117,15 @@
       "description": "The name of a Kubernetes Resource.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the Kubernetes resource selected for backup."
+      "security_impact": false,
+      "rationale": "Specifies the name of a particular Kubernetes resource. Resource names are workload-specific identifiers and are not suitable targets for a generic platform security policy."
     },
     "backup_config.selected_applications.namespaced_names.namespace": {
       "description": "The namespace of a Kubernetes Resource.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the namespace containing the resource selected for backup."
+      "security_impact": false,
+      "rationale": "Specifies the namespace containing a selected Kubernetes resource. Namespace names are workload-specific resource references and are not suitable targets for a generic platform security policy."
     },
     "backup_config.selected_namespace_labels": {
       "type": "block",
@@ -141,15 +141,15 @@
       "description": "The key of the kubernetes label.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines which Kubernetes namespace labels are used to select resources for backup."
+      "security_impact": false,
+      "rationale": "Specifies a team-defined label key used to select namespaces for backup. Selection metadata is an operational filtering choice rather than a generic platform security control."
     },
     "backup_config.selected_namespace_labels.resource_labels.value": {
       "description": "The value of the Label.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines which resources matching the namespace label are included in backups."
+      "security_impact": false,
+      "rationale": "Specifies a team-defined label value used to select namespaces for backup. Selection metadata is an operational filtering choice rather than a generic platform security control."
     },
     "backup_config.selected_namespaces": {
       "type": "block",
@@ -160,8 +160,8 @@
       "description": "A list of Kubernetes Namespaces.",
       "required": true,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Determines which Kubernetes namespaces are included in the backup scope."
+      "security_impact": false,
+      "rationale": "Specifies particular namespace names to include in backups. Namespace names are workload-specific resource references and backup scoping is an operational data-management decision."
     },
     "backup_schedule": {
       "type": "block",
@@ -179,8 +179,8 @@
       "description": "This flag denotes whether automatic Backup creation is paused for this BackupPlan.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Pausing automatic backups can reduce the protection and recoverability of data."
+      "security_impact": false,
+      "rationale": "Controls whether scheduled backup creation is paused. Pausing backup automation is an operational lifecycle and scheduling decision rather than a generic platform security control."
     },
     "backup_schedule.rpo_config": {
       "type": "block",
@@ -191,8 +191,8 @@
       "description": "Defines the target RPO for the BackupPlan in minutes, which means the target\nmaximum data loss in time that is acceptable for this BackupPlan. This must be\nat least 60, i.e., 1 hour, and at most 86400, i.e., 60 days.",
       "required": true,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Controls the acceptable amount of potential data loss between backups."
+      "security_impact": false,
+      "rationale": "Defines the workload's recovery point objective. The acceptable recovery interval depends on application and operational requirements and is not a generic platform security control."
     },
     "backup_schedule.rpo_config.exclusion_windows": {
       "type": "block",
@@ -203,15 +203,15 @@
       "description": "The exclusion window occurs every day if set to \"True\".\nSpecifying this field to \"False\" is an error.\nOnly one of singleOccurrenceDate, daily and daysOfWeek may be set.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls recurring periods when backups cannot run, affecting data protection."
+      "security_impact": false,
+      "rationale": "Defines recurrence of an operational backup exclusion window. Backup scheduling and timing preferences are workload-specific operational decisions rather than platform security controls."
     },
     "backup_schedule.rpo_config.exclusion_windows.duration": {
       "description": "Specifies duration of the window in seconds with up to nine fractional digits,\nterminated by 's'. Example: \"3.5s\". Restrictions for duration based on the\nrecurrence type to allow some time for backup to happen:\n  - single_occurrence_date:  no restriction\n  - daily window: duration < 24 hours\n  - weekly window:\n    - days of week includes all seven days of a week: duration < 24 hours\n    - all other weekly window: duration < 168 hours (i.e., 24 * 7 hours)",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines how long backups are prevented during an exclusion window."
+      "security_impact": false,
+      "rationale": "Defines the duration of an operational backup exclusion window. Its duration is a workload-specific scheduling choice rather than a generic platform security control."
     },
     "backup_schedule.rpo_config.exclusion_windows.days_of_week": {
       "type": "block",
@@ -222,8 +222,8 @@
       "description": "A list of days of week. Possible values: [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"SUNDAY\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Determines which days backups are excluded, affecting backup availability."
+      "security_impact": false,
+      "rationale": "Specifies days on which operational backup exclusion windows apply. Backup scheduling days are workload-specific operational preferences rather than platform security controls."
     },
     "backup_schedule.rpo_config.exclusion_windows.single_occurrence_date": {
       "type": "block",
@@ -234,22 +234,22 @@
       "description": "Day of a month.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines the day when a backup exclusion window occurs."
+      "security_impact": false,
+      "rationale": "Specifies the calendar day for a one-time backup exclusion window. This is an operational scheduling detail rather than a platform security control."
     },
     "backup_schedule.rpo_config.exclusion_windows.single_occurrence_date.month": {
       "description": "Month of a year.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines the month when a backup exclusion window occurs."
+      "security_impact": false,
+      "rationale": "Specifies the calendar month for a one-time backup exclusion window. This is an operational scheduling detail rather than a platform security control."
     },
     "backup_schedule.rpo_config.exclusion_windows.single_occurrence_date.year": {
       "description": "Year of the date.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines the year when a backup exclusion window occurs."
+      "security_impact": false,
+      "rationale": "Specifies the calendar year for a one-time backup exclusion window. This is an operational scheduling detail rather than a platform security control."
     },
     "backup_schedule.rpo_config.exclusion_windows.start_time": {
       "type": "block",
@@ -260,29 +260,29 @@
       "description": "Hours of day in 24 hour format.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines when a backup exclusion window starts and can affect backup protection."
+      "security_impact": false,
+      "rationale": "Specifies the hour at which an operational backup exclusion window begins. Time-of-day scheduling is an operational preference rather than a platform security control."
     },
     "backup_schedule.rpo_config.exclusion_windows.start_time.minutes": {
       "description": "Minutes of hour of day.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines the start time of a backup exclusion window."
+      "security_impact": false,
+      "rationale": "Specifies the minute at which an operational backup exclusion window begins. This timing detail is an operational scheduling preference rather than a platform security control."
     },
     "backup_schedule.rpo_config.exclusion_windows.start_time.nanos": {
       "description": "Fractions of seconds in nanoseconds.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines the precise start time of a backup exclusion window"
+      "security_impact": false,
+      "rationale": "Specifies sub-second precision for the start of an operational backup exclusion window and has no meaningful platform security policy value."
     },
     "backup_schedule.rpo_config.exclusion_windows.start_time.seconds": {
       "description": "Seconds of minutes of the time.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Determines the precise start time of a backup exclusion window."
+      "security_impact": false,
+      "rationale": "Specifies second-level timing for the start of an operational backup exclusion window. This is an operational scheduling detail rather than a platform security control."
     },
     "retention_policy": {
       "type": "block",
@@ -300,8 +300,8 @@
       "description": "The default maximum age of a Backup created via this BackupPlan.\nThis field MUST be an integer value >= 0 and <= 365. If specified,\na Backup created under this BackupPlan will be automatically deleted\nafter its age reaches (createTime + backupRetainDays).\nIf not specified, Backups created under this BackupPlan will NOT be\nsubject to automatic deletion. Updating this field does NOT affect\nexisting Backups under it. Backups created AFTER a successful update\nwill automatically pick up the new value.\nNOTE: backupRetainDays must be >= backupDeleteLockDays.\nIf cronSchedule is defined, then this must be <= 360 * the creation interval.\nIf rpo_config is defined, then this must be\n<= 360 * targetRpoMinutes/(1440minutes/day)",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Retention period must be sufficient for disaster recovery but not exceed data retention policies (7-90 days)."
+      "security_impact": false,
+      "rationale": "Defines how long backups are retained before automatic deletion. Retention duration depends on workload, operational, and data-management requirements rather than a generic platform security control."
     },
     "retention_policy.locked": {
       "description": "This flag denotes whether the retention policy of this BackupPlan is locked.\nIf set to True, no further update is allowed on this policy, including\nthe locked field itself.",
