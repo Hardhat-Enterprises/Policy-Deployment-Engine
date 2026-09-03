@@ -60,15 +60,15 @@
       "description": "Required. If this is true, the SubjectAltNames extension may be copied from a certificate request into the signed certificate. Otherwise, the requested SubjectAltNames will be discarded.",
       "required": true,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls whether SANs are passed through from the request; appropriate value depends on the PKI issuance workflow."
+      "security_impact": true,
+      "rationale": "Controls whether requested Subject Alternative Names can be copied into issued certificates. Restricting SAN passthrough prevents requesters from adding unauthorized identities that could be used for certificate impersonation."
     },
     "identity_constraints.allow_subject_passthrough": {
       "description": "Required. If this is true, the Subject field may be copied from a certificate request into the signed certificate. Otherwise, the requested Subject will be discarded.",
       "required": true,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls whether the certificate subject is passed through from the request; appropriate value depends on the PKI issuance workflow."
+      "security_impact": true,
+      "rationale": "Controls whether subject information from a certificate request can be copied into the issued certificate. Restricting subject passthrough prevents requesters from injecting unauthorized identities and impersonating other users."
     },
     "identity_constraints.cel_expression": {
       "type": "block",
@@ -167,7 +167,7 @@
       "description": "Required. The parts of an OID path. The most significant parts of the path come first.",
       "required": true,
       "type": "list(number)",
-     "security_impact": true,
+     "security_impact": false,
      "rationale": "Identifies the type of additional certificate extension. Validating OIDs against an approved set can prevent dangerous or unauthorized custom extensions from being included in certificates."
     },
     "predefined_values.ca_options": {
@@ -179,7 +179,7 @@
       "description": "Optional. Refers to the \"CA\" X.509 extension, which is a boolean value. When this value is true, the \"CA\" in Basic Constraints extension will be set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
+      "security_impact": true,
       "rationale": "Controls CA flag in the Basic Constraints extension; appropriate value depends on the certificate's intended use case."
     },
     "predefined_values.ca_options.max_issuer_path_length": {
@@ -217,8 +217,8 @@
       "description": "The key may be used to sign certificates.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Key capability flag; the combination of key usages is application-specific and no specific setting is mandated."
+      "security_impact": true,
+      "rationale": "Controls whether certificates issued from the template may sign other certificates. Restricting this capability on non-CA templates prevents unauthorized certificate-issuing authority and protects the PKI trust hierarchy."
     },
     "predefined_values.key_usage.base_key_usage.content_commitment": {
       "description": "The key may be used for cryptographic commitments. Note that this may also be referred to as \"non-repudiation\".",
@@ -231,8 +231,8 @@
       "description": "The key may be used sign certificate revocation lists.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Key capability flag; the combination of key usages is application-specific and no specific setting is mandated."
+      "security_impact": true,
+      "rationale": "Controls whether certificates issued from the template may sign certificate revocation lists. Restricting this capability prevents unauthorized revocation authority and protects the PKI trust hierarchy."
     },
     "predefined_values.key_usage.base_key_usage.data_encipherment": {
       "description": "The key may be used to encipher data.",
@@ -365,43 +365,43 @@
       "description": "Contains the excluded IP ranges. For IPv4 addresses, the ranges\nare expressed using CIDR notation as specified in RFC 4632.\nFor IPv6 addresses, the ranges are expressed in similar encoding as IPv4\naddresses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Excluded IP range constraints are PKI-design specific; no specific values are mandated by policy."
+      "security_impact": true,
+      "rationale": "Controls which IP ranges certificates issued from the template must not cover. Enforcing excluded IP ranges limits issuance scope and helps prevent certificates from being issued for unauthorized network identities."
     },
     "predefined_values.name_constraints.excluded_uris": {
       "description": "Contains the excluded URIs that apply to the host part of the name.\nThe value can be a hostname or a domain with a\nleading period (like '.example.com')",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Excluded URI constraints are PKI-design specific; no specific values are mandated by policy."
+      "security_impact": true,
+      "rationale": "Controls which URI namespaces certificates issued from the template must not cover. Enforcing excluded URI constraints helps prevent identity spoofing and unauthorized certificate issuance."
     },
     "predefined_values.name_constraints.permitted_dns_names": {
       "description": "Contains permitted DNS names. Any DNS name that can be\nconstructed by simply adding zero or more labels to\nthe left-hand side of the name satisfies the name constraint.\nFor example, 'example.com', 'www.example.com', 'www.sub.example.com'\nwould satisfy 'example.com' while 'example1.com' does not.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Permitted DNS name constraints are PKI-design specific; no specific values are mandated by policy."
+      "security_impact": true,
+      "rationale": "Controls which DNS namespaces certificates issued from the template may cover. Enforcing permitted DNS constraints prevents unauthorized cross-domain or overly broad certificate issuance."
     },
     "predefined_values.name_constraints.permitted_email_addresses": {
       "description": "Contains the permitted email addresses. The value can be a particular\nemail address, a hostname to indicate all email addresses on that host or\na domain with a leading period (e.g. '.example.com') to indicate\nall email addresses in that domain.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Permitted email address constraints are PKI-design specific; no specific values are mandated by policy."
+      "security_impact": true,
+      "rationale": "Controls which email identities certificates issued from the template may cover. Enforcing permitted email constraints limits issuance to approved identity patterns and helps prevent unauthorized certificates."
     },
     "predefined_values.name_constraints.permitted_ip_ranges": {
       "description": "Contains the permitted IP ranges. For IPv4 addresses, the ranges\nare expressed using CIDR notation as specified in RFC 4632.\nFor IPv6 addresses, the ranges are expressed in similar encoding as IPv4\naddresses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Permitted IP range constraints are PKI-design specific; no specific values are mandated by policy."
+      "security_impact": true,
+      "rationale": "Controls which IP ranges certificates issued from the template may cover. Enforcing permitted IP ranges protects network identity boundaries and prevents certificate scope from becoming unnecessarily broad."
     },
     "predefined_values.name_constraints.permitted_uris": {
       "description": "Contains the permitted URIs that apply to the host part of the name.\nThe value can be a hostname or a domain with a\nleading period (like '.example.com')",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Permitted URI constraints are PKI-design specific; no specific values are mandated by policy."
+      "security_impact": true,
+      "rationale": "Controls which URI namespaces certificates issued from the template may cover. Enforcing permitted URI constraints maintains clear identity boundaries and helps prevent unauthorized certificate issuance."
     },
     "predefined_values.policy_ids": {
       "type": "block",
