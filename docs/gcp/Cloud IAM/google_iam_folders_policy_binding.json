@@ -6,57 +6,57 @@
       "description": "Optional. User defined annotations. See https://google.aip.dev/148#annotations for more details such as format and size limitations\n\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field 'effective_annotations' for all of the annotations present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Stores optional user-defined metadata on the policy binding. Annotations are non-authoritative and do not change the binding's access-control behaviour."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls whether Terraform can delete the live folder policy binding. Deleting the binding removes the policy association enforced on the folder and can remove an active access-control restriction from the live cloud environment. Enforcing PREVENT reduces the risk of accidental removal of that security control during infrastructure changes. The security impact comes from removal of the live policy binding and its enforced access restriction, rather than from Terraform state management itself."
     },
     "display_name": {
       "description": "Optional. The description of the policy binding. Must be less than or equal to 63 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive text for the policy binding and does not affect policy enforcement."
     },
     "folder": {
       "description": "The parent folder for the PolicyBinding.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the parent folder containing the policy binding. It is a team-specific resource reference and should not be prescribed by platform policy."
     },
     "location": {
       "description": "The location of the PolicyBinding.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "security_impact": false,
+      "rationale": "Specifies the IAM policy-binding location. These policy bindings use the global IAM location, so there is no meaningful regional data-residency choice for a platform whitelist to constrain."
     },
     "policy": {
       "description": "Required. Immutable. The resource name of the policy to be bound. The binding parent and policy must belong to the same Organization (or Project).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the policy that will be bound. Selecting which team-specific policy to enforce is part of the organisation's access-control design and should not be prescribed by a generic platform rule."
     },
     "policy_binding_id": {
       "description": "The Policy Binding ID.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the identifier of the policy binding. Platform policy should not constrain team-specific resource names."
     },
     "policy_kind": {
       "description": "Immutable. The kind of the policy to attach in this binding. This\nfield must be one of the following:  - Left empty (will be automatically set\nto the policy kind) - The input policy kind   Possible values:  POLICY_KIND_UNSPECIFIED PRINCIPAL_ACCESS_BOUNDARY ACCESS",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the kind of policy attached by the binding. This is a functional policy architecture choice, and the provider restricts the value to supported policy kinds."
     },
     "condition": {
       "type": "block",
@@ -67,29 +67,29 @@
       "description": "Optional. Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides explanatory text for the binding condition and does not affect enforcement."
     },
     "condition.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains a team-defined CEL expression controlling when the policy binding applies. The correct expression depends on the organisation's access model, so generic constraints would overreach into free-form policy logic."
     },
     "condition.location": {
       "description": "Optional. String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides source-location information for expression error reporting. It is not the deployment location and has no security effect."
     },
     "condition.title": {
       "description": "Optional. Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a short descriptive title for the condition and does not affect enforcement."
     },
     "target": {
       "type": "block",
@@ -100,8 +100,8 @@
       "description": "Required. Immutable. Full Resource Name of the principal set used for principal access boundary policy bindings.\nExamples for each one of the following supported principal set types:\n* Folder: '//cloudresourcemanager.googleapis.com/folders/FOLDER_ID'\nIt must be parent by the policy binding's parent (the folder).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the principal set to which the policy is bound. Choosing the target principal set is team-specific IAM design and cannot be generically constrained without prescribing identities or resource references."
     }
   }
 }
