@@ -1,4 +1,4 @@
-package terraform.gcp.security.network_services.google_network_services_lb_traffic_extension.fail_open
+package terraform.gcp.security.network_services.google_network_services_lb_traffic_extension.extension_chains_extensions_fail_open
 
 import data.terraform.helpers
 import data.terraform.gcp.security.network_services.google_network_services_lb_traffic_extension.vars
