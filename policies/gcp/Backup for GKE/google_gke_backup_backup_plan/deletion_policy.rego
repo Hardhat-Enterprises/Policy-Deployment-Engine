@@ -1,17 +1,22 @@
 package terraform.gcp.security.backup_for_gke.google_gke_backup_backup_plan.deletion_policy
 
-import data.terraform.helpers
-import data.terraform.gcp.security.backup_for_gke.google_gke_backup_backup_plan.vars
+import data.terraform.helpers as helpers
+import data.terraform.gcp.security.backup_for_gke.google_gke_backup_backup_plan.vars as vars
 
-conditions := [
+conditions := [[
   {
-    "condition": "Deletion policy must not be empty or null",
+    "situation_description": "Backup Plan must be protected from accidental deletion.",
+    "remedies": ["Set deletion_policy = PREVENT."],
+  },
+  {
+    "condition": "deletion_policy must be PREVENT.",
     "attribute_path": ["deletion_policy"],
-    "values": ["null", ""],
-    "policy_type": "blocklist"
-  }
-]
+    "values": ["PREVENT"],
+    "policy_type": "whitelist",
+  },
+]]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := result.message
+details := result.details
