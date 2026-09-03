@@ -77,7 +77,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument controls operational traffic routing percentages between deployed models (e.g., for canary rollouts). It governs deployment mechanics and capacity distribution, not security perimeters, access controls, or data protection."
+      "rationale": "This parameter configures a map determining the percentage of traffic forwarded to each deployed model. It acts strictly as an architectural rollout control governing deployment capacity and operational traffic routing, rather than serving as a direct security boundary or security perimeter."
     },
     "encryption_spec": {
       "type": "block",
@@ -108,7 +108,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "While enabling logging is a security posture improvement, tuning the specific sampling rate is an operational trade-off between visibility, storage costs, and data volume. A generic platform policy should not dictate team-specific cost-management levers."
+      "rationale": "This parameter strictly defines the percentage of prediction requests to be logged. Quantitative sampling rate tuning is an operational cost-management lever and an observability trade-off, which falls entirely out of scope for core platform security policies or security enforcement boundaries."
     },
     "predict_request_response_logging_config.bigquery_destination": {
       "type": "block",
@@ -120,7 +120,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This specifies the exact BigQuery destination for the logs. Mandating a value here would require hardcoding specific project or dataset URIs for each team, which violates the requirement for generic, non-team-specific platform policies."
+      "rationale": "This field specifies the BigQuery URI used as the destination for request-response logging. It is explicitly classified as an external resource reference that requires team-specific, operational URIs to be configured, rather than acting as a platform-level security toggle or access-control mechanism."
     },
     "private_service_connect_config": {
     "type": "block",
