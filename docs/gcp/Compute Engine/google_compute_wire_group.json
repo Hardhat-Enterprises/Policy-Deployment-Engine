@@ -6,43 +6,43 @@
       "description": "Indicates whether the wire group is administratively enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "admin_enabled is an operational availability toggle controlling whether the wire group is active, not an access, exposure, or data control."
     },
     "cross_site_network": {
       "description": "Required cross site network to which wire group belongs.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "cross_site_network is an identifier/reference to the parent network this wire group belongs to, an architectural choice rather than a control itself."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "If deletion_policy is left at the default value of DELETE, this resource can be destroyed accidentally via terraform destroy or apply, removing active network connectivity configuration without warning."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when you create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "description is a free-text label field with no functional effect on resource behaviour, so it carries no security impact."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is created. The name must be\n1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first\ncharacter must be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "name is a resource identifier constrained by naming convention, not a control affecting access, exposure, or data protection."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "project is an identifier/reference to the parent project, not a control itself, security is enforced by the resource's own settings, not this pointer."
     },
     "endpoints": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "The identifier for this object. Format specified above.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "endpoints.endpoint is an identifier for the endpoint object, not a control affecting access, exposure, or data protection."
     },
     "endpoints.interconnects": {
       "type": "block",
@@ -65,22 +65,22 @@
       "description": "N/A",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "endpoints.interconnects.interconnect is an identifier/reference field, not a control affecting access, exposure, or data protection."
     },
     "endpoints.interconnects.interconnect_name": {
       "description": "The identifier for this object. Format specified above.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "endpoints.interconnects.interconnect_name is an identifier constrained by naming convention, not a control affecting access, exposure, or data protection."
     },
     "endpoints.interconnects.vlan_tags": {
       "description": "VLAN tags for the interconnect.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "VLAN tags define network segmentation boundaries for the interconnect. A misconfigured or overly broad VLAN tag can bridge traffic across segments that should remain isolated, a direct access/exposure concern analogous to src_ip_ranges scoping."
     },
     "wire_properties": {
       "type": "block",
@@ -91,22 +91,22 @@
       "description": "The configuration of a wire's bandwidth allocation.\nALLOCATE_PER_WIRE: configures a separate unmetered bandwidth allocation (and associated charges) for each wire in the group.\nSHARED_WITH_WIRE_GROUP: this is the default behavior, which configures one unmetered bandwidth allocation for the wire group. The unmetered bandwidth is divided equally across each wire in the group, but dynamic\nthrottling reallocates unused unmetered bandwidth from unused or underused wires to other wires in the group.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "bandwidth_allocation is a performance/cost allocation model choice between wires, not a control affecting access, exposure, or data protection."
     },
     "wire_properties.bandwidth_unmetered": {
       "description": "The unmetered bandwidth setting.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "bandwidth_unmetered is a performance/capacity tuning value, not a control affecting access, exposure, or data protection."
     },
     "wire_properties.fault_response": {
       "description": "Response when a fault is detected in a pseudowire:\nNONE: default.\nDISABLE_PORT: set the port line protocol down when inline probes detect a fault. This setting is only permitted on port mode pseudowires.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "fault_response determines whether the port is disabled on fault detection (fail-secure) or left running (fail-open, the default). This is a fail-secure vs fail-open enforcement decision directly affecting whether faulty/compromised links continue passing traffic."
     }
   }
 }
