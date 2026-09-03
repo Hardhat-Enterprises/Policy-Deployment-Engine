@@ -20,12 +20,14 @@ For a branch named `Service/gcp/cloud_storage/google_storage_bucket`, these are 
 | Path | What it is | Allowed |
 |---|---|---|
 | `docs/gcp/Cloud Storage/google_storage_bucket.json` | your documentation | add or edit |
-| `inputs/gcp/Cloud Storage/google_storage_bucket/**` | your `compliant.tf` / `config.tf` / `nonCompliant.tf` | add or edit |
+| `inputs/gcp/Cloud Storage/google_storage_bucket/**` | your `compliant.tf` / `config.tf` / `nonCompliant.tf`, and the `<sha>.json` plan the harness writes beside them | add or edit |
 | `policies/gcp/Cloud Storage/google_storage_bucket/**` | your `_vars.rego` and `<argument>.rego` | add or edit |
-| `inputs/plan_cache/**` | the shared terraform plan cache | **add only** |
 
 Nothing else. Not another resource type in your own service folder, not the shared harness, not
-the workflow files, and **no deletions anywhere** — not even inside your own folder.
+the workflow files, and **no deletions anywhere** — not even inside your own folder. The one
+exception is a `<sha>.json` plan inside your own fixtures: editing a fixture changes its sha, so
+the harness deletes the plan of the old version as it writes the new one. Commit that deletion
+along with the new file.
 
 Note that the service in the branch name is a **slug**: docs folder names contain spaces and
 brackets that are illegal in a git branch name, so `docs/gcp/Cloud Run (v2 API)/` is written
@@ -123,22 +125,19 @@ If you think the harness or a template really is wrong — a missing rule, a bug
 `policy_lint.py` — raise it with a senior team member so it can go in on its own `feature/`
 branch, where it will be reviewed as a change to everybody's tooling.
 
-## plan-cache-modified
+## legacy-plan-cache
 
-`inputs/plan_cache/` holds the committed terraform plan for **every** fixture pair in the repo,
-so that CI does not have to re-run `terraform plan` for a thousand resources on every push. Your
-branch may **add** entries to it — that is what happens when you test a new fixture of your own —
-but it must never change or delete the entries that are already there.
+Committed terraform plans used to live in one shared tree, `inputs/plan_cache/`. They now live
+inside the fixture directory they were planned from, as `<sha>.json`. That tree is gone, and a
+branch that adds files back into it is working from a checkout older than the move — usually
+because a local run on an old branch re-created it.
 
-If you see hundreds of these, a local test run cleared the cache and you committed the result.
-That deletes other people's cached plans; it is the single most disruptive thing a resource
-branch can do, and nothing about your own resource looks wrong afterwards. Restore it and commit
-the restoration:
+Delete it and pick up the current layout:
 
-    git checkout origin/dev -- inputs/plan_cache
-    git commit -m "restore plan cache"
+    git rm -r --cached inputs/plan_cache
+    git merge origin/dev
 
-Then re-run your tests and commit only the new entries they add.
+Then re-run your tests. The plan for your own fixture is written beside it; commit that.
 
 ---
 
