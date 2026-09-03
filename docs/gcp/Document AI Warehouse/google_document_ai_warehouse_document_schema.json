@@ -53,8 +53,8 @@
       "description": "Whether the property can be filtered. If this is a sub-property, all the parent properties must be marked filterable.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Setting this true lets the property's value be used as a structured query filter across the corpus, which lets a caller with query access probe for or enumerate documents by a specific property value (e.g. whether any document has property = X) even without full-text search or direct view of the field. That is a data-exposure/enumeration side-channel like is_searchable, so it should default to false for sensitive properties."
+      "security_impact": false,
+      "rationale": "Controls whether the property's value can be used as a structured query filter - a retrieval/indexing behaviour, not an access-control boundary. Actual document access is governed by IAM/warehouse-level permissions elsewhere, not by per-field search/filter flags."
     },
     "property_definitions.is_metadata": {
       "description": "Whether the property is user supplied metadata.",
@@ -81,8 +81,8 @@
       "description": "Indicates that the property should be included in a global search.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Setting this true includes the property's value in the warehouse-wide global search index, so any principal with query access to the corpus can discover it in search results across every document that uses this schema - independent of whether they would otherwise be shown that specific field. For a property holding sensitive content this materially widens the exposure surface, so it should default to false and only be enabled for properties confirmed non-sensitive."
+      "security_impact": false,
+      "rationale": "Controls whether the property's value is included in the global search index - a retrieval/indexing behaviour, not an access-control boundary. Actual document access is governed by IAM/warehouse-level permissions elsewhere, not by per-field search/filter flags."
     },
     "property_definitions.name": {
       "description": "The name of the metadata property.",
@@ -158,8 +158,8 @@
       "description": "Whether the property can be filtered. If this is a sub-property, all the parent properties must be marked filterable.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Setting this true lets the property's value be used as a structured query filter across the corpus, which lets a caller with query access probe for or enumerate documents by a specific property value (e.g. whether any document has property = X) even without full-text search or direct view of the field. That is a data-exposure/enumeration side-channel like is_searchable, so it should default to false for sensitive properties."
+      "security_impact": false,
+      "rationale": "Controls whether the property's value can be used as a structured query filter - a retrieval/indexing behaviour, not an access-control boundary. Actual document access is governed by IAM/warehouse-level permissions elsewhere, not by per-field search/filter flags."
     },
     "property_definitions.property_type_options.property_definitions.is_metadata": {
       "description": "Whether the property is user supplied metadata.",
@@ -186,8 +186,8 @@
       "description": "Indicates that the property should be included in a global search.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Setting this true includes the property's value in the warehouse-wide global search index, so any principal with query access to the corpus can discover it in search results across every document that uses this schema - independent of whether they would otherwise be shown that specific field. For a property holding sensitive content this materially widens the exposure surface, so it should default to false and only be enabled for properties confirmed non-sensitive."
+      "security_impact": false,
+      "rationale": "Controls whether the property's value is included in the global search index - a retrieval/indexing behaviour, not an access-control boundary. Actual document access is governed by IAM/warehouse-level permissions elsewhere, not by per-field search/filter flags."
     },
     "property_definitions.property_type_options.property_definitions.name": {
       "description": "The name of the metadata property.",

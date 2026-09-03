@@ -3,6 +3,12 @@ package terraform.gcp.security.document_ai_warehouse.google_document_ai_warehous
 import data.terraform.helpers
 import data.terraform.gcp.security.document_ai_warehouse.google_document_ai_warehouse_document_schema.vars
 
+# RETIRED (PDE review): property_definitions.property_type_options.property_definitions.is_searchable
+# is reclassified security_impact: false in docs — it controls retrieval/indexing
+# behaviour, not access control; document access is governed by IAM/warehouse-level
+# permissions elsewhere. Left in place and still enforced because Service/ branches
+# cannot delete files; a senior team member should remove this file and its
+# fixtures on a chore/ branch.
 conditions := [
     [
         {
