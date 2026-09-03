@@ -6,7 +6,7 @@ import data.terraform.gcp.security.cloud_iam.google_iam_folders_policy_binding.v
 conditions := [
     [
         {
-            "situation_description": "The folder policy binding can be deleted by Terraform, which can remove an active access-control restriction from the live cloud environment.",
+            "situation_description": "The live folder policy binding can be deleted by Terraform, which can remove an actively enforced access-control restriction from the Google Cloud environment.",
             "remedies": ["Set deletion_policy to PREVENT to reduce the risk of accidentally deleting the live folder policy binding and removing its enforced access-control restriction."]
         },
         {
