@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "Prevents service_account from using the editor role default service account",
             "attribute_path": ["service_account"],
-            "values": ["-*", [["compute@developer.gserviceaccount.com"]]],
+            "values": ["-*@*", [["compute"], ["developer.gserviceaccount.com"]]],
             "policy_type": "pattern blacklist"
         }
     ],
