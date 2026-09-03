@@ -1,7 +1,7 @@
 resource "google_cloudbuildv2_connection" "non_compliant_example_1" {
   project  = "non_compliant_example_1"
-  location = "us-central1"
-  name     = "my-connection"
+  location = "australia-southeast2"
+  name     = "non_compliant_example_1"
 
   bitbucket_cloud_config {
     workspace                     = "my-workspace"
