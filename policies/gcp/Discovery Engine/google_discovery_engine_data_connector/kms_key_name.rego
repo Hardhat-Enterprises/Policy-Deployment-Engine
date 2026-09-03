@@ -3,23 +3,18 @@ package terraform.gcp.security.discovery_engine.google_discovery_engine_data_con
 import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.google_discovery_engine_data_connector.vars
 
-# Require the KMS key to use a platform-approved location.
+# Require a customer-managed encryption key to be configured.
 conditions := [
     [
         {
-            "situation_description": "Does the connector use a KMS key in an approved location?",
-            "remedies": ["Use a Cloud KMS key in an approved platform location."],
+            "situation_description": "Does the connector configure a KMS key for CMEK encryption?",
+            "remedies": ["Set kms_key_name to a non-empty Cloud KMS key resource name."],
         },
         {
-            "condition": "KMS key is outside the approved platform location",
+            "condition": "KMS key name is not configured",
             "attribute_path": ["kms_key_name"],
-            "values": [
-                "locations/*/keyRings/",
-                [
-                    ["australia-southeast1"],
-                ],
-            ],
-            "policy_type": "pattern whitelist",
+            "values": [null, ""],
+            "policy_type": "blacklist",
         },
     ],
 ]
