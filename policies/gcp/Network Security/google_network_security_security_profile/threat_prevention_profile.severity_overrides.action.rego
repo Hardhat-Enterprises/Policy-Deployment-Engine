@@ -1,4 +1,4 @@
-package terraform.gcp.security.network_security.google_network_security_security_profile.severity_overrides.action
+package terraform.gcp.security.network_security.google_network_security_security_profile.threat_prevention_profile_severity_overrides_action
 import data.terraform.helpers
 import data.terraform.gcp.security.network_security.google_network_security_security_profile.vars
 
