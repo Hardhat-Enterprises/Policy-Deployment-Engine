@@ -10,7 +10,7 @@
       "rationale": "annotations has no security impact on the service or data"
     },
     "bare_metal_version": {
-      "description": "A human readable description of this Bare Metal Admin Cluster.",
+      "description": "The Anthos clusters on bare metal version for the admin cluster resource.",
       "required": false,
       "type": "string",
       "security_impact": true,
@@ -77,8 +77,8 @@
       "description": "The value of the arg as it will be passed to the API Server command line.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The literal value paired with an api_server_args.argument entry carries no security meaning on its own - its effect depends entirely on which kube-apiserver flag (argument) it modifies, and argument itself was already assessed as carrying no security impact. The policy engine evaluates one attribute in isolation and cannot correlate value with its sibling argument name, so a check on value alone could not distinguish a sensitive flag (e.g. anonymous-auth) from a benign one (e.g. max-requests-inflight) and would be either meaningless or misleading."
     },
     "control_plane.control_plane_node_pool_config": {
       "type": "block",
@@ -94,15 +94,15 @@
       "description": "The map of Kubernetes labels (key/value pairs) to be applied to\neach node. These will added in addition to any default label(s)\nthat Kubernetes may apply to the node. In case of conflict in\nlabel keys, the applied set may differ depending on the Kubernetes\nversion -- it's best to assume the behavior is undefined and\nconflicts should be avoided. For more information, including usage\nand the valid values, see:\n  - http://kubernetes.io/v1.1/docs/user-guide/labels.html\nAn object containing a list of \"key\": value pairs.\nFor example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Kubernetes labels are organisational metadata (grouping/selection); they carry no access-control or exposure implication."
     },
     "control_plane.control_plane_node_pool_config.node_pool_config.operating_system": {
       "description": "Specifies the nodes operating system (default: LINUX).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the node OS family for the control-plane node pool (default LINUX); this is a platform-compatibility choice, not an access or exposure control."
     },
     "control_plane.control_plane_node_pool_config.node_pool_config.node_configs": {
       "type": "block",
@@ -113,15 +113,15 @@
       "description": "The map of Kubernetes labels (key/value pairs) to be applied to\neach node. These will added in addition to any default label(s)\nthat Kubernetes may apply to the node. In case of conflict in\nlabel keys, the applied set may differ depending on the Kubernetes\nversion -- it's best to assume the behavior is undefined and\nconflicts should be avoided. For more information, including usage\nand the valid values, see:\n  - http://kubernetes.io/v1.1/docs/user-guide/labels.html\nAn object containing a list of \"key\": value pairs.\nFor example: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Kubernetes labels are organisational metadata (grouping/selection); they carry no access-control or exposure implication."
     },
     "control_plane.control_plane_node_pool_config.node_pool_config.node_configs.node_ip": {
       "description": "The default IPv4 address for SSH access and Kubernetes node.\nExample: 192.168.0.1",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The IPv4 address of a specific control-plane node's host machine. Like load_balancer.vip_config.control_plane_vip and node_access_config.login_user on this resource, this is an environment-specific network value with no universal 'safe' setting - a generic policy cannot constrain it without hardcoding a customer's own IP addressing plan."
     },
     "control_plane.control_plane_node_pool_config.node_pool_config.taints": {
       "type": "block",
@@ -132,22 +132,22 @@
       "description": "Specifies the nodes operating system (default: LINUX). Possible values: [\"EFFECT_UNSPECIFIED\", \"PREFER_NO_SCHEDULE\", \"NO_EXECUTE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Kubernetes scheduling taint effect; controls pod placement eligibility, not access or exposure."
     },
     "control_plane.control_plane_node_pool_config.node_pool_config.taints.key": {
       "description": "Key associated with the effect.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which taint a value/effect pair applies to; scheduling metadata only, no access-control implication."
     },
     "control_plane.control_plane_node_pool_config.node_pool_config.taints.value": {
       "description": "Value associated with the effect.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Scheduling taint value; no access-control implication."
     },
     "load_balancer": {
       "type": "block",
@@ -163,8 +163,8 @@
       "description": "BGP autonomous system number (ASN) of the cluster.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The BGP autonomous system number identifying the cluster's routing domain; an environment-specific network identifier, not an access or exposure control."
     },
     "load_balancer.bgp_lb_config.address_pools": {
       "type": "block",
@@ -175,29 +175,29 @@
       "description": "The addresses that are part of this pool.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The IP addresses/ranges assigned to the BGP address pool; environment-specific addressing, the same reasoning already applied to the CIDR block fields elsewhere on this resource."
     },
     "load_balancer.bgp_lb_config.address_pools.avoid_buggy_ips": {
       "description": "This avoids buggy consumer devices mistakenly\ndropping IPv4 traffic for those special IP addresses.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A compatibility workaround for buggy consumer devices mishandling certain IPv4 addresses; has no security implication."
     },
     "load_balancer.bgp_lb_config.address_pools.manual_assign": {
       "description": "If true, prevent IP addresses from being automatically assigned.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether pool IPs are assigned automatically or manually; an operational choice with no access-control implication."
     },
     "load_balancer.bgp_lb_config.address_pools.pool": {
       "description": "N/A",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier/name for the address pool; naming has no access-control implication."
     },
     "load_balancer.bgp_lb_config.bgp_peer_configs": {
       "type": "block",
@@ -208,22 +208,22 @@
       "description": "BGP autonomous system number (ASN) of the cluster.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The external BGP peer's autonomous system number; an environment-specific network identifier, not an access or exposure control."
     },
     "load_balancer.bgp_lb_config.bgp_peer_configs.control_plane_nodes": {
       "description": "The IP address of the control plane node that\nconnects to the external peer.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "IP addresses of the control-plane nodes that connect to the external BGP peer; environment-specific network values, the same reasoning already applied to node_ip on this resource."
     },
     "load_balancer.bgp_lb_config.bgp_peer_configs.ip_address": {
       "description": "N/A",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The external BGP peer's IP address; an environment-specific network value with no universal 'safe' setting."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config": {
       "type": "block",
@@ -239,15 +239,15 @@
       "description": "The labels assigned to nodes of this node pool.\nAn object containing a list of key/value pairs.\nExample:\n{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Kubernetes labels are organisational metadata (grouping/selection); they carry no access-control or exposure implication."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config.node_pool_config.operating_system": {
       "description": "The available Operating Systems to be run in a Node.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the node OS family for the load-balancer node pool (default LINUX); a platform-compatibility choice, not an access or exposure control."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config.node_pool_config.kubelet_config": {
       "type": "block",
@@ -258,22 +258,22 @@
       "description": "N/A",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A kubelet image-registry pull burst-rate tuning parameter; a performance/throughput knob, not an access or exposure control."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config.node_pool_config.kubelet_config.registry_pull_qps": {
       "description": "N/A",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A kubelet image-registry pull rate-limit tuning parameter; a performance/throughput knob, not an access or exposure control."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config.node_pool_config.kubelet_config.serialize_image_pulls_disabled": {
       "description": "N/A",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether image pulls run in parallel or serially on a node; a performance setting that does not affect image provenance or access control."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config.node_pool_config.node_configs": {
       "type": "block",
@@ -284,15 +284,15 @@
       "description": "The labels assigned to nodes of this node pool.\nAn object containing a list of key/value pairs.\nExample:\n{ \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Kubernetes labels are organisational metadata (grouping/selection); they carry no access-control or exposure implication."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config.node_pool_config.node_configs.node_ip": {
       "description": "The default IPv4 address for SSH access and Kubernetes node. Example: 192.168.0.1",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The IPv4 address of a specific load-balancer node's host machine; an environment-specific network value, the same reasoning already applied to node_ip elsewhere on this resource."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config.node_pool_config.taints": {
       "type": "block",
@@ -303,22 +303,22 @@
       "description": "Available taint effects.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Kubernetes scheduling taint effect; controls pod placement eligibility, not access or exposure."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config.node_pool_config.taints.key": {
       "description": "Key associated with the effect.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which taint a value/effect pair applies to; scheduling metadata only, no access-control implication."
     },
     "load_balancer.bgp_lb_config.load_balancer_node_pool_config.node_pool_config.taints.value": {
       "description": "N/A",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Scheduling taint value; no access-control implication."
     },
     "load_balancer.manual_lb_config": {
       "type": "block",
@@ -329,8 +329,8 @@
       "description": "Whether manual load balancing is enabled.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses manual load balancing over BGP/other modes; an infrastructure-topology choice with no inherently 'safe' state, the same reasoning already applied to load_balancer.vip_config and load_balancer.port_config on this resource."
     },
     "load_balancer.port_config": {
       "type": "block",
@@ -377,8 +377,8 @@
       "description": "Enables the use of advanced Anthos networking features.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables Bundled Load Balancing with BGP and the egress NAT gateway feature set (per Google's Distributed Cloud bare metal cluster-configuration reference) - a networking-architecture capability toggle, not an access-control or authentication setting. It does not gate Kubernetes NetworkPolicy enforcement: GKE Dataplane V2, which implements NetworkPolicy via Cilium/eBPF, is built into Google Distributed Cloud bare metal and is always active regardless of this flag."
     },
     "network_config.island_mode_cidr": {
       "type": "block",
@@ -408,8 +408,8 @@
       "description": "When set network_config.advanced_networking is automatically\nset to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables pods to attach multiple network interfaces; an immutable, environment-specific network-topology choice fixed at cluster creation. Neither enabled nor disabled is inherently the safer state - it depends on the customer's own network segmentation design - so it is not a useful policy target."
     },
     "node_access_config": {
       "type": "block",
@@ -490,15 +490,15 @@
       "description": "The host machine path.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The host machine filesystem path mounted into the cluster as a local PersistentVolume - functionally a hostPath-style mount. Pointing it at a sensitive system path (e.g. '/', '/etc', '/root', '/boot', '/proc', '/sys', '/var/run/docker.sock') exposes host filesystem content or control-plane sockets to workloads, a well-established Kubernetes container-escape/privilege-escalation vector. Unlike a customer's own IP addressing, dangerous path roots are identifiable in the abstract, so a blacklist of known-sensitive host paths is a meaningful policy target even though the full safe path space is customer-specific."
     },
     "storage.lvp_node_mounts_config.storage_class": {
       "description": "The StorageClass name that PVs will be created with.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A Kubernetes StorageClass name; an identifier/reference, not itself an access-control setting."
     },
     "storage.lvp_share_config": {
       "type": "block",
@@ -521,15 +521,15 @@
       "description": "The host machine path.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The host machine filesystem path mounted into the cluster as a local PersistentVolume - functionally a hostPath-style mount. Pointing it at a sensitive system path (e.g. '/', '/etc', '/root', '/boot', '/proc', '/sys', '/var/run/docker.sock') exposes host filesystem content or control-plane sockets to workloads, a well-established Kubernetes container-escape/privilege-escalation vector. Unlike a customer's own IP addressing, dangerous path roots are identifiable in the abstract, so a blacklist of known-sensitive host paths is a meaningful policy target even though the full safe path space is customer-specific."
     },
     "storage.lvp_share_config.lvp_config.storage_class": {
       "description": "The StorageClass name that PVs will be created with.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A Kubernetes StorageClass name; an identifier/reference, not itself an access-control setting."
     }
   }
 }
