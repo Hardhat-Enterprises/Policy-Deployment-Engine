@@ -11,4 +11,10 @@ resource "google_compute_storage_pool" "non_compliant_example_1" {
   zone = "australia-southeast1-a"
 
   deletion_protection = true
+
+  params {
+    resource_manager_tags = {
+      "pde-project-vindya/security" = "not-required"
+    }
+  }
 }

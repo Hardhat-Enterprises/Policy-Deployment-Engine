@@ -8,17 +8,18 @@ conditions := [
         {
             "situation_description": "Storage Pool does not have the required security Resource Manager tag",
             "remedies": [
-                "Add the approved Resource Manager security tag to the Storage Pool"
+                "Add the required Resource Manager security tag to the Storage Pool"
             ]
         },
         {
-            "condition": "Resource Manager tags must include the approved security tag",
-            "attribute_path": ["params", 0, "resource_manager_tags"],
-            "values": [
-                {
-                    "pde-project-vindya/security": "required"
-                }
+            "condition": "Storage Pool must have the required security Resource Manager tag",
+            "attribute_path": [
+                "params",
+                0,
+                "resource_manager_tags",
+                "pde-project-vindya/security"
             ],
+            "values": ["required"],
             "policy_type": "whitelist"
         }
     ]
