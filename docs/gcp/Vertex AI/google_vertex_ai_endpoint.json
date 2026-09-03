@@ -88,8 +88,8 @@
       "description": "Required. The Cloud KMS resource identifier of the customer managed encryption key used to protect a resource. Has the form: 'projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key'. The key needs to be in the same region as where the compute resource is created.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This specifies the exact Customer-Managed Encryption Key identifier. Because Terraform already enforces this as a required field whenever the encryption block is used, a policy checking for its presence is redundant. Furthermore, mandating a specific key value would require hardcoding team-specific key IDs, which violates generic platform policy rules."
+      "security_impact": true,
+      "rationale": "This parameter directly maps to the require-encryption/CMEK archetype. A platform security policy must enforce that kms_key_name is set to a valid, non-empty value to guarantee that Vertex AI endpoints are protected using Customer-Managed Encryption Keys rather than default Google-managed keys. The policy enforces the presence of a key reference without hardcoding any specific key identifier."
     },
     "predict_request_response_logging_config": {
       "type": "block",
@@ -138,8 +138,8 @@
       "description": "A list of Projects from which the forwarding rule will target the service attachment.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "While an allowlist restricts access and improves security, enforcing specific allowed projects requires team-specific knowledge. A generic, platform-wide policy cannot mandate hardcoded project values without violating the generic policy rules."
+      "security_impact": true,
+      "rationale": "This parameter acts as a critical network-exposure control that gates which tenants can reach the private resource. A platform policy must enforce that this allowlist exists and is appropriately bounded (non-empty and not overly broad) to prevent open-to-all misconfigurations, effectively restricting unauthorized network exposure without hardcoding specific immutable project IDs."
     },
     "private_service_connect_config.psc_automation_configs": {
       "type": "block",
