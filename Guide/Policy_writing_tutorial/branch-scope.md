@@ -132,12 +132,20 @@ inside the fixture directory they were planned from, as `<sha>.json`. That tree 
 branch that adds files back into it is working from a checkout older than the move — usually
 because a local run on an old branch re-created it.
 
-Delete it and pick up the current layout:
+**Usually you do not have to do anything about it by hand.** Merge `origin/dev`, then run the
+test harness for your resource as normal:
 
-    git rm -r --cached inputs/plan_cache
     git merge origin/dev
+    python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
 
-Then re-run your tests. The plan for your own fixture is written beside it; commit that.
+The harness moves your own plan out of `inputs/plan_cache/` and into your fixture directory
+itself — the file's contents were always the plan for those `*.tf`, so nothing is re-planned. It
+prints `adopted N plan(s) from the pre-move inputs/plan_cache/ layout`. Commit what it moved:
+
+    git add inputs "the files it moved, and the deletions"
+
+If entries are left over afterwards, they belong to fixtures that are not yours — those came in
+with a stray `git add .`, and `git rm -r inputs/plan_cache` is the fix.
 
 ---
 

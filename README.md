@@ -166,6 +166,16 @@ planned from (the `<sha>` is a hash of those `*.tf` files + the provider version
 The file is a plain `terraform show -json` document, so you can read it with `jq` like any
 other plan.
 
+`fixture_sha()` and `plan_cache_path()` in `scripts/auto_test/auto_test.py` are the only
+definition of which plan belongs to which fixture. The linters and the PDE Portal import them
+rather than re-deriving a path or a hash — which is why a provider bump, or the move out of
+`inputs/plan_cache/`, changes the answer everywhere at once. Import them; don't inline them.
+
+> Plans used to live in one shared `inputs/plan_cache/<platform>/<sha>.json` tree. A branch cut
+> before that move carries its own entries there through a merge of `dev`; the next `auto_test.py`
+> run moves them into the right fixture directories for you (`adopted N plan(s) from the pre-move
+> inputs/plan_cache/ layout`) rather than re-planning anything. Commit what it moved.
+
 ### Prerequisites
 
 - **`opa`** — always required (every test evaluates a policy).

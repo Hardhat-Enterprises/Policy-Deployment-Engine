@@ -45,6 +45,12 @@ CACHE_SETUP_SCRIPT = Path(__file__).resolve().parent / "cache_setup.sh"
 #
 # The file is a pure `terraform show -json` document: nothing wraps it, so OPA,
 # jq and the linters all read it as the plan it is.
+#
+# fixture_sha() and plan_cache_path() are the ONLY definition of "which plan
+# belongs to this fixture". The linters and the portal import them rather than
+# re-deriving a path or a hash, which is why a provider bump — or this move out
+# of inputs/plan_cache/ — changed the answer everywhere at once. Do not inline
+# either of them anywhere; import them.
 TARGET_PROVIDER_VERSION = (Path(__file__).resolve().parent / "provider_version.txt").read_text().strip()
 
 # Committed plan files are named <64 hex chars>.json. Terraform only ever parses
@@ -69,8 +75,53 @@ def plan_cache_path(input_dir: Path) -> Path:
     return input_dir / f"{fixture_sha(input_dir)}.json"
 
 
+def legacy_plan_path(input_dir: Path, sha: str) -> Path | None:
+    """Where this fixture's plan lived before plans moved into the fixture dirs.
+
+    ``<inputs>/plan_cache/<platform>/<sha>.json``, resolved from the fixture's own
+    ancestry rather than from REPO_ROOT so a tree under _tests/ resolves inside
+    itself. None when ``input_dir`` is not under an ``inputs/<platform>/`` path.
+    """
+    parts = input_dir.resolve().parts
+    try:
+        i = len(parts) - 1 - parts[::-1].index("inputs")
+    except ValueError:
+        return None
+    if i + 1 >= len(parts):
+        return None
+    inputs_root = Path(*parts[: i + 1])
+    return inputs_root / "plan_cache" / parts[i + 1] / f"{sha}.json"
+
+
+def adopt_legacy_plan(input_dir: Path, cache_path: Path) -> bool:
+    """Move a pre-move plan into the fixture dir. True if one was adopted.
+
+    Every Service branch that ever committed a plan carries its own
+    inputs/plan_cache/ entries through a merge of dev — they are additions git has
+    no reason to drop — so after merging they hold a legacy file the harness would
+    ignore and the linters would flag twice over (legacy-plan-cache from
+    branch_scope, fixture-missing-plan from policy_lint). The contents are still
+    exactly the plan for these *.tf, since the sha is the same hash it always was,
+    so the next local run moves it into place instead of re-planning the fixture
+    and leaving the contributor a manual `git rm` to work out.
+    """
+    if cache_path.exists():
+        return False
+    legacy = legacy_plan_path(input_dir, cache_path.stem)
+    if legacy is None or not legacy.is_file():
+        return False
+    try:
+        os.replace(legacy, cache_path)
+    except OSError:
+        return False
+    return True
+
+
 def get_or_build_plan(input_dir: Path, cache_path: Path, verbose: bool = False) -> Path | None:
     """Return the fixture's committed plan, running terraform first if it is absent.
+
+    A plan left at the pre-move path is adopted first (see adopt_legacy_plan), so
+    a branch that merges dev does not re-plan every fixture it owns.
 
     On the way out, any *other* .json in the fixture dir is deleted: the fixture
     has exactly one valid plan, so a sibling is the leftover of an earlier version
@@ -78,6 +129,7 @@ def get_or_build_plan(input_dir: Path, cache_path: Path, verbose: bool = False) 
     happens once ``cache_path`` is known-good, so a fixture whose terraform failed
     keeps whatever it already had — that plan may be unrebuildable offline.
     """
+    adopt_legacy_plan(input_dir, cache_path)
     if not cache_path.exists() and run_terraform_commands(input_dir, cache_path, verbose) is None:
         return None
     prune_stale_plans(input_dir, keep=cache_path)
@@ -764,6 +816,13 @@ def main():
     # terraform/provider at all). Stale siblings are pruned per fixture as each
     # pair runs — see get_or_build_plan — so there is no whole-tree prune step.
     pair_cache = {(i, p): plan_cache_path(i) for i, p in pairs}
+    # Adopt any pre-move plans before counting misses, so a branch that has just
+    # merged dev neither re-plans its fixtures nor stands up a provider mirror it
+    # turns out not to need.
+    adopted = sum(1 for (i, _), cp in pair_cache.items() if adopt_legacy_plan(i, cp))
+    if adopted:
+        print(f"[*] adopted {adopted} plan(s) from the pre-move inputs/plan_cache/ layout "
+              "— commit the moved files")
     misses = sum(1 for cp in pair_cache.values() if not cp.exists())
     if misses:
         print(f"[*] {misses}/{len(pairs)} plan(s) not cached — ensuring terraform provider cache…")
