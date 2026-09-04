@@ -1,5 +1,5 @@
 resource "google_dialogflow_generator" "non_compliant_example_1" {
-  location = "us_east1"
+  location = "australia_southeast1"
   deletion_policy = "DELETE"
   project = "my_gcp_project"
   description = "A v4.0 summarization generator."
