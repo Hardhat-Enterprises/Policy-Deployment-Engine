@@ -26,6 +26,7 @@ conditions := [
             ],
             "policy_type": "whitelist"
         }
+        
     ]
 ]
 
