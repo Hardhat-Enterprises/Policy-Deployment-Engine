@@ -80,11 +80,35 @@ uv run python scripts/docgen/generator.py --csp gcp --mode refresh-existing \
   (≠ `""`) matched by dotted key. Bumps `last_updated` and `provider_version`. Does not
   create new resource files.
 
+## apply_canonical.py
+
+Some arguments mean the same thing on every resource — data residency
+(`location` / `region` / `zone`) and the common IAM keys — so their assessment is
+locked in one place, `lib/canonical.py`, rather than re-decided per resource. New
+resources pick those values up from the generator automatically.
+
+`apply_canonical.py` is for the files that already exist: it walks
+`docs/gcp/**/*.json` and overwrites those canonical keys with the locked values.
+
+```bash
+# See what would change — this is the default, nothing is written:
+uv run python scripts/docgen/apply_canonical.py
+
+# Write it:
+uv run python scripts/docgen/apply_canonical.py --apply
+```
+
+It **overwrites** `security_impact` and `rationale` on the keys it owns, so a
+hand-written assessment of a canonical key is replaced. That is the intent — one
+answer for `location` across the tree — but it is why the dry run is the default.
+Run it from the repo root, and review the diff before committing.
+
 ## Layout
 
 ```
 scripts/docgen/
   generator.py            # CLI + orchestration + the two re-run modes
+  apply_canonical.py      # re-apply the locked cross-cutting assessments (above)
   lib/
     schema_source.py      # terraform/tofu init + `providers schema -json` (cached)
     service_map.py        # resource -> verbatim subcategory (reuses docgen clone)

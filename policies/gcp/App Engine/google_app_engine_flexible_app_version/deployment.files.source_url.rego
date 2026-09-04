@@ -1,4 +1,4 @@
-package terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.deployment.files.source_url
+package terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.deployment_files_source_url
 import data.terraform.helpers
 import data.terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.vars
 
