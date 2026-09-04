@@ -91,8 +91,8 @@ RULES = {
         "compliant.tf and nonCompliant.tf differ on attributes other than the "
         "argument under test."),
     "fixture-missing-plan": (
-        "No committed plan cache for this fixture pair — run the test locally and "
-        "commit inputs/plan_cache."),
+        "No committed plan for this fixture pair — run the test locally and commit "
+        "the <sha>.json the harness writes into the fixture directory."),
     "fixture-one-sided": (
         "The fixture has no compliant examples at all, or no non-compliant examples "
         "at all, so one half of what the harness checks is never exercised."),
@@ -397,15 +397,16 @@ def _resolve_helpers(policies_root, helpers_dir=None):
 # --------------------------------------------------------------------------- #
 # Plan cache
 # --------------------------------------------------------------------------- #
-def plan_cache_for(root, input_dir):
-    """``<root>/inputs/plan_cache/<platform>/<sha>.json`` for a fixture dir.
+def plan_cache_for(input_dir):
+    """``<input_dir>/<sha>.json`` — the committed plan, beside the fixture's *.tf.
 
-    The sha and platform come from ``auto_test.plan_cache_path`` (the pipeline's
-    own definition); only the *root* is rebased, so a fixture tree under
-    ``_tests/`` resolves inside itself. For the real repo this is the identity.
+    Straight through to ``auto_test.plan_cache_path`` (the pipeline's own
+    definition of which plan belongs to a fixture), so a provider bump changes
+    the expected filename here and in the harness at the same time. No root
+    rebasing is needed any more: the plan lives inside the directory it is for,
+    so a fixture tree under ``_tests/`` resolves inside itself for free.
     """
-    canonical = plan_cache_path(Path(input_dir))
-    return Path(root) / "inputs" / "plan_cache" / canonical.parent.name / canonical.name
+    return plan_cache_path(Path(input_dir))
 
 
 # --------------------------------------------------------------------------- #
@@ -838,24 +839,26 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     if not input_dir.is_dir() or not any(input_dir.glob("*.tf")):
         return []
 
-    cache = plan_cache_for(root, input_dir)
+    cache = plan_cache_for(input_dir)
     if not cache.exists():
+        # Reported repo-relative: the finding is read in CI logs and on the portal,
+        # where an absolute path of the checkout means nothing.
         return [Finding(service, resource_type, stem, "fixture-missing-plan",
-                        f"no committed plan cache at inputs/plan_cache/{platform}/"
-                        f"{cache.name} — run auto_test locally and commit it")]
+                        f"no committed plan at {cache.relative_to(root).as_posix()} — "
+                        "run auto_test locally and commit the file it writes")]
 
     try:
         plan = json.loads(cache.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         return [Finding(service, resource_type, stem, "fixture-missing-plan",
-                        f"plan cache {cache.name} is unreadable: {exc}")]
+                        f"plan {cache.name} is unreadable: {exc}")]
 
     # A cache written by an older/other tool (or a truncated file) must be a
     # finding, not an AttributeError halfway down this function.
     resources = _plan_resources(plan)
     if resources is None:
         return [Finding(service, resource_type, stem, "lint-error",
-                        f"plan cache {cache.name} is not a Terraform plan "
+                        f"plan {cache.name} is not a Terraform plan "
                         "(no planned_values.root_module.resources list)")]
 
     compliant, non_compliant = {}, {}
