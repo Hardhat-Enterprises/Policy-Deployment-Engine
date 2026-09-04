@@ -278,11 +278,15 @@ the two files are numbered independently of each other:
 
 ## fixture-missing-plan
 
-There's no committed plan cache for this fixture pair at `inputs/plan_cache/gcp/<sha>.json`. Run
-the test harness locally and commit what it produces:
+There's no committed plan for this fixture pair. Every fixture directory holds one, named
+`<sha>.json` for the hash of the `*.tf` beside it. Run the test harness locally and commit what
+it writes into your fixture directories:
 
     python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
-    git add inputs/plan_cache/
+    git add "inputs/gcp/<Service>/<resource type>"
+
+If you changed a fixture, the same run also deletes the plan of its previous version — commit
+that deletion too.
 
 See [Testing your policies](testing-policies.md#top) for the full local test loop.
 

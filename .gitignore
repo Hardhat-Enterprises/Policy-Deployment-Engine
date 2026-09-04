@@ -128,7 +128,12 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
-# Terraform plan files
+# Terraform plan files.
+#
+# NOT `*.json`, and nothing that matches a bare 64-hex name: every fixture dir
+# holds its committed plan as `<sha>.json` (see scripts/auto_test/auto_test.py),
+# and an ignore rule that swallowed it would silently stop the cache being
+# committed — CI would then re-run terraform for the whole tree.
 *.tfplan
 plan
 plan_*.json

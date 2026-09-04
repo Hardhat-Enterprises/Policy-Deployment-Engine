@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the prevent-destructive-loss archetype: a generic platform policy can require this be set to 'PREVENT' so a security-enforcing client TLS policy cannot be accidentally destroyed via terraform apply/destroy."
     },
     "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Cosmetic free-text field with no bearing on enforcement."
     },
     "labels": {
       "description": "Set of label tags associated with the ClientTlsPolicy resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Organisational metadata for filtering/billing; does not affect enforcement."
     },
     "location": {
       "description": "The location of the client tls policy.\nThe default value is 'global'.",
@@ -34,15 +34,15 @@
       "description": "Name of the ClientTlsPolicy resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier only; naming has no security bearing."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which project owns the resource. A generic platform policy cannot constrain this without hardcoding a specific project ID, which is team-specific and out of scope."
     },
     "sni": {
       "description": "Server Name Indication string to present to the server during TLS handshake. E.g: \"secure.example.com\".",
@@ -65,8 +65,8 @@
       "description": "Plugin instance name, used to locate and load CertificateProvider instance configuration. Set to \"google_cloud_private_spiffe\" to use Certificate Authority Service certificate provider instance.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "plugin_instance is an arbitrary, team-chosen string identifying which certificate provider to use, not a fixed value a generic policy can enforce. Pinning a specific plugin instance name would be overreaching."
     },
     "client_certificate.grpc_endpoint": {
       "type": "block",
@@ -77,8 +77,8 @@
       "description": "The target URI of the gRPC endpoint. Only UDS path is supported, and should start with \"unix:\".",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A local Unix domain socket path to a certificate-serving endpoint \u2014 environment-specific infrastructure detail. Not something a generic platform policy can meaningfully constrain beyond the schema's existing 'unix:' prefix requirement."
     },
     "server_validation_ca": {
       "type": "block",
@@ -94,8 +94,8 @@
       "description": "Plugin instance name, used to locate and load CertificateProvider instance configuration. Set to \"google_cloud_private_spiffe\" to use Certificate Authority Service certificate provider instance.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "plugin_instance is an arbitrary, team-chosen string identifying which certificate provider to use, not a fixed value a generic policy can enforce. Pinning a specific plugin instance name would be overreaching, consistent with the identical client_certificate.certificate_provider_instance.plugin_instance field on this same resource."
     },
     "server_validation_ca.grpc_endpoint": {
       "type": "block",
@@ -106,8 +106,8 @@
       "description": "The target URI of the gRPC endpoint. Only UDS path is supported, and should start with \"unix:\".",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A local Unix domain socket path to a certificate-serving endpoint \u2014 environment-specific infrastructure detail, same reasoning as the client-side equivalent."
     }
   }
 }
