@@ -1,4 +1,4 @@
-package terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.handlers.static_files.application_readable
+package terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.handlers_static_files_application_readable
 import data.terraform.helpers
 import data.terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.vars
 

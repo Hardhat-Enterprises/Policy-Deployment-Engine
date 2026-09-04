@@ -78,6 +78,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -101,17 +102,43 @@ IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}  # OS junk, ignored eve
 # Inputs-tree allow-lists (argument-dir leaf files). Edit as the pipeline grows.
 # --------------------------------------------------------------------------- #
 INPUT_REQUIRED_FILES = {"compliant.tf", "config.tf", "nonCompliant.tf"}  # must exist in every arg dir
-# Transient terraform artifacts, tolerated in a working tree (all gitignored).
-# Deliberately NO *.json entries: the only .json an argument dir may hold is the
-# committed plan, and that is checked by name against the fixture's own sha —
-# a tolerated `plan.json` would be a second, unverifiable plan sitting next to it.
+# Fallback tolerance for transient terraform artifacts, used ONLY when git cannot
+# be consulted (see ignored_under()). With git available the question is asked
+# exactly: a file git would let you commit is a file this linter must judge, and a
+# file git ignores is the contributor's own working mess and none of its business.
+# That matters because the guide walks contributors through
+# `terraform plan --out=plan` and `terraform show -json plan > plan.json` to find an
+# attribute path, so those files are *expected* to exist locally.
 INPUT_ALLOWED_TF_FILES = {
     ".terraform.lock.hcl",
-    "plan", "tfplan",
+    "plan", "plan.json", "tfplan", "tfplan.json",
     "terraform.tfstate", "terraform.tfstate.backup",
     "crash.log",
 }
 INPUT_ALLOWED_TF_DIRS = {".terraform"}                    # the only directory tolerated in an arg dir
+
+
+def ignored_under(root):
+    """Paths under ``root`` that git ignores — untracked and excluded.
+
+    One `git ls-files` for the whole tree, so the per-directory checks below are
+    set lookups. A file that is *tracked* never appears here even if a later
+    .gitignore rule would match it, which is the behaviour wanted: a binary
+    `tfplan` that reached dev has to be reported, however well ignored it would be
+    today.
+
+    Returns None outside a git checkout (or with no git on PATH), and the callers
+    then fall back to INPUT_ALLOWED_TF_FILES.
+    """
+    try:
+        proc = subprocess.run(
+            ["git", "ls-files", "--others", "--ignored", "--exclude-standard", "-z", "--", str(root)],
+            capture_output=True, text=True)
+    except (OSError, ValueError):
+        return None
+    if proc.returncode != 0:
+        return None
+    return {os.path.normpath(p) for p in proc.stdout.split("\0") if p}
 
 # --------------------------------------------------------------------------- #
 # Policies-tree allow-lists.
@@ -342,6 +369,13 @@ class InputsValidator:
         self.root = inputs_root
         self.docs = docs_index  # {service: {resource: {arg: type}}}
         self.logger = logger
+        self.ignored = ignored_under(inputs_root)   # None outside a git checkout
+
+    def _is_ignored(self, path):
+        """Would git decline to commit this? Then it is not this linter's business."""
+        if self.ignored is None:
+            return False
+        return os.path.normpath(os.path.relpath(path, start=os.curdir)) in self.ignored
 
     def _entries(self, path):
         try:
@@ -436,7 +470,8 @@ class InputsValidator:
         # harness shows up here as a stale plan rather than being silently tested
         # against the plan of its old config.
         expected = f"{fixture_sha(Path(arg_path))}.json"
-        plans = sorted(e for e in entries if e.endswith(".json"))
+        plans = sorted(e for e in entries if e.endswith(".json")
+                       and not self._is_ignored(os.path.join(arg_path, e)))
         if not plans:
             self.logger.log(f"{rel}: missing committed plan '{expected}' "
                             f"(run auto_test.py for this resource and commit the file it writes)")
@@ -452,12 +487,17 @@ class InputsValidator:
         for entry in entries:
             if entry in INPUT_REQUIRED_FILES or entry.endswith(".json"):
                 continue
-            if os.path.isdir(os.path.join(arg_path, entry)):
+            full = os.path.join(arg_path, entry)
+            if os.path.isdir(full):
                 if entry not in INPUT_ALLOWED_TF_DIRS:
                     self.logger.log(f"{rel}/{entry}: directories not allowed in an argument dir")
-            elif entry not in INPUT_ALLOWED_TF_FILES:
+            elif self._is_ignored(full):
+                continue                      # your own working mess; git will not commit it
+            elif self.ignored is None and entry in INPUT_ALLOWED_TF_FILES:
+                continue                      # no git to ask — fall back to the allow-list
+            else:
                 self.logger.log(f"{rel}/{entry}: unexpected file "
-                                f"(not required and not a terraform artifact — should be removed)")
+                                f"(git would commit this; delete it or add it to .gitignore)")
 
 
 class PoliciesValidator:

@@ -807,6 +807,26 @@ def _is_fixture_label(value):
     return isinstance(value, str) and bool(FIXTURE_LABEL_RE.match(value))
 
 
+# A *value* that names itself after the fixture it belongs to. Deliberately looser
+# than FIXTURE_LABEL_RE, which matches a terraform resource label and may keep its
+# underscores: many GCP id fields reject underscores, so a contributor naming an
+# example has to write `compliant-example-1`, and `compliant-assistant-1` is the
+# same act of naming. The polarity carries the meaning — a value starting
+# `compliant-` beside one starting `non-compliant-` is one label written twice, not
+# two different configurations.
+_LABEL_VALUE_RE = re.compile(r"^(non[-_]compliant|compliant)[-_]", re.I)
+
+
+def _label_polarity(value):
+    """'compliant' / 'non_compliant' when a value names itself after the fixture."""
+    if not isinstance(value, str):
+        return None
+    match = _LABEL_VALUE_RE.match(value)
+    if not match:
+        return None
+    return "non_compliant" if match.group(1).lower().startswith("non") else "compliant"
+
+
 def _drift_comparisons(compliant, non_compliant):
     """(compliant_values, non_compliant_values) pairs for the drift rule.
 
@@ -904,11 +924,35 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
 
     drifted = set()
     for good, bad in _drift_comparisons(compliant, non_compliant):
+        # What the argument under test is actually set to on each side. A key that
+        # merely carries these values onward is a mirror of the thing being tested,
+        # not a second difference: `google_service_account.email` is built from
+        # `account_id`, and a regional resource's `target` URL embeds its `region`.
+        # Changing the argument necessarily changes them, so reporting them tells a
+        # contributor to remove a difference the provider requires.
+        arg_good, arg_bad = good.get(argument_key), bad.get(argument_key)
+        mirrors = (isinstance(arg_good, str) and isinstance(arg_bad, str)
+                   and len(arg_good) >= 3 and len(arg_bad) >= 3 and arg_good != arg_bad)
+
         for key in set(good) | set(bad):
             if key in ignored:
                 continue
             good_value, bad_value = good.get(key), bad.get(key)
             if good_value == bad_value:
+                continue
+            # Case-sensitive containment on purpose: `location = "global"` beside
+            # `scope.type = "GLOBAL"` is a real editorial choice about the fixture,
+            # not a value the provider derived.
+            if (mirrors and isinstance(good_value, str) and isinstance(bad_value, str)
+                    and arg_good in good_value and arg_bad in bad_value):
+                continue
+            # A key whose two values are the fixture's own labels is naming, not
+            # drift — `odb_subnet_id = "compliant-example-1"` against
+            # `"non-compliant-example-1"` is one name written twice. The polarity
+            # has to line up: the compliant side must carry the compliant label. A
+            # pair that merely looks label-ish on one side stays drift.
+            if (_label_polarity(good_value) == "compliant"
+                    and _label_polarity(bad_value) == "non_compliant"):
                 continue
             # The identity attribute (`bucket` on an IAM binding, `name`
             # elsewhere) is exempt ONLY when it *is* the fixture label — two
@@ -947,11 +991,22 @@ def _friendly_name_index(policies_root, platform):
     """{normalised friendly name: [(service, resource_type), ...]} for a platform.
 
     Duplicate detection is only meaningful across the whole tree, so this reads
-    *every* ``_vars.rego`` under ``policies/<platform>/``. It does that in ONE
-    ``opa eval`` over the platform (~0.6s); asking per file cost 370 subprocesses
-    and ~9s for a single-resource lint. Package names are read from the files
-    themselves (a plain regex, no subprocess) so each result maps back to its
-    real service folder and resource-type directory.
+    *every* ``_vars.rego`` under ``policies/<platform>/``. It needs exactly one
+    field from each, ``friendly_resource_name``, and in every file in the tree that
+    field is a plain string literal — so the name is read straight out of the text
+    and OPA is not involved at all.
+
+    That is the one place this linter reads text rather than evaluated Rego, and it
+    is worth being precise about why it is safe here and nowhere else. A rule that
+    decides a finding has to see what the policy actually evaluates to; this index
+    only has to recognise the same literal twice. Evaluating the whole platform to
+    obtain it cost 0.93s of the 1.05s a single-resource lint spent — for a result
+    measured to be byte-identical to the regex over all 441 files.
+
+    A file whose name the regex cannot read is not assumed absent: those files, and
+    only those, are resolved with one ``opa eval`` over the platform. So a
+    ``friendly_resource_name`` that is computed rather than declared still lands in
+    the index correctly; it just makes the run pay for what it needs.
     """
     policies_root = Path(policies_root)
     key = (str(policies_root.resolve()), platform)
@@ -960,31 +1015,40 @@ def _friendly_name_index(policies_root, platform):
 
     platform_root = policies_root / platform
     vars_paths = sorted(platform_root.glob(f"*/*/{VARS_FILE}"))
-    helpers_dir = _resolve_helpers(policies_root)
-    try:
-        tree = _run_opa("data.terraform", helpers_dir, platform_root) or {}
-    except OpaUnavailableError:
-        raise
-    except PolicyLintError:
-        # ONE unparseable file anywhere under the platform fails the batch. Asking
-        # per file instead meant ~370 subprocesses (0.8s -> 9.3s) just because of an
-        # unrelated typo, so read the names out of the text instead: a friendly name
-        # is a literal in the file, and this index only needs that one field.
-        tree = None
 
-    index = {}
+    names, unread = {}, []
     for vars_path in vars_paths:
         try:
-            variables = None
-            if tree is not None:
-                variables = _walk(tree, _package_of(vars_path).split(".")[1:]
-                                  + ["variables"])
-            friendly = (variables.get("friendly_resource_name")
-                        if isinstance(variables, dict) else None)
-            if friendly is None:
-                friendly = _friendly_name_from_text(vars_path)
-        except (PolicyLintError, OSError, UnicodeDecodeError):
+            friendly = _friendly_name_from_text(vars_path)
+        except (OSError, UnicodeDecodeError):
             continue
+        if friendly is None:
+            unread.append(vars_path)
+        else:
+            names[vars_path] = friendly
+
+    if unread:
+        # Only now is an evaluation worth its cost, and only for these files.
+        helpers_dir = _resolve_helpers(policies_root)
+        try:
+            tree = _run_opa("data.terraform", helpers_dir, platform_root) or {}
+        except OpaUnavailableError:
+            raise
+        except PolicyLintError:
+            # ONE unparseable file anywhere under the platform fails the batch.
+            # Nothing more to try: those names stay out of the index.
+            tree = None
+        for vars_path in unread:
+            try:
+                variables = _walk(tree, _package_of(vars_path).split(".")[1:]
+                                  + ["variables"]) if tree is not None else None
+            except (PolicyLintError, OSError, UnicodeDecodeError):
+                continue
+            if isinstance(variables, dict):
+                names[vars_path] = variables.get("friendly_resource_name")
+
+    index = {}
+    for vars_path, friendly in names.items():
         friendly = friendly.strip().lower() if isinstance(friendly, str) else ""
         if friendly:
             index.setdefault(friendly, []).append(

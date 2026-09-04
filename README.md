@@ -200,7 +200,7 @@ rather than re-deriving a path or a hash — which is why a provider bump, or th
 | Tool | What it does | Docs |
 |------|--------------|------|
 | `scripts/check_resource.py` | **Start here.** Runs every check CI runs against your branch — branch name, scope, lint, doc completeness, argument coverage, OPA test — and names the one that failed. | [Testing your policies](Guide/Policy_writing_tutorial/testing-policies.md) |
-| `scripts/docgen/` | Generates the `docs/` JSON (one file per resource, every argument) from the Terraform provider **schema**. | [README](scripts/docgen/README.md) |
+| `scripts/docgen/` | Generates the `docs/` JSON (one file per resource, every argument) from the Terraform provider **schema**; `apply_canonical.py` re-applies the locked cross-cutting assessments (location/region/zone, IAM) to existing files. | [README](scripts/docgen/README.md) |
 | `scripts/linters/` | Validates that `docs/`, `inputs/`, and `policies/` reconcile (structure + content) and checks the branch-name convention. | [README](scripts/linters/readme-linters.md) |
 | `scripts/auto_test/` | `terraform plan` + `opa eval` harness over the fixtures, with a committed plan cache and an offline project-local provider cache. | "Testing Your Policies Locally" above |
 | `scripts/folder_generator/` | Small GUI to scaffold a new resource's input + policy files from `templates/`. | [README](scripts/folder_generator/README.md) |
