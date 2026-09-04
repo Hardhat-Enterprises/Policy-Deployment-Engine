@@ -16,10 +16,10 @@ There are four supporting scripts:
 - `check_branch_name.py` — enforces the branch naming convention.
 - `branch_scope.py` — enforces that a `Service/<platform>/<service_slug>/<resource_type>`
   branch changes **only** that resource's files (`docs/` JSON, `inputs/`,
-  `policies/`), plus additions to `inputs/plan_cache/`. It catches the two
-  silent mistakes — editing the shared harness and wiping the plan cache —
-  neither of which fails any test on the branch that caused it. Rules are
-  documented in `Guide/Policy_writing_tutorial/branch-scope.md`.
+  `policies/`). It catches the two silent mistakes — editing the shared harness
+  and sweeping up another resource's files — neither of which fails any test on
+  the branch that caused it. Rules are documented in
+  `Guide/Policy_writing_tutorial/branch-scope.md`.
 - `policy_lint.py` — deterministic *content*-quality rules over a policy kit's
   declared `conditions`/`variables` (hard-coded literals, trivial messages,
   fixture drift, ...). It answers whether the policy is any good, not just
