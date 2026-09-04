@@ -2,11 +2,11 @@
 
 Each case under ``fixtures/`` is a miniature repo tree (``docs/``, ``policies/``,
 ``inputs/``). The trees are copied into ``tmp_path`` before every test and the
-committed ``expected_plan.json`` next to a fixture's ``*.tf`` files is installed
-at the sha-named path ``inputs/plan_cache/<platform>/<sha>.json`` that
-``auto_test.plan_cache_path`` derives. Installing it at copy time (instead of
-committing it under that name) keeps the tests correct when the pinned provider
-version changes — the sha is recomputed from the same function the pipeline uses.
+committed ``expected_plan.json`` next to a fixture's ``*.tf`` files is renamed to
+the sha-named ``<sha>.json`` that ``auto_test.plan_cache_path`` derives — the same
+directory, the committed name. Renaming at copy time (instead of committing it
+under that name) keeps the tests correct when the pinned provider version changes:
+the sha is recomputed from the same function the pipeline uses.
 """
 
 import json
@@ -36,17 +36,15 @@ def _clean_caches():
 
 
 def build_tree(tmp_path, case):
-    """Copy fixture ``case`` into tmp_path and install its plan-cache entries."""
+    """Copy fixture ``case`` into tmp_path and install its committed plans."""
     dst = tmp_path / case
     shutil.copytree(FIXTURES / case, dst)
     for template in sorted(dst.rglob("expected_plan.json")):
-        cache = policy_lint.plan_cache_for(dst, template.parent)
-        # Guard rail: a bug in the re-rooting would otherwise have these tests
-        # writing plan-cache entries into the real repo.
+        cache = policy_lint.plan_cache_for(template.parent)
+        # Guard rail: the plan must land inside the copied tree, never in the real
+        # repo — it is derived from a path, and a path bug is silent otherwise.
         assert dst in cache.parents, f"{cache} escaped the fixture tree {dst}"
-        cache.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(template, cache)
-        template.unlink()
+        template.rename(cache)
     return dst
 
 
@@ -351,7 +349,7 @@ def test_fixture_drift_and_missing_plan(tmp_path):
         ("uniform_bucket_level_access", "fixture-missing-plan"),
     }
     missing = [f for f in findings if f.rule == "fixture-missing-plan"][0]
-    assert "no committed plan cache" in missing.message
+    assert "no committed plan at inputs/gcp/Cloud Storage/" in missing.message
     drift = [f for f in findings if f.rule == "fixture-drift"][0]
     # storage_class is the only attribute that differs besides name and the
     # argument under test — it must be the one named.
@@ -374,7 +372,7 @@ def test_fixture_drift_ignores_identity_and_computed_mirrors(tmp_path, resource_
         f"{noise} must not be read as drift"
     # And the plan really does differ on it, so the exemption is doing work.
     plan_dir = root / "inputs" / "gcp" / "Cloud Storage" / resource_type
-    cache = policy_lint.plan_cache_for(root, next(plan_dir.iterdir()))
+    cache = policy_lint.plan_cache_for(next(plan_dir.iterdir()))
     plan = json.loads(cache.read_text())
     values = {r["name"]: r["values"]
               for r in plan["planned_values"]["root_module"]["resources"]}
@@ -383,13 +381,14 @@ def test_fixture_drift_ignores_identity_and_computed_mirrors(tmp_path, resource_
 
 
 def test_plan_cache_for_matches_auto_test_on_the_real_repo():
-    # Re-rooting must be a no-op when the tree IS the repo, so the linter reads
-    # exactly the cache entries auto_test writes.
+    # The linter must read exactly the file auto_test writes: same directory as the
+    # fixture, same sha-derived name.
     input_dir = (project_root / "inputs" / "gcp" / "Cloud Storage"
                  / "google_storage_bucket" / "public_access_prevention")
     assert input_dir.is_dir(), "real fixture moved — update this test"
-    assert (policy_lint.plan_cache_for(project_root, input_dir)
-            == auto_test.plan_cache_path(input_dir))
+    cache = policy_lint.plan_cache_for(input_dir)
+    assert cache == auto_test.plan_cache_path(input_dir)
+    assert cache.parent == input_dir, "the committed plan lives beside its fixture"
 
 
 # --------------------------------------------------------------------------- #
@@ -666,7 +665,7 @@ def test_malformed_plan_cache_is_a_lint_error(tmp_path, payload):
     root = build_tree(tmp_path, "clean")
     input_dir = (root / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket"
                  / "public_access_prevention")
-    policy_lint.plan_cache_for(root, input_dir).write_text(payload)
+    policy_lint.plan_cache_for(input_dir).write_text(payload)
     findings = policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
     assert pairs(findings) == {("public_access_prevention", "lint-error")}
 
@@ -714,7 +713,7 @@ def _bucket_plan(root):
     """(cache_path, plan, resources) for the clean tree's bucket fixture."""
     input_dir = (root / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket"
                  / CLEAN_BUCKET_ARG)
-    cache = policy_lint.plan_cache_for(root, input_dir)
+    cache = policy_lint.plan_cache_for(input_dir)
     plan = json.loads(cache.read_text())
     return cache, plan, plan["planned_values"]["root_module"]["resources"]
 
