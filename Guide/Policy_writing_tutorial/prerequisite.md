@@ -46,6 +46,19 @@ git merge origin/dev
 ```
 pre-commit install
 ```
+
+Every commit then checks your branch name, your branch scope, the linters, your documentation
+and your argument coverage — and runs the OPA test too whenever your fixtures already have a
+committed plan. It skips the OPA test when a fixture you just edited would need `terraform` to
+run, so before you push, run the full check yourself:
+
+```
+python3 scripts/check_resource.py
+```
+
+That is the same set of checks CI runs. See
+[Testing your policies](testing-policies.md#top).
+
 #### Create your working branch
 
 Branch names must follow the repo convention (enforced by the branch-name check

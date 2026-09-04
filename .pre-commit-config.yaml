@@ -10,8 +10,18 @@
 # - branch-scope-check keeps a Service/ branch to its own resource's files. It
 #   runs with --staged so it sees what you are about to commit, which is where a
 #   stray `git add .` gets caught — before it is ever pushed.
+# - resource-gate runs the checks that only make sense for one resource: doc
+#   completeness, true-arg coverage, and the OPA test. --gate-only because the
+#   three hooks above already cover the rest of scripts/check_resource.py.
 #
-# Both do their own git inspection, so pass_filenames is false and always_run
+#   --if-cached is the important flag. With every plan committed the OPA test is
+#   0.2-0.9s, cheaper than the linting above it; but a fixture you just edited has
+#   no committed plan, and building one means running terraform — which on a fresh
+#   clone also downloads the provider mirror. A git hook may not do minutes of
+#   network to you, so it skips instead and says to run the full command before
+#   pushing.
+#
+# They all do their own git inspection, so pass_filenames is false and always_run
 # is true (the script decides whether there is anything to check).
 repos:
   - repo: local
@@ -31,6 +41,12 @@ repos:
       - id: branch-scope-check
         name: Branch scope (own resource only)
         entry: python scripts/linters/branch_scope.py --staged
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: resource-gate
+        name: Resource gate (docs, coverage, OPA)
+        entry: python scripts/check_resource.py --gate-only --if-cached
         language: system
         pass_filenames: false
         always_run: true

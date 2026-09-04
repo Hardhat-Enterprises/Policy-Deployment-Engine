@@ -199,6 +199,7 @@ rather than re-deriving a path or a hash — which is why a provider bump, or th
 
 | Tool | What it does | Docs |
 |------|--------------|------|
+| `scripts/check_resource.py` | **Start here.** Runs every check CI runs against your branch — branch name, scope, lint, doc completeness, argument coverage, OPA test — and names the one that failed. | [Testing your policies](Guide/Policy_writing_tutorial/testing-policies.md) |
 | `scripts/docgen/` | Generates the `docs/` JSON (one file per resource, every argument) from the Terraform provider **schema**. | [README](scripts/docgen/README.md) |
 | `scripts/linters/` | Validates that `docs/`, `inputs/`, and `policies/` reconcile (structure + content) and checks the branch-name convention. | [README](scripts/linters/readme-linters.md) |
 | `scripts/auto_test/` | `terraform plan` + `opa eval` harness over the fixtures, with a committed plan cache and an offline project-local provider cache. | "Testing Your Policies Locally" above |
@@ -214,8 +215,17 @@ Two GitHub Actions workflows in `.github/workflows/`:
   - *policy_check* job (only `Service/...` PRs): the per-resource gate — doc completeness
     (real `security_impact` + rationale), policy/input coverage for every `true` arg, and the
     `terraform plan` + OPA test. It then applies a `CI-Approved` / `CI-Review-Required` label.
-- **`policy_check_ALL`** — manual (`workflow_dispatch`) full-tree sweep: whole-tree lint + the
-  complete OPA suite.
+- **`policy_check_ALL`** — full-tree sweep on every push to `dev`, and on demand
+  (`workflow_dispatch`): whole-tree lint + the complete OPA suite. It publishes the
+  `policy-results` artifact the PDE Portal backend reads for the repo-wide baseline, so don't
+  rename that upload.
+- **`branch-scope`** — a `Service/` branch may only change its own resource's files.
+- **`pr-target`** — closes any pull request that does not target `dev` or `main`, with an
+  explanation on the PR.
+
+The *lint* and *policy_check* jobs run the same script you run locally
+(`scripts/check_resource.py`, with `--gate-only` for the resource job since the lint job has
+already covered the rest), so a green local run means a green CI run.
 
 A PR is blocked when a lint error lands on a file it changed, or (for `Service/` PRs) when the
 per-resource gate fails. Terraform and OPA versions are pinned in the workflows for
