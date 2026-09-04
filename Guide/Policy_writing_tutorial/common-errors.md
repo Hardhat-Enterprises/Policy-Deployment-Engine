@@ -1,6 +1,50 @@
 <a id="top"></a>
 <h1 align="center">Common Errors</h1>
 
+## Your branch is behind the shared harness
+
+The portal will not scan your branch while its copy of `scripts/` differs from the one on `dev`.
+It cannot judge your policies against a test harness that is not the harness CI uses, so instead
+of scanning it shows a blocker on your stage bar and runs nothing. **Your existing results are
+kept** — nothing you have already done is lost.
+
+This is normal whenever the shared tooling changes, and it is not something wrong with your
+resource. The fix is one merge.
+
+### Fix
+
+Bring your branch up to date, then run the test harness once:
+
+```bash
+git checkout Service/<platform>/<service_slug>/<resource_type>
+git fetch origin
+git merge origin/dev
+python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
+```
+
+The run may print something like `adopted 1 plan(s) from the pre-move inputs/plan_cache/ layout`.
+That is it moving your committed Terraform plan into your own fixture folder, which is where plans
+live now — one `<sha>.json` beside the `compliant.tf` / `nonCompliant.tf` it was planned from.
+Nothing is re-planned and nothing is lost; the file is only being put where it now belongs.
+
+Commit what the run moved, then push:
+
+```bash
+git add inputs
+git commit -m "Merge dev and move committed plan into the fixture folder"
+git push
+```
+
+If the harness printed nothing about adopting a plan, there may be nothing to add — push the merge
+on its own and you are done. The portal scans your branch again on the next push.
+
+> If `inputs/plan_cache/` still contains files after all that, they belong to other people's
+> fixtures and were picked up by a stray `git add .` at some point. Remove them with
+> `git rm -r inputs/plan_cache` and commit that too — see
+> [Branch scope](branch-scope.md#legacy-plan-cache).
+
+---
+
 ## Missing required Terraform attributes
 
 ![Failed-terraform-plan](images/failed-terraform-plan.PNG)
