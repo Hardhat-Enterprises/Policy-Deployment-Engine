@@ -1,6 +1,8 @@
 <a id="top"></a>
 <h1 align="center">Common Errors</h1>
 
+<a id="harness-out-of-date"></a>
+
 ## "Merge dev into your branch to catch up — nothing is scanned until then"
 
 Once your documentation has been reviewed, this notice replaces everything else on your portal

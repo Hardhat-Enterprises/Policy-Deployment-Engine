@@ -72,7 +72,7 @@
 - Documentation must be completed before raising a PR  
 - If the portal stops scanning your branch and asks you to merge `dev` to catch up, do that **and**
   re-run the test harness — see
-  [Merge dev into your branch to catch up](common-errors.md#merge-dev-into-your-branch-to-catch-up--nothing-is-scanned-until-then)  
+  [Merge dev into your branch to catch up](common-errors.md#harness-out-of-date)  
 
 
 <div align="center">
