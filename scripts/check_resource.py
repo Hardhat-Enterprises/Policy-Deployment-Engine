@@ -45,6 +45,9 @@ Options
                      downloads the provider mirror — minutes of network, which is
                      not something a git hook may do to you. Used by the pre-commit
                      hook; never use it as your final check before pushing.
+``--changed-only``   skip steps whose inputs this commit does not touch, judged from
+                     the staged files. Also for the pre-commit hook: it runs on every
+                     commit, and most commits change nothing this gate reads.
 
 Exits 0 when everything passed (or was legitimately skipped), 1 on any failure.
 """
@@ -146,6 +149,34 @@ def current_branch():
                        cwd=REPO, capture_output=True, text=True)
     name = r.stdout.strip()
     return name if r.returncode == 0 and name and name != "HEAD" else None
+
+
+def staged_paths():
+    """Repo-relative paths staged for the current commit."""
+    r = subprocess.run(["git", "diff", "--cached", "--name-only", "-z"],
+                       cwd=REPO, capture_output=True, text=True)
+    if r.returncode != 0:
+        return None                      # not a git checkout, or nothing to read
+    return [p for p in r.stdout.split("\0") if p]
+
+
+def touches_resource(paths, platform, folder, resource):
+    """The staged paths belonging to this resource's docs, fixtures or policies."""
+    prefixes = (f"{INPUTS}/{platform}/{folder}/{resource}/",
+                f"{POLICIES}/{platform}/{folder}/{resource}/")
+    doc = f"{DOCS}/{platform}/{folder}/{resource}.json"
+    return [p for p in paths if p == doc or p.startswith(prefixes)]
+
+
+def touches_opa_inputs(paths):
+    """Whether any staged path is something the OPA test actually reads.
+
+    A plan is built from *.tf and evaluated against *.rego. Editing the resource's
+    docs JSON changes what doc completeness and coverage say, but cannot change
+    what terraform plans or what OPA decides — so the expensive step is skippable
+    while the two cheap ones still run.
+    """
+    return any(p.endswith((".tf", ".rego")) for p in paths)
 
 
 def base_ref():
@@ -284,6 +315,8 @@ def main(argv=None):
     parser.add_argument("--if-cached", action="store_true",
                         help="Skip the OPA test when a fixture has no committed plan, rather "
                              "than running terraform to build one.")
+    parser.add_argument("--changed-only", action="store_true",
+                        help="Skip steps whose inputs the staged files do not touch.")
     args = parser.parse_args(argv)
 
     branch = args.branch or os.getenv("GITHUB_HEAD_REF") or current_branch()
@@ -319,6 +352,26 @@ def main(argv=None):
         report.fail("Resource gate",
                     f"resource doc not found: docs/{platform}/{folder}/{resource}.json")
         return report.summarise(resource)
+    # --changed-only: a commit that touches nothing this gate reads cannot change
+    # its verdict, so there is nothing to re-run. Same principle as the linters —
+    # a hook reports on what this commit did, and the full run before pushing is
+    # what confirms the resource as a whole.
+    staged = staged_paths() if args.changed_only else None
+    if staged is not None:
+        mine = touches_resource(staged, platform, folder, resource)
+        if not mine:
+            report.skip("Resource gate", "this commit changes nothing under "
+                                         f"{resource}'s docs, fixtures or policies")
+            return report.summarise(resource)
+        if not touches_opa_inputs(mine):
+            # Docs-only edit: coverage and completeness can move, the plan cannot.
+            args.if_cached = True
+            staged_opa = False
+        else:
+            staged_opa = True
+    else:
+        staged_opa = True
+
     doc = json.loads(doc_path.read_text(encoding="utf-8"))
 
     doc_errors = check_doc_completeness(doc)
@@ -341,6 +394,9 @@ def main(argv=None):
     # missing policy or fixture the OPA run would fail for a reason already reported.
     if doc_errors or cover_errors:
         report.skip("OPA test", "fix the findings above first")
+    elif not staged_opa:
+        report.skip("OPA test", "this commit changes no *.tf or *.rego, so the plan "
+                                "and the policy verdicts cannot have moved")
     else:
         step_opa(report, platform, folder, resource, args.if_cached)
 

@@ -19,10 +19,11 @@ you which check failed:
 
 If it prints `[OK] <resource>: every check passed`, CI will agree. **Run it before every push.**
 
-The `pre-commit` hooks run checks 1-5 for you on every commit, and check 6 too whenever your
-fixtures already have a committed plan — but they deliberately skip the OPA test when a fixture
-you just edited would need `terraform` to run, so this command is still the one that tells you
-everything is green.
+The `pre-commit` hooks run these for you on every commit, but only as far as the commit reaches:
+a commit that touches nothing under your resource skips checks 4-6, a docs-only commit skips
+check 6, and a fixture you have just edited skips it as well — building its plan means running
+`terraform`, which is not something a git hook should do to you. **This command is the one that
+tells you everything is green**, so run it before every push.
 
 ![linters-output](images/linters-output.PNG)
 

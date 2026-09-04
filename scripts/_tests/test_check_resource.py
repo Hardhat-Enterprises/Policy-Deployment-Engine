@@ -148,6 +148,52 @@ def test_a_missing_directory_is_not_an_error(tmp_path, monkeypatch):
 
 
 # --------------------------------------------------------------------------- #
+# --changed-only: does this commit touch anything the gate reads?
+# --------------------------------------------------------------------------- #
+ARGS = ("gcp", "Cloud Storage", "google_storage_bucket")
+
+
+@pytest.mark.parametrize("path", [
+    "docs/gcp/Cloud Storage/google_storage_bucket.json",
+    "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
+    "policies/gcp/Cloud Storage/google_storage_bucket/location.rego",
+    "policies/gcp/Cloud Storage/google_storage_bucket/_vars.rego",
+])
+def test_the_resources_own_files_are_recognised(path):
+    assert cr.touches_resource([path], *ARGS) == [path]
+
+
+@pytest.mark.parametrize("path", [
+    "docs/gcp/Cloud Storage/google_storage_bucket_iam_binding.json",   # neighbouring resource
+    "inputs/gcp/Compute Engine/google_compute_image/family/compliant.tf",
+    "policies/_helpers/helpers.rego",
+    "README.md",
+    "scripts/auto_test/auto_test.py",
+])
+def test_everything_else_is_not_this_resource(path):
+    assert cr.touches_resource([path], *ARGS) == []
+
+
+def test_a_service_folder_with_spaces_survives_the_prefix_match():
+    # Folder names carry spaces and brackets; the match is a plain string compare
+    # on repo-relative paths, so nothing needs escaping — but it is worth pinning.
+    path = "inputs/gcp/Cloud Run (v2 API)/google_cloud_run_v2_service/ingress/compliant.tf"
+    assert cr.touches_resource([path], "gcp", "Cloud Run (v2 API)",
+                               "google_cloud_run_v2_service") == [path]
+
+
+@pytest.mark.parametrize("path,reads", [
+    ("inputs/gcp/S/r/a/compliant.tf", True),
+    ("policies/gcp/S/r/a.rego", True),
+    ("docs/gcp/S/r.json", False),
+])
+def test_only_tf_and_rego_feed_the_opa_test(path, reads):
+    # A docs edit moves completeness and coverage; it cannot move a terraform plan
+    # or an OPA verdict, so the expensive step is skippable while the cheap ones run.
+    assert cr.touches_opa_inputs([path]) is reads
+
+
+# --------------------------------------------------------------------------- #
 # Reporting
 # --------------------------------------------------------------------------- #
 def test_a_clean_report_exits_zero(capsys):
