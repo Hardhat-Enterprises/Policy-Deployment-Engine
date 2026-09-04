@@ -25,8 +25,9 @@
     terraform plan --out=plan  
     terraform show -json plan > plan.json  
 
-   You don't commit this `plan.json` — the test harness generates and caches plans for you
-   under `inputs/plan_cache/`.
+   You don't commit this `plan.json` — it is gitignored. The test harness writes the plan that
+   *is* committed: a `<sha>.json` in the fixture's own directory, named for the hash of its
+   `*.tf`.
 
 6. Use the plan JSON to determine your attribute path.  
 
@@ -69,6 +70,9 @@
 - Attribute paths must match the structure of `plan.json`  
 - Always test before pushing  
 - Documentation must be completed before raising a PR  
+- If the portal stops scanning your branch and asks you to merge `dev` to catch up, do that **and**
+  re-run the test harness — see
+  [Merge dev into your branch to catch up](common-errors.md#harness-out-of-date)  
 
 
 <div align="center">
