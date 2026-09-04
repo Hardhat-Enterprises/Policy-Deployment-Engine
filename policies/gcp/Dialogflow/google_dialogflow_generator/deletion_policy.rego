@@ -20,7 +20,8 @@ conditions := [
     ]
 ]
 
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+message := result.message
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := result.details
