@@ -27,15 +27,35 @@ CACHE_SETUP_SCRIPT = Path(__file__).resolve().parent / "cache_setup.sh"
 
 # --- Committed plan-JSON cache --------------------------------------------
 # `terraform plan` (provider schema load) is ~90% of per-policy time, but the
-# fixtures are static, so the resulting plan.json only changes when a fixture's
-# *.tf or the provider version changes. We cache plan.json under
-# inputs/plan_cache/<platform>/<sha>.json (committed). On a run, a cache hit feeds
-# OPA directly and skips terraform entirely; a miss runs terraform once and writes
-# the cache. The target provider version is read from provider_version.txt (the
-# single source of truth shared with cache_setup.sh) so a provider bump
-# invalidates every cached plan.
+# fixtures are static, so a fixture's plan JSON only changes when its *.tf or the
+# provider version changes. So the plan is committed, as `<sha>.json` INSIDE the
+# fixture directory next to the *.tf files it was planned from. On a run, a cache
+# hit feeds OPA directly and skips terraform entirely; a miss runs terraform once
+# and writes the file. The target provider version is read from
+# provider_version.txt (the single source of truth shared with cache_setup.sh),
+# so a provider bump invalidates every cached plan.
+#
+# The sha is the whole validity check: the file is a hit only because its NAME is
+# the hash of the *.tf beside it, so an edited fixture cannot silently be tested
+# against the plan of its old config. Keeping the plan in the fixture dir (rather
+# than a central inputs/plan_cache/) is what makes staleness a local question —
+# any sibling *.json that is not `<current sha>.json` is stale by construction, so
+# prune_stale_plans() below is correct on a single-fixture run and needs no
+# whole-platform sweep to identify orphans.
+#
+# The file is a pure `terraform show -json` document: nothing wraps it, so OPA,
+# jq and the linters all read it as the plan it is.
+#
+# fixture_sha() and plan_cache_path() are the ONLY definition of "which plan
+# belongs to this fixture". The linters and the portal import them rather than
+# re-deriving a path or a hash, which is why a provider bump — or this move out
+# of inputs/plan_cache/ — changed the answer everywhere at once. Do not inline
+# either of them anywhere; import them.
 TARGET_PROVIDER_VERSION = (Path(__file__).resolve().parent / "provider_version.txt").read_text().strip()
-PLAN_CACHE_ROOT = REPO_ROOT / "inputs" / "plan_cache"
+
+# Committed plan files are named <64 hex chars>.json. Terraform only ever parses
+# *.tf / *.tf.json, so a hex-stemmed .json in the fixture dir is inert to it.
+PLAN_FILE_RE = re.compile(r"^[0-9a-f]{64}\.json$")
 
 
 def fixture_sha(input_dir: Path) -> str:
@@ -51,52 +71,83 @@ def fixture_sha(input_dir: Path) -> str:
 
 
 def plan_cache_path(input_dir: Path) -> Path:
-    """inputs/plan_cache/<platform>/<sha>.json for a fixture dir."""
+    """<input_dir>/<sha>.json — the committed plan for this fixture, beside its *.tf."""
+    return input_dir / f"{fixture_sha(input_dir)}.json"
+
+
+def legacy_plan_path(input_dir: Path, sha: str) -> Path | None:
+    """Where this fixture's plan lived before plans moved into the fixture dirs.
+
+    ``<inputs>/plan_cache/<platform>/<sha>.json``, resolved from the fixture's own
+    ancestry rather than from REPO_ROOT so a tree under _tests/ resolves inside
+    itself. None when ``input_dir`` is not under an ``inputs/<platform>/`` path.
+    """
     parts = input_dir.resolve().parts
-    platform = parts[parts.index("inputs") + 1]   # inputs/<platform>/<service>/...
-    return PLAN_CACHE_ROOT / platform / f"{fixture_sha(input_dir)}.json"
+    try:
+        i = len(parts) - 1 - parts[::-1].index("inputs")
+    except ValueError:
+        return None
+    if i + 1 >= len(parts):
+        return None
+    inputs_root = Path(*parts[: i + 1])
+    return inputs_root / "plan_cache" / parts[i + 1] / f"{sha}.json"
+
+
+def adopt_legacy_plan(input_dir: Path, cache_path: Path) -> bool:
+    """Move a pre-move plan into the fixture dir. True if one was adopted.
+
+    Every Service branch that ever committed a plan carries its own
+    inputs/plan_cache/ entries through a merge of dev — they are additions git has
+    no reason to drop — so after merging they hold a legacy file the harness would
+    ignore and the linters would flag twice over (legacy-plan-cache from
+    branch_scope, fixture-missing-plan from policy_lint). The contents are still
+    exactly the plan for these *.tf, since the sha is the same hash it always was,
+    so the next local run moves it into place instead of re-planning the fixture
+    and leaving the contributor a manual `git rm` to work out.
+    """
+    if cache_path.exists():
+        return False
+    legacy = legacy_plan_path(input_dir, cache_path.stem)
+    if legacy is None or not legacy.is_file():
+        return False
+    try:
+        os.replace(legacy, cache_path)
+    except OSError:
+        return False
+    return True
 
 
 def get_or_build_plan(input_dir: Path, cache_path: Path, verbose: bool = False) -> Path | None:
-    """Return the cached plan.json if present; otherwise run terraform and cache it."""
-    if cache_path.exists():
-        return cache_path
-    plan_json = run_terraform_commands(input_dir, verbose)
-    if plan_json is None or not plan_json.exists():
+    """Return the fixture's committed plan, running terraform first if it is absent.
+
+    A plan left at the pre-move path is adopted first (see adopt_legacy_plan), so
+    a branch that merges dev does not re-plan every fixture it owns.
+
+    On the way out, any *other* .json in the fixture dir is deleted: the fixture
+    has exactly one valid plan, so a sibling is the leftover of an earlier version
+    of these *.tf (or a stray plan.json from an older harness). Pruning only ever
+    happens once ``cache_path`` is known-good, so a fixture whose terraform failed
+    keeps whatever it already had — that plan may be unrebuildable offline.
+    """
+    adopt_legacy_plan(input_dir, cache_path)
+    if not cache_path.exists() and run_terraform_commands(input_dir, cache_path, verbose) is None:
         return None
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
-    # Write atomically so an interrupted run never leaves a truncated cache file
-    # that a later run would treat as a valid hit. tmp name is unique per fixture.
-    tmp = cache_path.with_suffix(f".{os.getpid()}.tmp")
-    shutil.copyfile(plan_json, tmp)
-    os.replace(tmp, cache_path)
+    prune_stale_plans(input_dir, keep=cache_path)
     return cache_path
 
 
-def prune_plan_cache(inputs_root: Path, used_paths: set[Path]) -> None:
-    """Delete cached plans no fixture references — only safe after a full-platform run."""
-    repo_inputs = (REPO_ROOT / "inputs").resolve()
-    try:
-        rel = inputs_root.resolve().relative_to(repo_inputs)
-    except ValueError:
-        print("plan-cache prune skipped: --inputs is outside the repo inputs/ tree.")
-        return
-    if len(rel.parts) > 1:
-        print(f"plan-cache prune skipped: run is scoped to '{inputs_root}', not a whole "
-              "platform — a scoped run can't know which cached plans are orphaned.")
-        return
-    platforms = {p.parent.name for p in used_paths}
+def prune_stale_plans(input_dir: Path, keep: Path) -> int:
+    """Delete every .json in a fixture dir except ``keep``. Returns the count."""
     removed = 0
-    for plat in platforms:
-        pdir = PLAN_CACHE_ROOT / plat
-        if not pdir.is_dir():
+    for f in input_dir.glob("*.json"):
+        if f.name == keep.name:
             continue
-        keep = {p.name for p in used_paths if p.parent.name == plat}
-        for f in pdir.glob("*.json"):
-            if f.name not in keep:
-                f.unlink()
-                removed += 1
-    print(f"plan-cache prune: removed {removed} orphaned plan(s).")
+        try:
+            f.unlink()
+            removed += 1
+        except OSError:
+            pass
+    return removed
 
 
 def ensure_cache_ready() -> None:
@@ -405,7 +456,8 @@ def get_policy_messages(data_paths, plan_path: Path, message_query: str) -> list
     return normalize_messages(val)
 
 
-def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | None:
+def run_terraform_commands(input_dir: Path, out_path: Path, verbose: bool = False) -> Path | None:
+    """Plan ``input_dir`` and write the plan JSON to ``out_path``. None on failure."""
     env = os.environ.copy()
 
     # Fake credentials live in a temp file OUTSIDE the repo tree, so an interrupted
@@ -428,7 +480,10 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
         'TF_CLI_CONFIG_FILE': str(CLI_CONFIG_FILE),
     })
 
-    plan_json = input_dir / "plan.json"
+    # Written via a temp file in the same dir, then os.replace'd: an interrupted
+    # run must never leave a truncated <sha>.json that the next run reads as a
+    # valid hit. One worker owns a fixture dir at a time, so pid is unique enough.
+    tmp = out_path.with_suffix(f".{os.getpid()}.tmp")
     commands = [
         ["terraform", "init", "-backend=false"],
         ["terraform", "plan", "-refresh=false", "-lock=false", "-input=false", "-out=plan"],
@@ -449,7 +504,7 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
 
         # `terraform show -json` writes the plan JSON to stdout; redirect it
         # straight to the file (no shell, no needless `| cat`).
-        with open(plan_json, "w", encoding="utf-8") as fh:
+        with open(tmp, "w", encoding="utf-8") as fh:
             result = subprocess.run(
                 ["terraform", "show", "-json", "plan"],
                 cwd=input_dir, stdout=fh, stderr=subprocess.PIPE, text=True, env=env)
@@ -459,13 +514,16 @@ def run_terraform_commands(input_dir: Path, verbose: bool = False) -> Path | Non
                 print("--- stderr ---")
                 print(result.stderr)
             return None
+        os.replace(tmp, out_path)
     finally:
         try:
             os.unlink(creds_name)
         except OSError:
             pass
+        if tmp.exists():
+            tmp.unlink(missing_ok=True)
 
-    return plan_json
+    return out_path
 
 
 def get_policy_metadata(policy_file: Path, service: str, resource: str, attribute: str) -> tuple[str, str]:
@@ -566,7 +624,7 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
     # Extract data about services and filesystem paths
     abs_input_dir = input_dir.resolve()
     service, resource, attribute = extract_path_parts(input_dir)
-    # Cache hit -> use the committed plan.json; miss -> run terraform and cache it.
+    # Cache hit -> use the committed <sha>.json; miss -> run terraform and write it.
     plan_path = get_or_build_plan(abs_input_dir, cache_path, verbose)
     cleanup_workspace(abs_input_dir, verbose)
 
@@ -574,7 +632,7 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
         res = make_failure(attribute, "Terraform failed to compile!", service, resource)
         return res
 
-    # plan_path is the persistent plan_cache file — never delete it here.
+    # plan_path is the fixture's committed <sha>.json — never delete it here.
     message_query, vars_query = get_policy_metadata(
         policy_file, service, resource, attribute)
 
@@ -614,10 +672,12 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
                                   resource_value_name)
 
 def cleanup_workspace(workdir: Path, verbose: bool = False):
-    # Remove transient terraform artifacts from the input dir. plan.json is already
-    # copied into the committed plan_cache before this runs, so the in-dir copy is
-    # transient; the lock is regenerated offline from the mirror on each init.
-    for fname in ["plan", "plan.json", ".terraform.lock.hcl"]:
+    # Remove transient terraform artifacts from the input dir. NOT the plan JSON:
+    # the harness no longer writes a `plan.json` at all — `terraform show -json`
+    # goes straight to the committed `<sha>.json`, which lives here permanently.
+    # `plan` is the binary plan file, and the lock is regenerated offline from the
+    # mirror on each init.
+    for fname in ["plan", ".terraform.lock.hcl"]:
         f = workdir / fname
         try:
             f.unlink()
@@ -724,9 +784,6 @@ def main():
                              "Default: the whole repo (policies/), or policies/<target>.")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("--workers", type=int, default=4, help="Number of parallel workers (default: 4)")
-    parser.add_argument("--prune-plan-cache", action="store_true",
-                        help="After a whole-platform/-repo run, delete cached plans no fixture "
-                             "references (orphans from changed/removed fixtures). Ignored for scoped runs.")
     parser.add_argument("--report", default=None, metavar="PATH",
                         help="Write the full results list to PATH as a JSON array of "
                              "{service, resource, policy, passed} objects (failure entries keep "
@@ -754,10 +811,18 @@ def main():
         print(" No input/policy pairs or mismatches found.")
         sys.exit(1)
 
-    # Resolve each pair's plan-cache path up front; only stand up the terraform
-    # provider cache if at least one plan is missing (a fully-cached run needs no
-    # terraform/provider at all).
+    # Resolve each pair's plan path up front; only stand up the terraform provider
+    # cache if at least one plan is missing (a fully-cached run needs no
+    # terraform/provider at all). Stale siblings are pruned per fixture as each
+    # pair runs — see get_or_build_plan — so there is no whole-tree prune step.
     pair_cache = {(i, p): plan_cache_path(i) for i, p in pairs}
+    # Adopt any pre-move plans before counting misses, so a branch that has just
+    # merged dev neither re-plans its fixtures nor stands up a provider mirror it
+    # turns out not to need.
+    adopted = sum(1 for (i, _), cp in pair_cache.items() if adopt_legacy_plan(i, cp))
+    if adopted:
+        print(f"[*] adopted {adopted} plan(s) from the pre-move inputs/plan_cache/ layout "
+              "— commit the moved files")
     misses = sum(1 for cp in pair_cache.values() if not cp.exists())
     if misses:
         print(f"[*] {misses}/{len(pairs)} plan(s) not cached — ensuring terraform provider cache…")
@@ -808,19 +873,6 @@ def main():
                           f"{fmt_duration(time.monotonic() - start_time)}", end="", flush=True)
         if not args.verbose:
             print()  # newline after the progress line
-
-    if args.prune_plan_cache:
-        # Don't prune if a fixture's terraform failed: we couldn't regenerate that
-        # plan offline, so its cache (if any) must not be treated as orphaned.
-        tf_failed = any(
-            r.get("failure", {}).get("reason", "").startswith("Terraform failed")
-            for r in results
-        )
-        if tf_failed:
-            print("plan-cache prune skipped: some fixtures failed terraform "
-                  "(cannot safely identify orphans).")
-        else:
-            prune_plan_cache(inputs_root, set(pair_cache.values()))
 
     # Emit the machine-readable report BEFORE the failure exit below, so a run with
     # failing policies still writes the full report (including passed: false entries).
