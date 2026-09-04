@@ -209,8 +209,8 @@ rather than re-deriving a path or a hash — which is why a provider bump, or th
 
 Two GitHub Actions workflows in `.github/workflows/`:
 
-- **`policy_check_PR`** — runs on every PR that touches `docs/`, `inputs/`, `policies/`, or the
-  tooling that validates them (`scripts/`, `templates/`, `tests/`, `.github/workflows/`):
+- **`policy_check_PR`** — runs on **every** pull request (no `paths:` filter: `lint` is a required
+  check, and GitHub never treats a workflow that did not run as satisfied):
   - *lint* job (all PRs): branch-name convention → whole-tree **structural** lint → the tools'
     own **test suite** → a **content** lint scoped to the files this PR changed (the repo-wide
     backlog never blocks you).
