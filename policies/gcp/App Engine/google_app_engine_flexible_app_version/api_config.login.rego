@@ -1,4 +1,4 @@
-package terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.api_config.login
+package terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.api_config_login
 import data.terraform.helpers
 import data.terraform.gcp.security.app_engine.google_app_engine_flexible_app_version.vars
 
