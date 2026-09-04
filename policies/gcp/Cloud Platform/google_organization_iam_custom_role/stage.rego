@@ -9,7 +9,7 @@ conditions := [
    "remedies": ["Remove admin-level permissions such as iam.roles.delete or resourcemanager.*"]},
   {
     "condition": "Blacklist risky permissions",
-    "attribute_path": ["permissions",0],
+    "attribute_path": ["permissions"],
     "values": ["iam.roles.delete", "resourcemanager.*"],
     "policy_type": "blacklist"
   }
@@ -29,6 +29,8 @@ conditions := [
 
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
 

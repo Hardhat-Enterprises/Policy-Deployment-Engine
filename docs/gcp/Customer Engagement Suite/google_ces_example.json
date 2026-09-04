@@ -6,43 +6,43 @@
       "description": "Resource ID segment making up resource 'name', defining the app the example belongs to. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the application that the example belongs to. It is used to associate the resource with the correct application but does not control security behaviour or enforce organisational security requirements. Therefore, it is not suitable for a reusable security policy."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the resource can be deleted or removed from Terraform management. Preventing accidental deletion is an important governance and security practice, especially for production environments. Because organisations may require deletion protection, this field should be enforced through policy."
     },
     "description": {
       "description": "Human-readable description of the example.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable description of the example. It improves documentation and readability but does not affect how the resource operates or how security controls are applied. Therefore, it does not require security policy enforcement."
     },
     "display_name": {
       "description": "Display name of the example.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the display name of the example for identification purposes. It helps users recognise the resource but does not influence permissions, security controls, or compliance requirements. It is not considered a security-related configuration."
     },
     "entry_agent": {
       "description": "The agent that initially handles the conversation. If not specified, the\nexample represents a conversation that is handled by the root agent.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/agents/{agent}'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the agent that initially handles the conversation. It references an existing resource but does not configure or enforce a security control. Since it only defines application behaviour, it is not appropriate for a reusable security policy."
     },
     "example_id": {
       "description": "The ID to use for the example, which will become the final component of\nthe example's resource name. In Terraform, this field is required.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Uniquely identifies the example resource within the application. It is required for resource creation but only serves as an identifier. As it does not influence security settings or governance, it should not be treated as a security policy attribute."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name', defining what region the parent app is in. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -55,8 +55,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the Google Cloud project that owns the resource. Although it determines where the resource is created, it does not enforce security controls by itself. It is mainly used for organisation and resource management."
     },
     "messages": {
       "type": "block",
@@ -67,8 +67,8 @@
       "description": "The role within the conversation, e.g., user, agent.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the role of the participant in the conversation, such as a user or an agent. It represents conversation data rather than a configurable security setting. Therefore, it is not suitable for security policy enforcement."
     },
     "messages.chunks": {
       "type": "block",
@@ -79,15 +79,15 @@
       "description": "Text data.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Stores the text content of a conversation message. It contains application data rather than a security configuration. Any protection of sensitive information should be handled through application design rather than Terraform policy."
     },
     "messages.chunks.updated_variables": {
       "description": "A struct represents variables that were updated in the conversation,\nkeyed by variable names.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Records variables that were updated during the conversation. It represents runtime conversation data instead of a security control. Since it does not configure resource behaviour, it is not appropriate for policy enforcement."
     },
     "messages.chunks.agent_transfer": {
       "type": "block",
@@ -98,8 +98,8 @@
       "description": "The agent to which the conversation is being transferred. The agent will\nhandle the conversation from this point forward.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/agents/{agent}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the agent that will receive the transferred conversation. It references another resource and defines application workflow rather than security requirements. Therefore, it is not considered security relevant."
     },
     "messages.chunks.image": {
       "type": "block",
@@ -110,15 +110,15 @@
       "description": "Raw bytes of the image.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains the raw image data used in the conversation. It represents application content instead of infrastructure configuration. Security policies should focus on resource settings rather than user-provided data."
     },
     "messages.chunks.image.mime_type": {
       "description": "The IANA standard MIME type of the source data.\nSupported image types includes:\n* image/png\n* image/jpeg\n* image/webp",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the MIME type of the uploaded image. It is used to correctly interpret image content but does not control access, permissions, or security behaviour. Therefore, it is not suitable for policy enforcement."
     },
     "messages.chunks.tool_call": {
       "type": "block",
@@ -129,22 +129,22 @@
       "description": "The input parameters and values for the tool in JSON object format.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains the input parameters passed to a tool during execution. It represents runtime request data rather than infrastructure configuration. As a result, it is not a reusable security policy setting."
     },
     "messages.chunks.tool_call.id": {
       "description": "The unique identifier of the tool call. If populated, the client should\nreturn the execution result with the matching ID in\nToolResponse.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Uniquely identifies a tool call so that responses can be matched correctly. It is an identifier used during execution and does not affect security controls or governance."
     },
     "messages.chunks.tool_call.tool": {
       "description": "The name of the tool to execute.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/tools/{tool}'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the tool that should be executed. It references an existing tool resource but does not configure security controls. Therefore, it is not appropriate for policy enforcement."
     },
     "messages.chunks.tool_call.toolset_tool": {
       "type": "block",
@@ -155,15 +155,15 @@
       "description": "The tool ID to filter the tools to retrieve the schema for.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a specific tool within a toolset. It is used to reference an existing resource and does not define security behaviour or organisational policy requirements."
     },
     "messages.chunks.tool_call.toolset_tool.toolset": {
       "description": "The resource name of the Toolset from which this tool is derived.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/toolsets/{toolset}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the toolset resource used by the tool. It acts as a resource reference rather than a configurable security setting. Therefore, it should not be treated as a security policy attribute."
     },
     "messages.chunks.tool_response": {
       "type": "block",
@@ -174,22 +174,22 @@
       "description": "The matching ID of the tool call the response is for.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Matches the tool response with the corresponding tool call. It is used for tracking execution and does not influence security, compliance, or governance."
     },
     "messages.chunks.tool_response.response": {
       "description": "The tool execution result in JSON object format.\nUse \"output\" key to specify tool response and \"error\" key to specify\nerror details (if any). If \"output\" and \"error\" keys are not specified,\nthen whole \"response\" is treated as tool execution result.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Stores the execution result returned by the tool. It represents application output instead of an infrastructure configuration setting. Therefore, it is not suitable for security policy enforcement."
     },
     "messages.chunks.tool_response.tool": {
       "description": "The name of the tool to execute.\nFormat: 'projects/{project}/locations/{location}/apps/{app}/tools/{tool}'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the tool that generated the response. It references an existing tool resource but does not define security controls or organisational policy requirements."
     },
     "messages.chunks.tool_response.toolset_tool": {
       "type": "block",
@@ -200,15 +200,15 @@
       "description": "The tool ID to filter the tools to retrieve the schema for.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a tool within a toolset for the response. It is used for resource identification only and does not affect the security posture of the infrastructure."
     },
     "messages.chunks.tool_response.toolset_tool.toolset": {
       "description": "The resource name of the Toolset from which this tool is derived.\nFormat:\n'projects/{project}/locations/{location}/apps/{app}/toolsets/{toolset}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the toolset associated with the tool response. It references an existing resource and does not configure or enforce security controls. Therefore, it is not appropriate for policy enforcement."
     }
   }
 }
