@@ -31,7 +31,8 @@ INPUTS tree (``--tree inputs``)
 ===============================
 The ``inputs/`` taxonomy must reconcile *exactly* to the docs taxonomy:
 
-2a. ``inputs/`` contains ONLY the allowed platform folders; no files.
+2a. ``inputs/`` contains ONLY the allowed platform folders; no files, and no
+    auxiliary folders — the tree is pure taxonomy.
 2b. Placeholder platforms (``aws``, ``azure``) contain exactly one entry: ``.gitkeep``.
 2c. ``inputs/gcp/`` holds only directories; each service-dir name must match a
     ``docs/gcp/<service>`` directory name exactly.
@@ -40,9 +41,11 @@ The ``inputs/`` taxonomy must reconcile *exactly* to the docs taxonomy:
 2e. Each resource-dir holds only directories (arguments); each name must match a
     *non-block* argument key in that resource's doc JSON (``arguments`` map).
 2f. Each argument-dir must contain the required files ``compliant.tf``,
-    ``config.tf``, ``nonCompliant.tf``. Terraform-generated artifacts
-    (``INPUT_ALLOWED_TF_FILES`` / ``INPUT_ALLOWED_TF_DIRS``) are tolerated;
-    anything else is flagged for removal.
+    ``config.tf``, ``nonCompliant.tf``, plus exactly one committed plan named
+    ``<sha>.json`` whose sha is ``auto_test.fixture_sha`` of that dir. Transient
+    terraform artifacts (``INPUT_ALLOWED_TF_FILES`` / ``INPUT_ALLOWED_TF_DIRS``)
+    are tolerated; anything else — a second .json, a stale ``<oldsha>.json``, a
+    hand-written ``plan.json`` — is flagged for removal.
 
 POLICIES tree (``--tree policies``)
 ===================================
@@ -77,6 +80,14 @@ import os
 import re
 import sys
 from datetime import datetime
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+# The committed plan's filename is the pipeline's own hash of the fixture, so the
+# linter asks auto_test for it rather than re-deriving it. Importing keeps the two
+# in lockstep: a provider bump changes the expected filename in both at once.
+from scripts.auto_test.auto_test import PLAN_FILE_RE, fixture_sha  # noqa: E402
 
 # --------------------------------------------------------------------------- #
 # Editable allow-lists — extend these as the docs tree grows.
@@ -85,17 +96,18 @@ ALLOWED_PLATFORMS = {"gcp", "aws", "azure"}        # only these dirs allowed at 
 ALLOWED_ROOT_FILES = {"ASSESSMENT_GUIDANCE.md"}    # non-platform files allowed at docs/ root
 PLACEHOLDER_PLATFORMS = {"aws", "azure"}           # must hold only .gitkeep (structure TBD)
 IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}  # OS junk, ignored everywhere
-INPUTS_AUX_DIRS = {"plan_cache"}                   # non-taxonomy dirs allowed under inputs/
-                                                   # (committed terraform-plan JSON cache,
-                                                   #  see scripts/auto_test/auto_test.py)
 
 # --------------------------------------------------------------------------- #
 # Inputs-tree allow-lists (argument-dir leaf files). Edit as the pipeline grows.
 # --------------------------------------------------------------------------- #
 INPUT_REQUIRED_FILES = {"compliant.tf", "config.tf", "nonCompliant.tf"}  # must exist in every arg dir
-INPUT_ALLOWED_TF_FILES = {                                # terraform-generated, tolerated
+# Transient terraform artifacts, tolerated in a working tree (all gitignored).
+# Deliberately NO *.json entries: the only .json an argument dir may hold is the
+# committed plan, and that is checked by name against the fixture's own sha —
+# a tolerated `plan.json` would be a second, unverifiable plan sitting next to it.
+INPUT_ALLOWED_TF_FILES = {
     ".terraform.lock.hcl",
-    "plan", "plan.json", "tfplan", "tfplan.json", "tfplan_flat.json",
+    "plan", "tfplan",
     "terraform.tfstate", "terraform.tfstate.backup",
     "crash.log",
 }
@@ -353,8 +365,6 @@ class InputsValidator:
         for entry in self._entries(self.root):
             full = os.path.join(self.root, entry)
             if os.path.isdir(full):
-                if entry in INPUTS_AUX_DIRS:
-                    continue  # plan_cache etc. — not part of the taxonomy
                 if entry not in ALLOWED_PLATFORMS:
                     self.logger.log(f"inputs/: disallowed folder '{entry}' "
                                     f"(allowed platforms: {sorted(ALLOWED_PLATFORMS)})")
@@ -421,8 +431,26 @@ class InputsValidator:
         if missing:
             self.logger.log(f"{rel}: missing required file(s) {sorted(missing)}")
 
+        # The committed plan. Exactly one, named for the sha of the *.tf beside it —
+        # the name IS the validity check, so a fixture edited without re-running the
+        # harness shows up here as a stale plan rather than being silently tested
+        # against the plan of its old config.
+        expected = f"{fixture_sha(Path(arg_path))}.json"
+        plans = sorted(e for e in entries if e.endswith(".json"))
+        if not plans:
+            self.logger.log(f"{rel}: missing committed plan '{expected}' "
+                            f"(run auto_test.py for this resource and commit the file it writes)")
+        else:
+            for entry in plans:
+                if entry == expected:
+                    continue
+                why = ("stale — these *.tf now hash to a different sha"
+                       if PLAN_FILE_RE.match(entry) else "not a committed plan filename")
+                self.logger.log(f"{rel}/{entry}: unexpected .json ({why}); the only .json "
+                                f"allowed here is '{expected}'")
+
         for entry in entries:
-            if entry in INPUT_REQUIRED_FILES:
+            if entry in INPUT_REQUIRED_FILES or entry.endswith(".json"):
                 continue
             if os.path.isdir(os.path.join(arg_path, entry)):
                 if entry not in INPUT_ALLOWED_TF_DIRS:
