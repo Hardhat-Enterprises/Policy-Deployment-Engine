@@ -70,9 +70,9 @@
 - Attribute paths must match the structure of `plan.json`  
 - Always test before pushing  
 - Documentation must be completed before raising a PR  
-- If the portal stops scanning your branch and shows a blocker about the harness being out of
-  date, merge `dev` and re-run the test harness — see
-  [Your branch is behind the shared harness](common-errors.md#your-branch-is-behind-the-shared-harness)  
+- If the portal stops scanning your branch and asks you to merge `dev` to catch up, do that **and**
+  re-run the test harness — see
+  [Merge dev into your branch to catch up](common-errors.md#merge-dev-into-your-branch-to-catch-up--nothing-is-scanned-until-then)  
 
 
 <div align="center">

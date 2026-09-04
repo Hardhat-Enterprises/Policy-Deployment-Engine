@@ -1,19 +1,30 @@
 <a id="top"></a>
 <h1 align="center">Common Errors</h1>
 
-## Your branch is behind the shared harness
+## "Merge dev into your branch to catch up — nothing is scanned until then"
 
-The portal will not scan your branch while its copy of `scripts/` differs from the one on `dev`.
-It cannot judge your policies against a test harness that is not the harness CI uses, so instead
-of scanning it shows a blocker on your stage bar and runs nothing. **Your existing results are
-kept** — nothing you have already done is lost.
+Once your documentation has been reviewed, this notice replaces everything else on your portal
+card:
 
-This is normal whenever the shared tooling changes, and it is not something wrong with your
-resource. The fix is one merge.
+> Your branch's copy of the shared test harness or linter (scripts/, policies/_helpers/) doesn't
+> match dev's. Merge dev into your branch to catch up — nothing is scanned until then.
+
+A shorter version names only the linter (`scripts/linters/`). Older tabs may still show a version
+that says you *changed* those files — ignore that wording; you almost certainly did not. It means
+your branch was cut before the shared tooling was last updated, which happens to everyone
+periodically and is not a problem with your resource.
+
+While the notice is up, the portal scans nothing and shows no other feedback — no per-argument
+rows, no linter advice. **Your existing results are kept.** You get them back on your next push
+after the steps below.
+
+> If your documentation has not been reviewed yet you will not see this notice at all, because
+> the documentation blockers come first — but your branch still needs the same catch-up before
+> anything will scan.
 
 ### Fix
 
-Bring your branch up to date, then run the test harness once:
+One merge, one harness run, one commit.
 
 ```bash
 git checkout Service/<platform>/<service_slug>/<resource_type>
@@ -22,24 +33,31 @@ git merge origin/dev
 python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
 ```
 
-The run may print something like `adopted 1 plan(s) from the pre-move inputs/plan_cache/ layout`.
-That is it moving your committed Terraform plan into your own fixture folder, which is where plans
-live now — one `<sha>.json` beside the `compliant.tf` / `nonCompliant.tf` it was planned from.
-Nothing is re-planned and nothing is lost; the file is only being put where it now belongs.
+Running the harness is not optional here — it is the step that finishes the job. Committed
+Terraform plans now live inside the fixture folder they belong to, as one `<sha>.json` beside the
+`compliant.tf` / `nonCompliant.tf` it was planned from, and the run moves yours there. It prints
+something like:
 
-Commit what the run moved, then push:
+    [*] adopted 1 plan(s) from the pre-move inputs/plan_cache/ layout — commit the moved files
+
+**`git status` will then show deletions and additions, not edits.** That is what a moved file looks
+like and it is exactly right — do not `git checkout` it away. Commit it and push:
 
 ```bash
 git add inputs
-git commit -m "Merge dev and move committed plan into the fixture folder"
+git commit -m "Merge dev and move committed plans into the fixture folders"
 git push
 ```
 
-If the harness printed nothing about adopting a plan, there may be nothing to add — push the merge
-on its own and you are done. The portal scans your branch again on the next push.
+If you skip the harness run, the linters will report `fixture-missing-plan` for your arguments and
+`legacy-plan-cache` for the files left behind. Those are not three separate problems — the single
+run above clears both.
 
-> If `inputs/plan_cache/` still contains files after all that, they belong to other people's
-> fixtures and were picked up by a stray `git add .` at some point. Remove them with
+If the harness printed nothing about adopting a plan, there was nothing to move: push the merge on
+its own and you are done.
+
+> If `inputs/plan_cache/` still contains files afterwards, they belong to other people's fixtures
+> and were picked up by a stray `git add .` at some point. Remove them with
 > `git rm -r inputs/plan_cache` and commit that too — see
 > [Branch scope](branch-scope.md#legacy-plan-cache).
 
