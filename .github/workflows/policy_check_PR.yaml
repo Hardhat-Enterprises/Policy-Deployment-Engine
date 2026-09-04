@@ -4,10 +4,20 @@ on:
   workflow_dispatch:
   pull_request:
     types: [opened, synchronize, reopened]
+    # The three content trees, AND everything that decides whether they are valid.
+    # A change to scripts/ is the change most able to break every contributor at
+    # once — it is the harness they are all checked by — so it must not be the one
+    # change that runs no checks. templates/ and tests/ are shared source for the
+    # same reason; .github/workflows/ so a workflow edit is checked by the
+    # workflow it edits.
     paths:
       - 'inputs/**'
       - 'policies/**'
       - 'docs/**'
+      - 'scripts/**'
+      - 'templates/**'
+      - 'tests/**'
+      - '.github/workflows/**'
 
 # Least privilege by default; the policy_check job widens to pull-requests:write
 # for labelling. The lint job needs only read.
@@ -63,9 +73,10 @@ jobs:
       - name: Structural lint (whole tree)
         run: python3 scripts/linters/linter.py --tree all --platform gcp --no-content-checks
 
-      # run_precommit_linter.py also runs policy_lint.py (content-quality rules,
-      # e.g. hard-coded values, fixture drift) over the resource types this PR
-      # touches, which needs `opa eval` on PATH.
+      # Needed by two steps below: policy_lint.py (run by run_precommit_linter.py
+      # for content-quality rules — hard-coded values, fixture drift — over the
+      # resource types this PR touches) evaluates Rego, and 56 of the unit tests do
+      # too. Both fail without `opa eval` on PATH.
       - name: Install OPA
         env:
           OPA_VERSION: ${{ env.OPA_VERSION }}
@@ -73,6 +84,15 @@ jobs:
           curl -L -o opa "https://openpolicyagent.org/downloads/${OPA_VERSION}/opa_linux_amd64_static"
           chmod +x opa
           sudo mv opa /usr/local/bin/opa
+
+      # The tools' own unit tests. They run here and nowhere else in CI, so without
+      # this step a change to the linters or the harness could break all 269 of them
+      # and still merge — and those are exactly the changes that reach every
+      # contributor at once. After Install OPA because most of them evaluate Rego.
+      - name: Run the test suite
+        run: |
+          python3 -m pip install --quiet pytest
+          python3 -m pytest -q
 
       # PR gate: structural + content checks (content is on by default), but only
       # fail on files this PR changed vs its base branch — never the repo-wide tree.

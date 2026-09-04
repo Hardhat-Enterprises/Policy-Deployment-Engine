@@ -209,9 +209,11 @@ rather than re-deriving a path or a hash — which is why a provider bump, or th
 
 Two GitHub Actions workflows in `.github/workflows/`:
 
-- **`policy_check_PR`** — runs on every PR that touches `docs/`, `inputs/`, or `policies/`:
-  - *lint* job (all PRs): branch-name convention → whole-tree **structural** lint → a
-    **content** lint scoped to the files this PR changed (the repo-wide backlog never blocks you).
+- **`policy_check_PR`** — runs on every PR that touches `docs/`, `inputs/`, `policies/`, or the
+  tooling that validates them (`scripts/`, `templates/`, `tests/`, `.github/workflows/`):
+  - *lint* job (all PRs): branch-name convention → whole-tree **structural** lint → the tools'
+    own **test suite** → a **content** lint scoped to the files this PR changed (the repo-wide
+    backlog never blocks you).
   - *policy_check* job (only `Service/...` PRs): the per-resource gate — doc completeness
     (real `security_impact` + rationale), policy/input coverage for every `true` arg, and the
     `terraform plan` + OPA test. It then applies a `CI-Approved` / `CI-Review-Required` label.
