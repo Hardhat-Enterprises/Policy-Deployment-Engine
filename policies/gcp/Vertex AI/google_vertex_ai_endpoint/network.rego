@@ -10,13 +10,14 @@ conditions := [
             "remedies": ["Configure the `network` attribute."]
         },
         {
-            "condition": "network is improperly configured",
+            "condition": "network is not in the approved list",
             "attribute_path": ["network"],
-            "values": ["projects/my-project/global/networks/invalid-network"],
-            "policy_type": "blacklist"
+            "values": ["projects/123456789/global/networks/my-secure-vpc"],
+            "policy_type": "whitelist"
         }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
