@@ -2,22 +2,25 @@ name: Terraform OPA Policy Check PR
 
 on:
   workflow_dispatch:
+  # NO paths filter, deliberately. Two reasons, and the second is the one that
+  # bites:
+  #
+  #   * A change to scripts/ is the change most able to break every contributor at
+  #     once — it is the harness they are all checked by — so it must not be the
+  #     one change that runs no checks. Same for templates/, tests/ and the
+  #     workflows themselves.
+  #   * `lint` is a REQUIRED status check. GitHub does not treat a workflow that
+  #     never ran as satisfied: it waits for a report that will never come, and the
+  #     pull request cannot be merged at all. A paths filter here would therefore
+  #     wedge every docs-only pull request — a Guide/ edit, a README fix — with a
+  #     check that is not pending, not failing, just absent. A job skipped by its
+  #     own `if:` (policy_check, below) reports "skipped" and does satisfy the
+  #     requirement; a workflow filtered out by `paths:` reports nothing.
+  #
+  # The lint job is ~25s, so running it on every pull request is the cheaper half
+  # of that trade by a wide margin.
   pull_request:
     types: [opened, synchronize, reopened]
-    # The three content trees, AND everything that decides whether they are valid.
-    # A change to scripts/ is the change most able to break every contributor at
-    # once — it is the harness they are all checked by — so it must not be the one
-    # change that runs no checks. templates/ and tests/ are shared source for the
-    # same reason; .github/workflows/ so a workflow edit is checked by the
-    # workflow it edits.
-    paths:
-      - 'inputs/**'
-      - 'policies/**'
-      - 'docs/**'
-      - 'scripts/**'
-      - 'templates/**'
-      - 'tests/**'
-      - '.github/workflows/**'
 
 # Least privilege by default; the policy_check job widens to pull-requests:write
 # for labelling. The lint job needs only read.
