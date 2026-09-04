@@ -14,12 +14,16 @@ There are four supporting scripts:
   measured against the base tree — so a pre-existing finding inside a file you
   merely touched is reported as context, not as your fault.
 - `check_branch_name.py` — enforces the branch naming convention.
+- `../check_resource.py` — not a linter itself: the single entry point that runs
+  all of these plus the per-resource gate (doc completeness, argument coverage,
+  OPA test), in the order CI runs them. It is what contributors are told to run
+  and what CI's `policy_check` job calls with `--gate-only`.
 - `branch_scope.py` — enforces that a `Service/<platform>/<service_slug>/<resource_type>`
   branch changes **only** that resource's files (`docs/` JSON, `inputs/`,
-  `policies/`), plus additions to `inputs/plan_cache/`. It catches the two
-  silent mistakes — editing the shared harness and wiping the plan cache —
-  neither of which fails any test on the branch that caused it. Rules are
-  documented in `Guide/Policy_writing_tutorial/branch-scope.md`.
+  `policies/`). It catches the two silent mistakes — editing the shared harness
+  and sweeping up another resource's files — neither of which fails any test on
+  the branch that caused it. Rules are documented in
+  `Guide/Policy_writing_tutorial/branch-scope.md`.
 - `policy_lint.py` — deterministic *content*-quality rules over a policy kit's
   declared `conditions`/`variables` (hard-coded literals, trivial messages,
   fixture drift, ...). It answers whether the policy is any good, not just
