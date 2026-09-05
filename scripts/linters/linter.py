@@ -13,6 +13,12 @@ Structure rules
 1c. ``gcp/`` contains only directories (one per service). Each service directory
     contains only ``*.json`` files — no subdirectories, no other file types.
 1d. Each GCP doc JSON validates against the schema below.
+1e. (content check) Cross-cutting arguments carry their canonical assessment. A
+    top-level ``location``/``region``/``zone``, and the common keys on the split IAM
+    resources, mean the same thing everywhere, so ``security_impact`` and
+    ``rationale`` come from ``scripts/docgen/lib/canonical.py`` — including for the
+    resources that module exempts, which are locked to a different answer rather than
+    left free. A content check on purpose: see ``DocsCanonicalValidator``.
 
 GCP doc JSON schema
 -------------------
@@ -31,7 +37,8 @@ INPUTS tree (``--tree inputs``)
 ===============================
 The ``inputs/`` taxonomy must reconcile *exactly* to the docs taxonomy:
 
-2a. ``inputs/`` contains ONLY the allowed platform folders; no files.
+2a. ``inputs/`` contains ONLY the allowed platform folders; no files, and no
+    auxiliary folders — the tree is pure taxonomy.
 2b. Placeholder platforms (``aws``, ``azure``) contain exactly one entry: ``.gitkeep``.
 2c. ``inputs/gcp/`` holds only directories; each service-dir name must match a
     ``docs/gcp/<service>`` directory name exactly.
@@ -40,9 +47,11 @@ The ``inputs/`` taxonomy must reconcile *exactly* to the docs taxonomy:
 2e. Each resource-dir holds only directories (arguments); each name must match a
     *non-block* argument key in that resource's doc JSON (``arguments`` map).
 2f. Each argument-dir must contain the required files ``compliant.tf``,
-    ``config.tf``, ``nonCompliant.tf``. Terraform-generated artifacts
-    (``INPUT_ALLOWED_TF_FILES`` / ``INPUT_ALLOWED_TF_DIRS``) are tolerated;
-    anything else is flagged for removal.
+    ``config.tf``, ``nonCompliant.tf``, plus exactly one committed plan named
+    ``<sha>.json`` whose sha is ``auto_test.fixture_sha`` of that dir. Transient
+    terraform artifacts (``INPUT_ALLOWED_TF_FILES`` / ``INPUT_ALLOWED_TF_DIRS``)
+    are tolerated; anything else — a second .json, a stale ``<oldsha>.json``, a
+    hand-written ``plan.json`` — is flagged for removal.
 
 POLICIES tree (``--tree policies``)
 ===================================
@@ -75,8 +84,24 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+# The committed plan's filename is the pipeline's own hash of the fixture, so the
+# linter asks auto_test for it rather than re-deriving it. Importing keeps the two
+# in lockstep: a provider bump changes the expected filename in both at once.
+from scripts.auto_test.auto_test import PLAN_FILE_RE, fixture_sha  # noqa: E402
+
+# Cross-cutting assessments (data residency, the IAM common keys) are decided once in
+# canonical.py rather than 400 times, and the generator writes them into every new
+# resource. Asking that module rather than restating its values is what keeps the check
+# and the thing it checks from ever disagreeing — including about which resources are
+# exempt.
+from scripts.docgen.lib.canonical import canonical_for  # noqa: E402
 
 # --------------------------------------------------------------------------- #
 # Editable allow-lists — extend these as the docs tree grows.
@@ -85,21 +110,48 @@ ALLOWED_PLATFORMS = {"gcp", "aws", "azure"}        # only these dirs allowed at 
 ALLOWED_ROOT_FILES = {"ASSESSMENT_GUIDANCE.md"}    # non-platform files allowed at docs/ root
 PLACEHOLDER_PLATFORMS = {"aws", "azure"}           # must hold only .gitkeep (structure TBD)
 IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}  # OS junk, ignored everywhere
-INPUTS_AUX_DIRS = {"plan_cache"}                   # non-taxonomy dirs allowed under inputs/
-                                                   # (committed terraform-plan JSON cache,
-                                                   #  see scripts/auto_test/auto_test.py)
 
 # --------------------------------------------------------------------------- #
 # Inputs-tree allow-lists (argument-dir leaf files). Edit as the pipeline grows.
 # --------------------------------------------------------------------------- #
 INPUT_REQUIRED_FILES = {"compliant.tf", "config.tf", "nonCompliant.tf"}  # must exist in every arg dir
-INPUT_ALLOWED_TF_FILES = {                                # terraform-generated, tolerated
+# Fallback tolerance for transient terraform artifacts, used ONLY when git cannot
+# be consulted (see ignored_under()). With git available the question is asked
+# exactly: a file git would let you commit is a file this linter must judge, and a
+# file git ignores is the contributor's own working mess and none of its business.
+# That matters because the guide walks contributors through
+# `terraform plan --out=plan` and `terraform show -json plan > plan.json` to find an
+# attribute path, so those files are *expected* to exist locally.
+INPUT_ALLOWED_TF_FILES = {
     ".terraform.lock.hcl",
-    "plan", "plan.json", "tfplan", "tfplan.json", "tfplan_flat.json",
+    "plan", "plan.json", "tfplan", "tfplan.json",
     "terraform.tfstate", "terraform.tfstate.backup",
     "crash.log",
 }
 INPUT_ALLOWED_TF_DIRS = {".terraform"}                    # the only directory tolerated in an arg dir
+
+
+def ignored_under(root):
+    """Paths under ``root`` that git ignores — untracked and excluded.
+
+    One `git ls-files` for the whole tree, so the per-directory checks below are
+    set lookups. A file that is *tracked* never appears here even if a later
+    .gitignore rule would match it, which is the behaviour wanted: a binary
+    `tfplan` that reached dev has to be reported, however well ignored it would be
+    today.
+
+    Returns None outside a git checkout (or with no git on PATH), and the callers
+    then fall back to INPUT_ALLOWED_TF_FILES.
+    """
+    try:
+        proc = subprocess.run(
+            ["git", "ls-files", "--others", "--ignored", "--exclude-standard", "-z", "--", str(root)],
+            capture_output=True, text=True)
+    except (OSError, ValueError):
+        return None
+    if proc.returncode != 0:
+        return None
+    return {os.path.normpath(p) for p in proc.stdout.split("\0") if p}
 
 # --------------------------------------------------------------------------- #
 # Policies-tree allow-lists.
@@ -292,6 +344,80 @@ class DocsValidator:
                 self.logger.log(f"{where}: 'rationale' must be a string")
 
 
+class DocsCanonicalValidator:
+    """Docs content check: canonical arguments carry their canonical assessment.
+
+    Some arguments mean the same thing on every resource — a top-level
+    ``location``/``region``/``zone``, and the common keys on the split IAM resources.
+    Deciding those per resource produced 14 different answers to the same question,
+    three of which were right for reasons the generic answer could not express (see
+    ``canonical.EXEMPTIONS``) and eleven of which were the same sentence rewritten.
+
+    A CONTENT check, not a structural one, and deliberately so. The structural pass is
+    a hard tree-wide gate on every pull request; a rule that can be broken by editing
+    any one of ~400 docs files does not belong there, or one contributor's drift turns
+    every other contributor's pull request red. As a content check it reaches people
+    the right way round: ``run_precommit_linter`` attributes it to whoever changed the
+    file, and the whole-tree ALL run reports the rest.
+    """
+
+    def __init__(self, docs_root, logger):
+        self.docs_root = docs_root
+        self.logger = logger
+
+    def validate(self, only_platform=None):
+        for platform in sorted(ALLOWED_PLATFORMS):
+            if only_platform and platform != only_platform:
+                continue
+            root = os.path.join(self.docs_root, platform)
+            if not os.path.isdir(root):
+                continue
+            for service in sorted(os.listdir(root)):
+                service_dir = os.path.join(root, service)
+                if not os.path.isdir(service_dir):
+                    continue
+                for entry in sorted(os.listdir(service_dir)):
+                    if entry.endswith(".json"):
+                        self._check_file(os.path.join(service_dir, entry),
+                                         f"docs/{platform}/{service}/{entry}",
+                                         entry[:-len(".json")])
+
+    def _check_file(self, path, rel, resource):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                doc = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            return                      # DocsValidator reports malformed files
+        arguments = doc.get("arguments")
+        if not isinstance(arguments, dict):
+            return
+
+        for key, entry in arguments.items():
+            if not isinstance(entry, dict) or "security_impact" not in entry:
+                continue                # blocks carry no assessment
+            canon = canonical_for(resource, key)
+            if canon is None:
+                continue
+            impact, rationale = canon
+            for field, want in (("security_impact", impact), ("rationale", rationale)):
+                got = entry.get(field)
+                if got == want:
+                    continue
+                self.logger.log(
+                    f"[content] {rel}: argument '{key}' has a canonical {field} that has "
+                    f"been changed. Restore it with "
+                    f"`python3 scripts/docgen/apply_canonical.py --apply`, or — if this "
+                    f"resource genuinely differs — add it to EXEMPTIONS in "
+                    f"scripts/docgen/lib/canonical.py with the reason "
+                    f"(found {shorten(got)}, expected {shorten(want)})")
+
+
+def shorten(value, limit=60):
+    """A field value, trimmed to something that fits on a terminal line."""
+    text = json.dumps(value) if not isinstance(value, str) else value
+    return repr(text if len(text) <= limit else text[:limit] + "…")
+
+
 def build_gcp_docs_index(docs_root):
     """Return ``{service: {resource: {arg_key: type}}}`` for ``docs/gcp/``.
 
@@ -330,6 +456,13 @@ class InputsValidator:
         self.root = inputs_root
         self.docs = docs_index  # {service: {resource: {arg: type}}}
         self.logger = logger
+        self.ignored = ignored_under(inputs_root)   # None outside a git checkout
+
+    def _is_ignored(self, path):
+        """Would git decline to commit this? Then it is not this linter's business."""
+        if self.ignored is None:
+            return False
+        return os.path.normpath(os.path.relpath(path, start=os.curdir)) in self.ignored
 
     def _entries(self, path):
         try:
@@ -353,8 +486,6 @@ class InputsValidator:
         for entry in self._entries(self.root):
             full = os.path.join(self.root, entry)
             if os.path.isdir(full):
-                if entry in INPUTS_AUX_DIRS:
-                    continue  # plan_cache etc. — not part of the taxonomy
                 if entry not in ALLOWED_PLATFORMS:
                     self.logger.log(f"inputs/: disallowed folder '{entry}' "
                                     f"(allowed platforms: {sorted(ALLOWED_PLATFORMS)})")
@@ -421,15 +552,39 @@ class InputsValidator:
         if missing:
             self.logger.log(f"{rel}: missing required file(s) {sorted(missing)}")
 
+        # The committed plan. Exactly one, named for the sha of the *.tf beside it —
+        # the name IS the validity check, so a fixture edited without re-running the
+        # harness shows up here as a stale plan rather than being silently tested
+        # against the plan of its old config.
+        expected = f"{fixture_sha(Path(arg_path))}.json"
+        plans = sorted(e for e in entries if e.endswith(".json")
+                       and not self._is_ignored(os.path.join(arg_path, e)))
+        if not plans:
+            self.logger.log(f"{rel}: missing committed plan '{expected}' "
+                            f"(run auto_test.py for this resource and commit the file it writes)")
+        else:
+            for entry in plans:
+                if entry == expected:
+                    continue
+                why = ("stale — these *.tf now hash to a different sha"
+                       if PLAN_FILE_RE.match(entry) else "not a committed plan filename")
+                self.logger.log(f"{rel}/{entry}: unexpected .json ({why}); the only .json "
+                                f"allowed here is '{expected}'")
+
         for entry in entries:
-            if entry in INPUT_REQUIRED_FILES:
+            if entry in INPUT_REQUIRED_FILES or entry.endswith(".json"):
                 continue
-            if os.path.isdir(os.path.join(arg_path, entry)):
+            full = os.path.join(arg_path, entry)
+            if os.path.isdir(full):
                 if entry not in INPUT_ALLOWED_TF_DIRS:
                     self.logger.log(f"{rel}/{entry}: directories not allowed in an argument dir")
-            elif entry not in INPUT_ALLOWED_TF_FILES:
+            elif self._is_ignored(full):
+                continue                      # your own working mess; git will not commit it
+            elif self.ignored is None and entry in INPUT_ALLOWED_TF_FILES:
+                continue                      # no git to ask — fall back to the allow-list
+            else:
                 self.logger.log(f"{rel}/{entry}: unexpected file "
-                                f"(not required and not a terraform artifact — should be removed)")
+                                f"(git would commit this; delete it or add it to .gitignore)")
 
 
 class PoliciesValidator:
@@ -758,10 +913,13 @@ def main(argv=None):
               f"{f' (platform: {args.platform})' if args.platform else ''}\n")
         PoliciesValidator(policies_root, docs_index, logger).validate_root(only_platform=args.platform)
 
-    if args.content_checks and (do_inputs or do_policies):
+    if args.content_checks and (do_docs or do_inputs or do_policies):
         print("\n[*] Running content checks\n")
-        ContentChecksValidator(policies_root, inputs_root, logger).validate(
-            only_platform=args.platform, do_inputs=do_inputs, do_policies=do_policies)
+        if do_docs:
+            DocsCanonicalValidator(docs_root, logger).validate(only_platform=args.platform)
+        if do_inputs or do_policies:
+            ContentChecksValidator(policies_root, inputs_root, logger).validate(
+                only_platform=args.platform, do_inputs=do_inputs, do_policies=do_policies)
 
     if logger.summary():
         sys.exit(1)

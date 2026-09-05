@@ -6,36 +6,36 @@
       "description": "Reference to a SecurityProfile with the CustomIntercept configuration.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another SecurityProfile resource. We secure the referenced resource itself, not this pointer to it."
     },
     "custom_mirroring_profile": {
       "description": "Reference to a SecurityProfile with the custom mirroring configuration for the SecurityProfileGroup.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another SecurityProfile resource. We secure the referenced resource itself, not this pointer to it."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the prevent-destructive-loss archetype: a generic platform policy can require this be set to 'PREVENT' so a security-enforcing profile group cannot be accidentally destroyed via terraform apply/destroy."
     },
     "description": {
       "description": "An optional description of the profile. The Max length is 512 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Cosmetic free-text field with no bearing on enforcement."
     },
     "labels": {
       "description": "A map of key/value label pairs to assign to the resource.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Organisational metadata for filtering/billing; does not affect enforcement."
     },
     "location": {
       "description": "The location of the security profile group.\nThe default value is 'global'.",
@@ -48,29 +48,29 @@
       "description": "The name of the security profile group resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier only; naming has no security bearing."
     },
     "parent": {
       "description": "The name of the parent this security profile group belongs to.\nFormat: 'organizations/{organization_id}' or 'projects/{project_id}'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which org/project owns the resource. A generic platform policy cannot constrain this without hardcoding a specific organisation or project ID, which is team-specific and out of scope."
     },
     "threat_prevention_profile": {
       "description": "Reference to a SecurityProfile with the threat prevention configuration for the SecurityProfileGroup.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another SecurityProfile resource. We secure the referenced resource itself, not this pointer to it."
     },
     "url_filtering_profile": {
       "description": "Reference to a SecurityProfile with the URL filtering configuration for the SecurityProfileGroup.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another SecurityProfile resource. We secure the referenced resource itself, not this pointer to it."
     }
   }
 }
