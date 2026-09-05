@@ -6,64 +6,64 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This parameter aligns with the prevent-destructive-loss archetype. Controlling full resource deletion is a core operational security concern aimed at preventing accidental mass data loss."
     },
     "description": {
       "description": "Description of this TensorboardExperiment.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource descriptions are organizational metadata and do not act as security boundaries."
     },
     "display_name": {
       "description": "User provided name of this TensorboardExperiment.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource naming conventions and display names are operational identifiers and do not act as security boundaries."
     },
     "labels": {
       "description": "The labels with user-defined metadata to organize your\nTensorboardExperiment.\n\nLabel keys and values cannot be longer than 64 characters\n(Unicode codepoints), can only contain lowercase letters, numeric\ncharacters, underscores and dashes. International characters are allowed.\nNo more than 64 user labels can be associated with one Dataset (System\nlabels are excluded).\n\nSee https://goo.gl/xmQnxf for more information and examples of labels.\nSystem reserved label keys are prefixed with 'aiplatform.googleapis.com/'\nand are immutable. The following system labels exist for each Dataset:\n\n* 'aiplatform.googleapis.com/dataset_metadata_schema': output only. Its\nvalue is the metadata_schema's title.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are metadata used for billing and organization, not for enforcing platform security policies."
     },
     "location": {
       "description": "The location of the Tensorboard Experiment. eg us-central1",
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "Determines the region/zone where the resource is created. A platform security policy must enforce this via an approved-region whitelist to ensure data residency and compliance."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
       "security_impact": "true/false",
-      "rationale": ""
+      "rationale": "Project placement is a fundamental architectural configuration, not an active security enforcement mechanism."
     },
     "source": {
       "description": "Source of the TensorboardExperiment. Example: a custom training job.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field specifies the source of the experiment as informational or architectural metadata, rather than functioning as a platform-level security control."
     },
     "tensorboard": {
       "description": "The Tensorboard instance.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This parameter is strictly a resource reference linking the experiment to its parent Tensorboard instance, rather than a security configuration or access control mechanism."
     },
     "tensorboard_experiment_id": {
       "description": "The ID to use for the Tensorboard experiment, which becomes the final\ncomponent of the Tensorboard experiment's resource name.\n\nThis value should be 1-128 characters, and valid characters\nare '/a-z-/'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource identifiers map infrastructure components together and are used for naming conventions, not as security constraints or exposure controls."
     }
   }
 }
