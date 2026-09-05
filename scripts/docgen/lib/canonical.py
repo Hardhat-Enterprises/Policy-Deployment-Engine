@@ -10,11 +10,17 @@ Some arguments mean the same thing on every resource, so their `security_impact`
   locator/identifier args.
 
 These values are **prepopulated by the generator** for new resources and **overwrite**
-any per-resource value on existing ones (canonical always wins), so a future linter can
-assert they are present and unmodified.
+any per-resource value on existing ones (canonical always wins), so the linter can assert
+they are present and unmodified (`linter.py`, docs content checks).
+
+Not every resource's residency key is a residency *decision*, though, so `EXEMPTIONS`
+below records the ones where the generic answer would be wrong — with the correct answer,
+not a licence to write anything. An exempt key is still locked; it is locked to a
+different value. That distinction is the whole point: "canonical always wins" only stays
+true if canonical can be right about the exceptions too.
 
 The single source of truth is this module — `apply_canonical()` is called by the
-generator and by the one-time applier over existing docs.
+generator, by the applier over existing docs, and by the linter that checks them.
 """
 
 from typing import Dict
@@ -49,6 +55,43 @@ LOCATOR_RATIONALE = (
     "does not constrain resource names or references to other resources."
 )
 
+# --- exemptions: where the generic residency answer is wrong -----------------
+#
+# Both categories share a shape: the key exists, but its value is not this resource's
+# choice to make. Policing it would either constrain nothing (the API accepts one
+# value) or re-police a decision another resource already fixed. Marking those
+# `security_impact: true` and asking for a region whitelist would send a contributor
+# looking for a control that cannot exist.
+#
+# Adding an entry is a deliberate act: it needs the resource, the key, and a rationale
+# that says *why this one is different*. Everything not listed stays canonical.
+
+RESIDENCY_FIXED_RATIONALE = (
+    "Specifies the IAM policy-binding location. These policy bindings use the global IAM "
+    "location, so there is no meaningful regional data-residency choice for a platform "
+    "whitelist to constrain."
+)
+PER_INSTANCE_CONFIG_ZONE_RATIONALE = (
+    "This doesn't choose where the instance is provisioned — it must match wherever the "
+    "referenced instance_group_manager already lives; the resource doesn't create a new "
+    "location, it addresses an existing one. The actual data-residency decision belongs to "
+    "the instance_group_manager (or region_instance_group_manager) resource being "
+    "referenced, so a whitelist here would just be re-policing a value that resource "
+    "already fixed, not an independent architecture choice of this resource's own."
+)
+
+# (resource_type, flat argument key) -> (security_impact, rationale)
+EXEMPTIONS = {
+    # The API accepts only "global" here, so there is no region to whitelist.
+    ("google_iam_folders_policy_binding", "location"):
+        (False, RESIDENCY_FIXED_RATIONALE),
+    ("google_iam_organizations_policy_binding", "location"):
+        (False, RESIDENCY_FIXED_RATIONALE),
+    # Mirrors the zone of the instance group manager it references.
+    ("google_compute_per_instance_config", "zone"):
+        (False, PER_INSTANCE_CONFIG_ZONE_RATIONALE),
+}
+
 RESIDENCY_KEYS = ("location", "region", "zone")
 IAM_SUFFIXES = ("_iam_binding", "_iam_member", "_iam_policy")
 CONDITION_KEYS = ("condition.expression", "condition.title", "condition.description")
@@ -65,6 +108,12 @@ def canonical_for(resource_name: str, key: str):
     ``key`` is the flat dotted argument key. ``resource_name`` is the full type
     (e.g. ``google_storage_bucket`` or ``google_storage_bucket_iam_binding``).
     """
+    # Exemptions first: a resource listed here has a different *correct* answer, not
+    # an absent one, so it must not fall through to the generic rules below.
+    exempt = EXEMPTIONS.get((resource_name, key))
+    if exempt is not None:
+        return exempt
+
     leaf = key.rsplit(".", 1)[-1]
     if is_iam_resource(resource_name):
         # Every leaf on an IAM resource is canonical (these resources only contain
