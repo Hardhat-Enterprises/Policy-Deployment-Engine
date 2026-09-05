@@ -1,7 +1,7 @@
-package terraform.gcp.security.model_Armor.google_model_armor_floorsetting.location
+package terraform.gcp.security.model_armor.google_model_armor_floorsetting.location
 
 import data.terraform.helpers
-import data.terraform.gcp.security.model_Armor.google_model_armor_floorsetting.vars
+import data.terraform.gcp.security.model_armor.google_model_armor_floorsetting.vars
 
 # Condition: location must always be "global"
 conditions := [

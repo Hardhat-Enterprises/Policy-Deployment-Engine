@@ -1,6 +1,6 @@
-package terraform.gcp.security.BigQuery.google_bigquery_routine.data_governance_type
+package terraform.gcp.security.bigquery.google_bigquery_routine.data_governance_type
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_routine.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_routine.vars
 
 conditions := [
     [
