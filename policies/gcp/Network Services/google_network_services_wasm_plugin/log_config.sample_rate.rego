@@ -1,4 +1,4 @@
-package terraform.gcp.security.network_services.google_network_services_wasm_plugin.sample_rate
+package terraform.gcp.security.network_services.google_network_services_wasm_plugin.log_config_sample_rate
 
 import data.terraform.helpers
 import data.terraform.gcp.security.network_services.google_network_services_wasm_plugin.vars
