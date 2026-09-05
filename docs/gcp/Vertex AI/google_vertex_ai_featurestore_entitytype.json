@@ -70,8 +70,8 @@
       "description": "Whether to enable / disable / inherite default hebavior for import features analysis. The value must be one of the values below:\n* DEFAULT: The default behavior of whether to enable the monitoring. EntityType-level config: disabled.\n* ENABLED: Explicitly enables import features analysis. EntityType-level config: by default enables import features analysis for all Features under it.\n* DISABLED: Explicitly disables import features analysis. EntityType-level config: by default disables import features analysis for all Features under it.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Toggling data quality monitoring analysis is an operational observability choice, rather than a direct security or access-control mechanism."
+      "security_impact": true,
+      "rationale": "This parameter functions as a security telemetry toggle. A platform policy must enforce this state to be enabled to satisfy the security telemetry archetype, ensuring that critical auditability, monitoring data capture, and data quality insights are actively collected and not bypassed."
     },
     "monitoring_config.numerical_threshold_config": {
       "type": "block",
@@ -94,8 +94,8 @@
       "description": "The monitoring schedule for snapshot analysis. For EntityType-level config: unset / disabled = true indicates disabled by default for Features under it; otherwise by default enable snapshot analysis monitoring with monitoringInterval for Features under it.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Enabling or disabling snapshot analysis is a data quality and performance trade-off, not a platform security policy target."
+      "security_impact": true,
+      "rationale": "This flag directly controls security telemetry and monitoring data capture. To comply with the platform's security telemetry archetype, a policy must enforce that this disabled flag is set to false, ensuring continuous security auditability and preventing the suppression of required monitoring data."
     },
     "monitoring_config.snapshot_analysis.monitoring_interval_days": {
       "description": "Configuration of the snapshot analysis based monitoring pipeline running interval. The value indicates number of days. The default value is 1.\nIf both FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days and [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval][] are set when creating/updating EntityTypes/Features, FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days will be used.",
