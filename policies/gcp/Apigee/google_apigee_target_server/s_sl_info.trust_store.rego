@@ -6,24 +6,25 @@ import data.terraform.gcp.security.apigee.google_apigee_target_server.vars
 conditions := [
     [
         {
-            "situation_description": "The Apigee target server does not use an approved truststore for backend TLS certificate validation.",
+            "situation_description": "The truststore reference for backend TLS certificate validation is missing or empty.",
             "remedies": [
-                "Set s_sl_info.trust_store to an approved truststore reference.",
+                "Set s_sl_info.trust_store to a valid truststore reference.",
                 "Ensure that the truststore contains the complete trusted certificate chain for the backend service.",
-                "Use a managed truststore reference to simplify certificate rotation."
+                "Use a managed truststore reference to support secure certificate rotation."
             ]
         },
         {
-            "condition": "Check whether the configured truststore is approved for backend certificate validation.",
+            "condition": "Check whether the truststore reference is present and non-empty.",
             "attribute_path": [
                 "s_sl_info",
                 0,
                 "trust_store"
             ],
             "values": [
-                "ref://approved-truststore-reference"
+                null,
+                ""
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]

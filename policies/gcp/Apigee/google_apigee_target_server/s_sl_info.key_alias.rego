@@ -6,24 +6,25 @@ import data.terraform.gcp.security.apigee.google_apigee_target_server.vars
 conditions := [
     [
         {
-            "situation_description": "The Apigee target server does not use an approved client certificate alias for mutual TLS authentication.",
+            "situation_description": "The client certificate key alias for mutual TLS authentication is missing or empty.",
             "remedies": [
-                "Set s_sl_info.key_alias to an approved client certificate alias.",
-                "Ensure that the alias exists in the configured keystore.",
-                "Use a valid and unexpired certificate issued for backend client authentication."
+                "Set s_sl_info.key_alias to a valid client certificate alias.",
+                "Ensure that the specified alias exists in the configured keystore.",
+                "Use a valid and unexpired certificate intended for backend client authentication."
             ]
         },
         {
-            "condition": "Check whether the configured key alias is approved for mutual TLS authentication.",
+            "condition": "Check whether the client certificate key alias is present and non-empty.",
             "attribute_path": [
                 "s_sl_info",
                 0,
                 "key_alias"
             ],
             "values": [
-                "approved-client-certificate"
+                null,
+                ""
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]

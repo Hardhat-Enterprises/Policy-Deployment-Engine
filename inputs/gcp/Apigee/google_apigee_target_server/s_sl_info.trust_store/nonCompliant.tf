@@ -1,5 +1,5 @@
 # Tests the s_sl_info.trust_store argument.
-# The configured truststore is not approved for backend certificate validation.
+# The truststore is non-compliant because it is empty.
 
 resource "google_apigee_target_server" "non_compliant_example_1" {
   name     = "unapproved-truststore-target-server"
@@ -12,6 +12,6 @@ resource "google_apigee_target_server" "non_compliant_example_1" {
     enabled                  = true
     enforce                  = true
     ignore_validation_errors = false
-    trust_store              = "ref://unapproved-truststore-reference"
+    trust_store              = ""
   }
 }

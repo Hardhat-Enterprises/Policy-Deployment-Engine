@@ -6,24 +6,25 @@ import data.terraform.gcp.security.apigee.google_apigee_target_server.vars
 conditions := [
     [
         {
-            "situation_description": "The Apigee target server does not use an approved keystore for mutual TLS client authentication.",
+            "situation_description": "The keystore reference for mutual TLS client authentication is missing or empty.",
             "remedies": [
-                "Set s_sl_info.key_store to an approved keystore reference.",
+                "Set s_sl_info.key_store to a valid keystore reference.",
                 "Ensure that the keystore contains a valid client certificate and private key.",
-                "Use a managed keystore reference to simplify certificate rotation."
+                "Use a managed keystore reference to support secure certificate rotation."
             ]
         },
         {
-            "condition": "Check whether the configured keystore is approved for mutual TLS authentication.",
+            "condition": "Check whether the keystore reference is present and non-empty.",
             "attribute_path": [
                 "s_sl_info",
                 0,
                 "key_store"
             ],
             "values": [
-                "ref://approved-keystore-reference"
+                null,
+                ""
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]

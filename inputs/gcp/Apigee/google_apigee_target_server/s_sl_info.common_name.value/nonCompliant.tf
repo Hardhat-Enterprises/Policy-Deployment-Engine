@@ -1,5 +1,5 @@
 # Tests the s_sl_info.common_name.value argument.
-# The configured value does not match the approved backend certificate name.
+# An empty value fails the required presence check.
 
 resource "google_apigee_target_server" "non_compliant_example_1" {
   name     = "invalid-common-name-target-server"
@@ -15,7 +15,7 @@ resource "google_apigee_target_server" "non_compliant_example_1" {
     trust_store              = "ref://approved-truststore-reference"
 
     common_name {
-      value          = "untrusted.example.com"
+      value          = ""
       wildcard_match = false
     }
   }

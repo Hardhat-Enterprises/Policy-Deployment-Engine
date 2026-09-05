@@ -6,15 +6,15 @@ import data.terraform.gcp.security.apigee.google_apigee_target_server.vars
 conditions := [
     [
         {
-            "situation_description": "The configured TLS common name does not match an approved identity for the backend target server.",
+            "situation_description": "The TLS common name for the backend target server is missing or empty.",
             "remedies": [
-                "Set s_sl_info.common_name.value to the expected backend certificate common name.",
-                "Ensure that the configured value matches the identity in the backend TLS certificate.",
-                "Update the policy when the approved backend hostname or certificate identity changes."
+                "Set s_sl_info.common_name.value to the backend certificate common name.",
+                "Ensure the configured value matches the identity in the backend TLS certificate.",
+                "Verify that the TLS common name is not null or empty."
             ]
         },
         {
-            "condition": "Check whether the configured TLS common name is approved for the backend target server.",
+            "condition": "Check whether the configured TLS common name is present and non-empty.",
             "attribute_path": [
                 "s_sl_info",
                 0,
@@ -23,9 +23,10 @@ conditions := [
                 "value"
             ],
             "values": [
-                "backend.example.com"
+                null,
+                ""
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]
