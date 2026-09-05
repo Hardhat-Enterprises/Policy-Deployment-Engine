@@ -91,8 +91,8 @@ RULES = {
         "compliant.tf and nonCompliant.tf differ on attributes other than the "
         "argument under test."),
     "fixture-missing-plan": (
-        "No committed plan cache for this fixture pair — run the test locally and "
-        "commit inputs/plan_cache."),
+        "No committed plan for this fixture pair — run the test locally and commit "
+        "the <sha>.json the harness writes into the fixture directory."),
     "fixture-one-sided": (
         "The fixture has no compliant examples at all, or no non-compliant examples "
         "at all, so one half of what the harness checks is never exercised."),
@@ -206,6 +206,58 @@ FIXTURE_IGNORED_KEYS = {
     "name", "labels", "label", "effective_labels", "terraform_labels",
     "effective_annotations",
 }
+
+# --- fixtures whose second difference the provider requires ------------------
+#
+# The drift rule asks that a compliant and a non-compliant example differ only on
+# the argument under test. Sometimes they cannot. Every entry here is the same
+# shape: the argument under test belongs to a set Terraform allows only one of, so
+# showing a compliant and a non-compliant value of it necessarily changes which
+# member of that set is populated. Asking these authors to remove the difference
+# would be asking for a fixture terraform will not accept.
+#
+# This is NOT a way to silence a finding you would rather not fix. It lives in
+# scripts/, which a Service branch cannot edit, so adding one takes a maintainer —
+# and each entry has to say what the mutually exclusive set is. A fixture that
+# stops drifting makes its entry stale, and a test over the real tree fails when
+# that happens, so the list cannot quietly rot.
+#
+# (service folder, resource type, argument) -> ({keys}, why)
+FIXTURE_DRIFT_EXEMPT = {
+    ("App Hub", "google_apphub_application", "scope.type"): (
+        {"location"},
+        "A GLOBAL-scoped application can only exist in the `global` location and a "
+        "REGIONAL one only in a real region, so the location follows the scope type "
+        "under test rather than varying independently of it."),
+    ("Certificate Manager", "google_certificate_manager_certificate",
+     "self_managed.pem_private_key"): (
+        {"managed"},
+        "`managed` and `self_managed` are mutually exclusive. Demonstrating a "
+        "non-compliant self_managed private key means the compliant example cannot "
+        "use self_managed at all, so it uses `managed` instead."),
+    ("Certificate Manager", "google_certificate_manager_certificate_map_entry",
+     "matcher"): (
+        {"hostname"},
+        "`matcher` and `hostname` are mutually exclusive. The compliant example "
+        "cannot set the matcher it is meant not to use, so it sets a hostname."),
+    ("Cloud Platform", "google_folder_organization_policy", "constraint"): (
+        {"boolean_policy", "list_policy", "restore_policy"},
+        "Each constraint is of a fixed type — compute.disableSerialPortAccess is a "
+        "boolean constraint, serviceuser.services a list one — and the three policy "
+        "blocks are mutually exclusive. Varying the constraint under test therefore "
+        "varies which block is populated."),
+    ("Cloud Storage", "google_storage_object_acl", "predefined_acl"): (
+        {"role_entity"},
+        "`predefined_acl` and `role_entity` are mutually exclusive. The compliant "
+        "example cannot set the predefined ACL it is meant not to use, so it grants "
+        "the equivalent access with role_entity."),
+}
+
+
+def drift_exempt_keys(service, resource_type, stem):
+    """Keys this fixture may differ on because the provider leaves it no choice."""
+    entry = FIXTURE_DRIFT_EXEMPT.get((service, resource_type, stem))
+    return entry[0] if entry else frozenset()
 
 # The policy types `policies/_helpers/helpers.rego` can dispatch, in the order its
 # error message lists them (so the two read identically to a student who hits both).
@@ -397,15 +449,16 @@ def _resolve_helpers(policies_root, helpers_dir=None):
 # --------------------------------------------------------------------------- #
 # Plan cache
 # --------------------------------------------------------------------------- #
-def plan_cache_for(root, input_dir):
-    """``<root>/inputs/plan_cache/<platform>/<sha>.json`` for a fixture dir.
+def plan_cache_for(input_dir):
+    """``<input_dir>/<sha>.json`` — the committed plan, beside the fixture's *.tf.
 
-    The sha and platform come from ``auto_test.plan_cache_path`` (the pipeline's
-    own definition); only the *root* is rebased, so a fixture tree under
-    ``_tests/`` resolves inside itself. For the real repo this is the identity.
+    Straight through to ``auto_test.plan_cache_path`` (the pipeline's own
+    definition of which plan belongs to a fixture), so a provider bump changes
+    the expected filename here and in the harness at the same time. No root
+    rebasing is needed any more: the plan lives inside the directory it is for,
+    so a fixture tree under ``_tests/`` resolves inside itself for free.
     """
-    canonical = plan_cache_path(Path(input_dir))
-    return Path(root) / "inputs" / "plan_cache" / canonical.parent.name / canonical.name
+    return plan_cache_path(Path(input_dir))
 
 
 # --------------------------------------------------------------------------- #
@@ -806,6 +859,26 @@ def _is_fixture_label(value):
     return isinstance(value, str) and bool(FIXTURE_LABEL_RE.match(value))
 
 
+# A *value* that names itself after the fixture it belongs to. Deliberately looser
+# than FIXTURE_LABEL_RE, which matches a terraform resource label and may keep its
+# underscores: many GCP id fields reject underscores, so a contributor naming an
+# example has to write `compliant-example-1`, and `compliant-assistant-1` is the
+# same act of naming. The polarity carries the meaning — a value starting
+# `compliant-` beside one starting `non-compliant-` is one label written twice, not
+# two different configurations.
+_LABEL_VALUE_RE = re.compile(r"^(non[-_]compliant|compliant)[-_]", re.I)
+
+
+def _label_polarity(value):
+    """'compliant' / 'non_compliant' when a value names itself after the fixture."""
+    if not isinstance(value, str):
+        return None
+    match = _LABEL_VALUE_RE.match(value)
+    if not match:
+        return None
+    return "non_compliant" if match.group(1).lower().startswith("non") else "compliant"
+
+
 def _drift_comparisons(compliant, non_compliant):
     """(compliant_values, non_compliant_values) pairs for the drift rule.
 
@@ -838,24 +911,26 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     if not input_dir.is_dir() or not any(input_dir.glob("*.tf")):
         return []
 
-    cache = plan_cache_for(root, input_dir)
+    cache = plan_cache_for(input_dir)
     if not cache.exists():
+        # Reported repo-relative: the finding is read in CI logs and on the portal,
+        # where an absolute path of the checkout means nothing.
         return [Finding(service, resource_type, stem, "fixture-missing-plan",
-                        f"no committed plan cache at inputs/plan_cache/{platform}/"
-                        f"{cache.name} — run auto_test locally and commit it")]
+                        f"no committed plan at {cache.relative_to(root).as_posix()} — "
+                        "run auto_test locally and commit the file it writes")]
 
     try:
         plan = json.loads(cache.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         return [Finding(service, resource_type, stem, "fixture-missing-plan",
-                        f"plan cache {cache.name} is unreadable: {exc}")]
+                        f"plan {cache.name} is unreadable: {exc}")]
 
     # A cache written by an older/other tool (or a truncated file) must be a
     # finding, not an AttributeError halfway down this function.
     resources = _plan_resources(plan)
     if resources is None:
         return [Finding(service, resource_type, stem, "lint-error",
-                        f"plan cache {cache.name} is not a Terraform plan "
+                        f"plan {cache.name} is not a Terraform plan "
                         "(no planned_values.root_module.resources list)")]
 
     compliant, non_compliant = {}, {}
@@ -897,15 +972,40 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     # Only the argument's *top-level* key is expected to differ; a nested
     # argument (a.b.c) is compared at its block key, since the plan nests it.
     argument_key = stem.split(".")[0]
-    ignored = FIXTURE_IGNORED_KEYS | {argument_key}
+    ignored = (FIXTURE_IGNORED_KEYS | {argument_key}
+               | drift_exempt_keys(service, resource_type, stem))
 
     drifted = set()
     for good, bad in _drift_comparisons(compliant, non_compliant):
+        # What the argument under test is actually set to on each side. A key that
+        # merely carries these values onward is a mirror of the thing being tested,
+        # not a second difference: `google_service_account.email` is built from
+        # `account_id`, and a regional resource's `target` URL embeds its `region`.
+        # Changing the argument necessarily changes them, so reporting them tells a
+        # contributor to remove a difference the provider requires.
+        arg_good, arg_bad = good.get(argument_key), bad.get(argument_key)
+        mirrors = (isinstance(arg_good, str) and isinstance(arg_bad, str)
+                   and len(arg_good) >= 3 and len(arg_bad) >= 3 and arg_good != arg_bad)
+
         for key in set(good) | set(bad):
             if key in ignored:
                 continue
             good_value, bad_value = good.get(key), bad.get(key)
             if good_value == bad_value:
+                continue
+            # Case-sensitive containment on purpose: `location = "global"` beside
+            # `scope.type = "GLOBAL"` is a real editorial choice about the fixture,
+            # not a value the provider derived.
+            if (mirrors and isinstance(good_value, str) and isinstance(bad_value, str)
+                    and arg_good in good_value and arg_bad in bad_value):
+                continue
+            # A key whose two values are the fixture's own labels is naming, not
+            # drift — `odb_subnet_id = "compliant-example-1"` against
+            # `"non-compliant-example-1"` is one name written twice. The polarity
+            # has to line up: the compliant side must carry the compliant label. A
+            # pair that merely looks label-ish on one side stays drift.
+            if (_label_polarity(good_value) == "compliant"
+                    and _label_polarity(bad_value) == "non_compliant"):
                 continue
             # The identity attribute (`bucket` on an IAM binding, `name`
             # elsewhere) is exempt ONLY when it *is* the fixture label — two
@@ -944,11 +1044,22 @@ def _friendly_name_index(policies_root, platform):
     """{normalised friendly name: [(service, resource_type), ...]} for a platform.
 
     Duplicate detection is only meaningful across the whole tree, so this reads
-    *every* ``_vars.rego`` under ``policies/<platform>/``. It does that in ONE
-    ``opa eval`` over the platform (~0.6s); asking per file cost 370 subprocesses
-    and ~9s for a single-resource lint. Package names are read from the files
-    themselves (a plain regex, no subprocess) so each result maps back to its
-    real service folder and resource-type directory.
+    *every* ``_vars.rego`` under ``policies/<platform>/``. It needs exactly one
+    field from each, ``friendly_resource_name``, and in every file in the tree that
+    field is a plain string literal — so the name is read straight out of the text
+    and OPA is not involved at all.
+
+    That is the one place this linter reads text rather than evaluated Rego, and it
+    is worth being precise about why it is safe here and nowhere else. A rule that
+    decides a finding has to see what the policy actually evaluates to; this index
+    only has to recognise the same literal twice. Evaluating the whole platform to
+    obtain it cost 0.93s of the 1.05s a single-resource lint spent — for a result
+    measured to be byte-identical to the regex over all 441 files.
+
+    A file whose name the regex cannot read is not assumed absent: those files, and
+    only those, are resolved with one ``opa eval`` over the platform. So a
+    ``friendly_resource_name`` that is computed rather than declared still lands in
+    the index correctly; it just makes the run pay for what it needs.
     """
     policies_root = Path(policies_root)
     key = (str(policies_root.resolve()), platform)
@@ -957,31 +1068,40 @@ def _friendly_name_index(policies_root, platform):
 
     platform_root = policies_root / platform
     vars_paths = sorted(platform_root.glob(f"*/*/{VARS_FILE}"))
-    helpers_dir = _resolve_helpers(policies_root)
-    try:
-        tree = _run_opa("data.terraform", helpers_dir, platform_root) or {}
-    except OpaUnavailableError:
-        raise
-    except PolicyLintError:
-        # ONE unparseable file anywhere under the platform fails the batch. Asking
-        # per file instead meant ~370 subprocesses (0.8s -> 9.3s) just because of an
-        # unrelated typo, so read the names out of the text instead: a friendly name
-        # is a literal in the file, and this index only needs that one field.
-        tree = None
 
-    index = {}
+    names, unread = {}, []
     for vars_path in vars_paths:
         try:
-            variables = None
-            if tree is not None:
-                variables = _walk(tree, _package_of(vars_path).split(".")[1:]
-                                  + ["variables"])
-            friendly = (variables.get("friendly_resource_name")
-                        if isinstance(variables, dict) else None)
-            if friendly is None:
-                friendly = _friendly_name_from_text(vars_path)
-        except (PolicyLintError, OSError, UnicodeDecodeError):
+            friendly = _friendly_name_from_text(vars_path)
+        except (OSError, UnicodeDecodeError):
             continue
+        if friendly is None:
+            unread.append(vars_path)
+        else:
+            names[vars_path] = friendly
+
+    if unread:
+        # Only now is an evaluation worth its cost, and only for these files.
+        helpers_dir = _resolve_helpers(policies_root)
+        try:
+            tree = _run_opa("data.terraform", helpers_dir, platform_root) or {}
+        except OpaUnavailableError:
+            raise
+        except PolicyLintError:
+            # ONE unparseable file anywhere under the platform fails the batch.
+            # Nothing more to try: those names stay out of the index.
+            tree = None
+        for vars_path in unread:
+            try:
+                variables = _walk(tree, _package_of(vars_path).split(".")[1:]
+                                  + ["variables"]) if tree is not None else None
+            except (PolicyLintError, OSError, UnicodeDecodeError):
+                continue
+            if isinstance(variables, dict):
+                names[vars_path] = variables.get("friendly_resource_name")
+
+    index = {}
+    for vars_path, friendly in names.items():
         friendly = friendly.strip().lower() if isinstance(friendly, str) else ""
         if friendly:
             index.setdefault(friendly, []).append(
