@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deletion-blocking flags follow the prevent-destructive-loss archetype: enforcing PREVENT protects against accidental or malicious destruction of the resource, so this is treated as security-relevant."
     },
     "instance": {
       "description": "The name for a specific VM instance that the IP address belongs to.\nThis is required for network endpoints of type GCE_VM_IP_PORT.\nThe instance must be in the same zone of network endpoint group.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the VM instance). Per the project's core rule, resource references are not themselves security controls — the instance's own security is enforced at its own resource policies."
     },
     "ip_address": {
       "description": "IPv4 address of network endpoint. The IP address must belong\nto a VM in GCE (either the primary IP or as part of an aliased IP\nrange).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This IP must belong to an existing VM already within the GCP network, making it effectively a reference to that VM's networking configuration rather than an arbitrary external destination. Consistent with the project's reference rule, this is not itself a security control."
     },
     "network_endpoint_group": {
       "description": "The network endpoint group this endpoint is part of.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the network endpoint group). Per the project's core rule, resource references are not themselves security controls — the endpoint group's own security is enforced at its own resource policies."
     },
     "port": {
       "description": "Port number of network endpoint.\n**Note** 'port' is required unless the Network Endpoint Group is created\nwith the type of 'GCE_VM_IP'",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A routing parameter that pairs with the target address; it does not itself represent a security decision independent of which destination is being targeted."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project determines resource ownership/location, similar to other identifier fields; it is not itself a security control."
     },
     "zone": {
       "description": "Zone where the containing network endpoint group is located.",
