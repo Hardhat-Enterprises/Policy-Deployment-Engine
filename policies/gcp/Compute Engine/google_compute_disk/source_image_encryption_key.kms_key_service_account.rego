@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_disk.source_image_encryption_key.kms_key_service_account
+package terraform.gcp.security.compute_engine.google_compute_disk.source_image_encryption_key_kms_key_service_account
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_disk.vars
 conditions := [

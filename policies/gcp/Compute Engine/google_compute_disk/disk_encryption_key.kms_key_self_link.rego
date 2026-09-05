@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_disk.disk_encryption_key.kms_key_self_link
+package terraform.gcp.security.compute_engine.google_compute_disk.disk_encryption_key_kms_key_self_link
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_disk.vars
 conditions := [
