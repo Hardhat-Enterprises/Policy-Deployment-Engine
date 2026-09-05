@@ -7,9 +7,9 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_ad
     {"situation_description" : "Enforcing location security",
     "remedies":[ "Change location to approved region"]},
     {
-        "condition": "Test if a location is australia_southeast1",
+        "condition": "Test if a location is australia-southeast1",
         "attribute_path" : ["location"],
-        "values" : ["australia_southeast1", "australia_southeast2"],
+        "values" : ["australia-southeast1", "australia-southeast2"],
         "policy_type" : "whitelist"
     }
     ]

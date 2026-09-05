@@ -1,7 +1,7 @@
 resource "google_gkeonprem_bare_metal_admin_cluster" "non_compliant_example_1" {
   name     = "non_compliant_example_1"
   project  = "PDE"
-  location = "australia_southeast1"
+  location = "australia-southeast1"
 
   storage {
     lvp_node_mounts_config {
