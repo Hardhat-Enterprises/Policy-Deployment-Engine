@@ -909,3 +909,77 @@ def test_mistyped_service_is_not_a_no_policies_dir_marker(tmp_path, capsys):
     err = capsys.readouterr().err
     assert rc == 2
     assert "no-policies-dir" not in err
+
+
+# --------------------------------------------------------------------------- #
+# Drift exemptions: fixtures the provider will not let you write any other way.
+# --------------------------------------------------------------------------- #
+def test_an_exempt_fixture_gets_its_recorded_keys():
+    assert policy_lint.drift_exempt_keys(
+        "Cloud Storage", "google_storage_object_acl", "predefined_acl") == {"role_entity"}
+
+
+def test_everything_else_gets_nothing():
+    assert policy_lint.drift_exempt_keys(
+        "Cloud Storage", "google_storage_bucket", "location") == frozenset()
+    # Right resource, wrong argument — the exemption is per fixture, not per resource.
+    assert policy_lint.drift_exempt_keys(
+        "Cloud Storage", "google_storage_object_acl", "bucket") == frozenset()
+
+
+def test_every_exemption_states_its_mutually_exclusive_set():
+    # An entry without a reason is a silenced finding, not a recorded fact.
+    for key, (keys, why) in policy_lint.FIXTURE_DRIFT_EXEMPT.items():
+        service, resource, stem = key
+        assert all(isinstance(x, str) and x for x in (service, resource, stem))
+        assert keys and all(isinstance(k, str) and k for k in keys)
+        assert isinstance(why, str) and len(why.strip()) > 60, key
+
+
+def test_an_exemption_silences_only_the_keys_it_names(tmp_path, monkeypatch):
+    # The fixtures_bad tree drifts on `storage_class`. Exempting that key clears the
+    # finding; exempting a different one leaves it exactly where it was.
+    root = build_tree(tmp_path, "fixtures_bad")
+    entry = ("Cloud Storage", "google_storage_bucket", "public_access_prevention")
+
+    def drift_findings():
+        policy_lint.clear_caches()
+        return [f for f in policy_lint.lint_resource(
+            root, "gcp", "Cloud Storage", "google_storage_bucket")
+            if f.rule == "fixture-drift"]
+
+    assert drift_findings(), "the fixture must drift before anything is exempted"
+
+    monkeypatch.setitem(policy_lint.FIXTURE_DRIFT_EXEMPT, entry,
+                        ({"something_else"}, "x" * 70))
+    assert drift_findings(), "exempting an unrelated key must change nothing"
+
+    monkeypatch.setitem(policy_lint.FIXTURE_DRIFT_EXEMPT, entry,
+                        ({"storage_class"}, "x" * 70))
+    assert drift_findings() == [], "exempting the drifted key must clear it"
+
+
+@pytest.mark.parametrize("entry", sorted(policy_lint.FIXTURE_DRIFT_EXEMPT))
+def test_every_exemption_is_still_needed(entry, monkeypatch):
+    """Removing an entry must bring its finding back on the real tree.
+
+    This is what stops the list rotting. A fixture that is rewritten so it no longer
+    needs its exemption leaves a stale entry behind, quietly exempting a key that
+    might drift again later — and nothing else would notice.
+    """
+    service, resource, stem = entry
+    exempted = policy_lint.FIXTURE_DRIFT_EXEMPT[entry][0]
+    monkeypatch.setattr(policy_lint, "FIXTURE_DRIFT_EXEMPT",
+                        {k: v for k, v in policy_lint.FIXTURE_DRIFT_EXEMPT.items()
+                         if k != entry})
+    policy_lint.clear_caches()
+    findings = policy_lint.lint_resource(project_root, "gcp", service, resource)
+    drift = [f for f in findings if f.rule == "fixture-drift" and f.policy == stem]
+    assert drift, (f"{entry} no longer drifts without its exemption — the fixture was "
+                   f"fixed, so remove the entry from FIXTURE_DRIFT_EXEMPT")
+    reported = set(drift[0].message.split(": ", 1)[1].split(", "))
+    assert reported <= exempted, (
+        f"{entry} drifts on {reported - exempted}, which its exemption does not "
+        f"cover — either the fixture gained a real second difference, or the entry "
+        f"needs widening with a reason")
+
