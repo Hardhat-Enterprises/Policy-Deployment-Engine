@@ -1,6 +1,6 @@
-package terraform.gcp.security.BigQuery.google_bigquery_dataset_access.domain
+package terraform.gcp.security.bigquery.google_bigquery_dataset_access.domain
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_dataset_access.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_dataset_access.vars
 
 conditions := [
     [

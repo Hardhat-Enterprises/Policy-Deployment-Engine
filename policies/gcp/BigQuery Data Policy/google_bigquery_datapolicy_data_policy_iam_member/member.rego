@@ -9,7 +9,7 @@ conditions := [
     {
         "condition": "Validating member",
         "attribute_path" : ["member"],
-        "values" : ["allAuthenticatedUsers, allUsers"], 
+        "values" : ["allAuthenticatedUsers", "allUsers"],
         "policy_type" : "blacklist"
     }
     ],

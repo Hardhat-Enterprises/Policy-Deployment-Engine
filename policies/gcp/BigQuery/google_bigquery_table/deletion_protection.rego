@@ -1,6 +1,6 @@
-package terraform.gcp.security.BigQuery.google_bigquery_table.deletion_protection
+package terraform.gcp.security.bigquery.google_bigquery_table.deletion_protection
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_table.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_table.vars
 
 conditions := [
     [

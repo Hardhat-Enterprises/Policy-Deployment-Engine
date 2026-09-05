@@ -569,6 +569,22 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     # format can still be matched via a valid id value.
     name_map = get_resource_name_map(plan_path, str(resource_type), resource_value_name)
     unique_names = set(name_map.keys())
+
+    # A policy whose declared resource type matches nothing in the plan is inert:
+    # there is nothing to flag, so nothing goes unflagged and the check would pass
+    # while testing nothing at all. Every fixture is required to contain compliant
+    # and non-compliant examples of the resource under test, so zero matches always
+    # means the policy's _vars.rego names the wrong type.
+    if not unique_names:
+        actual_types = get_all_resource_types(plan_path)
+        reason = (
+            f"Policy declares resource_type '{resource_type}', which matches no resource "
+            f"in the plan. Types present: "
+            f"{', '.join(actual_types) if actual_types else 'NONE'}"
+        )
+        thread_safe_print(f"Check failed: {reason}\n")
+        return make_failure(attribute, reason, service, resource)
+
     candidates = unique_names | {v for v in name_map.values() if v}
     # Match only within the "Non-Compliant Resources:" portion(s) of the message,
     # never the remedy/advisory text — otherwise an approved value echoed in a
