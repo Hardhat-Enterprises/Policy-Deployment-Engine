@@ -103,6 +103,28 @@ hand-written assessment of a canonical key is replaced. That is the intent — o
 answer for `location` across the tree — but it is why the dry run is the default.
 Run it from the repo root, and review the diff before committing.
 
+### When the generic answer is wrong
+
+Not every residency key is a residency *decision*. `google_iam_folders_policy_binding`
+only accepts the global IAM location, and `google_compute_per_instance_config.zone` has
+to match the instance group manager it references — marking either "restrict this to an
+approved region" would send a contributor looking for a control that cannot exist.
+
+`EXEMPTIONS` in `lib/canonical.py` records those, and it records the **correct answer**,
+not permission to write anything: an exempt key is still locked, just to a different
+value. So `apply_canonical.py` leaves it alone, the generator writes the right thing into
+a new resource, and the linter still checks it.
+
+Adding one is deliberate — the resource, the key, and a rationale saying why this one
+differs. Everything not listed stays canonical.
+
+### The linter enforces it
+
+`linter.py`'s docs content checks report any canonical key whose assessment has been
+changed, naming both the fix (`apply_canonical.py --apply`) and the way out
+(`EXEMPTIONS`). It is a content check rather than a structural one so that one drifted
+file cannot turn every contributor's pull request red.
+
 ## Layout
 
 ```

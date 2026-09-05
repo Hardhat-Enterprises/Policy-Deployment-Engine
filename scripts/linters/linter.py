@@ -13,6 +13,12 @@ Structure rules
 1c. ``gcp/`` contains only directories (one per service). Each service directory
     contains only ``*.json`` files — no subdirectories, no other file types.
 1d. Each GCP doc JSON validates against the schema below.
+1e. (content check) Cross-cutting arguments carry their canonical assessment. A
+    top-level ``location``/``region``/``zone``, and the common keys on the split IAM
+    resources, mean the same thing everywhere, so ``security_impact`` and
+    ``rationale`` come from ``scripts/docgen/lib/canonical.py`` — including for the
+    resources that module exempts, which are locked to a different answer rather than
+    left free. A content check on purpose: see ``DocsCanonicalValidator``.
 
 GCP doc JSON schema
 -------------------
@@ -89,6 +95,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 # linter asks auto_test for it rather than re-deriving it. Importing keeps the two
 # in lockstep: a provider bump changes the expected filename in both at once.
 from scripts.auto_test.auto_test import PLAN_FILE_RE, fixture_sha  # noqa: E402
+
+# Cross-cutting assessments (data residency, the IAM common keys) are decided once in
+# canonical.py rather than 400 times, and the generator writes them into every new
+# resource. Asking that module rather than restating its values is what keeps the check
+# and the thing it checks from ever disagreeing — including about which resources are
+# exempt.
+from scripts.docgen.lib.canonical import canonical_for  # noqa: E402
 
 # --------------------------------------------------------------------------- #
 # Editable allow-lists — extend these as the docs tree grows.
@@ -329,6 +342,80 @@ class DocsValidator:
                                 f"the string {VALID_SECURITY_IMPACT_STR!r} (found {si!r})")
             if "rationale" in entry and not isinstance(entry["rationale"], str):
                 self.logger.log(f"{where}: 'rationale' must be a string")
+
+
+class DocsCanonicalValidator:
+    """Docs content check: canonical arguments carry their canonical assessment.
+
+    Some arguments mean the same thing on every resource — a top-level
+    ``location``/``region``/``zone``, and the common keys on the split IAM resources.
+    Deciding those per resource produced 14 different answers to the same question,
+    three of which were right for reasons the generic answer could not express (see
+    ``canonical.EXEMPTIONS``) and eleven of which were the same sentence rewritten.
+
+    A CONTENT check, not a structural one, and deliberately so. The structural pass is
+    a hard tree-wide gate on every pull request; a rule that can be broken by editing
+    any one of ~400 docs files does not belong there, or one contributor's drift turns
+    every other contributor's pull request red. As a content check it reaches people
+    the right way round: ``run_precommit_linter`` attributes it to whoever changed the
+    file, and the whole-tree ALL run reports the rest.
+    """
+
+    def __init__(self, docs_root, logger):
+        self.docs_root = docs_root
+        self.logger = logger
+
+    def validate(self, only_platform=None):
+        for platform in sorted(ALLOWED_PLATFORMS):
+            if only_platform and platform != only_platform:
+                continue
+            root = os.path.join(self.docs_root, platform)
+            if not os.path.isdir(root):
+                continue
+            for service in sorted(os.listdir(root)):
+                service_dir = os.path.join(root, service)
+                if not os.path.isdir(service_dir):
+                    continue
+                for entry in sorted(os.listdir(service_dir)):
+                    if entry.endswith(".json"):
+                        self._check_file(os.path.join(service_dir, entry),
+                                         f"docs/{platform}/{service}/{entry}",
+                                         entry[:-len(".json")])
+
+    def _check_file(self, path, rel, resource):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                doc = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            return                      # DocsValidator reports malformed files
+        arguments = doc.get("arguments")
+        if not isinstance(arguments, dict):
+            return
+
+        for key, entry in arguments.items():
+            if not isinstance(entry, dict) or "security_impact" not in entry:
+                continue                # blocks carry no assessment
+            canon = canonical_for(resource, key)
+            if canon is None:
+                continue
+            impact, rationale = canon
+            for field, want in (("security_impact", impact), ("rationale", rationale)):
+                got = entry.get(field)
+                if got == want:
+                    continue
+                self.logger.log(
+                    f"[content] {rel}: argument '{key}' has a canonical {field} that has "
+                    f"been changed. Restore it with "
+                    f"`python3 scripts/docgen/apply_canonical.py --apply`, or — if this "
+                    f"resource genuinely differs — add it to EXEMPTIONS in "
+                    f"scripts/docgen/lib/canonical.py with the reason "
+                    f"(found {shorten(got)}, expected {shorten(want)})")
+
+
+def shorten(value, limit=60):
+    """A field value, trimmed to something that fits on a terminal line."""
+    text = json.dumps(value) if not isinstance(value, str) else value
+    return repr(text if len(text) <= limit else text[:limit] + "…")
 
 
 def build_gcp_docs_index(docs_root):
@@ -826,10 +913,13 @@ def main(argv=None):
               f"{f' (platform: {args.platform})' if args.platform else ''}\n")
         PoliciesValidator(policies_root, docs_index, logger).validate_root(only_platform=args.platform)
 
-    if args.content_checks and (do_inputs or do_policies):
+    if args.content_checks and (do_docs or do_inputs or do_policies):
         print("\n[*] Running content checks\n")
-        ContentChecksValidator(policies_root, inputs_root, logger).validate(
-            only_platform=args.platform, do_inputs=do_inputs, do_policies=do_policies)
+        if do_docs:
+            DocsCanonicalValidator(docs_root, logger).validate(only_platform=args.platform)
+        if do_inputs or do_policies:
+            ContentChecksValidator(policies_root, inputs_root, logger).validate(
+                only_platform=args.platform, do_inputs=do_inputs, do_policies=do_policies)
 
     if logger.summary():
         sys.exit(1)
