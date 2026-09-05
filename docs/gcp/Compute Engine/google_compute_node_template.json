@@ -2,54 +2,40 @@
   "last_updated": "2026-06-23T08:26:44Z",
   "provider_version": "7.37.0",
   "arguments": {
-    "cpu_overcommit_type": {
-      "description": "CPU overcommit. Default value: \"NONE\" Possible values: [\"ENABLED\", \"NONE\"]",
-      "required": false,
+    "name": {
+      "description": "Name of the resource.",
+      "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "deletion_policy": {
-      "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The template's identifier. Naming is a team choice; we don't constrain resource names or references."
     },
     "description": {
       "description": "An optional textual description of the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "name": {
-      "description": "Name of the resource.",
-      "required": true,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-text metadata for human readability. It has no effect on the resource's configuration or behavior."
     },
     "node_affinity_labels": {
       "description": "Labels to use for node affinity, which will be used in\ninstance scheduling.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels used purely for scheduling affinity between instances and nodes. This is an architectural/scheduling choice, not a security control, similar to other categorization labels."
     },
     "node_type": {
       "description": "Node type to use for nodes group that are created from this template.\nOnly one of nodeTypeFlexibility and nodeType can be specified.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the sole-tenant node shape to reserve. This is a functional sizing choice with no universally secure value — appropriate node types vary entirely by workload."
     },
-    "project": {
-      "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
+    "cpu_overcommit_type": {
+      "description": "CPU overcommit.\nDefault value is `NONE`.\nPossible values are: `ENABLED`, `NONE`.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether CPU can be oversubscribed on the node for cost efficiency. This is a functional/architectural cost-vs-isolation tradeoff with no single universally secure value."
     },
     "region": {
       "description": "Region where nodes using the node template will be created.\nIf it is not provided, the provider region is used.",
@@ -58,50 +44,19 @@
       "security_impact": true,
       "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
     },
-    "accelerators": {
-      "type": "block",
-      "description": "List of the type and count of accelerator cards attached to the\nnode template",
-      "required": false
-    },
-    "accelerators.accelerator_count": {
-      "description": "The number of the guest accelerator cards exposed to this\nnode template.",
-      "required": false,
-      "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "accelerators.accelerator_type": {
-      "description": "Full or partial URL of the accelerator type resource to expose\nto this node template.",
+    "project": {
+      "description": "The ID of the project in which the resource belongs.\nIf it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which GCP project the template belongs to — a reference/identifier, not a security-configurable property."
     },
-    "disks": {
-      "type": "block",
-      "description": "List of the type, size and count of disks attached to the\nnode template",
-      "required": false
-    },
-    "disks.disk_count": {
-      "description": "Specifies the number of such disks.",
-      "required": false,
-      "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "disks.disk_size_gb": {
-      "description": "Specifies the size of the disk in base-2 GB.",
-      "required": false,
-      "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "disks.disk_type": {
-      "description": "Specifies the desired disk type on the node. This disk type must be a local storage type (e.g.: local-ssd). Note that for nodeTemplates, this should be the name of the disk type and not its URL.",
+    "deletion_policy": {
+      "description": "Whether Terraform will be prevented from destroying the resource. Defaults to DELETE.\nWhen a 'terraform destroy' or 'terraform apply' would delete the resource,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy this template via IaC (DELETE/ABANDON/PREVENT). Maps to the prevent-destructive-loss archetype (same mechanism as force_destroy): PREVENT blocks hard-destroy of the resource, and a policy should enforce that value."
     },
     "node_type_flexibility": {
       "type": "block",
@@ -112,15 +67,15 @@
       "description": "Number of virtual CPUs to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies a CPU count constraint for flexible node matching — a capacity-sizing choice with no security implication."
     },
     "node_type_flexibility.memory": {
       "description": "Physical memory available to the node, defined in MB.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies a memory constraint for flexible node matching — a capacity-sizing choice with no security implication."
     },
     "server_binding": {
       "type": "block",
@@ -128,11 +83,56 @@
       "required": false
     },
     "server_binding.type": {
-      "description": "Type of server binding policy. If 'RESTART_NODE_ON_ANY_SERVER',\nnodes using this template will restart on any physical server\nfollowing a maintenance event.\n\nIf 'RESTART_NODE_ON_MINIMAL_SERVER', nodes using this template\nwill restart on the same physical server following a maintenance\nevent, instead of being live migrated to or restarted on a new\nphysical server. This option may be useful if you are using\nsoftware licenses tied to the underlying server characteristics\nsuch as physical sockets or cores, to avoid the need for\nadditional licenses when maintenance occurs. However, VMs on such\nnodes will experience outages while maintenance is applied. Possible values: [\"RESTART_NODE_ON_ANY_SERVER\", \"RESTART_NODE_ON_MINIMAL_SERVERS\"]",
+      "description": "Type of server binding policy. If `RESTART_NODE_ON_ANY_SERVER`,\nnodes using this template will restart on any physical server\nfollowing a maintenance event.\nIf `RESTART_NODE_ON_MINIMAL_SERVER`, nodes using this template\nwill restart on the same physical server following a maintenance\nevent, instead of being live migrated to or restarted on a new\nphysical server. This option may be useful if you are using\nsoftware licenses tied to the underlying server characteristics\nsuch as physical sockets or cores, to avoid the need for\nadditional licenses when maintenance occurs. However, VMs on such\nnodes will experience outages while maintenance is applied.\nPossible values are: `RESTART_NODE_ON_ANY_SERVER`, `RESTART_NODE_ON_MINIMAL_SERVERS`.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects maintenance-restart behavior (live-migrate vs. restart-in-place), typically driven by software licensing needs. This is a functional/architectural choice with no universally secure value."
+    },
+    "accelerators": {
+      "type": "block",
+      "description": "List of the type and count of accelerator cards attached to the\nnode template",
+      "required": false
+    },
+    "accelerators.accelerator_count": {
+      "description": "The number of the guest accelerator cards exposed to this\nnode template.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Specifies how many accelerator (GPU) cards to attach — a capacity/performance sizing choice, not a security control."
+    },
+    "accelerators.accelerator_type": {
+      "description": "Full or partial URL of the accelerator type resource to expose\nto this node template.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies which accelerator (GPU) type to attach — a functional hardware choice with no universally secure value."
+    },
+    "disks": {
+      "type": "block",
+      "description": "List of the type, size and count of disks attached to the\nnode template",
+      "required": false
+    },
+    "disks.disk_count": {
+      "description": "Specifies the number of such disks.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Specifies how many local disks to attach — a capacity-sizing choice, not a security control."
+    },
+    "disks.disk_type": {
+      "description": "Specifies the desired disk type on the node. This disk type must be a local storage type (e.g.: local-ssd). Note that for nodeTemplates, this should be the name of the disk type and not its URL.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Specifies the local storage type — a functional choice with no security implication."
+    },
+    "disks.disk_size_gb": {
+      "description": "Specifies the size of the disk in base-2 GB.",
+      "required": false,
+      "type": "number",
+      "security_impact": false,
+      "rationale": "Specifies local disk size — a capacity-sizing choice with no security implication."
     }
   }
 }
