@@ -1,10 +1,10 @@
 resource "google_netapp_storage_pool" "compliant_example_1" {
-  project       = "deakin-lab-123"
-  name          = "compliant-example-1"
+  project       = "example-project"
+  name          = "compliant_example_1"
   location      = "australia-southeast2"
   service_level = "PREMIUM"
   capacity_gib  = 2048
-  network       = "projects/deakin-lab-123/global/networks/nondefault-vpc"
+  network       = "projects/example-project/global/networks/example-vpc"
 
-  kms_config = "projects/deakin-lab-123/locations/australia-southeast2/kmsConfigs/example-kms-config"
+  kms_config = "projects/example-project/locations/australia-southeast2/kmsConfigs/example-config"
 }
