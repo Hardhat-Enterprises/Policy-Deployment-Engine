@@ -46,6 +46,22 @@ git merge origin/dev
 ```
 pre-commit install
 ```
+
+Every commit then checks your branch name, your branch scope and the linters, and — when the
+commit actually touches your resource — your documentation, your argument coverage and the OPA
+test. It stays out of your way otherwise: a commit that changes nothing under your resource skips
+the resource checks entirely, a docs-only commit skips the OPA test, and a fixture you just
+edited skips it too rather than making a git hook run `terraform`.
+
+That last case is the one to remember. Before you push, run the full check yourself:
+
+```
+python3 scripts/check_resource.py
+```
+
+That is the same set of checks CI runs. See
+[Testing your policies](testing-policies.md#top).
+
 #### Create your working branch
 
 Branch names must follow the repo convention (enforced by the branch-name check

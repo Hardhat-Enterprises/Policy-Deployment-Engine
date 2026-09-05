@@ -8,6 +8,9 @@ sys.path.insert(0, str(project_root))
 
 from scripts.docgen.lib.canonical import (
     CONDITION_RATIONALE,
+    EXEMPTIONS,
+    PER_INSTANCE_CONFIG_ZONE_RATIONALE,
+    RESIDENCY_FIXED_RATIONALE,
     LOCATOR_RATIONALE,
     MEMBERS_RATIONALE,
     POLICY_DATA_RATIONALE,
@@ -93,3 +96,51 @@ def test_apply_canonical_idempotent():
     args = {"location": _leaf()}
     apply_canonical("google_x", args)
     assert apply_canonical("google_x", args) == 0   # second pass changes nothing
+
+
+# --------------------------------------------------------------------------- #
+# Exemptions: resources whose residency key is not a residency decision.
+# --------------------------------------------------------------------------- #
+def test_an_exempt_key_gets_its_own_locked_answer():
+    # Not "no answer" — a different one. The key stays locked, which is what lets
+    # the linter check every resource without carving a hole for these.
+    assert canonical_for("google_iam_folders_policy_binding", "location") == (
+        False, RESIDENCY_FIXED_RATIONALE)
+    assert canonical_for("google_compute_per_instance_config", "zone") == (
+        False, PER_INSTANCE_CONFIG_ZONE_RATIONALE)
+
+
+def test_the_same_key_elsewhere_is_still_generic():
+    # The exemption is per resource, not per key name: `location` on anything not
+    # listed is still a data-residency decision.
+    assert canonical_for("google_storage_bucket", "location") == (True, RESIDENCY_RATIONALE)
+    assert canonical_for("google_compute_instance", "zone") == (True, RESIDENCY_RATIONALE)
+
+
+def test_exemptions_are_checked_before_every_other_rule():
+    # google_iam_folders_policy_binding does not end in _iam_binding, so it reaches
+    # the residency branch. If the lookup ran later it would be overwritten there.
+    assert canonical_for("google_iam_folders_policy_binding", "location")[0] is False
+
+
+def test_apply_canonical_leaves_a_correct_exempt_entry_alone():
+    args = {"location": {"security_impact": False, "rationale": RESIDENCY_FIXED_RATIONALE}}
+    assert apply_canonical("google_iam_folders_policy_binding", args) == 0
+    assert args["location"]["rationale"] == RESIDENCY_FIXED_RATIONALE
+
+
+def test_apply_canonical_restores_an_exempt_entry_that_drifted():
+    args = {"location": {"security_impact": True, "rationale": "wrong"}}
+    assert apply_canonical("google_iam_folders_policy_binding", args) == 1
+    assert args["location"] == {"security_impact": False,
+                                "rationale": RESIDENCY_FIXED_RATIONALE}
+
+
+def test_every_exemption_records_a_real_answer():
+    # An entry with an empty rationale would be an exemption in name only — a way to
+    # opt out of the check rather than to record a better answer.
+    for (resource, key), (impact, rationale) in EXEMPTIONS.items():
+        assert isinstance(resource, str) and resource.startswith("google_")
+        assert isinstance(key, str) and key
+        assert isinstance(impact, bool)
+        assert isinstance(rationale, str) and len(rationale.strip()) > 40, (resource, key)
