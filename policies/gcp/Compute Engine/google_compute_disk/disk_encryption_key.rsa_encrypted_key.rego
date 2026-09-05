@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_disk.disk_encryption_key_rsa_encrypted_key
+package terraform.gcp.security.compute_engine.google_compute_disk.disk_encryption_key.rsa_encrypted_key
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_disk.vars
 conditions := [
