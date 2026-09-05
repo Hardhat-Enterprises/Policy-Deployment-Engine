@@ -1,11 +1,9 @@
 resource "google_compute_disk" "compliant_example_1" {
   name     = "compliant-example-1"
   zone     = "australia-southeast1-a"
-  type     = "pd-ssd"
-  snapshot = "projects/my-project/global/snapshots/my-encrypted-snapshot"
+  snapshot = "projects/my-project/global/snapshots/my-snapshot"
 
   source_snapshot_encryption_key {
-    kms_key_self_link       = "projects/my-project/locations/australia-southeast1/keyRings/my-key-ring/cryptoKeys/my-key"
-    kms_key_service_account = "disk-encrypter@my-project.iam.gserviceaccount.com"
+    kms_key_service_account = "example-sa@example-project.iam.gserviceaccount.com"
   }
 }
