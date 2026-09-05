@@ -209,11 +209,15 @@ rather than re-deriving a path or a hash — which is why a provider bump, or th
 
 Two GitHub Actions workflows in `.github/workflows/`:
 
-- **`policy_check_PR`** — runs on **every** pull request (no `paths:` filter: `lint` is a required
-  check, and GitHub never treats a workflow that did not run as satisfied):
+- **`policy_check_PR`** — runs on **every** pull request (no `paths:` filter: GitHub never treats
+  a workflow that did not run as satisfied, so a filtered-out workflow would block a required
+  check forever). Steps and jobs skip on what the PR actually changed instead — a skipped *job*
+  reports `skipped`, which does satisfy a required check:
   - *lint* job (all PRs): branch-name convention → whole-tree **structural** lint → the tools'
     own **test suite** → a **content** lint scoped to the files this PR changed (the repo-wide
-    backlog never blocks you).
+    backlog never blocks you). The last three skip when nothing they read has changed.
+  - *Branch scope* job (only `Service/...` PRs): the branch may change only its own resource's
+    files.
   - *policy_check* job (only `Service/...` PRs): the per-resource gate — doc completeness
     (real `security_impact` + rationale), policy/input coverage for every `true` arg, and the
     `terraform plan` + OPA test. It then applies a `CI-Approved` / `CI-Review-Required` label.
@@ -221,9 +225,14 @@ Two GitHub Actions workflows in `.github/workflows/`:
   (`workflow_dispatch`): whole-tree lint + the complete OPA suite. It publishes the
   `policy-results` artifact the PDE Portal backend reads for the repo-wide baseline, so don't
   rename that upload.
-- **`branch-scope`** — a `Service/` branch may only change its own resource's files.
 - **`pr-target`** — closes any pull request that does not target `dev` or `main`, with an
-  explanation on the PR.
+  explanation on the PR. Its own workflow because it runs on `pull_request_target`, which needs
+  different permissions.
+
+**One required status check: `PR checks`.** It is the `gate` job at the end of `policy_check_PR`,
+which passes only when every other job in that workflow succeeded or was legitimately skipped.
+GitHub has no way to require a *workflow*, only a single check — so naming each job in the ruleset
+would leave the next job anyone adds required by nobody. Requiring the gate covers them all.
 
 The *lint* and *policy_check* jobs run the same script you run locally
 (`scripts/check_resource.py`, with `--gate-only` for the resource job since the lint job has
