@@ -3,6 +3,13 @@ package terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_storage
 import data.terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_storage_pool.vars
 import data.terraform.helpers
 
+kms_config_pattern := `^projects/[^/]+/locations/[^/]+/kmsConfigs/[^/]+$`
+
+valid_kms_config(value) if {
+    is_string(value)
+    regex.match(kms_config_pattern, value)
+}
+
 conditions := [
     [
         {
@@ -20,12 +27,7 @@ conditions := [
     ],
 ]
 
-kms_config_pattern := `^projects/[^/]+/locations/[^/]+/kmsConfigs/[^/]+$`
 
-valid_kms_config(value) if {
-    is_string(value)
-    regex.match(kms_config_pattern, value)
-}
 
 violations := [
 {
