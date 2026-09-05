@@ -207,6 +207,58 @@ FIXTURE_IGNORED_KEYS = {
     "effective_annotations",
 }
 
+# --- fixtures whose second difference the provider requires ------------------
+#
+# The drift rule asks that a compliant and a non-compliant example differ only on
+# the argument under test. Sometimes they cannot. Every entry here is the same
+# shape: the argument under test belongs to a set Terraform allows only one of, so
+# showing a compliant and a non-compliant value of it necessarily changes which
+# member of that set is populated. Asking these authors to remove the difference
+# would be asking for a fixture terraform will not accept.
+#
+# This is NOT a way to silence a finding you would rather not fix. It lives in
+# scripts/, which a Service branch cannot edit, so adding one takes a maintainer —
+# and each entry has to say what the mutually exclusive set is. A fixture that
+# stops drifting makes its entry stale, and a test over the real tree fails when
+# that happens, so the list cannot quietly rot.
+#
+# (service folder, resource type, argument) -> ({keys}, why)
+FIXTURE_DRIFT_EXEMPT = {
+    ("App Hub", "google_apphub_application", "scope.type"): (
+        {"location"},
+        "A GLOBAL-scoped application can only exist in the `global` location and a "
+        "REGIONAL one only in a real region, so the location follows the scope type "
+        "under test rather than varying independently of it."),
+    ("Certificate Manager", "google_certificate_manager_certificate",
+     "self_managed.pem_private_key"): (
+        {"managed"},
+        "`managed` and `self_managed` are mutually exclusive. Demonstrating a "
+        "non-compliant self_managed private key means the compliant example cannot "
+        "use self_managed at all, so it uses `managed` instead."),
+    ("Certificate Manager", "google_certificate_manager_certificate_map_entry",
+     "matcher"): (
+        {"hostname"},
+        "`matcher` and `hostname` are mutually exclusive. The compliant example "
+        "cannot set the matcher it is meant not to use, so it sets a hostname."),
+    ("Cloud Platform", "google_folder_organization_policy", "constraint"): (
+        {"boolean_policy", "list_policy", "restore_policy"},
+        "Each constraint is of a fixed type — compute.disableSerialPortAccess is a "
+        "boolean constraint, serviceuser.services a list one — and the three policy "
+        "blocks are mutually exclusive. Varying the constraint under test therefore "
+        "varies which block is populated."),
+    ("Cloud Storage", "google_storage_object_acl", "predefined_acl"): (
+        {"role_entity"},
+        "`predefined_acl` and `role_entity` are mutually exclusive. The compliant "
+        "example cannot set the predefined ACL it is meant not to use, so it grants "
+        "the equivalent access with role_entity."),
+}
+
+
+def drift_exempt_keys(service, resource_type, stem):
+    """Keys this fixture may differ on because the provider leaves it no choice."""
+    entry = FIXTURE_DRIFT_EXEMPT.get((service, resource_type, stem))
+    return entry[0] if entry else frozenset()
+
 # The policy types `policies/_helpers/helpers.rego` can dispatch, in the order its
 # error message lists them (so the two read identically to a student who hits both).
 # Anything else is refused at evaluation time; this rule catches it at authoring
@@ -920,7 +972,8 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     # Only the argument's *top-level* key is expected to differ; a nested
     # argument (a.b.c) is compared at its block key, since the plan nests it.
     argument_key = stem.split(".")[0]
-    ignored = FIXTURE_IGNORED_KEYS | {argument_key}
+    ignored = (FIXTURE_IGNORED_KEYS | {argument_key}
+               | drift_exempt_keys(service, resource_type, stem))
 
     drifted = set()
     for good, bad in _drift_comparisons(compliant, non_compliant):
