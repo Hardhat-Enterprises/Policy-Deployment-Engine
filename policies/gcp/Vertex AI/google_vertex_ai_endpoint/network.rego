@@ -10,10 +10,10 @@ conditions := [
             "remedies": ["Configure the `network` attribute."]
         },
         {
-            "condition": "network is not in the approved list",
+            "condition": "network is improperly configured",
             "attribute_path": ["network"],
-            "values": ["projects/123456789/global/networks/my-secure-vpc"],
-            "policy_type": "whitelist"
+            "values": [".*invalid-network.*"],
+            "policy_type": "pattern blacklist"
         }
     ]
 ]
