@@ -27,7 +27,7 @@ conditions := [
                 "Cookie",
                 "X-API-Key"
             ],
-            "policy_type": "blacklist"
+            "policy_type": "element blacklist"
         }
     ]
 ]
