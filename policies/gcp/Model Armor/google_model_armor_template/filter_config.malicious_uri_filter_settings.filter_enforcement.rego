@@ -1,7 +1,7 @@
-package terraform.gcp.security.model_Armor.google_model_armor_template.filter_config_malicious_uri_filter_settings_filter_enforcement
+package terraform.gcp.security.model_armor.google_model_armor_template.filter_config_malicious_uri_filter_settings_filter_enforcement
 
 import data.terraform.helpers
-import data.terraform.gcp.security.model_Armor.google_model_armor_template.vars
+import data.terraform.gcp.security.model_armor.google_model_armor_template.vars
 
 
 conditions := [
