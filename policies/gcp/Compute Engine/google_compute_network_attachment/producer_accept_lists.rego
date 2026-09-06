@@ -6,18 +6,16 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Network attachment producer_accept_lists includes unapproved projects.",
+      "situation_description": "Network attachment producer_accept_lists is empty, so no producer projects are explicitly approved.",
       "remedies": [
-        "Restrict producer_accept_lists to only approved-project-123 or other explicitly approved project IDs.",
+        "Set producer_accept_lists to the project(s) explicitly approved to connect to this network attachment.",
       ],
     },
     {
-      "condition": "producer_accept_lists must contain only approved projects.",
+      "condition": "producer_accept_lists must not be empty or invalid.",
       "attribute_path": ["producer_accept_lists"],
-      "values": [
-        "approved-project-123",
-      ],
-      "policy_type": "whitelist",
+      "values": [null, [], "invalid-project"],
+      "policy_type": "blacklist",
     },
   ],
 ]
