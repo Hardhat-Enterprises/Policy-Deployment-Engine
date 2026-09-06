@@ -3,6 +3,11 @@ package terraform.gcp.security.compute_engine.google_compute_router_route_policy
 import data.terraform.gcp.security.compute_engine.google_compute_router_route_policy.vars
 import data.terraform.helpers
 
+# Only PREVENT is accepted: it blocks any destroy operation outright.
+# ABANDON merely removes the resource from Terraform's management without
+# deleting it, so it does not offer the same protection and is intentionally
+# excluded from the whitelist below.
+
 conditions := [
   [
     {
