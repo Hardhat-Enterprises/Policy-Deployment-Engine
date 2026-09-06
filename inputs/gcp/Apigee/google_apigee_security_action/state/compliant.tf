@@ -2,7 +2,7 @@
 # ENABLED is compliant because the security action is active.
 
 resource "google_apigee_security_action" "compliant_example_1" {
-  security_action_id = "enabled-security-action"
+  security_action_id = "policy-security-action"
   org_id              = "example-org"
   env_id              = "test"
   state               = "ENABLED"

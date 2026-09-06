@@ -2,7 +2,7 @@
 # DISABLED is non-compliant because the security action is inactive.
 
 resource "google_apigee_security_action" "non_compliant_example_1" {
-  security_action_id = "disabled-security-action"
+  security_action_id = "policy-security-action"
   org_id              = "example-org"
   env_id              = "test"
   state               = "DISABLED"

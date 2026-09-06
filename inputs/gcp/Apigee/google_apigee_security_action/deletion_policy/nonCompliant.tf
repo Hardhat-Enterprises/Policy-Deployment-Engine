@@ -2,7 +2,7 @@
 # DELETE is non-compliant because it allows Terraform to delete the action.
 
 resource "google_apigee_security_action" "non_compliant_example_1" {
-  security_action_id = "unprotected-security-action"
+  security_action_id = "policy-security-action"
   org_id              = "example-org"
   env_id              = "test"
   state               = "ENABLED"
