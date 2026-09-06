@@ -129,13 +129,13 @@ python scripts/linters/branch_scope.py --staged           # what you are about t
 python scripts/linters/branch_scope.py --base origin/dev  # the whole branch vs dev (CI)
 ```
 
-**CI (`.github/workflows/branch-scope.yml`):** a `branch_scope` job runs
+**CI (the `Branch scope` job in `.github/workflows/policy_check_PR.yaml`):** it runs
 `branch_scope.py --branch <head ref> --base origin/<base>` on every pull request
-from a `Service/` branch. It is a **separate workflow with no `paths:` filter**
-on purpose: `policy_check_PR.yaml` only runs when `docs/`, `inputs/` or
-`policies/` changed, so a branch whose only change is to `scripts/` or to a
-stray committed binary would never trigger it — and those are exactly the
-changes the scope check exists to catch.
+from a `Service/` branch. It was its own workflow until that one dropped its
+`paths:` filter — the filter was the reason, since a branch whose only change is
+to `scripts/` or to a stray committed binary would not have triggered it, and
+those are exactly the changes this check exists to catch. That workflow now runs
+on every pull request, so the job lives there.
 
 **CI (`.github/workflows/policy_check_PR.yaml`):** a `lint` job runs
 (1) `linter.py --tree all --no-content-checks` as a hard whole-tree structural

@@ -380,6 +380,42 @@ def test_fixture_drift_ignores_identity_and_computed_mirrors(tmp_path, resource_
     assert good.get(noise) != bad.get(noise)
 
 
+# --------------------------------------------------------------------------- #
+# Drift: a value that names itself after its fixture is naming, not drift.
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("value,polarity", [
+    ("compliant-example-1", "compliant"),
+    ("compliant_example_1", "compliant"),
+    ("compliant-assistant-1", "compliant"),      # not every id says "example"
+    ("non-compliant-example-1", "non_compliant"),
+    ("non_compliant_example_1", "non_compliant"),
+    ("Compliant-Example-1", "compliant"),        # case is not the signal
+])
+def test_a_value_named_after_its_fixture_is_recognised(value, polarity):
+    # Many GCP id fields reject underscores, so a contributor naming an example has
+    # to write it with hyphens. That is the same act of naming.
+    assert policy_lint._label_polarity(value) == polarity
+
+
+@pytest.mark.parametrize("value", [
+    "my-bucket-1",
+    "Protected assistant",
+    "projects/123456789",
+    "",
+    None,
+    42,
+])
+def test_anything_else_is_not_a_fixture_label(value):
+    assert policy_lint._label_polarity(value) is None
+
+
+def test_the_prefix_alone_does_not_qualify_it():
+    # "compliant" as a bare word, or as part of a longer one, is not a label — the
+    # separator is what makes it a name for this fixture.
+    assert policy_lint._label_polarity("compliant") is None
+    assert policy_lint._label_polarity("complianceteam") is None
+
+
 def test_plan_cache_for_matches_auto_test_on_the_real_repo():
     # The linter must read exactly the file auto_test writes: same directory as the
     # fixture, same sha-derived name.
@@ -540,12 +576,11 @@ def test_lint_error_is_a_documented_rule():
 
 
 # --------------------------------------------------------------------------- #
-# Fix round 1: the friendly-name index is one OPA call, not one per resource.
+# The friendly-name index needs one string literal per _vars.rego, so it reads
+# them rather than evaluating the platform — and evaluates only what it must.
 # --------------------------------------------------------------------------- #
-def test_friendly_name_index_uses_a_single_opa_call(tmp_path, monkeypatch):
-    root = build_tree(tmp_path, "vars_bad")
-    policy_lint.clear_caches()
-
+def _counting_opa(monkeypatch):
+    """Record every subprocess policy_lint launches, still running each one."""
     real_run = subprocess.run
     calls = []
 
@@ -554,11 +589,60 @@ def test_friendly_name_index_uses_a_single_opa_call(tmp_path, monkeypatch):
         return real_run(cmd, *args, **kwargs)
 
     monkeypatch.setattr(policy_lint.subprocess, "run", counting_run)
+    return calls
+
+
+def test_the_index_costs_no_opa_call_when_every_name_is_a_literal(tmp_path, monkeypatch):
+    root = build_tree(tmp_path, "vars_bad")
+    policy_lint.clear_caches()
+    calls = _counting_opa(monkeypatch)
+
     index = policy_lint._friendly_name_index(root / "policies", "gcp")
 
-    assert len(calls) == 1, f"expected one batched opa eval, got {len(calls)}"
+    assert calls == [], f"expected no opa eval, got {len(calls)}"
     assert sorted(rt for names in index.values() for _, rt in names) == [
         "google_a_thing", "google_b_thing", "google_d_thing", "google_e_thing"]
+
+
+def test_a_name_the_regex_cannot_read_is_evaluated(tmp_path, monkeypatch):
+    # A computed friendly_resource_name must still reach the index — the point of
+    # reading text first is to skip work, never to miss a name.
+    root = build_tree(tmp_path, "vars_bad")
+    vars_path = (root / "policies" / "gcp" / "Compute Service" / "google_a_thing"
+                 / policy_lint.VARS_FILE)
+    text = vars_path.read_text(encoding="utf-8")
+    literal = policy_lint._friendly_name_from_text(vars_path)
+    assert literal, "fixture must declare a literal for this test to remove one"
+    parts = ", ".join(f'"{w}"' for w in literal.split(" "))
+    vars_path.write_text(
+        text.replace(f'"friendly_resource_name": "{literal}"',
+                     f'"friendly_resource_name": concat(" ", [{parts}])'),
+        encoding="utf-8")
+    assert policy_lint._friendly_name_from_text(vars_path) is None
+
+    policy_lint.clear_caches()
+    calls = _counting_opa(monkeypatch)
+    index = policy_lint._friendly_name_index(root / "policies", "gcp")
+
+    assert len(calls) == 1, "the one unreadable file should cost exactly one eval"
+    assert ("Compute Service", "google_a_thing") in index.get(literal.lower(), [])
+
+
+def test_the_two_paths_agree_on_the_real_tree():
+    # The optimisation is only sound while every _vars.rego declares a literal. If
+    # someone writes a computed one, this is where that shows up — and the code
+    # above already handles it, so this is a notice, not a trap.
+    policies = project_root / "policies"
+    policy_lint.clear_caches()
+    index = policy_lint._friendly_name_index(policies, "gcp")
+
+    scraped = {}
+    for vars_path in sorted((policies / "gcp").glob(f"*/*/{policy_lint.VARS_FILE}")):
+        name = policy_lint._friendly_name_from_text(vars_path)
+        assert name is not None, f"{vars_path} needs an opa eval to read its name"
+        scraped.setdefault(name.strip().lower(), []).append(
+            (vars_path.parent.parent.name, vars_path.parent.name))
+    assert index == scraped
 
 
 # --------------------------------------------------------------------------- #
@@ -825,3 +909,77 @@ def test_mistyped_service_is_not_a_no_policies_dir_marker(tmp_path, capsys):
     err = capsys.readouterr().err
     assert rc == 2
     assert "no-policies-dir" not in err
+
+
+# --------------------------------------------------------------------------- #
+# Drift exemptions: fixtures the provider will not let you write any other way.
+# --------------------------------------------------------------------------- #
+def test_an_exempt_fixture_gets_its_recorded_keys():
+    assert policy_lint.drift_exempt_keys(
+        "Cloud Storage", "google_storage_object_acl", "predefined_acl") == {"role_entity"}
+
+
+def test_everything_else_gets_nothing():
+    assert policy_lint.drift_exempt_keys(
+        "Cloud Storage", "google_storage_bucket", "location") == frozenset()
+    # Right resource, wrong argument — the exemption is per fixture, not per resource.
+    assert policy_lint.drift_exempt_keys(
+        "Cloud Storage", "google_storage_object_acl", "bucket") == frozenset()
+
+
+def test_every_exemption_states_its_mutually_exclusive_set():
+    # An entry without a reason is a silenced finding, not a recorded fact.
+    for key, (keys, why) in policy_lint.FIXTURE_DRIFT_EXEMPT.items():
+        service, resource, stem = key
+        assert all(isinstance(x, str) and x for x in (service, resource, stem))
+        assert keys and all(isinstance(k, str) and k for k in keys)
+        assert isinstance(why, str) and len(why.strip()) > 60, key
+
+
+def test_an_exemption_silences_only_the_keys_it_names(tmp_path, monkeypatch):
+    # The fixtures_bad tree drifts on `storage_class`. Exempting that key clears the
+    # finding; exempting a different one leaves it exactly where it was.
+    root = build_tree(tmp_path, "fixtures_bad")
+    entry = ("Cloud Storage", "google_storage_bucket", "public_access_prevention")
+
+    def drift_findings():
+        policy_lint.clear_caches()
+        return [f for f in policy_lint.lint_resource(
+            root, "gcp", "Cloud Storage", "google_storage_bucket")
+            if f.rule == "fixture-drift"]
+
+    assert drift_findings(), "the fixture must drift before anything is exempted"
+
+    monkeypatch.setitem(policy_lint.FIXTURE_DRIFT_EXEMPT, entry,
+                        ({"something_else"}, "x" * 70))
+    assert drift_findings(), "exempting an unrelated key must change nothing"
+
+    monkeypatch.setitem(policy_lint.FIXTURE_DRIFT_EXEMPT, entry,
+                        ({"storage_class"}, "x" * 70))
+    assert drift_findings() == [], "exempting the drifted key must clear it"
+
+
+@pytest.mark.parametrize("entry", sorted(policy_lint.FIXTURE_DRIFT_EXEMPT))
+def test_every_exemption_is_still_needed(entry, monkeypatch):
+    """Removing an entry must bring its finding back on the real tree.
+
+    This is what stops the list rotting. A fixture that is rewritten so it no longer
+    needs its exemption leaves a stale entry behind, quietly exempting a key that
+    might drift again later — and nothing else would notice.
+    """
+    service, resource, stem = entry
+    exempted = policy_lint.FIXTURE_DRIFT_EXEMPT[entry][0]
+    monkeypatch.setattr(policy_lint, "FIXTURE_DRIFT_EXEMPT",
+                        {k: v for k, v in policy_lint.FIXTURE_DRIFT_EXEMPT.items()
+                         if k != entry})
+    policy_lint.clear_caches()
+    findings = policy_lint.lint_resource(project_root, "gcp", service, resource)
+    drift = [f for f in findings if f.rule == "fixture-drift" and f.policy == stem]
+    assert drift, (f"{entry} no longer drifts without its exemption — the fixture was "
+                   f"fixed, so remove the entry from FIXTURE_DRIFT_EXEMPT")
+    reported = set(drift[0].message.split(": ", 1)[1].split(", "))
+    assert reported <= exempted, (
+        f"{entry} drifts on {reported - exempted}, which its exemption does not "
+        f"cover — either the fixture gained a real second difference, or the entry "
+        f"needs widening with a reason")
+
