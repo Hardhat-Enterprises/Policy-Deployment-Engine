@@ -6,28 +6,32 @@ import data.terraform.gcp.security.apigee.google_apigee_environment_api_revision
 conditions := [
     [
         {
-            "situation_description": "The deployed Apigee API proxy does not use an approved, dedicated service account for its runtime identity, which could grant the proxy unnecessary access to Google Cloud resources.",
+            "situation_description": "The deployed Apigee API proxy does not have an explicitly configured service account for its runtime identity, which could result in the use of an unintended identity.",
             "remedies": [
-                "Set service_account to an approved dedicated Apigee runtime service account.",
-                "Grant the service account only the permissions required by the deployed API proxy.",
-                "Avoid default, shared, user-managed, or broadly privileged service accounts."
+                "Configure service_account for the deployed API proxy.",
+                "Use a dedicated service account instead of a default or shared identity.",
+                "Grant the service account only the permissions required by the API proxy."
             ]
         },
         {
-            "condition": "Check whether the deployed API proxy uses an approved runtime service account.",
+            "condition": "Check whether the deployed API proxy has an explicitly configured service account.",
             "attribute_path": [
                 "service_account"
             ],
             "values": [
-                "apigee-runtime@example-project.iam.gserviceaccount.com"
+                null,
+                ""
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]
 
+# Evaluates the conditions once and stores the result
+result := helpers.get_multi_summary(conditions, vars.variables)
+
 # Displays a general message about policy compliance
-message := helpers.get_multi_summary(conditions, vars.variables).message
+message := result.message
 
 # Displays detailed compliance results for each resource
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := result.details

@@ -1,5 +1,5 @@
 # Tests the service_account argument.
-# A dedicated, approved runtime service account is compliant.
+# An explicit service account is configured for the API proxy.
 
 resource "google_apigee_environment_api_revision_deployment" "compliant_example_1" {
   org_id      = "example-org"
