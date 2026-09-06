@@ -94,7 +94,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 # The committed plan's filename is the pipeline's own hash of the fixture, so the
 # linter asks auto_test for it rather than re-deriving it. Importing keeps the two
 # in lockstep: a provider bump changes the expected filename in both at once.
-from scripts.auto_test.auto_test import PLAN_FILE_RE, fixture_sha  # noqa: E402
+from scripts.auto_test.auto_test import (  # noqa: E402
+    PLAN_FILE_RE, alternate_fixture_shas, fixture_sha)
 
 # Cross-cutting assessments (data residency, the IAM common keys) are decided once in
 # canonical.py rather than 400 times, and the generator writes them into every new
@@ -559,6 +560,10 @@ class InputsValidator:
         expected = f"{fixture_sha(Path(arg_path))}.json"
         plans = sorted(e for e in entries if e.endswith(".json")
                        and not self._is_ignored(os.path.join(arg_path, e)))
+        # The name a pre-normalisation (CRLF/BOM) checkout would have written. Same
+        # plan, different sha — worth saying so, because the remedy is a rename and
+        # a git config, not a terraform run. See auto_test.adopt_denormalised_plan.
+        denormalised = {f"{sha}.json" for sha in alternate_fixture_shas(Path(arg_path))}
         if not plans:
             self.logger.log(f"{rel}: missing committed plan '{expected}' "
                             f"(run auto_test.py for this resource and commit the file it writes)")
@@ -566,8 +571,16 @@ class InputsValidator:
             for entry in plans:
                 if entry == expected:
                     continue
-                why = ("stale — these *.tf now hash to a different sha"
-                       if PLAN_FILE_RE.match(entry) else "not a committed plan filename")
+                if entry in denormalised:
+                    why = ("named from CRLF line endings (or a UTF-8 BOM) in these *.tf — "
+                           "same plan, pre-normalisation sha; fix with "
+                           "`git config core.autocrlf input` then "
+                           "`git add --renormalize .`, and re-run auto_test.py "
+                           "to rename it")
+                elif PLAN_FILE_RE.match(entry):
+                    why = "stale — these *.tf now hash to a different sha"
+                else:
+                    why = "not a committed plan filename"
                 self.logger.log(f"{rel}/{entry}: unexpected .json ({why}); the only .json "
                                 f"allowed here is '{expected}'")
 
