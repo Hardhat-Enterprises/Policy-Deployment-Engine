@@ -6,15 +6,15 @@
       "description": "The collection ID.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier for the collection. These are not constrained and thus do not require a policy"
     },
     "engine_id": {
       "description": "The engine ID.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier for the engine. Identifiers are not constrained. So no policy is required."
     },
     "location": {
       "description": "The geographic location where the data store should reside. The value can\nonly be one of \"global\", \"us\" and \"eu\".",
@@ -27,15 +27,15 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the project for the resource. Not a security policy target."
     },
     "widget_config_id": {
       "description": "The unique ID to use for the WidgetConfig. Currently only accepts \"default_search_widget_config\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Another identifier for the resource. Identifiers are not constrained. So no policy is required and it only accepts a single value"
     },
     "access_settings": {
       "type": "block",
@@ -46,36 +46,37 @@
       "description": "Whether public unauthenticated access is allowed.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This allows for the widget to be accessd by unauthenticated publicusers, exposing search functionality to unauthenticated users and requires a restricition via a policy"
+      
     },
     "access_settings.allowlisted_domains": {
       "description": "List of domains that are allowed to integrate the search widget.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defined the domains that can ember the search widger.An empty allowlist could allow unauthorised domains to access the widget, which could create a data exposure risk. THus a policy should restrict access to specified domains only"
     },
     "access_settings.enable_web_app": {
       "description": "Whether web app access is enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Toggles web app access to the widget. A functional feature that is used as a toggle, does not control security access"
     },
     "access_settings.language_code": {
       "description": "Language code for user interface. Use language tags defined by\n[BCP47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt). If unset, the\ndefault language code is \"en-US\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Used to set the UI display language, UX setting that has no security impact"
     },
     "access_settings.workforce_identity_pool_provider": {
       "description": "The workforce identity pool provider used to access the widget.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Is used to specify te identity pool provider for the authenticaiton of the widget. It controls which identity provider is trusted for access, this directly impacts the widget's authentication"
     },
     "homepage_setting": {
       "type": "block",
@@ -91,15 +92,15 @@
       "description": "Destination URL of shortcut.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Is used to set the dewstinaiton URL for a homepage shortcut. THis is a UI navigation setting, does not control security access."
     },
     "homepage_setting.shortcuts.title": {
       "description": "Title of the shortcut.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "only sets the display title for a homepage shortcut, not a security setting"
     },
     "homepage_setting.shortcuts.icon": {
       "type": "block",
@@ -110,8 +111,8 @@
       "description": "Image URL.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "sets the icon image URL for the homepage shortcut. Not a securiy setting."
     },
     "ui_branding": {
       "type": "block",
@@ -127,8 +128,8 @@
       "description": "Image URL.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "sets the icon image URL for the widget branding. Not a securiy setting."
     },
     "ui_settings": {
       "type": "block",
@@ -139,78 +140,78 @@
       "description": "The default ordering for search results if specified.\nUsed to set SearchRequest#orderBy on applicable requests.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Only controls the default ordering of the search results. Funcitonal setting but not a security setting."
     },
     "ui_settings.disable_user_events_collection": {
       "description": "If set to true, the widget will not collect user events.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Control the collectiosn of user interaction envents. This may ave privacy implications ;mpolicy should require this to set to true, in case to prevent unnecessary data collection"
     },
     "ui_settings.enable_autocomplete": {
       "description": "Whether or not to enable autocomplete.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Toggles autocomplete feature for the search widget.  Not a security feature"
     },
     "ui_settings.enable_create_agent_button": {
       "description": "If set to true, the widget will enable the create agent button.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional feature with no security impact."
     },
     "ui_settings.enable_people_search": {
       "description": "If set to true, the widget will enable people search.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Toggles people search, functional feature with no security impact."
     },
     "ui_settings.enable_quality_feedback": {
       "description": "Turn on or off collecting the search result quality feedback from end users.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional feature that controls whether the user can provide feedback, with no security impact."
     },
     "ui_settings.enable_safe_search": {
       "description": "Whether to enable safe search.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the filtering of search results to exclude potentially inappropriate content. This has privacy and safety implications and could lead to exposure of inappropriate content if not enabled. Policy should require this to be set to true."
     },
     "ui_settings.enable_search_as_you_type": {
       "description": "Whether to enable search-as-you-type behavior for the search widget.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional feature that controls search-as-you-type behavior, with no security impact."
     },
     "ui_settings.enable_visual_content_summary": {
       "description": "If set to true, the widget will enable visual content summary on applicable\nsearch requests. Only used by healthcare search.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Toggles visual content summary in search results. Functional setting that has not security impact."
     },
     "ui_settings.interaction_type": {
       "description": "Describes widget (or web app) interaction type Possible values: [\"SEARCH_ONLY\", \"SEARCH_WITH_ANSWER\", \"SEARCH_WITH_FOLLOW_UPS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the widget interaction mode. This is a functional setting and not a security setting."
     },
     "ui_settings.result_description_type": {
       "description": "Controls whether result extract is display and how (snippet or extractive answer).\nDefault to no result if unspecified. Possible values: [\"SNIPPET\", \"EXTRACTIVE_ANSWER\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how the search result descriptionare displayed and how"
     },
     "ui_settings.data_store_ui_configs": {
       "type": "block",
@@ -221,8 +222,8 @@
       "description": "The name of the data store. It should be data store resource name. Format:\n'projects/{project}/locations/{location}/collections/{collectionId}/dataStores/{dataStoreId}'.\nFor APIs under 'WidgetService', such as [WidgetService.LookUpWidgetConfig][],\nthe project number and location part is erased in this field.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Reference to the data store, an identifier that is not a security policy target"
     },
     "ui_settings.data_store_ui_configs.facet_field": {
       "type": "block",
@@ -233,15 +234,15 @@
       "description": "The field name that end users will see.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the display name for a UI component, functional setting  not a security setting."
     },
     "ui_settings.data_store_ui_configs.facet_field.field": {
       "description": "Registered field name. The format is 'field.abc'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the registered field for facetung, Functional configuration reference, not a security control"
     },
     "ui_settings.data_store_ui_configs.fields_ui_components_map": {
       "type": "block",
@@ -252,29 +253,29 @@
       "description": " Possible values: [\"MOBILE\", \"DESKTOP\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "sets a display template for a UI component, UI customisation setting with no security impact"
     },
     "ui_settings.data_store_ui_configs.fields_ui_components_map.display_template": {
       "description": "The template to customize how the field is displayed.\nAn example value would be a string that looks like: \"Price: {value}\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "identifies the registered field for a UI component, a functional configuration reference."
     },
     "ui_settings.data_store_ui_configs.fields_ui_components_map.field": {
       "description": "Registered field name. The format is 'field.abc'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identify the registered field for a UI component mapping. Functional configuration referecne, not a security configuration"
     },
     "ui_settings.data_store_ui_configs.fields_ui_components_map.ui_component": {
       "description": "The identifier for this object. Format specified above.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the UI component type. Functional configuration reference, not a security configuration."
     },
     "ui_settings.generative_answer_config": {
       "type": "block",
@@ -285,71 +286,71 @@
       "description": "Whether generated answer contains suggested related questions.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether related questions are displayed in the generated answer. Functional configuration, not a security control."
     },
     "ui_settings.generative_answer_config.ignore_adversarial_query": {
       "description": "Specifies whether to filter out queries that are adversarial.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether adversarial queries are filtered. Disabling this could allow prompt injection or other, attacks. Policy should require this to be enabled."
     },
     "ui_settings.generative_answer_config.ignore_low_relevant_content": {
       "description": "Specifies whether to filter out queries that are not relevant to the content.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the filteration of low relevance queries, functional control with no security impact"
     },
     "ui_settings.generative_answer_config.ignore_non_answer_seeking_query": {
       "description": "Specifies whether to filter out queries that are not answer-seeking.\nThe default value is 'false'. No answer is returned if the search query\nis classified as a non-answer seeking query.\nIf this field is set to 'true', we skip generating answers for\nnon-answer seeking queries and return fallback messages instead.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether non-answer-seeking queries will be filtered. Functiona quality setting with no direct security impact"
     },
     "ui_settings.generative_answer_config.image_source": {
       "description": "Source of image returned in the answer. Possible values: [\"ALL_AVAILABLE_SOURCES\", \"CORPUS_IMAGE_ONLY\", \"FIGURE_GENERATION_ONLY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the source of images in generated answers. This is a functional content configuration choice with no security impact"
     },
     "ui_settings.generative_answer_config.language_code": {
       "description": "Language code for Summary. Use language tags defined by\n[BCP47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt). Note: This\nis an experimental feature.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the language for generated answers and their summaries, localisation setting that has no security impact"
     },
     "ui_settings.generative_answer_config.max_rephrase_steps": {
       "description": "Max rephrase steps. The max number is 5 steps. If not set or\nset to < 1, it will be set to 1 by default.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Is used to control te maximum number of rephrasing steps allowed for generated answwers. Functional performance tuning parameters with not security impact"
     },
     "ui_settings.generative_answer_config.model_prompt_preamble": {
       "description": "Text at the beginning of the prompt that instructs the model that generates the answer.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the preamble for the generative answer, functional performance tuning parameter with no security  impact"
     },
     "ui_settings.generative_answer_config.model_version": {
       "description": "The model version used to generate the answer.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specified  the model version for generative answer, functional setting not a security setting"
     },
     "ui_settings.generative_answer_config.result_count": {
       "description": "The number of top results to generate the answer from. Up to 10.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Funtional tuning parameter for generative answer, not a security setting"
     }
   }
 }
