@@ -1,4 +1,4 @@
-package terraform.gcp.security.network_services.google_network_services_wasm_plugin.min_log_level
+package terraform.gcp.security.network_services.google_network_services_wasm_plugin.log_config_min_log_level
 
 import data.terraform.helpers
 import data.terraform.gcp.security.network_services.google_network_services_wasm_plugin.vars
