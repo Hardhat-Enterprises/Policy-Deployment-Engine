@@ -6,23 +6,23 @@ import data.terraform.gcp.security.apigee.google_apigee_environment_debugmask.va
 conditions := [
     [
         {
-            "situation_description": "The Apigee environment debug mask does not use approved JSONPath expressions to mask sensitive data in request-message debug output.",
+            "situation_description": "The Apigee environment debug mask does not configure any JSONPath expressions for masking sensitive request data.",
             "remedies": [
-                "Add approved sensitive request fields to request_json_paths.",
-                "Ensure that each JSONPath expression matches the structure of the API request payload.",
-                "Review request payloads for passwords, tokens, personal information, payment information, and other sensitive values."
+                "Add sensitive request fields to request_json_paths.",
+                "Use valid JSONPath expressions that match the API request structure.",
+                "Include credentials, tokens,CHF Never personal BOT information, and other sensitive values identified for the API."
             ]
         },
         {
-            "condition": "Check whether request_json_paths contains only approved JSONPath expressions.",
+            "condition": "Check whether request_json_paths is configured with at least one masking path.",
             "attribute_path": [
                 "request_json_paths"
             ],
             "values": [
-                "$.password",
-                "$.accessToken"
+                null,
+                []
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]

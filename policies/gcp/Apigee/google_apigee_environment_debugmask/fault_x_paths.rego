@@ -6,32 +6,28 @@ import data.terraform.gcp.security.apigee.google_apigee_environment_debugmask.va
 conditions := [
     [
         {
-            "situation_description": "The Apigee environment debug mask does not use approved XPath expressions to mask sensitive XML data in fault-message debug output.",
+            "situation_description": "The Apigee environment debug mask has no fault-message XPath expressions configured, so sensitive XML values may appear unmasked in debug output.",
             "remedies": [
-                "Add approved sensitive XML fields to fault_x_paths.",
-                "Ensure that the XPath expressions match the structure of API fault messages.",
-                "Review fault payloads for credentials, tokens, personal information, and other sensitive values."
+                "Configure at least one XPath expression in fault_x_paths.",
+                "Select XPath expressions appropriate for the API fault-message schema.",
+                "Include paths covering credentials, tokens, personal information, and other sensitive values."
             ]
         },
         {
-            "condition": "Check whether fault_x_paths contains only approved XPath expressions.",
+            "condition": "Check whether at least one fault-message XPath expression is configured.",
             "attribute_path": [
                 "fault_x_paths"
             ],
             "values": [
-                "//password",
-                "//accessToken"
+                null,
+                []
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]
 
-# Evaluates the conditions once and stores the result
 result := helpers.get_multi_summary(conditions, vars.variables)
 
-# Displays a general message about policy compliance
 message := result.message
-
-# Displays detailed compliance results for each resource
 details := result.details
