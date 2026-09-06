@@ -1,6 +1,6 @@
-package terraform.gcp.security.BigQuery.google_bigquery_dataset.access_user_by_email
+package terraform.gcp.security.bigquery.google_bigquery_dataset.access_user_by_email
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_dataset.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_dataset.vars
 
 # policy_lint reports hard-coded-value on the address(es) below, and the finding
 # stands. This attribute is a LIST, and the pattern policy types read the value as

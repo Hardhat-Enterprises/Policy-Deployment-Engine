@@ -35,13 +35,14 @@
    - `<attribute>.rego` (policy logic)  
    - `_vars.rego` (resource metadata — one per resource)  
 
-8. Test your policy. The linter runs automatically via pre-commit, or run it directly:
+8. Check your work. One command runs everything CI will run — branch name, branch scope,
+   lint, doc completeness, argument coverage, and the `terraform plan` + `opa eval` test:
 
-    python3 scripts/linters/linter.py --platform gcp
+    python3 scripts/check_resource.py
 
-   Then run the OPA test harness (it handles `terraform plan`, plan caching, and `opa eval`):
-
-    python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource>"
+   If it says every check passed, CI will agree. See
+   [Testing your policies](testing-policies.md#top) for what each check means and how to run
+   the individual tools when you are chasing one failure.
 
 9. Fix any errors and re-test until successful.  
 
