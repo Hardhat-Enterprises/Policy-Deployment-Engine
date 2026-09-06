@@ -10,7 +10,6 @@ allowed to touch::
     docs/<platform>/<Service folder>/<resource_type>.json      the documentation
     inputs/<platform>/<Service folder>/<resource_type>/**      the fixtures
     policies/<platform>/<Service folder>/<resource_type>/**    the policies
-    inputs/plan_cache/**                                       additions only
 
 Anything else is somebody else's work or is shared by everybody, and a branch
 that changes it is either a stray `git add .` or a merge gone wrong. Two of
@@ -20,13 +19,20 @@ those mistakes are silent and expensive:
   from ``dev`` when the portal scans a branch, so editing them changes nothing
   about what the branch is actually checked against — it only makes the local
   run disagree with CI, and it makes the portal's drift check refuse to scan.
-* **The plan cache.** ``inputs/plan_cache/`` holds the committed terraform plan
-  for *every* fixture in the repo. Running the test harness in a way that clears
-  it deletes a thousand other people's cached plans, and nothing about the
-  contributor's own resource looks wrong afterwards.
+* **Somebody else's resource.** A stray ``git add .`` after a wide local test run
+  sweeps up files from resources the branch has nothing to do with, and nothing
+  about the contributor's own resource looks wrong afterwards.
 
 Neither shows up as a failing test on the branch that caused it, which is why
 this runs as its own gate on the push that introduces it.
+
+Committed terraform plans (``<sha>.json``) live inside the fixture directory they
+belong to, so they are covered by the ``inputs/`` line above and need no rule of
+their own — with one exception: deleting one is allowed *inside the branch's own
+scope*, because editing a fixture changes its sha and the harness prunes the plan
+of the old version as it writes the new one. ``inputs/plan_cache/`` is the tree
+those plans used to live in; a branch that re-adds it is working from a checkout
+older than that move.
 
 Note the service *slug* in the branch name is not the directory name: docs
 folders contain spaces and parentheses that are illegal in a git ref, so
@@ -52,6 +58,7 @@ a real docs folder — that last one is a branch-name problem, and
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 from dataclasses import dataclass, asdict
@@ -65,14 +72,15 @@ RULES = {
         "change only its own docs JSON, inputs/ fixtures and policies/ files."),
     "deleted-file": (
         "The branch deletes a file. Nothing on a resource branch needs a deletion — "
-        "not even inside your own folder; rename by adding the new file."),
+        "not even inside your own folder; rename by adding the new file. The one "
+        "exception is a <sha>.json plan inside your own fixtures, which the harness "
+        "prunes for you when a fixture changes."),
     "shared-harness-edit": (
         "The file is part of the shared test harness, helper library or templates. "
         "It is common to every resource type and is not editable from a resource branch."),
-    "plan-cache-modified": (
-        "inputs/plan_cache/ is append-only: it holds the committed terraform plan for "
-        "every fixture in the repo, so a branch may add cache entries but never change "
-        "or delete existing ones."),
+    "legacy-plan-cache": (
+        "inputs/plan_cache/ no longer exists. Committed terraform plans now live as "
+        "<sha>.json inside the fixture directory they were planned from."),
 }
 
 # Shared across every resource type, so never in one branch's scope.
@@ -88,7 +96,11 @@ SHARED_HARNESS_PREFIXES = (
     "templates/",
 )
 
-PLAN_CACHE_PREFIX = "inputs/plan_cache/"
+# Where committed plans used to live, before they moved beside their fixtures.
+LEGACY_PLAN_CACHE_PREFIX = "inputs/plan_cache/"
+
+# A committed plan is named for the sha of the *.tf beside it (auto_test.fixture_sha).
+PLAN_FILE_RE = re.compile(r"^[0-9a-f]{64}\.json$")
 
 SERVICE_PREFIX = "Service/"
 
@@ -109,11 +121,11 @@ REMEDIES = {
         "template really does need changing, raise it with a senior team member so it "
         "can go in on its own feature/ branch — editing it here does not change what "
         "you are checked against, and it stops the portal scanning your branch."),
-    "plan-cache-modified": (
-        "Restore the cache with `git checkout origin/{base} -- inputs/plan_cache` and "
-        "commit that. This usually means a local test run cleared the cache; re-run "
-        "your tests afterwards and commit only the new entries it adds for your own "
-        "fixtures."),
+    "legacy-plan-cache": (
+        "Delete it with `git rm -r --cached inputs/plan_cache` (or `git checkout "
+        "origin/{base} -- .` if the whole tree came back), then merge `origin/{base}` "
+        "so your branch has the current layout. Your own plan is written beside your "
+        "fixtures by the next `auto_test.py` run — commit that instead."),
 }
 
 
@@ -285,12 +297,19 @@ def classify(status, path, platform, folder, resource_type):
     """The single rule ``path`` breaks, or None if it is allowed.
 
     Order is most-specific-location first so a contributor gets the one message
-    that tells them what to do: a wiped plan cache is a plan-cache problem, not a
-    thousand separate deletions.
+    that tells them what to do: a branch working from the pre-move layout is told
+    that once, not once per resurrected cache file.
     """
-    if path.startswith(PLAN_CACHE_PREFIX):
-        return None if status == "A" else "plan-cache-modified"
+    if path.startswith(LEGACY_PLAN_CACHE_PREFIX):
+        # Deleting the old tree is exactly right; bringing it back is the mistake.
+        return None if status == "D" else "legacy-plan-cache"
     if status == "D":
+        # A fixture's *.tf edit changes its sha, and the harness prunes the plan of
+        # the previous version as it writes the new one. That deletion is the
+        # contributor doing the right thing — but only inside their own fixtures.
+        if (PLAN_FILE_RE.match(path.rsplit("/", 1)[-1])
+                and path_in_scope(path, platform, folder, resource_type)):
+            return None
         return "deleted-file"
     if path.startswith(SHARED_HARNESS_PREFIXES):
         return "shared-harness-edit"
