@@ -15,7 +15,7 @@ resource "google_gke_backup_backup_plan" "non_compliant_example_1" {
 
   retention_policy {
     backup_delete_lock_days = 30
-    backup_retain_days      = 180
+    backup_retain_days      = 90
   }
 }
 
