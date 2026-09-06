@@ -61,7 +61,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 # fixture_sha / plan_cache_path are the pipeline's own definition of "which
 # cached plan belongs to this fixture". Importing keeps the two in lockstep: a
 # provider bump changes the sha in both places at once.
-from scripts.auto_test.auto_test import plan_cache_path  # noqa: E402
+from scripts.auto_test.auto_test import (  # noqa: E402
+    find_denormalised_plan, plan_cache_path)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HELPERS_DIR = REPO_ROOT / "policies" / "_helpers"
@@ -92,7 +93,9 @@ RULES = {
         "argument under test."),
     "fixture-missing-plan": (
         "No committed plan for this fixture pair — run the test locally and commit "
-        "the <sha>.json the harness writes into the fixture directory."),
+        "the <sha>.json the harness writes into the fixture directory. If the plan "
+        "looks present locally, check line endings: a fixture committed with CRLF "
+        "(or a UTF-8 BOM) is named for a sha no LF checkout computes."),
     "fixture-one-sided": (
         "The fixture has no compliant examples at all, or no non-compliant examples "
         "at all, so one half of what the harness checks is never exercised."),
@@ -915,8 +918,24 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     if not cache.exists():
         # Reported repo-relative: the finding is read in CI logs and on the portal,
         # where an absolute path of the checkout means nothing.
+        where = cache.relative_to(root).as_posix()
+        # By far the most common cause of a plan that is present locally and absent
+        # here: the fixture was committed (or checked out) with CRLF line endings or
+        # a UTF-8 BOM, so it was named for the pre-normalisation sha. Naming the
+        # remedy is the difference between a rename and every contributor on the
+        # branch re-running terraform for a file whose contents are already correct.
+        denormalised = find_denormalised_plan(input_dir)
+        if denormalised is not None:
+            return [Finding(service, resource_type, stem, "fixture-missing-plan",
+                            f"no committed plan at {where} — but {denormalised.name} is "
+                            "provably the same plan under a pre-normalisation name (these "
+                            "*.tf were planned on a CRLF checkout, or carry a UTF-8 BOM). "
+                            "Re-run auto_test from any checkout and commit the rename it "
+                            "makes — the contents are already correct, so no terraform is "
+                            "needed. On Windows also set `git config core.autocrlf input` "
+                            "and run `git add --renormalize .` so it does not recur")]
         return [Finding(service, resource_type, stem, "fixture-missing-plan",
-                        f"no committed plan at {cache.relative_to(root).as_posix()} — "
+                        f"no committed plan at {where} — "
                         "run auto_test locally and commit the file it writes")]
 
     try:
