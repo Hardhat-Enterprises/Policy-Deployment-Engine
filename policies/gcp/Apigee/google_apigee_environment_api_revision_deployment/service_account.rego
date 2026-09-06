@@ -3,35 +3,28 @@ package terraform.gcp.security.apigee.google_apigee_environment_api_revision_dep
 import data.terraform.helpers
 import data.terraform.gcp.security.apigee.google_apigee_environment_api_revision_deployment.vars
 
-conditions := [
-    [
-        {
-            "situation_description": "The deployed Apigee API proxy does not have an explicitly configured service account for its runtime identity, which could result in the use of an unintended identity.",
-            "remedies": [
-                "Configure service_account for the deployed API proxy.",
-                "Use a dedicated service account instead of a default or shared identity.",
-                "Grant the service account only the permissions required by the API proxy."
+conditions := [[
+    {
+        "situation_description": "The deployed API proxy uses a service account that does not follow the required Google Cloud service account domain pattern.",
+        "remedies": [
+            "Configure service_account using the domain '<account>@<project>.iam.gserviceaccount.com'.",
+            "Use a dedicated least-privilege service account for the deployed API proxy."
+        ]
+    },
+    {
+        "condition": "service_account uses the Google Cloud service account domain",
+        "attribute_path": ["service_account"],
+        "values": [
+            "iam.*.com",
+            [
+                ["gserviceaccount"]
             ]
-        },
-        {
-            "condition": "Check whether the deployed API proxy has an explicitly configured service account.",
-            "attribute_path": [
-                "service_account"
-            ],
-            "values": [
-                null,
-                ""
-            ],
-            "policy_type": "blacklist"
-        }
-    ]
-]
+        ],
+        "policy_type": "pattern whitelist"
+    }
+]]
 
-# Evaluates the conditions once and stores the result
 result := helpers.get_multi_summary(conditions, vars.variables)
 
-# Displays a general message about policy compliance
 message := result.message
-
-# Displays detailed compliance results for each resource
 details := result.details
