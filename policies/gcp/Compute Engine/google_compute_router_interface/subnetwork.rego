@@ -6,18 +6,16 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Router interface subnetwork is not an approved subnetwork.",
+      "situation_description": "Router interface subnetwork is set to an empty or invalid value.",
       "remedies": [
-        "Set subnetwork to an approved subnetwork, e.g. projects/approved-project/regions/australia-southeast1/subnetworks/approved-subnetwork.",
+        "If using subnetwork mode, set subnetwork to a valid subnetwork reference. Interfaces using vpn_tunnel or interconnect_attachment instead do not need subnetwork set.",
       ],
     },
     {
-      "condition": "subnetwork must be one of the approved subnetworks.",
+      "condition": "subnetwork, if set, must not be empty or invalid.",
       "attribute_path": ["subnetwork"],
-      "values": [
-        "projects/approved-project/regions/australia-southeast1/subnetworks/approved-subnetwork",
-      ],
-      "policy_type": "whitelist",
+      "values": ["", "invalid-subnetwork"],
+      "policy_type": "blacklist",
     },
   ],
 ]
