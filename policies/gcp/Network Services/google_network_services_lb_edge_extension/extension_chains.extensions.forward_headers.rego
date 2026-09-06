@@ -1,4 +1,3 @@
-
 package terraform.gcp.security.google_network_services_lb_edge_extension.extension_chains.extensions.forward_headers
 
 import data.terraform.helpers
@@ -7,14 +6,14 @@ import data.terraform.gcp.security.network_services.google_network_services_lb_e
 conditions := [
     [
         {
-            "situation_description": "The LB Edge Extension should forward only explicitly approved HTTP headers.",
+            "situation_description": "The LB Edge Extension should not forward credential-bearing HTTP headers.",
             "remedies": [
-                "Configure forward_headers using only the approved safe header set.",
-                "Remove unapproved or sensitive headers from the forward_headers list."
+                "Remove credential-bearing headers from the forward_headers list.",
+                "Review forwarded headers to ensure authentication credentials and session information are not exposed."
             ]
         },
         {
-            "condition": "The forward_headers attribute must contain only explicitly approved safe headers.",
+            "condition": "The forward_headers attribute must not contain credential-bearing HTTP headers.",
             "attribute_path": [
                 "extension_chains",
                 0,
@@ -23,9 +22,12 @@ conditions := [
                 "forward_headers"
             ],
             "values": [
-                "X-Request-ID"
+                "Authorization",
+                "Proxy-Authorization",
+                "Cookie",
+                "X-API-Key"
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]
