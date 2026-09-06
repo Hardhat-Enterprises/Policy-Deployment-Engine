@@ -1,11 +1,9 @@
 resource "google_blockchain_node_engine_blockchain_nodes" "non_compliant_example_1" {
   project            = "my-secure-project"
   blockchain_node_id = "non_compliant_example_1"
-  location           = "asia-east1"
+  location           = "us-central1"
   blockchain_type    = ""
   ethereum_details {
-    api_enable_admin = true
-    api_enable_debug = true
     node_type        = "FULL"
     consensus_client = "LIGHTHOUSE"
     execution_client = "GETH"

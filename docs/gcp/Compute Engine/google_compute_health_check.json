@@ -6,64 +6,64 @@
       "description": "How often (in seconds) to send a health check. The default value is 5\nseconds.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how frequently health-check probes are sent. The appropriate interval depends on workload responsiveness and availability requirements, so constraining it to a generic platform value would not provide a consistent security benefit."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how Terraform handles deletion or removal of the health-check resource from management. This is a resource lifecycle and operational-governance choice rather than a generic security control, so platform policy should not prescribe a single deletion behaviour."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when\nyou create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive metadata for the health-check resource. It does not affect authentication, authorisation, network exposure, encryption, logging, or resource security."
     },
     "healthy_threshold": {
       "description": "A so-far unhealthy instance will be marked healthy after this many\nconsecutive successes. The default value is 2.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how many successful probes are required before an unhealthy backend is marked healthy. The appropriate threshold depends on application recovery behaviour and availability requirements, so a generic platform-level constraint would be operationally overreaching."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035.  Specifically, the name must be 1-63 characters long and\nmatch the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means\nthe first character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the\nlast character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the health-check resource. Platform policy does not constrain team-specific resource names, and the field does not directly improve authentication, authorisation, encryption, exposure control, or monitoring."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Google Cloud project that contains the resource. Project references are team-specific, and a platform policy should not prescribe which project a team must use."
     },
     "source_regions": {
       "description": "The list of cloud regions from which health checks are performed. If\nany regions are specified, then exactly 3 regions should be specified.\nThe region names must be valid names of Google Cloud regions. This can\nonly be set for global health check. If this list is non-empty, then\nthere are restrictions on what other health check fields are supported\nand what other resources can use this health check:\n\n* SSL, HTTP2, and GRPC protocols are not supported.\n\n* The TCP request field is not supported.\n\n* The proxyHeader field for HTTP, HTTPS, and TCP is not supported.\n\n* The checkIntervalSec field must be at least 30.\n\n* The health check cannot be used with BackendService nor with managed\ninstance group auto-healing.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the regions from which health-check probes originate and changes the protocols and resources supported by the health check. This is an architectural and operational configuration rather than a data-residency or generic security control."
     },
     "timeout_sec": {
       "description": "How long (in seconds) to wait before claiming failure.\nThe default value is 5 seconds.  It is invalid for timeoutSec to have\ngreater value than checkIntervalSec.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how long the health check waits before declaring a probe failure. The suitable timeout depends on backend response characteristics and workload requirements, so no single generic security value can be enforced."
     },
     "unhealthy_threshold": {
       "description": "A so-far healthy instance will be marked unhealthy after this many\nconsecutive failures. The default value is 2.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how many consecutive probe failures are required before a healthy backend is marked unhealthy. The appropriate threshold depends on service stability and availability requirements, making it an operational tuning choice rather than a generic security-policy target."
     },
     "grpc_health_check": {
       "type": "block",
@@ -74,29 +74,29 @@
       "description": "The gRPC service name for the health check.\nThe value of grpcServiceName has the following meanings by convention:\n  - Empty serviceName means the overall status of all services at the backend.\n  - Non-empty serviceName means the health of that gRPC service, as defined by the owner of the service.\nThe grpcServiceName can only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the team-defined gRPC service whose health is checked. The correct service name depends on the backend application, so platform policy should not constrain it to a specific or generic value."
     },
     "grpc_health_check.port": {
       "description": "The port number for the health check request.\nMust be specified if portName and portSpecification are not set\nor if port_specification is USE_FIXED_PORT. Valid values are 1 through 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the TCP port used for the gRPC health-check request. The correct port is determined by the backend application, so a platform-level policy cannot enforce one universally secure value."
     },
     "grpc_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a team-defined named port for the backend. Port names are application-specific identifiers, and Google Cloud does not support this field for the gRPC health-check configuration, so it is not a useful generic security-policy target."
     },
     "grpc_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, gRPC health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how the gRPC health-check port is selected. The appropriate option depends on the backend type and load-balancer architecture, so enforcing one platform-wide value would be operationally overreaching rather than a generic security control."
     },
     "grpc_tls_health_check": {
       "type": "block",
@@ -107,22 +107,22 @@
       "description": "The gRPC service name for the health check.\nThe value of grpcServiceName has the following meanings by convention:\n  - Empty serviceName means the overall status of all services at the backend.\n  - Non-empty serviceName means the health of that gRPC service, as defined by the owner of the service.\nThe grpcServiceName can only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the application-defined gRPC service whose health is evaluated. Because service names and registered health states are determined by the backend owner, a platform policy should not constrain this field to a generic or specific value."
     },
     "grpc_tls_health_check.port": {
       "description": "The port number for the health check request.\nMust be specified if port_specification is USE_FIXED_PORT. Valid values are 1 through 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the TCP port used by the TLS-enabled gRPC health check. Although the parent health-check type uses TLS, this field only selects an application-specific port and does not control whether encryption is enabled, so no universal security value can be enforced."
     },
     "grpc_tls_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': Not supported for GRPC with TLS health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, gRPC with TLS health check follows behavior specified in the 'port' field. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how the TLS-enabled gRPC health-check port is selected. The appropriate selection method depends on the backend and load-balancer architecture and does not enable or weaken TLS itself, so it is not a generic security-policy target."
     },
     "http2_health_check": {
       "type": "block",
@@ -133,50 +133,50 @@
       "description": "The value of the host header in the HTTP2 health check request.\nIf left empty (default value), the public IP on behalf of which this health\ncheck is performed will be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the Host header sent by the HTTP/2 health-check request. The required value depends on the backend application's virtual-host configuration, so a platform policy cannot safely prescribe a specific or generic hostname."
     },
     "http2_health_check.port": {
       "description": "The TCP port number for the HTTP2 health check request.\nThe default value is 443.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the backend port used for the HTTP/2 health check. The correct port depends on the application deployment, and this field does not control whether TLS is enabled, so enforcing one platform-wide port would not provide a generic security benefit."
     },
     "http2_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a team-defined named port for the HTTP/2 backend. Named ports are application-specific identifiers, and Google Cloud does not support this field for this configuration, so it is not a meaningful generic security-policy target."
     },
     "http2_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, HTTP2 health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how the HTTP/2 health-check port is selected. The correct method depends on the load-balancer and backend architecture, so enforcing one generic value would constrain legitimate deployments without providing a consistent security improvement."
     },
     "http2_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether a PROXY protocol header is added to the HTTP/2 health-check request. The correct setting depends on the backend protocol configuration, so enforcing one platform-wide value would be an operational constraint rather than a generic security control."
     },
     "http2_health_check.request_path": {
       "description": "The request path of the HTTP2 health check request.\nThe default value is /.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the application-defined URL path used by the HTTP/2 health check. The correct path depends on the backend application, so a generic platform policy cannot prescribe one universally secure value."
     },
     "http2_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines an application-specific response string used to determine HTTP/2 health-check success. Because the expected content depends on the backend application, a platform policy cannot meaningfully constrain it to a generic value."
     },
     "http_health_check": {
       "type": "block",
@@ -187,50 +187,50 @@
       "description": "The value of the host header in the HTTP health check request.\nIf left empty (default value), the public IP on behalf of which this health\ncheck is performed will be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the Host header sent with the HTTP health-check request. The correct hostname depends on the backend application's virtual-host configuration, so platform policy should not prescribe a specific or generic value."
     },
     "http_health_check.port": {
       "description": "The TCP port number for the HTTP health check request.\nThe default value is 80.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the backend port used for the HTTP health check. The correct port is application-specific, and this field does not enable or disable transport security, so enforcing one platform-wide port would not provide a generic security benefit."
     },
     "http_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a team-defined named port for the HTTP backend. Named ports are application-specific identifiers, so constraining them through a generic platform policy would be overreaching and would not provide a consistent security improvement."
     },
     "http_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, HTTP health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how the HTTP health-check port is selected. The correct option depends on the backend and load-balancer architecture, so enforcing one platform-wide method would constrain legitimate designs without providing a consistent security gain."
     },
     "http_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether a PROXY protocol header is added to the HTTP health-check request. The appropriate value depends on the backend protocol configuration, so it is an operational compatibility choice rather than a generic security-policy target."
     },
     "http_health_check.request_path": {
       "description": "The request path of the HTTP health check request.\nThe default value is /.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the application-defined URL path used for the HTTP health check. Because the correct endpoint depends on the backend application, platform policy should not prescribe a generic or specific path."
     },
     "http_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines an application-specific response string used to determine HTTP health-check success. The expected content is chosen by the backend owner, so a generic platform policy cannot meaningfully constrain this field."
     },
     "https_health_check": {
       "type": "block",
@@ -241,50 +241,50 @@
       "description": "The value of the host header in the HTTPS health check request.\nIf left empty (default value), the public IP on behalf of which this health\ncheck is performed will be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines which virtual host receives HTTPS health check requests. However, the correct host depends on the deployed application and infrastructure design. Because different environments legitimately require different host values, no single secure configuration can be enforced across all deployments."
     },
     "https_health_check.port": {
       "description": "The TCP port number for the HTTPS health check request.\nThe default value is 443.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the destination port used for HTTPS health check requests. However, the appropriate port depends on the deployed application architecture. Since different workloads require different ports, no universally secure value can be enforced across all deployments."
     },
     "https_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the backend port by its configured name. The correct port name depends on the deployed application, so no universally secure value can be enforced across all environments."
     },
     "https_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, HTTPS health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines how the destination port is selected for HTTPS health checks. Because the correct method depends on the application's deployment model, no universally secure configuration can be enforced."
     },
     "https_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether a proxy protocol header is included in health check requests. The correct option depends on backend compatibility, so no single secure value applies across all deployments."
     },
     "https_health_check.request_path": {
       "description": "The request path of the HTTPS health check request.\nThe default value is /.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the application endpoint used for HTTPS health checks. Because valid health check paths differ between applications, no universal secure value can be enforced."
     },
     "https_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the expected application response for determining backend health. Since valid responses depend on the application implementation, no universally secure value can be enforced."
     },
     "log_config": {
       "type": "block",
@@ -295,8 +295,8 @@
       "description": "Indicates whether or not to export logs. This is false by default,\nwhich means no health check logging will be done.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether health check logs are exported. These logs record health check activity for liveness and availability monitoring. This is operational telemetry rather than security audit or access logging, so requiring it to be enabled would enforce an operational monitoring choice rather than a generic platform-level security requirement."
     },
     "ssl_health_check": {
       "type": "block",
@@ -307,43 +307,43 @@
       "description": "The TCP port number for the SSL health check request.\nThe default value is 443.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the destination port for SSL health check requests. The appropriate port depends on the deployed application, so no universally secure value can be enforced across all environments."
     },
     "ssl_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the backend port using its configured name. The correct port name depends on the deployed application, so no universally secure value can be enforced across all deployments."
     },
     "ssl_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, SSL health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines how the SSL health check selects its destination port. Because the appropriate method depends on the deployed application architecture, no universally secure configuration can be enforced."
     },
     "ssl_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether a proxy protocol header is included in SSL health check requests. Since backend compatibility requirements differ across deployments, no universally secure value can be enforced."
     },
     "ssl_health_check.request": {
       "description": "The application data to send once the SSL connection has been\nestablished (default value is empty). If both request and response are\nempty, the connection establishment alone will indicate health. The request\ndata can only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the request content used during SSL health checks. Because valid request data varies between applications, no universally secure value can be enforced."
     },
     "ssl_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the expected backend response for SSL health checks. Since expected responses vary between applications, no universally secure configuration can be enforced."
     },
     "tcp_health_check": {
       "type": "block",
@@ -354,43 +354,43 @@
       "description": "The TCP port number for the TCP health check request.\nThe default value is 443.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the destination port for TCP health checks. The correct port depends on the deployed application, so no universally secure value can be enforced across all environments."
     },
     "tcp_health_check.port_name": {
       "description": "Port name as defined in InstanceGroup#NamedPort#name. If both port and\nport_name are defined, port takes precedence.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the backend port by its configured name. Since valid port names depend on the deployed application, no universally secure value can be enforced."
     },
     "tcp_health_check.port_specification": {
       "description": "Specifies how port is selected for health checking, can be one of the\nfollowing values:\n\n  * 'USE_FIXED_PORT': The port number in 'port' is used for health checking.\n\n  * 'USE_NAMED_PORT': The 'portName' is used for health checking.\n\n  * 'USE_SERVING_PORT': For NetworkEndpointGroup, the port specified for each\n  network endpoint is used for health checking. For other backends, the\n  port or named port specified in the Backend Service is used for health\n  checking.\n\nIf not specified, TCP health check follows behavior specified in 'port' and\n'portName' fields. Possible values: [\"USE_FIXED_PORT\", \"USE_NAMED_PORT\", \"USE_SERVING_PORT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines how TCP health checks select the destination port. Because deployment architectures differ, no universally secure configuration can be enforced."
     },
     "tcp_health_check.proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to the\nbackend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether a proxy protocol header is included in TCP health check requests. Since backend compatibility requirements vary across deployments, no universally secure value can be enforced."
     },
     "tcp_health_check.request": {
       "description": "The application data to send once the TCP connection has been\nestablished (default value is empty). If both request and response are\nempty, the connection establishment alone will indicate health. The request\ndata can only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the request payload used for TCP health checks. Because valid request content depends on the deployed application, no universally secure value can be enforced."
     },
     "tcp_health_check.response": {
       "description": "The bytes to match against the beginning of the response data. If left empty\n(the default value), any response will indicate health. The response data\ncan only be ASCII.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the expected backend response used during TCP health checks. Since valid responses vary between applications, no universally secure configuration can be enforced."
     }
   }
 }

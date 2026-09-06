@@ -8,5 +8,5 @@ resource "google_binary_authorization_policy" "non_compliant_example_1" {
     require_attestations_by = []
   }
 
-  description = "Non-compliant policy with no attestors defined"
+  description = "Compliant policy with at least one attestor defined"
 }
