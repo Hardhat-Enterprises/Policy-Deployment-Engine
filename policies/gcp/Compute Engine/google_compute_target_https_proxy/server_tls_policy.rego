@@ -6,18 +6,28 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Target HTTPS proxy server_tls_policy is not an approved TLS policy.",
+      "situation_description": "Target HTTPS proxy server_tls_policy is missing or does not reference an approved ServerTlsPolicy.",
       "remedies": [
-        "Set server_tls_policy to an explicitly approved networksecurity.ServerTlsPolicy resource.",
+        "Set server_tls_policy to a valid path: projects/{project}/locations/global/serverTlsPolicies/{policy}",
       ],
     },
     {
-      "condition": "server_tls_policy must be an approved TLS policy.",
+      "condition": "server_tls_policy must not be empty or invalid.",
+      "attribute_path": ["server_tls_policy"],
+      "values": [null, "", "invalid-policy"],
+      "policy_type": "blacklist",
+    },
+    {
+      "condition": "server_tls_policy must follow approved project/policy pattern.",
       "attribute_path": ["server_tls_policy"],
       "values": [
-        "projects/approved-project/locations/global/serverTlsPolicies/approved-policy",
+        "projects/*/locations/global/serverTlsPolicies/*",
+        [
+          ["project-1", "project-2"],
+          ["policy-1", "policy-2"],
+        ],
       ],
-      "policy_type": "whitelist",
+      "policy_type": "pattern whitelist",
     },
   ],
 ]

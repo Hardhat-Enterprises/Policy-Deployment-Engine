@@ -6,18 +6,28 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Target HTTPS proxy ssl_policy is not an approved SSL policy.",
+      "situation_description": "Target HTTPS proxy ssl_policy is missing or does not reference an approved SslPolicy.",
       "remedies": [
-        "Set ssl_policy to an explicitly approved SslPolicy resource.",
+        "Set ssl_policy to a valid path: projects/{project}/global/sslPolicies/{policy}",
       ],
     },
     {
-      "condition": "ssl_policy must be an approved SSL policy.",
+      "condition": "ssl_policy must not be empty or invalid.",
+      "attribute_path": ["ssl_policy"],
+      "values": [null, "", "invalid-policy"],
+      "policy_type": "blacklist",
+    },
+    {
+      "condition": "ssl_policy must follow approved project/policy pattern.",
       "attribute_path": ["ssl_policy"],
       "values": [
-        "projects/approved-project/global/sslPolicies/approved-ssl-policy",
+        "projects/*/global/sslPolicies/*",
+        [
+          ["project-1", "project-2"],
+          ["policy-1", "policy-2"],
+        ],
       ],
-      "policy_type": "whitelist",
+      "policy_type": "pattern whitelist",
     },
   ],
 ]
