@@ -6,18 +6,16 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Network attachment subnetworks includes an unapproved subnetwork.",
+      "situation_description": "Network attachment subnetworks is empty or invalid, so no subnetwork is explicitly configured.",
       "remedies": [
-        "Restrict subnetworks to only projects/approved-project/regions/australia-southeast1/subnetworks/approved-subnetwork or other explicitly approved subnetworks.",
+        "Set subnetworks to the subnetwork(s) this network attachment should use.",
       ],
     },
     {
-      "condition": "subnetworks must contain only approved subnetworks.",
+      "condition": "subnetworks must not be empty or invalid.",
       "attribute_path": ["subnetworks"],
-      "values": [
-        "projects/approved-project/regions/australia-southeast1/subnetworks/approved-subnetwork",
-      ],
-      "policy_type": "whitelist",
+      "values": [null, [], "invalid-subnetwork"],
+      "policy_type": "blacklist",
     },
   ],
 ]
