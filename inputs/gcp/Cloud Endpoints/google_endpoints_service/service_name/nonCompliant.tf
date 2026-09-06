@@ -7,7 +7,7 @@ swagger: "2.0"
 info:
   title: "api"
   version: "1.0.0"
-host: "api.example.com"
+host: "api.endpoints.my-project-123.cloud.goog"
 schemes:
   - https
 paths:
