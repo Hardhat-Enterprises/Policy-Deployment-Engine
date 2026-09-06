@@ -6,23 +6,23 @@ import data.terraform.gcp.security.apigee.google_apigee_environment_debugmask.va
 conditions := [
     [
         {
-            "situation_description": "The Apigee environment debug mask does not mask the approved sensitive flow variables, which could expose authentication information in debug sessions.",
+            "situation_description": "The Apigee environment debug mask does not configure any flow variables for masking, which could expose sensitive values during debug sessions.",
             "remedies": [
-                "Add approved sensitive flow variables to the variables list.",
+                "Add sensitive flow variables to the variables list.",
                 "Mask authorization headers, API keys, tokens, credentials, and other sensitive variables.",
-                "Review API proxy flows to identify additional variables containing sensitive data."
+                "Review each API proxy flow for custom variables containing sensitive information."
             ]
         },
         {
-            "condition": "Check whether the debug mask contains only approved sensitive flow variables.",
+            "condition": "Check whether the debug mask contains at least one masked flow variable.",
             "attribute_path": [
                 "variables"
             ],
             "values": [
-                "request.header.authorization",
-                "request.queryparam.api_key"
+                null,
+                []
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]

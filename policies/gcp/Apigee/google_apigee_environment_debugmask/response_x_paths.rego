@@ -6,23 +6,23 @@ import data.terraform.gcp.security.apigee.google_apigee_environment_debugmask.va
 conditions := [
     [
         {
-            "situation_description": "The Apigee environment debug mask does not use approved XPath expressions to mask sensitive XML data in response-message debug output.",
+            "situation_description": "The Apigee environment debug mask does not configure any XPath expressions for masking sensitive XML response data.",
             "remedies": [
-                "Add approved sensitive XML response fields to response_x_paths.",
-                "Ensure that each XPath expression matches the API response structure.",
-                "Review response payloads for access tokens, personal information, payment information, and other sensitive values."
+                "Add sensitive XML response fields to response_x_paths.",
+                "Use XPath expressions that match the API response structure.",
+                "Include tokens, personal information, payment information, and other sensitive XML fields identified for the API."
             ]
         },
         {
-            "condition": "Check whether response_x_paths contains only approved XPath expressions.",
+            "condition": "Check whether response_x_paths contains at least one XML response masking path.",
             "attribute_path": [
                 "response_x_paths"
             ],
             "values": [
-                "//accessToken",
-                "//customer/email"
+                null,
+                []
             ],
-            "policy_type": "whitelist"
+            "policy_type": "blacklist"
         }
     ]
 ]

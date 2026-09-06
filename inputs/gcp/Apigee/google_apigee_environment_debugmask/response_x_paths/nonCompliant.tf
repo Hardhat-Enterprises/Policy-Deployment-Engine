@@ -4,7 +4,5 @@
 resource "google_apigee_environment_debugmask" "non_compliant_example_1" {
   env_id = "organizations/example-org/environments/test"
 
-  response_x_paths = [
-    "//status"
-  ]
+  response_x_paths = []
 }
