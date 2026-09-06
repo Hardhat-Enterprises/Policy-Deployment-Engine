@@ -7,8 +7,8 @@ resource "google_bigquery_data_transfer_config" "non_compliant_example_1" {
   project                = "CH-project"
 
   params = {
-    query            = "SELECT CURRENT_DATE();"
-    destination_table_name_template = "daily_summary"
-    write_disposition = "WRITE_TRUNCATE"
+    destination_table_name_template = "my_table"
+    write_disposition               = "WRITE_APPEND"
+    query                           = "SELECT name FROM tabl WHERE x = 'y'"
   }
 }

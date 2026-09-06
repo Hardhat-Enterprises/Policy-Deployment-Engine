@@ -10,7 +10,7 @@ data "google_iam_policy" "nc" {
 resource "google_bigquery_table_iam_policy" "non_compliant_example_1" {
   project     = "PDE"
   dataset_id  = "non_compliant_example_1"
-  table_id    = "table_nc1"
+  table_id    = "table_c1"
   policy_data = data.google_iam_policy.nc.policy_data
 }
 
@@ -26,6 +26,6 @@ data "google_iam_policy" "nc2" {
 resource "google_bigquery_table_iam_policy" "non_compliant_example_2" {
   project     = "PDE"
   dataset_id  = "non_compliant_example_2"
-  table_id    = "table_nc2"
+  table_id    = "table_c2"
   policy_data = data.google_iam_policy.nc2.policy_data
 }

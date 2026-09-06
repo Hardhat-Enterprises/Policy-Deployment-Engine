@@ -13,17 +13,28 @@ conditions := [
       "condition": "Only specific values are allowed in UDM query",
       "attribute_path": ["udm_query"],
       "values": [
-        "principal.hostname=\"malicious.com\"",
-        "principal.user_email=\"admin@malicious.com\"",
         "principal.hostname=\"malicious.com\""
-        
       ],
       "policy_type": "blacklist"
     }
   ],
+  [
+    {
+      "situation_description": "UDM query scopes access by an email address at a known-bad domain.",
+      "remedies": ["Do not scope data access by an address at an untrusted domain."]
+    },
+    {
+      "condition": "UDM query must not select on an email at a blacklisted domain",
+      "attribute_path": ["udm_query"],
+      "values": ["principal.user_email=\"*@*\"", [[], ["malicious.com"]]],
+      "policy_type": "pattern blacklist"
+    }
+  ],
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
 
 # Detailed report of each condition and situation
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := result.details
