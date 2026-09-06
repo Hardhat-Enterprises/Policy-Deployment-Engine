@@ -6,18 +6,16 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Target HTTPS proxy certificate_map is not an approved certificate map.",
+      "situation_description": "Target HTTPS proxy certificate_map is missing, so no certificate map is explicitly configured.",
       "remedies": [
-        "Set certificate_map to an explicitly approved certificate map.",
+        "Set certificate_map to the certificate map this proxy should use.",
       ],
     },
     {
-      "condition": "certificate_map must be an approved certificate map.",
+      "condition": "certificate_map must not be empty or invalid.",
       "attribute_path": ["certificate_map"],
-      "values": [
-        "//certificatemanager.googleapis.com/projects/approved-project/locations/global/certificateMaps/approved-map",
-      ],
-      "policy_type": "whitelist",
+      "values": [null, "", "invalid-map"],
+      "policy_type": "blacklist",
     },
   ],
 ]

@@ -6,18 +6,16 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Target HTTPS proxy certificate_manager_certificates includes an unapproved certificate.",
+      "situation_description": "Target HTTPS proxy certificate_manager_certificates is empty, so no certificate is explicitly configured.",
       "remedies": [
-        "Restrict certificate_manager_certificates to only explicitly approved certificate manager certificates.",
+        "Set certificate_manager_certificates to the certificate manager certificate(s) this proxy should use.",
       ],
     },
     {
-      "condition": "certificate_manager_certificates must contain only approved certificates.",
+      "condition": "certificate_manager_certificates must not be empty or invalid.",
       "attribute_path": ["certificate_manager_certificates"],
-      "values": [
-        "//certificatemanager.googleapis.com/projects/approved-project/locations/global/certificates/approved-cert",
-      ],
-      "policy_type": "whitelist",
+      "values": [null, [], "invalid-certificate"],
+      "policy_type": "blacklist",
     },
   ],
 ]
