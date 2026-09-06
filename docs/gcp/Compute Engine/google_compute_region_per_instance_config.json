@@ -7,7 +7,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Should be set to false to ensure that the instance is not accidentally configured to destroy the instance"
+      "rationale": "Should be set to PREVENT to ensure that the instance is not accidentally configured to destroy the instance"
     },
     "minimal_action": {
       "description": "The minimal action to perform on the instance during an update.\nDefault is 'NONE'. Possible values are:\n* REPLACE\n* RESTART\n* REFRESH\n* NONE",
@@ -74,8 +74,8 @@
       "description": "Preserved metadata defined for this instance. This is a list of key->value pairs.",
       "required": false,
       "type": "map(string)",
-      "security_impact": false,
-      "rationale": "Only used as the metadata thus does not have an impact on the security aspects of the resource"
+      "security_impact": true,
+      "rationale": "Metadata can old sensitive information in plaintext thus policy is needed to prevent this from happening"
     },
     "preserved_state.disk": {
       "type": "block",
@@ -86,29 +86,29 @@
       "description": "A value that prescribes what should happen to the stateful disk when the VM instance is deleted.\nThe available options are 'NEVER' and 'ON_PERMANENT_INSTANCE_DELETION'.\n'NEVER' - detach the disk when the VM is deleted, but do not delete the disk.\n'ON_PERMANENT_INSTANCE_DELETION' will delete the stateful disk when the VM is permanently\ndeleted from the instance group. Default value: \"NEVER\" Possible values: [\"NEVER\", \"ON_PERMANENT_INSTANCE_DELETION\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Must be set to NEVER to protect the data integrity of the stateful disk from unintended or malicious deletion"
+      "security_impact": false,
+      "rationale": "This is a operational data handling control not a security control as it a preference for the user on how stateful disks are handled on instance deletion"
     },
     "preserved_state.disk.device_name": {
       "description": "A unique device name that is reflected into the /dev/ tree of a Linux operating system running within the instance.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Only used for naming conventions which does not have an effect on the security of the resource"
+      "rationale": "Only used for a naming convention for disk device name which does not have an effect on the security of the resource"
     },
     "preserved_state.disk.mode": {
       "description": "The mode of the disk. Default value: \"READ_WRITE\" Possible values: [\"READ_ONLY\", \"READ_WRITE\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Should be set to read_only to prevent modification of the disk to ensure data integrity"
+      "security_impact": false,
+      "rationale": "The chosen state of the mode for the disk is an operational control for the user not a security control as it would be too restriciting to have READ_ONLY if they need writing access"
     },
     "preserved_state.disk.source": {
       "description": "The URI of an existing persistent disk to attach under the specified device-name in the format\n'projects/project-id/zones/zone/disks/disk-name'.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "URI could belong to another zone thus should be checked to ensure data residency"
+      "security_impact": false,
+      "rationale": "Used as an identifier that points to the URI thus is a operational control not a security control"
     },
     "preserved_state.external_ip": {
       "type": "block",
@@ -119,8 +119,8 @@
       "description": "These stateful IPs will never be released during autohealing, update or VM instance recreate operations. This flag is used to configure if the IP reservation should be deleted after it is no longer used by the group, e.g. when the given instance or the whole group is deleted. Default value: \"NEVER\" Possible values: [\"NEVER\", \"ON_PERMANENT_INSTANCE_DELETION\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Should be configured to delete the IP addresses as they can lead to reuse in public purposes which can lead to routing and security risks"
+      "security_impact": false,
+      "rationale": "This is operational control as it allows for the IP reservation to persist even after the instance of group is deleted which is apart the IP address life cycle making it not a security control"
     },
     "preserved_state.external_ip.interface_name": {
       "description": "The identifier for this object. Format specified above.",
@@ -138,8 +138,8 @@
       "description": "The URL of the reservation for this IP address.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Purpose is to use a specfic IP address associated with the reservation thus it would not affect the security of the resource"
+      "security_impact": true,
+      "rationale": "Purpose is to use a keep the same externa IP address associated with the reservation too be reused, which can lead to network exposure as it is external thus needing a policy"
     },
     "preserved_state.internal_ip": {
       "type": "block",
@@ -170,7 +170,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Purpose to perserve the internal IP address thus would not be related to the security"
+      "rationale": "Specifies an internal IP address to reserve for reuse, in which it would not be suitable for policy creation as there would need to be hardcoding for the IP addresses."
     }
   }
 }
