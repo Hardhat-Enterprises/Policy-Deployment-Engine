@@ -1,7 +1,7 @@
 resource "google_cloudfunctions2_function" "non_compliant_example_1" {
   name     = "non_compliant_example_1"
   location = " " #empty location 
-  project = "nc project"
+  project = "c project"
   
   build_config {
     runtime     = "python311"
@@ -16,7 +16,7 @@ resource "google_cloudfunctions2_function" "non_compliant_example_1" {
 
   service_config {
     max_instance_count = 2
-    available_memory   = "1024M"
+    available_memory   = "512M"
     timeout_seconds    = 120
     ingress_settings   = "ALLOW_ALL"
     environment_variables = {

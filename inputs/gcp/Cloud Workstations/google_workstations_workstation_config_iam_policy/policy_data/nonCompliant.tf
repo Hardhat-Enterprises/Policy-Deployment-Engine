@@ -27,7 +27,7 @@ data "google_iam_policy" "nc2" {
 resource "google_workstations_workstation_config_iam_policy" "non_compliant_example_2" {
   project                = "925810350503"
   location               = "us-central1"
-  workstation_cluster_id = "nc"
+  workstation_cluster_id = "c"
   workstation_config_id  = "non_compliant_example_2"
   policy_data            = data.google_iam_policy.nc2.policy_data
 }

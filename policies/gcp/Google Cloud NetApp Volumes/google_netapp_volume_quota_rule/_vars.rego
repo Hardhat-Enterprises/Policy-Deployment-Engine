@@ -2,7 +2,7 @@ package terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_volume_
 
 
 variables := {
-    "friendly_resource_name": "netapps_volumes", 
+    "friendly_resource_name": "NetApp Volume Quota Rule", 
     "resource_type":  "google_netapp_volume_quota_rule",
     "resource_value_name" : "name" 
 }
