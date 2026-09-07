@@ -1,5 +1,5 @@
 resource "google_dataproc_autoscaling_policy" "non_compliant_example_1" {
-  policy_id       = "dataproc-policy-example"
+  policy_id       = "non_compliant_example_1"
   location        = "australia-southeast1"
   deletion_policy = "DELETE"
 
