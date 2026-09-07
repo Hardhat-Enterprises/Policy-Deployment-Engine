@@ -86,9 +86,10 @@ conditions := [
       "condition": "Encryption key annotation must match the approved KMS key path",
       "attribute_path": ["template", 0, "metadata", 0, "annotations", "run.googleapis.com/encryption-key"],
       "values": [
-        "projects/my-gcp-project/locations/australia-southeast1/keyRings/prod-keyring/cryptoKeys/cloudrun-key"
+        "projects/*/locations/*/keyRings/*/cryptoKeys/*",
+        [["my-gcp-project"], ["australia-southeast1"], ["prod-keyring"], ["cloudrun-key"]]
       ],
-      "policy_type": "whitelist"
+      "policy_type": "pattern whitelist"
     }
   ],
   [
@@ -103,9 +104,10 @@ conditions := [
       "condition": "VPC access connector annotation must use an approved connector",
       "attribute_path": ["template", 0, "metadata", 0, "annotations", "run.googleapis.com/vpc-access-connector"],
       "values": [
-        "projects/my-gcp-project/locations/australia-southeast1/connectors/prod-vpc-connector"
+        "projects/*/locations/*/connectors/*",
+        [["my-gcp-project"], ["australia-southeast1"], ["prod-vpc-connector"]]
       ],
-      "policy_type": "whitelist"
+      "policy_type": "pattern whitelist"
     }
   ],
   [

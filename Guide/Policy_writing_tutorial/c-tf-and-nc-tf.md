@@ -69,8 +69,21 @@ resource "google_cloudfunctions_function" "non_compliant_example_1" {
 ```
 
 > **Fixture labels matter:** the linter requires both the resource label **and** the `name`
-> argument to follow `compliant_example_N` / `non_compliant_example_N` (numbered from 1). Add
-> further numbered blocks (`compliant_example_2`, …) if you need more than one example.
+> argument to follow `compliant_example_N` / `non_compliant_example_N`, numbered sequentially
+> from 1 within each file. Add further numbered blocks (`compliant_example_2`, …) if you need
+> more than one example.
+
+> **The two files do not have to hold the same number of examples.** `compliant.tf` and
+> `nonCompliant.tf` are numbered independently, and the harness matches each example by its
+> label, not by pairing them up — every `non_compliant_example_N` must be flagged by your policy,
+> and no `compliant_example_N` may be. So **N compliant against M non-compliant is fine**, and
+> one compliant baseline tested against several non-compliant examples — each breaking the rule
+> in a different way — is the shape to aim for. What you must never have is nothing on one side:
+> a fixture with no compliant example, or none non-compliant, is reported as
+> [`fixture-one-sided`](policy-lint.md#fixture-one-sided).
+
+Whatever else differs between the two files, the argument under test should be the **only**
+attribute whose value changes — see [`fixture-drift`](policy-lint.md#fixture-drift).
 
 <div align="center"> 
 
