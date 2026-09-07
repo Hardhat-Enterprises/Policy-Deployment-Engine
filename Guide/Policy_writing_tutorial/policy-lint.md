@@ -206,6 +206,34 @@ The whole point of the pair is to isolate a single variable: if two things diffe
 flags the non-compliant resource, you cannot tell which of the two the policy actually caught.
 Fix it by making every other attribute identical between the two files.
 
+Two kinds of difference are **not** reported, because neither is a second variable:
+
+- **Naming your examples.** `odb_subnet_id = "compliant-example-1"` against
+  `"non-compliant-example-1"` is one label written twice. Any value that starts
+  `compliant-`/`compliant_` on the compliant side and `non-compliant-`/`non_compliant_` on the
+  other is read as naming, not drift. (Many GCP id fields reject underscores, which is why the
+  hyphenated form is what you have to write.)
+- **Values the provider derives from the one under test.** `google_service_account.email` is
+  built out of `account_id`; a regional resource's `target` URL contains its `region`. Changing
+  the argument necessarily changes them.
+
+### When the provider gives you no choice
+
+Occasionally the argument under test belongs to a set Terraform allows only one of —
+`predefined_acl` and `role_entity` on a `google_storage_object_acl`, `managed` and
+`self_managed` on a certificate. Showing a compliant and a non-compliant value of one of them
+*forces* the other to differ, and there is no version of the fixture that terraform will accept
+without that second difference.
+
+Those fixtures are listed in `FIXTURE_DRIFT_EXEMPT` in `scripts/linters/policy_lint.py`, each
+with the mutually exclusive set written out. **You cannot add to it yourself** — it lives under
+`scripts/`, which a `Service/` branch may not change. If you are certain your fixture is one of
+these, ask a maintainer; the entry needs a reason, and a test fails if a listed fixture is later
+rewritten so it no longer needs one.
+
+Check first that it really is forced. Most of these findings are an attribute that simply drifted
+while the fixture was being written, and those are yours to fix.
+
 Bad — `public_access_prevention.rego`, but `storage_class` moved too:
 
     # compliant.tf
