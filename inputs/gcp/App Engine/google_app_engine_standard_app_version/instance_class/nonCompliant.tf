@@ -1,7 +1,7 @@
 resource "google_app_engine_standard_app_version" "non_compliant_example_1" {
   project        = "gcp-project-12345"
   version_id     = "v1"
-  service        = "dev-test"
+  service        = "prod-web"
   runtime        = "nodejs20"
   instance_class = "F2"
 
