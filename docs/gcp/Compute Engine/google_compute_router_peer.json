@@ -6,141 +6,141 @@
       "description": "User-specified flag to indicate which mode to use for advertisement.\nValid values of this enum field are: 'DEFAULT', 'CUSTOM' Default value: \"DEFAULT\" Possible values: [\"DEFAULT\", \"CUSTOM\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses how routes are advertised (DEFAULT or CUSTOM). This is a routing design choice and neither value is insecure, so no policy is needed."
     },
     "advertised_groups": {
       "description": "User-specified list of prefix groups to advertise in custom\nmode, which currently supports the following option:\n\n* 'ALL_SUBNETS': Advertises all of the router's own VPC subnets.\nThis excludes any routes learned for subnets that use VPC Network\nPeering.\n\n\nNote that this field can only be populated if advertiseMode is 'CUSTOM'\nand overrides the list defined for the router (in the \"bgp\" message).\nThese groups are advertised in addition to any specified prefixes.\nLeave this field blank to advertise no custom groups.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses which groups of subnets are advertised to the peer. What a team advertises to its own trusted router is a routing choice, not a security control."
     },
     "advertised_route_priority": {
       "description": "The priority of routes advertised to this BGP peer.\nWhere there is more than one matching route of maximum\nlength, the routes with the lowest priority value win.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the priority of routes advertised to the peer. This only tunes traffic preference and does not affect security."
     },
     "custom_learned_route_priority": {
       "description": "The user-defined custom learned route priority for a BGP session.\nThis value is applied to all custom learned route ranges for the session. You can choose a value\nfrom 0 to 65335. If you don't provide a value, Google Cloud assigns a priority of 100 to the ranges.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the priority of routes learned from the peer. This only tunes traffic preference and does not affect security."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "A policy should require this to be set to PREVENT or ABANDON so that a team cannot accidentally destroy a BGP peer and lose connectivity."
     },
     "enable": {
       "description": "The status of the BGP peer connection. If set to false, any active session\nwith the peer is terminated and all associated routing information is removed.\nIf set to true, the peer connection can be established with routing information.\nThe default is true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Turns the BGP session on or off. This is an operational switch and neither value is insecure."
     },
     "enable_ipv4": {
       "description": "Enable IPv4 traffic over BGP Peer. It is enabled by default if the peerIpAddress is version 4.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Turns IPv4 traffic on or off for the session. This is a functional choice, not a security control."
     },
     "enable_ipv6": {
       "description": "Enable IPv6 traffic over BGP Peer. If not specified, it is disabled by default.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Turns IPv6 traffic on or off for the session. This is a functional choice, not a security control."
     },
     "export_policies": {
       "description": "routers.list of export policies applied to this peer, in the order they must be evaluated. \nThe name must correspond to an existing policy that has ROUTE_POLICY_TYPE_EXPORT type.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names of existing export route policies to apply. This is a reference to another resource; we secure the route policy itself, not the name pointing to it."
     },
     "import_policies": {
       "description": "routers.list of import policies applied to this peer, in the order they must be evaluated. \nThe name must correspond to an existing policy that has ROUTE_POLICY_TYPE_IMPORT type.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names of existing import route policies to apply. This is a reference to another resource; we secure the route policy itself, not the name pointing to it."
     },
     "interface": {
       "description": "Name of the interface the BGP peer is associated with.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Name of the router interface this peer uses. This is just a reference, not a security control."
     },
     "ip_address": {
       "description": "IP address of the interface inside Google Cloud Platform.\nOnly IPv4 is supported.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "IP address of the interface inside Google Cloud. IP addressing is a team decision and a generic policy cannot check it."
     },
     "ipv4_nexthop_address": {
       "description": "IPv4 address of the interface inside Google Cloud Platform.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "IPv4 next-hop address inside Google Cloud. IP addressing is a team decision and a generic policy cannot check it."
     },
     "ipv6_nexthop_address": {
       "description": "IPv6 address of the interface inside Google Cloud Platform.\nThe address must be in the range 2600:2d00:0:2::/64 or 2600:2d00:0:3::/64.\nIf you do not specify the next hop addresses, Google Cloud automatically\nassigns unused addresses from the 2600:2d00:0:2::/64 or 2600:2d00:0:3::/64 range for you.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "IPv6 next-hop address inside Google Cloud. IP addressing is a team decision and a generic policy cannot check it."
     },
     "name": {
       "description": "Name of this BGP peer. The name must be 1-63 characters long,\nand comply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which\nmeans the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit,\nexcept the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Name of the BGP peer. A name does not affect the security of the resource or its data."
     },
     "peer_asn": {
       "description": "Peer BGP Autonomous System Number (ASN).\nEach BGP interface may use a different value.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The peer network's BGP AS number. It identifies the team's own peer, and a generic policy cannot check it without hardcoding team-specific values."
     },
     "peer_ip_address": {
       "description": "IP address of the BGP interface outside Google Cloud Platform.\nOnly IPv4 is supported. Required if 'ip_address' is set.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "IP address of the peer's BGP interface. IP addressing is a team decision and a generic policy cannot check it."
     },
     "peer_ipv4_nexthop_address": {
       "description": "IPv4 address of the BGP interface outside Google Cloud Platform.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "IPv4 next-hop address on the peer side. IP addressing is a team decision and a generic policy cannot check it."
     },
     "peer_ipv6_nexthop_address": {
       "description": "IPv6 address of the BGP interface outside Google Cloud Platform.\nThe address must be in the range 2600:2d00:0:2::/64 or 2600:2d00:0:3::/64.\nIf you do not specify the next hop addresses, Google Cloud automatically\nassigns unused addresses from the 2600:2d00:0:2::/64 or 2600:2d00:0:3::/64 range for you.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "IPv6 next-hop address on the peer side. IP addressing is a team decision and a generic policy cannot check it."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project the resource belongs to. This is just a reference, not a security control."
     },
     "region": {
       "description": "Region where the router and BgpPeer reside.\nIf it is not provided, the provider region is used.",
@@ -153,29 +153,29 @@
       "description": "The name of the Cloud Router in which this BgpPeer will be configured.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Name of the Cloud Router this peer is created on. This is just a reference, not a security control."
     },
     "router_appliance_instance": {
       "description": "The URI of the VM instance that is used as third-party router appliances\nsuch as Next Gen Firewalls, Virtual Routers, or Router Appliances.\nThe VM instance must be located in zones contained in the same region as\nthis Cloud Router. The VM instance is the peer side of the BGP session.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Link to the VM used as the router appliance. This is a reference to another resource, not a security control."
     },
     "zero_advertised_route_priority": {
       "description": "Force the advertised_route_priority to be 0.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Forces the advertised route priority to 0. This only tunes traffic preference and does not affect security."
     },
     "zero_custom_learned_route_priority": {
       "description": "Force the custom_learned_route_priority to be 0.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Forces the learned route priority to 0. This only tunes traffic preference and does not affect security."
     },
     "advertised_ip_ranges": {
       "type": "block",
@@ -186,15 +186,15 @@
       "description": "User-specified description for the IP range.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A text description of the IP range. Descriptions have no security impact."
     },
     "advertised_ip_ranges.range": {
       "description": "The IP range to advertise. The value must be a\nCIDR-formatted string.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The IP range advertised to the peer. IP ranges are team addressing decisions; network protection comes from firewall rules, not from restricting range values."
     },
     "bfd": {
       "type": "block",
@@ -205,29 +205,29 @@
       "description": "The minimum interval, in milliseconds, between BFD control packets\nreceived from the peer router. The actual value is negotiated\nbetween the two routers and is equal to the greater of this value\nand the transmit interval of the other router. If set, this value\nmust be between 1000 and 30000.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "BFD timer controlling how fast link failures are detected. This is availability tuning, not a security control."
     },
     "bfd.min_transmit_interval": {
       "description": "The minimum interval, in milliseconds, between BFD control packets\ntransmitted to the peer router. The actual value is negotiated\nbetween the two routers and is equal to the greater of this value\nand the corresponding receive interval of the other router. If set,\nthis value must be between 1000 and 30000.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "BFD timer controlling how fast link failures are detected. This is availability tuning, not a security control."
     },
     "bfd.multiplier": {
       "description": "The number of consecutive BFD packets that must be missed before\nBFD declares that a peer is unavailable. If set, the value must\nbe a value between 5 and 16.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "How many missed BFD packets mark the peer as down. This is availability tuning, not a security control."
     },
     "bfd.session_initialization_mode": {
       "description": "The BFD session initialization mode for this BGP peer.\nIf set to 'ACTIVE', the Cloud Router will initiate the BFD session\nfor this BGP peer. If set to 'PASSIVE', the Cloud Router will wait\nfor the peer router to initiate the BFD session for this BGP peer.\nIf set to 'DISABLED', BFD is disabled for this BGP peer. Possible values: [\"ACTIVE\", \"DISABLED\", \"PASSIVE\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses how the BFD session starts (ACTIVE, PASSIVE or DISABLED). BFD only detects link failures, so this is availability tuning, not a security control."
     },
     "custom_learned_ip_ranges": {
       "type": "block",
@@ -238,8 +238,8 @@
       "description": "The IP range to learn. The value must be a\nCIDR-formatted string.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The IP range learned from the peer. IP ranges are team addressing decisions; network protection comes from firewall rules, not from restricting range values."
     },
     "md5_authentication_key": {
       "type": "block",
@@ -250,15 +250,15 @@
       "description": "Value of the key.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The secret key value itself. A generic policy cannot validate a secret value and must never hardcode or match real key material."
     },
     "md5_authentication_key.name": {
       "description": "[REQUIRED] Name used to identify the key.\nMust be unique within a router. Must be referenced by exactly one bgpPeer. Must comply with RFC1035.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Identifies the MD5 key that authenticates the BGP session. Without authentication the session can be spoofed and false routes injected. A policy should require this to be set (non-empty) so every peer uses authenticated BGP, without pinning any specific key name."
     }
   }
 }
