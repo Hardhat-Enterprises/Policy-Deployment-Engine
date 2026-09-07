@@ -5,14 +5,14 @@ import data.terraform.gcp.security.compute_engine.google_compute_network_firewal
 conditions := [
     [
     {
-      "situation_description": "The rule sends traffic to a security profile group that is not on the organisation's approved list",
-      "remedies": ["Point security_profile_group at an approved security profile group through out the link"]
+      "situation_description": "No security profile group is set, so traffic routed for inspection has no profile to inspect it against",
+      "remedies": ["Set security_profile_group to the security profile group that should inspect this traffic"]
     },
     {
-      "condition": "security_profile_group is an approved profile group",
+      "condition": "security_profile_group is set",
       "attribute_path": ["security_profile_group"],
-    "values": ["https://networksecurity.googleapis.com/v1/projects/fake-project/locations/global/securityProfileGroups/approved-spg"],
-    "policy_type": "whitelist"
+      "values": [null, ""],
+      "policy_type": "blacklist"
     }
   ]
 ]

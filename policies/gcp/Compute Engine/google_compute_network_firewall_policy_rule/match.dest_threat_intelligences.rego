@@ -5,14 +5,14 @@ import data.terraform.gcp.security.compute_engine.google_compute_network_firewal
 conditions := [
     [
     {
-      "situation_description": "the rule targets a destination region that is outside the approved list",
-      "remedies": ["filter the dest_threat_intelligences to regions"]
+      "situation_description": "the rule does not check destination traffic against any Google threat intelligence list",
+      "remedies": ["add at least one Google threat intelligence list to dest_threat_intelligences"]
     },
     {
-      "condition": "dest_threat_intelligences contains a unrestricted region",
+      "condition": "dest_threat_intelligences references at least one threat intelligence list",
       "attribute_path": ["match", 0, "dest_threat_intelligences"],
-      "values": ["iplist-known-malicious-ips"],
-      "policy_type": "whitelist"
+      "values": [null, []],
+      "policy_type": "blacklist"
     }
   ]
 ]
