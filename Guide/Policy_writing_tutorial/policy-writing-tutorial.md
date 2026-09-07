@@ -21,6 +21,8 @@
 <a href="vars-rego.md">_vars.rego</a><br>
 <a href="policy-rego.md">policy.rego</a><br>
 <a href="testing-policies.md">Testing your policies</a><br>
+<a href="policy-lint.md">policy_lint — content-quality rules</a><br>
+<a href="branch-scope.md">branch_scope — stay inside your own resource</a><br>
 <a href="raising-pull-request.md">Raising a Pull Request</a><br>
 <a href="general-workflow.md">General work flow</a>
 
