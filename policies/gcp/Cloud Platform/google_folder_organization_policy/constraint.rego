@@ -9,7 +9,7 @@ conditions := [
      "remedies": ["Deny risky services using list_policy.deny.values (e.g., cloudresourcemanager.googleapis.com)."]},
     {
       "condition": "Deny risky services",
-      "attribute_path": ["list_policy",0,"deny",0,"values",0],
+      "attribute_path": ["list_policy",0,"deny",0,"values"],
       "values": ["cloudresourcemanager.googleapis.com"],
       "policy_type": "blacklist"
     }
@@ -44,5 +44,7 @@ conditions := [
 
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

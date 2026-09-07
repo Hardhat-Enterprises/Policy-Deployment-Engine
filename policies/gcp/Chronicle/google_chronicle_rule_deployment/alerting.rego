@@ -21,7 +21,9 @@ conditions := [
 ]
 
 # Message output when policy is evaluated
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
 
 # Detailed condition evaluation output
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := result.details

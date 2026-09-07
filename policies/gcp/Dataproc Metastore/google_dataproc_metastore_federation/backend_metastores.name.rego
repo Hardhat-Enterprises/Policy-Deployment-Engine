@@ -13,12 +13,17 @@ conditions := [
     {
       "condition": "Test version of Apache Hive metastore",
       "attribute_path": ["backend_metastores", 0, "name"],
-      "values": ["projects/acme-data-01/locations/australia-southeast1/services/test", "projects/acme-data-01/locations/australia-southeast2/services/test"],
-      "policy_type": "whitelist"
+      "values": [
+        "projects/*/locations/*/services/*",
+        [["acme-data-01"], ["australia-southeast1", "australia-southeast2"], ["test"]]
+      ],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]
 
   
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
