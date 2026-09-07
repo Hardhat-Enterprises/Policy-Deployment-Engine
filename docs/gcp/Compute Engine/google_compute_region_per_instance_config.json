@@ -75,7 +75,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": true,
-      "rationale": "Metadata can old sensitive information in plaintext thus policy is needed to prevent this from happening"
+      "rationale": "Metadata can hold sensitive information in plaintext thus a policy would be needed to enforce credential hygiene by blacklisting keywords that could disclose plaintext secrets"
     },
     "preserved_state.disk": {
       "type": "block",
@@ -120,7 +120,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This is operational control as it allows for the IP reservation to persist even after the instance of group is deleted which is apart the IP address life cycle making it not a security control"
+      "rationale": "Purpose is that it allows for the IP reservation to persist after the instance of the group is deleted which is a process that is apart of the IP address life cycle and cleanup settings, resulting in making it operational control not a security control"
     },
     "preserved_state.external_ip.interface_name": {
       "description": "The identifier for this object. Format specified above.",
@@ -138,8 +138,8 @@
       "description": "The URL of the reservation for this IP address.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Purpose is to use a keep the same externa IP address associated with the reservation too be reused, which can lead to network exposure as it is external thus needing a policy"
+      "security_impact": false,
+      "rationale": "Purpose is to keep the same external IP address associated with the reservation too for reuse, because it is a configuration pointer not an exposure control we do not have to pin the specfic IP addresses"
     },
     "preserved_state.internal_ip": {
       "type": "block",
