@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument controls Terraform resource lifecycle behaviour. PREVENT, DELETE and ABANDON determine whether Terraform may destroy the resource or remove it from state, but they do not directly control authentication, authorization, encryption, confidentiality, integrity, or resource exposure. Therefore, this argument is operational rather than security impacting."
+      "security_impact": true,
+      "rationale": "The deletion policy controls whether Terraform can destroy the multicast domain activation. Setting it to PREVENT blocks destructive deletion and helps protect the resource from accidental loss. DELETE permits the resource to be destroyed, while ABANDON removes it from Terraform management. Therefore, enforcing PREVENT provides protection against destructive resource loss."
     },
     "description": {
       "description": "An optional text description of the multicast domain activation.",
