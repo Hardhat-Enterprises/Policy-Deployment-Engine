@@ -3,6 +3,12 @@ package terraform.gcp.security.compute_engine.google_compute_region_ssl_certific
 import data.terraform.gcp.security.compute_engine.google_compute_region_ssl_certificate.vars
 import data.terraform.helpers
 
+# private_key must be absent because Terraform can never fully protect a
+# plaintext key defined inline. The secure alternative is private_key_wo, a
+# write-only argument whose value is never exposed in planned_values or
+# state, so no platform policy can inspect it — that invisibility is
+# intentional and is why private_key_wo is security_impact: false.
+
 conditions := [
   [
     {
