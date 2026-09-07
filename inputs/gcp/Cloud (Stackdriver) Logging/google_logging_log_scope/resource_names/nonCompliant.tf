@@ -9,5 +9,5 @@ resource "google_logging_log_scope" "non_compliant_example_1" {
     "projects/sandbox-project"   # Sandbox project
   ]
 
-  description = "Insecure scope with unauthorized projects"
+  description = "Security monitoring scope for production projects"
 }

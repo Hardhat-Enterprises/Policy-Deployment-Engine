@@ -1,6 +1,6 @@
-package terraform.gcp.security.BigQuery.google_bigquery_routine.remote_function_options_endpoint
+package terraform.gcp.security.bigquery.google_bigquery_routine.remote_function_options_endpoint
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_routine.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_routine.vars
 
 conditions := [
     [
@@ -15,5 +15,7 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
