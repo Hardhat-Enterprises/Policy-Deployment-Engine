@@ -9,6 +9,6 @@ resource "google_clouddeploy_delivery_pipeline_iam_binding" "non_compliant_examp
   role     = "roles/editor"
   
   members = [
-    "user:admin-user@example.com",
+    "user:deploy-user@example.com",
   ]
 }
