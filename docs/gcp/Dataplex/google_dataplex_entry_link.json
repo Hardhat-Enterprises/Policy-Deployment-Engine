@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The deletion policy controls how Terraform handles resource deletion. Setting it to \"PREVENT\" can help avoid accidental deletions, while \"ABANDON\" allows for resource management without deletion. The default \"DELETE\" allows for normal deletion behavior. This is because entry links are reccreatable, and do not hold any data, so they cam be safely destroyed."
     },
     "entry_group_id": {
       "description": "The id of the entry group this entry link is in.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the parent entry group the link is created in. Resource identifiers and references are not policy targets. There is no value that is more/less secure tan another."
     },
     "entry_link_id": {
       "description": "The id of the entry link to create.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the identifier for the entry link, and has no impact on how secure resources are their data is."
     },
     "entry_link_type": {
       "description": "Relative resource name of the Entry Link Type used to create this Entry Link. For example:\nprojects/dataplex-types/locations/global/entryLinkTypes/definition",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "the entry_link_type refernces the entry point of a resource. This does not pose a risk because resource are secured within terraform."
     },
     "location": {
       "description": "The location for the entry.",
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "The location argument determines where the resource is created. Policy should restrict it to only accept data from approved locations."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project argument is used as the identifier for a project that owns a resource, and do not determine which project a resource belongs to."
     },
     "aspects": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "The map keys of the Aspects which the service should modify.\nIt should be the aspect type reference in the format '{project_number}.{location_id}.{aspect_type_id}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "aspects.aspect_key is a reference aspect type resource, which are used as a template for aspects. The referenced resource itself is secured, rather than the aspects.aspect_key itself."
     },
     "aspects.aspect": {
       "type": "block",
@@ -65,8 +65,8 @@
       "description": "The content of the aspect in JSON form, according to its aspect type schema. The maximum size of the field is 120KB (encoded as UTF-8).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "aspects.aspect.data defines free-form JSON metadata, free form policies are not able to constrain this argument. "
     },
     "entry_references": {
       "type": "block",
@@ -77,22 +77,22 @@
       "description": "The relative resource name of the referenced Entry, of the form:\nprojects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}/entries/{entry_id}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The entry_reference.name is a reference to the Entry being linked. References are not restricted to other resources."
     },
     "entry_references.path": {
       "description": "The path in the Entry that is referenced in the Entry Link.\nEmpty path denotes that the Entry itself is referenced in the Entry Link.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "a sub-path pointer inside the referenced Entry, and is not a security control."
     },
     "entry_references.type": {
       "description": "The reference type of the Entry. Possible values: [\"SOURCE\", \"TARGET\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An enum that descibes the role of the reference, they are not insecure values, so there is nothing to constrain."
     }
   }
 }

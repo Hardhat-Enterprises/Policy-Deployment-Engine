@@ -1,5 +1,5 @@
 resource "google_privileged_access_manager_entitlement" "non_compliant_example_1" {
-  entitlement_id       = "non-compliant-example-1"
+  entitlement_id       = "compliant-example-1"
   location             = "global"
   max_request_duration = "3600s"
   parent               = "projects/my-project-name"
@@ -17,8 +17,8 @@ resource "google_privileged_access_manager_entitlement" "non_compliant_example_1
   privileged_access {
     gcp_iam_access {
       role_bindings {
-        role                 = "roles/owner"
-        condition_expression = "request.time < timestamp(\"2099-12-31T23:59:59.000Z\")"
+        role                 = "roles/storage.admin"
+        condition_expression = "request.time < timestamp(\"2024-12-31T23:59:59.000Z\")"
       }
       resource      = "//cloudresourcemanager.googleapis.com/projects/my-project-name"
       resource_type = "cloudresourcemanager.googleapis.com/Project"
@@ -27,12 +27,12 @@ resource "google_privileged_access_manager_entitlement" "non_compliant_example_1
 
   approval_workflow {
     manual_approvals {
-      require_approver_justification = false
+      require_approver_justification = true
       steps {
-        approvals_needed = 0
+        approvals_needed = 1
         approvers {
           principals = [
-            "user:same-user@example.com"
+            "group:approvers@example.com"
           ]
         }
       }

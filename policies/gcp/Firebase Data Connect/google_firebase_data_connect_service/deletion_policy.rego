@@ -18,6 +18,8 @@ conditions := [
     ]
 ]
    
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := result.message
+
+details := result.details

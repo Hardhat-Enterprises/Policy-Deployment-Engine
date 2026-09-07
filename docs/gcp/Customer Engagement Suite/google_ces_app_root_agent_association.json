@@ -6,22 +6,22 @@
       "description": "The ID or fully qualified resource name of the agent to associate as the\nroot agent of the app.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which agent will be associated as the root agent of the application. It only references an existing resource and does not control how the resource is secured or managed. Since it is a resource identifier rather than a configurable security setting, it is not suitable for a reusable security policy."
     },
     "app_id": {
       "description": "The ID of the App. Used to construct the app resource name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the application where the root agent association will be created. It is required for linking resources correctly, but it does not influence security controls, permissions, or compliance requirements. Therefore, it does not need to be enforced through a security policy."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether the resource can be deleted or removed from Terraform management. Setting an appropriate deletion policy helps prevent accidental deletion of important production resources and supports better operational governance. Because organisations often require protection against unintended resource removal, this field should be considered security relevant."
     },
     "location": {
       "description": "The location of the App.",
@@ -34,8 +34,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the Google Cloud project that owns the resource. Although it determines where the resource is deployed, it does not define or enforce a security control by itself. It is mainly used for resource organisation and identification, so it is not appropriate as a reusable security policy setting."
     }
   }
 }

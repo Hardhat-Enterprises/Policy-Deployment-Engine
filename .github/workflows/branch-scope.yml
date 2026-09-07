@@ -1,0 +1,60 @@
+name: Branch Scope
+
+# A Service/<platform>/<service_slug>/<resource_type> branch may only change the
+# files belonging to that one resource. Its committed terraform plans live inside
+# its own fixture dirs (<sha>.json), so they need no exception.
+#
+# Deliberately its own workflow with NO `paths:` filter, unlike
+# policy_check_PR.yaml. That workflow only runs when docs/, inputs/ or policies/
+# changed — so a branch whose *only* change is to scripts/ (the shared harness),
+# to .github/, or to a stray committed binary would never trigger it, and those
+# are exactly the changes this check exists to catch. Keeping it separate also
+# means the expensive terraform/OPA jobs are not dragged into running on PRs
+# that touch nothing they care about.
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: branch-scope-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  branch_scope:
+    name: Branch scope
+    runs-on: ubuntu-latest
+    # feature/ branches and dev are out of this check's remit; the script agrees
+    # (it exits 0 on a non-Service branch), but skipping the job keeps the PR
+    # check list honest about what was actually evaluated.
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'Service/')
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0                                   # need history for the merge-base
+          # Check out the branch tip itself, not the PR's synthetic merge commit,
+          # so the merge-base diff below is exactly the contributor's own changes.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      # Only the branch's own changes count: the diff is taken from the
+      # merge-base with the base branch, so merging dev in to catch up never
+      # registers as the contributor's edit.
+      - name: Check branch scope
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref || 'dev' }}
+        run: |
+          git fetch --quiet origin "$BASE_REF"
+          python3 scripts/linters/branch_scope.py \
+            --branch "${HEAD_REF:-$GITHUB_REF_NAME}" \
+            --base "origin/$BASE_REF"

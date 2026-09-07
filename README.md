@@ -13,8 +13,8 @@ Three trees mirror each other, keyed off the **docs taxonomy** (the linter enfor
 docs/<platform>/<Service>/<resource>.json        # SOURCE OF TRUTH: every argument of a
                                                   #   resource + its security assessment
 inputs/<platform>/<Service>/<resource>/<arg>/     # Terraform fixture per argument:
-                                                  #   compliant.tf, nonCompliant.tf, config.tf
-inputs/plan_cache/<platform>/<sha>.json           # committed terraform-plan JSON cache
+                                                  #   compliant.tf, nonCompliant.tf, config.tf,
+                                                  #   <sha>.json — its committed terraform plan
 policies/<platform>/<Service>/<resource>/<arg>.rego   # one Rego policy per argument
 policies/_helpers/                                # shared Rego helpers (+ _vars.rego per resource)
 
@@ -149,15 +149,32 @@ summary:
 ### How it works (and why it's fast)
 
 For each policy the runner produces a `terraform plan` of the fixture, converts it to JSON,
-and evaluates the policy with `opa`. Because the fixtures are static, the JSON plans are
-**committed** under `inputs/plan_cache/<platform>/<sha>.json` (the `<sha>` is a hash of the
-fixture's `*.tf` files + the provider version):
+and evaluates the policy with `opa`. Because the fixtures are static, each plan is
+**committed inside the fixture directory** as `<sha>.json`, beside the `*.tf` files it was
+planned from (the `<sha>` is a hash of those `*.tf` files + the provider version):
 
-- **Plan already cached** → it is fed straight to OPA and **Terraform is not run at all**.
+- **Plan already committed** → it is fed straight to OPA and **Terraform is not run at all**.
   A full run is ~40s and needs only `opa` installed.
 - **You changed a fixture's `.tf`** → its hash changes, so just that fixture re-runs
-  `terraform plan` and the new plan is written to the cache. **Commit the new/updated
-  `inputs/plan_cache/...json` alongside your fixture change.**
+  `terraform plan`, the new `<sha>.json` is written beside it, and the plan of the old
+  version is deleted in the same step. **Commit both** — the new file and the deletion —
+  alongside your fixture change. A fixture always has exactly one committed plan, and the
+  filename is what proves it belongs to the `*.tf` next to it: a plan that no longer matches
+  can't be mistaken for a valid one, because the harness would be looking for a different
+  name.
+
+The file is a plain `terraform show -json` document, so you can read it with `jq` like any
+other plan.
+
+`fixture_sha()` and `plan_cache_path()` in `scripts/auto_test/auto_test.py` are the only
+definition of which plan belongs to which fixture. The linters and the PDE Portal import them
+rather than re-deriving a path or a hash — which is why a provider bump, or the move out of
+`inputs/plan_cache/`, changes the answer everywhere at once. Import them; don't inline them.
+
+> Plans used to live in one shared `inputs/plan_cache/<platform>/<sha>.json` tree. A branch cut
+> before that move carries its own entries there through a merge of `dev`; the next `auto_test.py`
+> run moves them into the right fixture directories for you (`adopted N plan(s) from the pre-move
+> inputs/plan_cache/ layout`) rather than re-planning anything. Commit what it moved.
 
 ### Prerequisites
 
@@ -173,16 +190,10 @@ fixture's `*.tf` files + the provider version):
   `auto_test.py` runs this automatically if the cache is missing, so usually you don't need
   to call it yourself.
 
-> **Maintainers:** pruning orphaned plan-cache entries (left by changed/removed fixtures)
-> is a *local* operation — run a full-tree pass with `--prune-plan-cache` and commit the
-> result:
->
-> ```bash
-> python3 scripts/auto_test/auto_test.py gcp --prune-plan-cache
-> ```
->
-> It is a no-op on a scoped run (it can't tell which other resources' plans are orphaned),
-> and CI never prunes — the runner is ephemeral with nothing committed back.
+> **No pruning step.** A stale plan is a file in the fixture's own directory whose name is
+> not the fixture's current sha, so the harness deletes it as it writes the replacement — on
+> a single-resource run just as correctly as on a full pass. CI changes nothing back: the
+> runner is ephemeral, and everything it would write is already committed.
 
 ## 🛠 Tooling (`scripts/`)
 

@@ -6,71 +6,71 @@
       "description": "URL to the backup target pool. Must also set failover_ratio.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Just a link to a backup pool for failover. It's about keeping the service up, not security, and there's no set safe value to check, so nothing to enforce."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "ABANDON can leave the target pool active after Terraform stops managing it. This can leave old backend routing or access settings outside normal security updates. PREVENT can also stop accidental or malicious destruction of the target pool. Because this setting affects the control and availability of load-balancing infrastructure, it has a security impact."
     },
     "description": {
       "description": "Textual description field.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Just a free text description. It does not affect how the resource works or its security, so there is nothing to enforce."
     },
     "failover_ratio": {
       "description": "Ratio (0 to 1) of failed nodes before using the backup pool (which must also be set).",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Just a number that sets when to fail over to the backup pool. It is a performance and availability setting, not a security one."
     },
     "health_checks": {
       "description": "List of zero or one health check name or self_link. Only legacy google_compute_http_health_check is supported.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Attaches a health check to the pool. That is more about uptime and monitoring than security, so there is no security value to enforce here."
     },
     "instances": {
       "description": "List of instances in the pool. They can be given as URLs, or in the form of \"zone/name\". Note that the instances need not exist at the time of target pool creation, so there is no need to use the Terraform interpolators to create a dependency on the instances from the target pool.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The list of instances in the pool. It is normal setup for what is in the pool and there is no fixed secure value to check, so no policy needed."
     },
     "name": {
       "description": "A unique name for the resource, required by GCE. Changing this forces a new resource to be created.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The name is just an identifier for the resource, not something you enforce a security rule on. Hardcoding a naming pattern isn't what these policies are for, so this is false."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Project just says where the resource lives, it's not a security control on the resource itself. Locking it to specific projects would be overreaching, so this is false."
     },
     "region": {
       "description": "Where the target pool resides. Defaults to project region.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "Determines the region or zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency, the allowed set is parameterised, a hardcoded example whitelist is acceptable."
     },
     "session_affinity": {
       "description": "How to distribute load. Options are \"NONE\" (no affinity). \"CLIENT_IP\" (hash of the source/dest addresses / ports), and \"CLIENT_IP_PROTO\" also includes the protocol (default \"NONE\").",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how traffic is spread across instances (NONE, CLIENT_IP, CLIENT_IP_PROTO). That is a load-balancing choice, not really security, so I have left it false."
     }
   }
 }

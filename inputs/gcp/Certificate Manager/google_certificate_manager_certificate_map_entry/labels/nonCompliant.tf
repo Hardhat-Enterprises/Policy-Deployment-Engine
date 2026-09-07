@@ -1,14 +1,14 @@
 resource "google_certificate_manager_certificate_map_entry" "non_compliant_example_1" {
   project     = "sit764-policy-project"
   name        = "non_compliant_example_1"
-  description = "Non-compliant certificate map entry with non-approved environment label."
-  map         = "nc-map"
+  description = "Compliant certificate map entry with approved environment label."
+  map         = "c-map"
 
   certificates = [
-    "projects/sit764-policy-project/locations/global/certificates/nc-certificate"
+    "projects/sit764-policy-project/locations/global/certificates/c-certificate"
   ]
 
-  hostname = "unapproved.example.net"
+  hostname = "secure.example.com"
 
   labels = {
     environment = "development"
