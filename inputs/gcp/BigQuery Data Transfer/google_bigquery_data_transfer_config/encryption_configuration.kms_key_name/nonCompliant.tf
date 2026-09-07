@@ -10,8 +10,8 @@ resource "google_bigquery_data_transfer_config" "non_compliant_example_1" {
    encryption_configuration {kms_key_name = ""}
 
   params = {
-    query                            = "SELECT 'insecure';"
-    destination_table_name_template  = "bad_table_$${run_time}"
-    write_disposition                = "WRITE_APPEND"
+    query                           = "SELECT CURRENT_DATE()"
+    destination_table_name_template = "my_table_$${run_time}"
+    write_disposition               = "WRITE_TRUNCATE"
   }
 }

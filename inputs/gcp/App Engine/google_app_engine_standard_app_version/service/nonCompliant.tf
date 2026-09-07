@@ -1,8 +1,8 @@
 resource "google_app_engine_standard_app_version" "non_compliant_example_1" {
-  project = "gcp-project-12345"
+  project    = "appeng-flex"
   version_id = "v1"
   service    = "unauthorized-app-name"
-  runtime    = "nodejs10"
+  runtime    = "nodejs20"
 
   entrypoint {
     shell = "node ./app.js"
@@ -10,9 +10,9 @@ resource "google_app_engine_standard_app_version" "non_compliant_example_1" {
 
   deployment {
     zip {
-      source_url = "https://storage.googleapis.com/appengine-static-content/hello-world.zip"
+      source_url = "https://storage.googleapis.com/hardhat-standard-static-content/hello-world.zip"
     }
   }
 
-  service_account = "google_service_account.custom_service_account.email"
+  service_account = "my-account-c@appeng-flex.iam.gserviceaccount.com"
 }
