@@ -6,16 +6,16 @@ import data.terraform.gcp.security.compute_engine.google_compute_router_nat_addr
 conditions := [
     [
         {
-            "situation_description": "Router NAT Address does not prevent destructive deletion",
+            "situation_description": "Router NAT Address may be abandoned and left outside Terraform management",
             "remedies": [
-                "Set deletion_policy to PREVENT"
+                "Do not set deletion_policy to ABANDON"
             ]
         },
         {
-            "condition": "Deletion policy must prevent resource destruction",
+            "condition": "Deletion policy must not abandon the NAT address from Terraform management",
             "attribute_path": ["deletion_policy"],
-            "values": ["PREVENT"],
-            "policy_type": "whitelist"
+            "values": ["ABANDON"],
+            "policy_type": "blacklist"
         }
     ]
 ]
