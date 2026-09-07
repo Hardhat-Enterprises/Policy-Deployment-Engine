@@ -20,8 +20,8 @@
       "description": "The full name of the Google Compute Engine network to which the\ninstance is connected. If left unspecified, the default network\nwill be used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the VPC network to which the Redis instance is connected. Policy can prevent use of the default network and require an explicitly configured network."
+      "security_impact": false,
+      "rationale": "References a VPC network used by the Redis instance. The network name or ID is an external resource reference, so it is out of scope for policy enforcement and should not be constrained here."
     },
     "connect_mode": {
       "description": "The connection mode of the Redis instance. Default value: \"DIRECT_PEERING\" Possible values: [\"DIRECT_PEERING\", \"PRIVATE_SERVICE_ACCESS\"]",
@@ -69,8 +69,8 @@
       "description": "The zone where the instance will be provisioned. If not provided,\nthe service will choose a zone for the instance. For STANDARD_HA tier,\ninstances will be created across two zones for protection against\nzonal failures. If [alternativeLocationId] is also provided, it must\nbe different from [locationId].",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the zone in which the instance is provisioned. This primarily affects placement and availability rather than security policy."
+      "security_impact": true,
+      "rationale": "Controls the deployment location of the Redis instance. This is security-relevant because approved regions may be required for data residency and organisational deployment requirements, so the value should be restricted to approved locations."
     },
     "maintenance_version": {
       "description": "The self service update maintenance version.",
@@ -112,14 +112,14 @@
       "required": false,
       "type": "map(string)",
       "security_impact": true,
-      "rationale": "Controls Redis configuration parameters, some of which can change security-relevant behaviour. Policy can restrict insecure Redis configuration values."
+      "rationale": "Controls Redis configuration parameters that can affect the security posture of the instance. Policies can restrict insecure settings, such as configuration that enables dangerous commands or weakens authentication or transport-related protections."
     },
     "redis_version": {
       "description": "The version of Redis software. If not provided, latest supported\nversion will be used. Please check the API documentation linked\nat the top for the latest valid values.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the Redis software version. Policy can restrict deployments to approved supported versions to reduce exposure to vulnerabilities in outdated versions."
+      "security_impact": false,
+      "rationale": "Selects the Redis software engine version. Supported versions are managed by the cloud provider, and version selection is treated as an operational or team choice unless a specific documented-insecure version must be prohibited."
     },
     "region": {
       "description": "The name of the Redis region of the instance.",
