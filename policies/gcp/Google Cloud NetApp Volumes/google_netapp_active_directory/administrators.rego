@@ -15,7 +15,7 @@ conditions := [
       "condition": "administrators must not contain broad or wildcard principals.",
       "attribute_path": ["administrators"],
       "values": ["*", "everyone", "all", "domain users"],
-      "policy_type": "blacklist"
+      "policy_type": "element blacklist"
     }
   ]
 ]

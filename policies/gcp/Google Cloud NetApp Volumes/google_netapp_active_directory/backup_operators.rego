@@ -15,7 +15,7 @@ conditions := [
       "condition": "backup_operators must not contain broad or wildcard principals.",
       "attribute_path": ["backup_operators"],
       "values": ["*", "everyone", "all", "domain users"],
-      "policy_type": "blacklist"
+      "policy_type": "element blacklist"
     }
   ]
 ]
