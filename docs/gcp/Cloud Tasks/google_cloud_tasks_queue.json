@@ -116,7 +116,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the service account identity used to generate OAuth access tokens. Restricting this value to approved service accounts helps prevent tasks from operating under unintended identities or privileges."
+      "rationale": "Controls which service account is used to generate the OAuth token for Cloud Tasks requests. Using a non-default, intentionally selected service account supports least-privilege access and reduces the risk of tasks running with broader permissions than necessary, so this argument has a direct security impact."
     },
     "http_target.oidc_token": {
       "type": "block",
@@ -135,7 +135,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the service account identity represented by generated OIDC tokens. Restricting this value to approved identities supports least privilege and controlled workload authentication."
+      "rationale": "Controls which service account is used to generate the OIDC token for Cloud Tasks requests. Using a non-default, intentionally selected service account supports least-privilege access and reduces the risk of tasks running with broader permissions than necessary, so this argument has a direct security impact."
     },
     "http_target.uri_override": {
       "type": "block",
@@ -146,8 +146,8 @@
       "description": "Host override.\n\nWhen specified, replaces the host part of the task URL.\nFor example, if the task URL is \"https://www.google.com\", and host value\nis set to \"example.net\", the overridden URI will be changed to \"https://example.net\".\nHost value cannot be an empty string (INVALID_ARGUMENT).",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Replaces the host component of the execution URI for tasks in the queue. Restricting host overrides to approved destinations can prevent task traffic from being redirected to unintended or untrusted endpoints."
+      "security_impact": false,
+      "rationale": "This argument specifies an application-specific destination host for tasks in the queue. Although destination selection can affect where requests are sent, enforcing particular host values would require project-specific endpoint allowlists or routing rules. These are managed by individual application teams rather than a reusable, multi-tenant platform security baseline, so this argument is not classified as having a direct security impact."
     },
     "http_target.uri_override.port": {
       "description": "Port override.\n\nWhen specified, replaces the port part of the task URI.\nFor instance, for a URI http://www.google.com/foo and port=123, the overridden URI becomes http://www.google.com:123/foo.\nNote that the port value must be a positive integer.\nSetting the port to 0 (Zero) clears the URI port.",
