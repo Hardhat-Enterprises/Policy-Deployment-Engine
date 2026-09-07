@@ -6,80 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "org": {
-      "description": "Name of the Apigee organization.",
-      "required": true,
-      "type": "string",
-      "security_impact": false,
-      "rationale": "It describes the name of organization and does not have any security impact."
-    },
-    "addons_config": {
-      "type": "block",
-      "description": "Addon configurations of the Apigee organization.",
-      "required": false
-    },
-    "addons_config.advanced_api_ops_config": {
-      "type": "block",
-      "description": "Configuration for the Advanced API Ops add-on.",
-      "required": false
+      "security_impact": true,
+      "rationale": "This argument controls whether Terraform can destroy the addons configuration resource. The default value of DELETE allows unrestricted destructive operations. Destroying this resource would disable all enabled add-ons across the organization, potentially removing security features like abuse detection and anomaly detection in one action. A generic platform policy can require this to be set to PREVENT, blocking accidental or unauthorized deletion at the platform level without requiring team-specific values."
     },
     "addons_config.advanced_api_ops_config.enabled": {
       "description": "Flag that specifies whether the Advanced API Ops add-on is enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "addons_config.api_security_config": {
-      "type": "block",
-      "description": "Configuration for the API Security add-on.",
-      "required": false
+      "security_impact": true,
+      "rationale": "This toggles Advanced API Operations, which provides anomaly detection using ML models to identify unusual API traffic patterns such as spikes in latency or error rate, advanced alerting (anomaly alerts, TLS expiry alerts), and enhanced security reporting. Per GCP documentation, AAPI Ops automatically detects unusual patterns in API traffic that could indicate threats or performance issues. A generic platform policy can require this to be true to ensure all organizations have automated anomaly detection and advanced security alerting active. No team-specific values are needed."
     },
     "addons_config.api_security_config.enabled": {
-      "description": "Flag that specifies whether the API security add-on is enabled.",
+      "description": "Flag that specifies whether the Advanced API Security add-on is enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "addons_config.connectors_platform_config": {
-      "type": "block",
-      "description": "Configuration for the Monetization add-on.",
-      "required": false
+      "security_impact": true,
+      "rationale": "This toggles Advanced API Security, which provides abuse detection using ML to detect API scraping, bot attacks, and anomalous traffic, risk assessment and security scoring of API proxies, security profiles, and security actions for automatic blocking or flagging of suspicious traffic. Per GCP documentation, Advanced API Security uses machine learning models to detect patterns that are a sign of malicious activity. A generic platform policy can require this to be true to ensure all organizations have runtime API threat detection active. No team-specific values are needed."
     },
     "addons_config.connectors_platform_config.enabled": {
       "description": "Flag that specifies whether the Connectors Platform add-on is enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "addons_config.integration_config": {
-      "type": "block",
-      "description": "Configuration for the Integration add-on.",
-      "required": false
+      "security_impact": false,
+      "rationale": "This toggles the Connectors Platform add-on, which enables integration with external systems such as Salesforce and SAP. This is a functional integration capability that determines what external systems Apigee can connect to. Enabling or disabling it does not change the security posture of the organization's APIs. The choice depends entirely on team-specific integration requirements."
     },
     "addons_config.integration_config.enabled": {
       "description": "Flag that specifies whether the Integration add-on is enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "addons_config.monetization_config": {
-      "type": "block",
-      "description": "Configuration for the Monetization add-on.",
-      "required": false
+      "security_impact": false,
+      "rationale": "This toggles Application Integration, which enables building integration flows within Apigee for workflow orchestration. This is a functional capability with no effect on the security posture of the organization's APIs. The choice to enable it depends entirely on team-specific workflow requirements."
     },
     "addons_config.monetization_config.enabled": {
       "description": "Flag that specifies whether the Monetization add-on is enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This toggles API Monetization, which enables rate plans, billing, and revenue tracking for APIs. This is a business and billing feature with no effect on security posture. The choice to enable it depends entirely on whether the team needs to monetize their APIs."
     }
   }
 }
