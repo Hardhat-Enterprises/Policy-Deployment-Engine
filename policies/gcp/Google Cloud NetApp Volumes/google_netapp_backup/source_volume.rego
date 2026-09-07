@@ -1,35 +1,60 @@
 package terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_backup.source_volume
 
-import data.terraform.helpers
 import data.terraform.gcp.security.google_cloud_netapp_volumes.google_netapp_backup.vars
+import data.terraform.helpers.shared
 
-# policy_lint reports hard-coded-value on the value below, and the finding stands.
-# A pattern whitelist only judges values that MATCH its target: one that does not
-# match the shape is never flagged at all. This argument's non-compliant example
-# is the empty string, so converting would make the fixture pass for the wrong
-# reason. Either _helpers needs a pattern whitelist that fails a non-matching
-# value, or the fixture needs a wrongly-scoped (not malformed) example.
-conditions := [
-  [
-    {
-      "situation_description": "Backups must reference an approved volume in the Deakin project and AU regions",
-      "remedies": [
-        "Set source_volume to one of the approved full IDs below."
-      ]
-    },
-    {
-      "condition": "source_volume equals an approved volume ID",
-      "attribute_path": ["source_volume"],
-      "values": [
-        "projects/deakin-lab-123/locations/australia-southeast1/volumes/backup-volume",
-        "projects/deakin-lab-123/locations/australia-southeast2/volumes/backup-volume"
-      ],
-      "policy_type": "whitelist"
-    }
-  ]
+# The project and volume name are deployment-specific.
+# This policy validates that source_volume uses the expected Google Cloud
+# NetApp volume resource path and an approved Australian region.
+conditions := []
+
+source_volume_path := ["source_volume"]
+
+resources := [
+    resource |
+    resource := input.planned_values.root_module.resources[_]
+    resource.type == vars.variables.resource_type
 ]
 
-result := helpers.get_multi_summary(conditions, vars.variables)
+non_compliant_resource(resource) if {
+    source_volume := shared.get_attribute_value(resource, source_volume_path)
+    not is_string(source_volume)
+}
 
-message := result.message
-details := result.details
+non_compliant_resource(resource) if {
+    source_volume := shared.get_attribute_value(resource, source_volume_path)
+    is_string(source_volume)
+    not regex.match("^projects/[^/]+/locations/australia-southeast[12]/volumes/[^/]+$", source_volume)
+}
+
+non_compliant_resources := [
+    resource |
+    resource := resources[_]
+    non_compliant_resource(resource)
+]
+
+non_compliant_names := [
+    shared.get_resource_attribute(resource, vars.variables.resource_value_name) |
+    resource := non_compliant_resources[_]
+]
+
+non_compliant_display := concat(", ", non_compliant_names) if {
+    count(non_compliant_names) > 0
+}
+
+non_compliant_display := "None - All passed" if {
+    count(non_compliant_names) == 0
+}
+
+message := [
+    sprintf("Total %s detected: %d ", [vars.variables.friendly_resource_name, count(resources)]),
+    "Situation 1: Backup source volumes must reference a valid Google Cloud NetApp volume in an approved Australian region.",
+    sprintf("Non-Compliant Resources: %s", [non_compliant_display]),
+    "Potential Remedies: Set source_volume to a valid NetApp volume resource path in australia-southeast1 or australia-southeast2."
+]
+
+details := [{
+    "situation": "Backup source volumes must reference a valid Google Cloud NetApp volume in an approved Australian region.",
+    "remedies": ["Set source_volume to a valid NetApp volume resource path in australia-southeast1 or australia-southeast2."],
+    "non_compliant_resources": non_compliant_names
+}]
