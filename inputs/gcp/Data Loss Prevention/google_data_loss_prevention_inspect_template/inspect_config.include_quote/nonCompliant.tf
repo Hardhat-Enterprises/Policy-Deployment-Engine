@@ -1,6 +1,6 @@
 resource "google_data_loss_prevention_inspect_template" "non_compliant_example_1" {
   parent       = "projects/my-project-name"
-  description  = "Non-compliant example"
+  description  = "Example"
   display_name = "non_compliant_example_1"
 
   inspect_config {
