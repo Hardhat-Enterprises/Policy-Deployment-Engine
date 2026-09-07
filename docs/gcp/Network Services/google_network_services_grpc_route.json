@@ -7,7 +7,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument controls Terraform resource lifecycle behaviour. PREVENT, DELETE and ABANDON determine whether Terraform can destroy the resource or remove it from state, but they do not directly affect authentication, authorization, encryption, confidentiality, integrity, or exposure of the GRPC route. Therefore, this argument is operational rather than security impacting."
+      "rationale": "This argument controls Terraform resource lifecycle behaviour. DELETE, ABANDON and PREVENT determine how Terraform manages destruction or removal from state, but they do not directly affect authentication, authorization, encryption, confidentiality, integrity, or exposure. Therefore, this argument is operational rather than security impacting."
     },
     "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
@@ -41,8 +41,8 @@
       "description": "Location (region) of the GRPCRoute resource to be created. Only the value 'global' is currently allowed; defaults to 'global' if omitted.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "security_impact": false,
+      "rationale": "The Terraform provider restricts this argument to the literal value global. Other locations fail provider validation before a plan can be created, so there is no configurable security choice for a policy to enforce. Therefore, this argument does not require a separate security policy."
     },
     "meshes": {
       "description": "List of meshes this GrpcRoute is attached to, as one of the routing rules to route the requests served by the mesh.",
