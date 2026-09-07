@@ -6,16 +6,16 @@ import data.terraform.gcp.security.compute_engine.google_compute_target_http_pro
 conditions := [
     [
         {
-            "situation_description": "Target HTTP Proxy uses the ABANDON deletion policy",
+            "situation_description": "Target HTTP Proxy uses an unapproved deletion policy",
             "remedies": [
                 "Set deletion_policy to DELETE or PREVENT"
             ]
         },
         {
-            "condition": "Deletion policy must not abandon the resource",
+            "condition": "Deletion policy must use an approved value",
             "attribute_path": ["deletion_policy"],
-            "values": ["ABANDON"],
-            "policy_type": "blacklist"
+            "values": ["DELETE", "PREVENT"],
+            "policy_type": "whitelist"
         }
     ]
 ]
