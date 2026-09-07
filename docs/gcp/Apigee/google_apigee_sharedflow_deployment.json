@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This is a Terraform-level lifecycle meta-argument that controls whether 'terraform destroy' can undeploy the sharedflow. It affects operational workflow safety (preventing accidental undeployment), not the security configuration of the deployment itself. The choice between DELETE, PREVENT, and ABANDON is an infrastructure management concern, not a security posture decision."
+      "security_impact": true,
+      "rationale": "This argument controls whether Terraform can destroy the resource. The default value of DELETE allows unrestricted destructive operations. A generic platform policy can require this to be set to PREVENT, blocking accidental or unauthorized deletion of the sharedflow deployment via terraform destroy or terraform apply. This enforces a deletion-blocking safeguard across all teams without requiring team-specific values, preventing destructive loss of cloud resources at the platform level."
     },
     "environment": {
       "description": "The resource ID of the environment.",
