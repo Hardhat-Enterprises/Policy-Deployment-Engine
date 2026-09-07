@@ -1,6 +1,6 @@
-package terraform.gcp.security.BigQuery.google_bigquery_row_access_policy.grantees
+package terraform.gcp.security.bigquery.google_bigquery_row_access_policy.grantees
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_row_access_policy.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_row_access_policy.vars
 
 conditions := [
     [
