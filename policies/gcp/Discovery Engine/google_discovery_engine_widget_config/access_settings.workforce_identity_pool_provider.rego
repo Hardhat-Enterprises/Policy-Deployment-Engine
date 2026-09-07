@@ -6,16 +6,23 @@ import data.terraform.gcp.security.discovery_engine.google_discovery_engine_widg
 conditions := [
     [
         {
-            "situation_description": "Widget config does not specify a workforce identity pool provider, leaving widget authentication uncontrolled",
+            "situation_description": "Widget config workforce identity pool provider does not follow the required structural path format",
             "remedies": [
                 "Set access_settings.workforce_identity_pool_provider to a valid provider path following the format: locations/{location}/workforcePools/{pool}/providers/{provider}"
             ]
         },
         {
-            "condition": "workforce_identity_pool_provider must not be empty or null",
+            "condition": "workforce_identity_pool_provider must follow the approved structural pattern",
             "attribute_path": ["access_settings", 0, "workforce_identity_pool_provider"],
-            "values": [null, ""],
-            "policy_type": "blacklist"
+            "values": [
+                "locations/*/workforcePools/*/providers/*",
+                [
+                    ["global", "us", "eu"],
+                    ["approved-pool"],
+                    ["approved-provider"]
+                ]
+            ],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
