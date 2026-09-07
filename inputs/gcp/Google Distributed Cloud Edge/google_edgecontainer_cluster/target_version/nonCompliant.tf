@@ -3,22 +3,19 @@ resource "google_edgecontainer_cluster" "non_compliant_example_1" {
   location = "australia-southeast1" #Required
 
   networking {
-    #overly permissive CIDR ranges
-    cluster_ipv4_cidr_blocks  = ["0.0.0.0/0"]
-    services_ipv4_cidr_blocks = ["0.0.0.0/0"]
+    cluster_ipv4_cidr_blocks  = ["10.0.0.0/16"]
+    services_ipv4_cidr_blocks = ["10.1.0.0/16"]
   } #Required
  
   authorization {
-    #invalid/unapproved admin email
     admin_users {
-      username = "invalid@example.com"
-    } #Required
+      username = "hpandya368@gmail.com"
+    }
   }
 
   fleet {
-    #hardcoded project number instead of dynamic lookup
-    project = "projects/1234567890"
-  } #Required
+   project = "projects/gdce-dev"
+} #Required
 
   #outdated version
   target_version = "1.0.0" #Policy to be tested 

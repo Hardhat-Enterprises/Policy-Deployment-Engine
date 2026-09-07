@@ -6,7 +6,7 @@ data "google_iam_policy" "nc" {
 }
 
 resource "google_spanner_database_iam_policy" "non_compliant_example_1" {
-  instance    = "nc"
+  instance    = "c"
   database    = "non_compliant_example_1"
   policy_data = data.google_iam_policy.nc.policy_data
 }

@@ -1,7 +1,7 @@
 resource "google_certificate_manager_dns_authorization" "non_compliant_example_1" {
   name        = "non_compliant_example_1"
   project     = "sit764-policy-project"
-  description = "Non-compliant DNS authorization using a non-approved domain"
+  description = "Compliant DNS authorization using an approved domain"
   domain      = "unapproved-example.net"
   type        = "PER_PROJECT_RECORD"
 
