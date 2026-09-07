@@ -3,7 +3,7 @@
 resource "google_cloudbuildv2_repository" "non_compliant_example_1" {
   project           = "non_compliant_example_1"
   location          = "australia-southeast2"
-  name              = "my-repository"
+  name              = "non_compliant_example_1"
   parent_connection = "my-connection"
   remote_uri        = "https://github.com/approved-org/secure-repo.git"
 
@@ -17,7 +17,7 @@ resource "google_cloudbuildv2_repository" "non_compliant_example_1" {
 resource "google_cloudbuildv2_repository" "non_compliant_example_2" {
   project           = "non_compliant_example_2"
   location          = "australia-southeast2"
-  name              = "my-repository"
+  name              = "non_compliant_example_2"
   parent_connection = "my-connection"
   remote_uri        = "https://github.com/approved-org/secure-repo.git"
 
