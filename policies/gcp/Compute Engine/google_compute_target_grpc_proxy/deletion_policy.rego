@@ -6,16 +6,16 @@ import data.terraform.gcp.security.compute_engine.google_compute_target_grpc_pro
 conditions := [
     [
         {
-            "situation_description": "Target gRPC Proxy does not prevent destructive deletion",
+            "situation_description": "Target gRPC Proxy may be abandoned and left outside Terraform management",
             "remedies": [
-                "Set deletion_policy to PREVENT"
+                "Do not set deletion_policy to ABANDON"
             ]
         },
         {
-            "condition": "Deletion policy must prevent resource destruction",
+            "condition": "Deletion policy must not abandon the target gRPC proxy from Terraform management",
             "attribute_path": ["deletion_policy"],
-            "values": ["PREVENT"],
-            "policy_type": "whitelist"
+            "values": ["ABANDON"],
+            "policy_type": "blacklist"
         }
     ]
 ]
