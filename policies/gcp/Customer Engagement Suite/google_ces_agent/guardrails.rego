@@ -15,7 +15,7 @@ conditions := [
             "condition": "Guardrails must not use unapproved guardrail resources.",
             "attribute_path": ["guardrails"],
             "values": [
-                "unapproved-guardrail"
+                "*"
             ],
             "policy_type": "element blacklist"
         }
