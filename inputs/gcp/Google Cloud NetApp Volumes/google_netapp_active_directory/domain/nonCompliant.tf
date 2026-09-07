@@ -3,7 +3,7 @@ resource "google_netapp_active_directory" "non_compliant_example_1" {
   name = "non_compliant_example_1"
   location = "us-central1"
   domain = ""
-  dns = ""
+  dns = "172.30.64.3"
   net_bios_prefix = "smbserver"
   username = "user"
   password = "pass"
