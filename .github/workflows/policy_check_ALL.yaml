@@ -78,21 +78,21 @@ jobs:
           if-no-files-found: warn
 
       # Best-effort provider mirror. The ALL run is designed to execute OFFLINE from
-      # the committed plan cache (inputs/plan_cache): when every plan is cached,
-      # auto_test skips terraform entirely and this mirror is never touched. So a
-      # registry hiccup here must NOT fail the job — auto_test still lazily builds the
-      # cache itself (ensure_cache_ready) if a fixture ever misses. Don't add `set -e`
-      # semantics: the `|| echo` keeps the step green when the registry is unreachable.
-      - name: Set up provider cache (best-effort; plan cache is the offline source)
+      # the committed plans (one <sha>.json per fixture dir): when every plan is
+      # present, auto_test skips terraform entirely and this mirror is never touched.
+      # So a registry hiccup here must NOT fail the job — auto_test still lazily builds
+      # the cache itself (ensure_cache_ready) if a fixture ever misses. Don't add
+      # `set -e` semantics: the `|| echo` keeps the step green when the registry is
+      # unreachable.
+      - name: Set up provider cache (best-effort; committed plans are the offline source)
         run: |
           bash scripts/auto_test/cache_setup.sh \
-            || echo "⚠️  provider mirror unavailable — relying on the committed plan cache"
+            || echo "⚠️  provider mirror unavailable — relying on the committed plans"
 
-      # NOTE: plan-cache pruning is intentionally NOT done here. The runner is
-      # ephemeral and this workflow has no commit/push step, so any prune would be
-      # discarded. Pruning is a local-maintainer operation:
-      #   python3 scripts/auto_test/auto_test.py --inputs inputs/gcp \
-      #       --policies policies/gcp --prune-plan-cache   # then commit the result
+      # NOTE: a stale plan is pruned by the harness itself, in the fixture dir it
+      # belongs to, as the replacement is written — there is no repo-wide prune step to
+      # run here. Nothing this runner writes is committed back anyway: it is ephemeral
+      # and this workflow has no commit/push step.
       # Only gcp carries fixtures/policies today (inputs/aws and inputs/azure are
       # empty), so a single gcp run already spans every provider the ALL run scans
       # and can write policy_results.json directly. When aws/azure gain fixtures,
