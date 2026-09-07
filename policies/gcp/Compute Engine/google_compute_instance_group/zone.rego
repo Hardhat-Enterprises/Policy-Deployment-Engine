@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "Zone must be within the approved region whitelist.",
             "attribute_path": ["zone"],
-            "values": ["australia-southeast1",],
+            "values": ["australia-southeast1-a", "australia-southeast1-b", "australia-southeast1-c"],
             "policy_type": "whitelist"
         }
     ]

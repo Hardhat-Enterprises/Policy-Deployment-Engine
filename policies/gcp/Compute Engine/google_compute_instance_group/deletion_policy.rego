@@ -11,8 +11,8 @@ conditions := [
         },
         {
             "condition": "A message about what the condition does",
-            "attribute_path" : [deletion_policy], 
-            "values" : [PREVENT], 
+            "attribute_path" : ["deletion_policy"], 
+            "values" : ["PREVENT"], 
             "policy_type" : "whitelist" 
         }
     ]
