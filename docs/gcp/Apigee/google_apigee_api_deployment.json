@@ -6,15 +6,15 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This is a Terraform-level lifecycle meta-argument that controls whether 'terraform destroy' can undeploy the API proxy. It affects operational workflow safety (preventing accidental undeployment), not the security configuration of the deployment itself. The choice between DELETE, PREVENT, and ABANDON is an infrastructure management concern, not a security posture decision."
+      "security_impact": true,
+      "rationale": "This argument controls whether Terraform can destroy the resource. The default value of DELETE allows unrestricted destructive operations. A generic platform policy can require this to be set to PREVENT, blocking accidental or unauthorized deletion of the API deployment via terraform destroy or terraform apply. This enforces a deletion-blocking safeguard across all teams without requiring team-specific values, preventing destructive loss of cloud resources at the platform level."
     },
     "environment": {
       "description": "The Apigee Environment associated with the Apigee API deployment.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "This specifies which Apigee environment the API proxy is deployed to (e.g. test, staging, prod). Environment names are arbitrary, team-specific strings with no platform-enforced security distinction between them. A generic policy cannot constrain this without hardcoding team-specific environment names. The security configuration of the environment itself is governed by the google_apigee_environment resource, not by what is deployed into it."
+      "rationale": "This specifies which Apigee environment the API proxy is deployed to. Environment names are arbitrary, team-specific strings with no platform-enforced security distinction between them. A generic policy cannot constrain this without hardcoding team-specific environment names. The security configuration of the environment itself is governed by the google_apigee_environment resource, not by what is deployed into it."
     },
     "org_id": {
       "description": "The Apigee Organization associated with the Apigee API deployment.",
