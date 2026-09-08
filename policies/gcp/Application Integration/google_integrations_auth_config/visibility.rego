@@ -22,7 +22,9 @@ conditions := [
 ]
 
 # Summary message of policy compliance
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
 
 # Detailed compliance summary for debugging
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := result.details

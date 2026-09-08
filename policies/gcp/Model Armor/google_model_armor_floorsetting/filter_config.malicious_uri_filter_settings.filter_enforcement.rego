@@ -1,7 +1,7 @@
-package terraform.gcp.security.model_Armor.google_model_armor_floorsetting.filter_config_malicious_uri_filter_settings_filter_enforcement
+package terraform.gcp.security.model_armor.google_model_armor_floorsetting.filter_config_malicious_uri_filter_settings_filter_enforcement
 
 import data.terraform.helpers
-import data.terraform.gcp.security.model_Armor.google_model_armor_floorsetting.vars
+import data.terraform.gcp.security.model_armor.google_model_armor_floorsetting.vars
 
 
 conditions := [
@@ -12,7 +12,7 @@ conditions := [
     },
     {
       "condition": "filter_config must not be completely empty",
-      "attribute_path": ["filter_config",0],
+      "attribute_path": ["filter_config"],
       "values": [
         {"malicious_uri_filter_settings":[],"pi_and_jailbreak_filter_settings":[],"rai_settings":[],"sdp_settings":[]}
       ],
@@ -33,5 +33,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
