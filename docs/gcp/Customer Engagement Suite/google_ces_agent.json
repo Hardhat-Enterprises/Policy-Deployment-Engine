@@ -102,8 +102,8 @@
       "description": "The python code to execute for the callback.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Contains free-form execuitable Python code which is executed after the agent runs. A generic platform policy cannot reliably inspect or validate arbitrary Python scripts, so this field is not suitable for infrastructure policy enforcement. Security review of the code should be handled through application development and code review processes rather than platform policy."
+      "security_impact": true,
+      "rationale": "Executable Python code that runs during the agent lifecycle. A content-security policy statically analyses it (e.g. with Bandit) and enforces a severity threshold on findings (command injection, unsafe subprocess, weak hashing, hardcoded secrets) — a plain Rego value check cannot assess the code's security."
     },
     "after_model_callbacks": {
       "type": "block",
