@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 6 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist
+- Support for 7 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Content Security
 - AND logic for multi-condition situations
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -29,6 +29,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [4. Pattern Blacklist](#4-pattern-blacklist)
   - [5. Pattern Whitelist](#5-pattern-whitelist)
   - [6. Element Blacklist](#6-element-blacklist)
+  - [7. Content Security](#7-content-security)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (AND Logic)](#multi-condition-example-and-logic)
@@ -87,7 +88,8 @@ policies/_helpers/
     ├── range.rego
     ├── pattern_blacklist.rego
     ├── pattern_whitelist.rego
-    └── element_blacklist.rego
+    ├── element_blacklist.rego
+    └── content_security.rego
 ```
 
 ### Component Responsibilities
@@ -250,6 +252,24 @@ get_violations(tf_variables, attribute_path, values) = results
   "policy_type": "Element Blacklist",
   "attribute_path": ["status", 0, "restricted_services"],
   "values": ["*", "0.0.0.0"]
+}
+```
+
+### 7. Content Security
+**Module:** `policies/content_security.rego`
+**Use Case:** Flag resources whose embedded content (e.g. Python code) has static-analysis findings at/above a severity threshold.
+
+**Logic:**
+- Reads pre-computed findings from `input.content_security_findings` (produced by `scripts/content_analysis/`).
+- Matches findings to resources by `resource_type` + `resource_name`.
+- Any finding whose `severity` is at/above a threshold in `values` = violation.
+
+**Example:**
+```json
+{
+  "policy_type": "content security",
+  "attribute_path": ["after_agent_callbacks", 0, "python_code"],
+  "values": ["MEDIUM"]
 }
 ```
 

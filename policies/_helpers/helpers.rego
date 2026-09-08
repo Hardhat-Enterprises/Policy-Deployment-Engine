@@ -19,6 +19,7 @@ import data.terraform.helpers.policies.range
 import data.terraform.helpers.policies.pattern_blacklist
 import data.terraform.helpers.policies.pattern_whitelist
 import data.terraform.helpers.policies.element_blacklist
+import data.terraform.helpers.policies.content_security
 
 ################################################################################
 # Public API
@@ -178,11 +179,15 @@ select_policy_logic(tf_variables, attribute_path, values_formatted, "element bla
     results := element_blacklist.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
+select_policy_logic(tf_variables, attribute_path, values_formatted, "content security") = results if {
+    results := content_security.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
 # Fallback for unknown policy types
 select_policy_logic(_, _, _, policy_type) = results if {
-    not policy_type in ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist", "element blacklist"]
+    not policy_type in ["blacklist", "whitelist", "range", "pattern blacklist", "pattern whitelist", "element blacklist", "content security"]
     results := {
-        {"error": sprintf("Unknown policy type: '%s'. Valid types: blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist", [policy_type])}
+        {"error": sprintf("Unknown policy type: '%s'. Valid types: blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, content security", [policy_type])}
     }
 }
 
