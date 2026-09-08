@@ -1,10 +1,10 @@
 resource "google_apigee_dns_zone" "non_compliant_example_1" {
-  org_id                 = "Test"
+  org_id                 = "PDE-Apigee-Org"
   dns_zone_id = ""
-  domain = "test.com"
-  description = "DNS zone for non-compliant resource"
+  domain = "hardhat.deakin.edu.au"
+  description = "DNS zone for compliant resource"
   peering_config {
-    target_project_id = ""
-    target_network_id = ""
+    target_project_id = "my-project-id"
+    target_network_id = "my-network-id"
   }
 }
