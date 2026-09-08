@@ -6,14 +6,14 @@ import data.terraform.gcp.security.network_services.google_network_services_grpc
 conditions := [
     [
         {
-            "situation_description": "The gRPC route is not configured in the approved location.",
+            "situation_description": "The gRPC route is not configured in a platform-approved location.",
             "remedies": [
-                "Configure the gRPC route in the approved location.",
-                "Use global as the approved location for this resource."
+                "Configure the gRPC route in a location permitted by the organisation's data residency policy.",
+                "Use a platform-approved location that is supported by this resource."
             ]
         },
         {
-            "condition": "location must use the approved location",
+            "condition": "location must be within the platform-approved location set",
             "attribute_path": ["location"],
             "values": ["global"],
             "policy_type": "whitelist"
