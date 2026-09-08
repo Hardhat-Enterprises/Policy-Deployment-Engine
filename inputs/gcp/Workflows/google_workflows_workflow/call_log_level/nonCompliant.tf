@@ -1,7 +1,7 @@
 resource "google_workflows_workflow" "non_compliant_example_1" {
   name          = "non_compliant_example_1"
   project       = "pde"
-  region        = "us-central1"
+  region        = "australia-southeast1"
   description   = "description"
   call_log_level = "LOG_ALL_CALLS"
   labels = {
