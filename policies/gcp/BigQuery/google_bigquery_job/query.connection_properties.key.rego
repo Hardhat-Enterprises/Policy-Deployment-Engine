@@ -1,6 +1,6 @@
-package terraform.gcp.security.BigQuery.google_bigquery_job.query_connection_properties_key
+package terraform.gcp.security.bigquery.google_bigquery_job.query_connection_properties_key
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_job.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_job.vars
 
 conditions := [
     [
