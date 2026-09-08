@@ -1,7 +1,7 @@
-package terraform.gcp.security.BigQuery.google_bigquery_routine.spark_options_container_image
+package terraform.gcp.security.bigquery.google_bigquery_routine.spark_options_container_image
 
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_routine.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_routine.vars
 
 conditions := [
     [
