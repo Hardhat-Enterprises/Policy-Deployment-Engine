@@ -1,7 +1,7 @@
-package terraform.gcp.security.BigQuery.google_bigquery_dataset.access_special_group
+package terraform.gcp.security.bigquery.google_bigquery_dataset.access_special_group
 
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_dataset.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_dataset.vars
 
 conditions := [
     [

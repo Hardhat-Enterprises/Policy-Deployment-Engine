@@ -6,57 +6,57 @@
       "description": "The user provided Resource ID for this Certificate Authority.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the Certificate Authority; identifier values are organization-specific metadata."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Prevents destructive removal or unmanaged abandonment of a Certificate Authority."
     },
     "deletion_protection": {
       "description": "Whether Terraform will be prevented from destroying the CertificateAuthority.\nWhen the field is set to true or unset in Terraform state, a 'terraform apply'\nor 'terraform destroy' that would delete the CertificateAuthority will fail.\nWhen the field is set to false, deleting the CertificateAuthority is allowed.",
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Certificate Authority deletion protection must be enabled to prevent accidental or malicious deletion of a CA. Deleting a CA invalidates all certificates it has issued and cannot be undone."
+      "rationale": "Prevents accidental or malicious CA deletion that would disrupt certificate issuance, revocation, and trust-chain operations."
     },
     "desired_state": {
       "description": "Desired state of the CertificateAuthority. Set this field to 'STAGED' to create a 'STAGED' root CA.\nPossible values: ENABLED, DISABLED, STAGED.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a valid CA lifecycle stage; no single state is universally secure."
     },
     "gcs_bucket": {
       "description": "The name of a Cloud Storage bucket where this CertificateAuthority will publish content,\nsuch as the CA certificate and CRLs. This must be a bucket name, without any prefixes\n(such as 'gs://') or suffixes (such as '.googleapis.com'). For example, to use a bucket named\nmy-bucket, you would simply specify 'my-bucket'. If not specified, a managed bucket will be\ncreated.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a publication bucket whose access controls are assessed on the bucket resource."
     },
     "ignore_active_certificates_on_deletion": {
       "description": "This field allows the CA to be deleted even if the CA has active certs. Active certs include both unrevoked and unexpired certs.\nUse with care. Defaults to 'false'.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Allows deletion despite active certificates, bypassing a CA safety control."
     },
     "labels": {
       "description": "Labels with user-defined metadata.\n\nAn object containing a list of \"key\": value pairs. Example: { \"name\": \"wrench\", \"mass\":\n\"1.3kg\", \"count\": \"3\" }.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Stores user-defined metadata and does not change CA security behavior."
     },
     "lifetime": {
       "description": "The desired lifetime of the CA certificate. Used to create the \"notBeforeTime\" and\n\"notAfterTime\" fields inside an X.509 certificate. A duration in seconds with up to nine\nfractional digits, terminated by 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "CA lifetime is specific to the PKI hierarchy and certificate rotation design."
     },
     "location": {
       "description": "Location of the CertificateAuthority. A full list of valid locations can be found by\nrunning 'gcloud privateca locations list'.",
@@ -69,36 +69,36 @@
       "description": "The signed CA certificate issued from the subordinated CA's CSR. This is needed when activating the subordiante CA with a third party issuer.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains an issuer-specific signed certificate that cannot be generically constrained as text."
     },
     "pool": {
       "description": "The name of the CaPool this Certificate Authority belongs to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a CA pool, whose security posture is assessed on the pool resource."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the owning project rather than configuring a CA security control."
     },
     "skip_grace_period": {
       "description": "If this flag is set, the Certificate Authority will be deleted as soon as\npossible without a 30-day grace period where undeletion would have been\nallowed. If you proceed, there will be no way to recover this CA.\nUse with care. Defaults to 'false'.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Removes the CA recovery period and permits irreversible deletion immediately."
     },
     "type": {
       "description": "The Type of this CertificateAuthority.\n\n~> **Note:** For 'SUBORDINATE' Certificate Authorities, they need to\nbe activated before they can issue certificates. Default value: \"SELF_SIGNED\" Possible values: [\"SELF_SIGNED\", \"SUBORDINATE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Root versus subordinate CA is a valid PKI architecture choice."
     },
     "config": {
       "type": "block",
@@ -119,57 +119,57 @@
       "description": "The common name of the distinguished name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Distinguished-name identity is specific to the organization and CA profile."
     },
     "config.subject_config.subject.country_code": {
       "description": "The country code of the subject.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Distinguished-name identity is specific to the organization and CA profile."
     },
     "config.subject_config.subject.locality": {
       "description": "The locality or city of the subject.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Distinguished-name identity is specific to the organization and CA profile."
     },
     "config.subject_config.subject.organization": {
       "description": "The organization of the subject.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Distinguished-name identity is specific to the organization and CA profile."
     },
     "config.subject_config.subject.organizational_unit": {
       "description": "The organizational unit of the subject.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Distinguished-name identity is specific to the organization and CA profile."
     },
     "config.subject_config.subject.postal_code": {
       "description": "The postal code of the subject.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Distinguished-name identity is specific to the organization and CA profile."
     },
     "config.subject_config.subject.province": {
       "description": "The province, territory, or regional state of the subject.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Distinguished-name identity is specific to the organization and CA profile."
     },
     "config.subject_config.subject.street_address": {
       "description": "The street address of the subject.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Distinguished-name identity is specific to the organization and CA profile."
     },
     "config.subject_config.subject_alt_name": {
       "type": "block",
@@ -180,29 +180,29 @@
       "description": "Contains only valid, fully-qualified host names.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "CA subject identities are deployment-specific and cannot use a generic allowlist."
     },
     "config.subject_config.subject_alt_name.email_addresses": {
       "description": "Contains only valid RFC 2822 E-mail addresses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "CA subject identities are deployment-specific and cannot use a generic allowlist."
     },
     "config.subject_config.subject_alt_name.ip_addresses": {
       "description": "Contains only valid 32-bit IPv4 addresses or RFC 4291 IPv6 addresses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "CA subject identities are deployment-specific and cannot use a generic allowlist."
     },
     "config.subject_config.subject_alt_name.uris": {
       "description": "Contains only valid RFC 3986 URIs.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "CA subject identities are deployment-specific and cannot use a generic allowlist."
     },
     "config.subject_key_id": {
       "type": "block",
@@ -213,8 +213,8 @@
       "description": "The value of the KeyId in lowercase hexadecimal.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A custom subject key identifier supports external-CA migration and is CA-specific."
     },
     "config.x509_config": {
       "type": "block",
@@ -225,8 +225,8 @@
       "description": "Describes Online Certificate Status Protocol (OCSP) endpoint addresses that appear in the\n\"Authority Information Access\" extension in the certificate.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "OCSP endpoint values are PKI-specific and have no universal URL allowlist."
     },
     "config.x509_config.additional_extensions": {
       "type": "block",
@@ -237,15 +237,15 @@
       "description": "Indicates whether or not this extension is critical (i.e., if the client does not know how to\nhandle this extension, the client should consider this to be an error).",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Criticality depends on the semantics of the specific custom X.509 extension."
     },
     "config.x509_config.additional_extensions.value": {
       "description": "The value of this X.509 extension. A base64-encoded string.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Custom base64 extension content is PKI-profile-specific and cannot be generically constrained."
     },
     "config.x509_config.additional_extensions.object_id": {
       "type": "block",
@@ -256,8 +256,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Custom extension OIDs are application and PKI-profile-specific."
     },
     "config.x509_config.ca_options": {
       "type": "block",
@@ -268,29 +268,29 @@
       "description": "When true, the \"CA\" in Basic Constraints extension will be set to true.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the certificate is a CA certificate; the CA role is an architectural choice."
     },
     "config.x509_config.ca_options.max_issuer_path_length": {
       "description": "Refers to the \"path length constraint\" in Basic Constraints extension. For a CA certificate, this value describes the depth of\nsubordinate CA certificates that are allowed. If this value is less than 0, the request will fail. Setting the value to 0\nrequires setting 'zero_max_issuer_path_length = true'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Permitted subordinate depth depends on the designed PKI hierarchy."
     },
     "config.x509_config.ca_options.non_ca": {
       "description": "When true, the \"CA\" in Basic Constraints extension will be set to false.\nIf both 'is_ca' and 'non_ca' are unset, the extension will be omitted from the CA certificate.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the certificate may act as a CA; the role is determined by the PKI architecture."
     },
     "config.x509_config.ca_options.zero_max_issuer_path_length": {
       "description": "When true, the \"path length constraint\" in Basic Constraints extension will be set to 0.\nIf both 'max_issuer_path_length' and 'zero_max_issuer_path_length' are unset,\nthe max path length will be omitted from the CA certificate.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Permitted subordinate depth depends on the designed PKI hierarchy."
     },
     "config.x509_config.key_usage": {
       "type": "block",
@@ -306,64 +306,64 @@
       "description": "The key may be used to sign certificates.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables the inherent certificate-signing capability required for a Certificate Authority."
     },
     "config.x509_config.key_usage.base_key_usage.content_commitment": {
       "description": "The key may be used for cryptographic commitments. Note that this may also be referred to as \"non-repudiation\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Additional key usages depend on the certificate profile and interoperability requirements."
     },
     "config.x509_config.key_usage.base_key_usage.crl_sign": {
       "description": "The key may be used sign certificate revocation lists.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables the inherent CRL-signing capability required for a Certificate Authority that publishes revocations."
     },
     "config.x509_config.key_usage.base_key_usage.data_encipherment": {
       "description": "The key may be used to encipher data.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Additional key usages depend on the certificate profile and interoperability requirements."
     },
     "config.x509_config.key_usage.base_key_usage.decipher_only": {
       "description": "The key may be used to decipher only.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Additional key usages depend on the certificate profile and interoperability requirements."
     },
     "config.x509_config.key_usage.base_key_usage.digital_signature": {
       "description": "The key may be used for digital signatures.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Additional key usages depend on the certificate profile and interoperability requirements."
     },
     "config.x509_config.key_usage.base_key_usage.encipher_only": {
       "description": "The key may be used to encipher only.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Additional key usages depend on the certificate profile and interoperability requirements."
     },
     "config.x509_config.key_usage.base_key_usage.key_agreement": {
       "description": "The key may be used in a key agreement protocol.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Additional key usages depend on the certificate profile and interoperability requirements."
     },
     "config.x509_config.key_usage.base_key_usage.key_encipherment": {
       "description": "The key may be used to encipher other keys.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Additional key usages depend on the certificate profile and interoperability requirements."
     },
     "config.x509_config.key_usage.extended_key_usage": {
       "type": "block",
@@ -374,43 +374,43 @@
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.2. Officially described as \"TLS WWW client authentication\", though regularly used for non-WWW TLS.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Extended key usages are PKI use-case-specific and have no universal combination."
     },
     "config.x509_config.key_usage.extended_key_usage.code_signing": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.3. Officially described as \"Signing of downloadable executable code client authentication\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Extended key usages are PKI use-case-specific and have no universal combination."
     },
     "config.x509_config.key_usage.extended_key_usage.email_protection": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.4. Officially described as \"Email protection\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Extended key usages are PKI use-case-specific and have no universal combination."
     },
     "config.x509_config.key_usage.extended_key_usage.ocsp_signing": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.9. Officially described as \"Signing OCSP responses\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Extended key usages are PKI use-case-specific and have no universal combination."
     },
     "config.x509_config.key_usage.extended_key_usage.server_auth": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.1. Officially described as \"TLS WWW server authentication\", though regularly used for non-WWW TLS.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Extended key usages are PKI use-case-specific and have no universal combination."
     },
     "config.x509_config.key_usage.extended_key_usage.time_stamping": {
       "description": "Corresponds to OID 1.3.6.1.5.5.7.3.8. Officially described as \"Binding the hash of an object to a time\".",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Extended key usages are PKI use-case-specific and have no universal combination."
     },
     "config.x509_config.key_usage.unknown_extended_key_usages": {
       "type": "block",
@@ -421,8 +421,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Custom extended-key-usage OIDs are specific to the PKI profile."
     },
     "config.x509_config.name_constraints": {
       "type": "block",
@@ -433,64 +433,64 @@
       "description": "Indicates whether or not the name constraints are marked critical.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Makes X.509 name constraints fail closed for clients that cannot process them."
     },
     "config.x509_config.name_constraints.excluded_dns_names": {
       "description": "Contains excluded DNS names. Any DNS name that can be\nconstructed by simply adding zero or more labels to\nthe left-hand side of the name satisfies the name constraint.\nFor example, 'example.com', 'www.example.com', 'www.sub.example.com'\nwould satisfy 'example.com' while 'example1.com' does not.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Allowed and excluded namespaces are specific to the organization and PKI profile."
     },
     "config.x509_config.name_constraints.excluded_email_addresses": {
       "description": "Contains the excluded email addresses. The value can be a particular\nemail address, a hostname to indicate all email addresses on that host or\na domain with a leading period (e.g. '.example.com') to indicate\nall email addresses in that domain.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Allowed and excluded namespaces are specific to the organization and PKI profile."
     },
     "config.x509_config.name_constraints.excluded_ip_ranges": {
       "description": "Contains the excluded IP ranges. For IPv4 addresses, the ranges\nare expressed using CIDR notation as specified in RFC 4632.\nFor IPv6 addresses, the ranges are expressed in similar encoding as IPv4\naddresses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Allowed and excluded namespaces are specific to the organization and PKI profile."
     },
     "config.x509_config.name_constraints.excluded_uris": {
       "description": "Contains the excluded URIs that apply to the host part of the name.\nThe value can be a hostname or a domain with a\nleading period (like '.example.com')",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Allowed and excluded namespaces are specific to the organization and PKI profile."
     },
     "config.x509_config.name_constraints.permitted_dns_names": {
       "description": "Contains permitted DNS names. Any DNS name that can be\nconstructed by simply adding zero or more labels to\nthe left-hand side of the name satisfies the name constraint.\nFor example, 'example.com', 'www.example.com', 'www.sub.example.com'\nwould satisfy 'example.com' while 'example1.com' does not.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Allowed and excluded namespaces are specific to the organization and PKI profile."
     },
     "config.x509_config.name_constraints.permitted_email_addresses": {
       "description": "Contains the permitted email addresses. The value can be a particular\nemail address, a hostname to indicate all email addresses on that host or\na domain with a leading period (e.g. '.example.com') to indicate\nall email addresses in that domain.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Allowed and excluded namespaces are specific to the organization and PKI profile."
     },
     "config.x509_config.name_constraints.permitted_ip_ranges": {
       "description": "Contains the permitted IP ranges. For IPv4 addresses, the ranges\nare expressed using CIDR notation as specified in RFC 4632.\nFor IPv6 addresses, the ranges are expressed in similar encoding as IPv4\naddresses.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Allowed and excluded namespaces are specific to the organization and PKI profile."
     },
     "config.x509_config.name_constraints.permitted_uris": {
       "description": "Contains the permitted URIs that apply to the host part of the name.\nThe value can be a hostname or a domain with a\nleading period (like '.example.com')",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Allowed and excluded namespaces are specific to the organization and PKI profile."
     },
     "config.x509_config.policy_ids": {
       "type": "block",
@@ -501,8 +501,8 @@
       "description": "An ObjectId specifies an object identifier (OID). These provide context and describe types in ASN.1 messages.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Certificate-policy OIDs identify organization-specific PKI policies."
     },
     "key_spec": {
       "type": "block",
@@ -514,14 +514,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Certificate Authority key algorithm must use an approved cryptographic standard to enforce encryption compliance. Weaker algorithms such as 2048-bit RSA do not meet organisational security requirements."
+      "rationale": "Controls the strength of the CA signing key; requiring approved algorithms prevents weak cryptographic signatures."
     },
     "key_spec.cloud_kms_key_version": {
       "description": "The resource name for an existing Cloud KMS CryptoKeyVersion in the format\n'projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a KMS key version whose algorithm, rotation, and IAM are assessed on that resource."
     },
     "subordinate_config": {
       "type": "block",
@@ -532,8 +532,8 @@
       "description": "This can refer to a CertificateAuthority that was used to create a\nsubordinate CertificateAuthority. This field is used for information\nand usability purposes only. The resource name is in the format\n'projects/*/locations/*/caPools/*/certificateAuthorities/*'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a parent CA whose trust and security posture are assessed independently."
     },
     "subordinate_config.pem_issuer_chain": {
       "type": "block",
@@ -544,8 +544,8 @@
       "description": "Expected to be in leaf-to-root order according to RFC 5246.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Issuer-chain content is hierarchy-specific and cryptographically validated."
     },
     "user_defined_access_urls": {
       "type": "block",
@@ -556,15 +556,15 @@
       "description": "A list of URLs where this CertificateAuthority's CA certificate is published that is specified by users.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Certificate publication endpoints are deployment-specific and have no universal hostname allowlist."
     },
     "user_defined_access_urls.crl_access_urls": {
       "description": "A list of URLs where this CertificateAuthority's CRLs are published that is specified by users.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "CRL publication endpoints are deployment-specific and have no universal hostname allowlist."
     }
   }
 }
