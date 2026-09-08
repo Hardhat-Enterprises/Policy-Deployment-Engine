@@ -20,8 +20,8 @@
       "description": "User-provided name of the Network firewall policy.\nThe name should be unique in the project in which the firewall policy is created.\nThe name must be 1-63 characters long, and comply with RFC1035. Specifically,\nthe name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])?\nwhich means the first character must be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale":  "This is the user-provided name of the network firewall policy. Enterprise governance can require security resources to follow approved naming conventions so they can be consistently identified, audited, and managed. A generic platform policy can enforce a naming pattern without requiring a team-specific name."
+      "security_impact": false,
+      "rationale":"This is a resource identifier used to name the firewall policy. It does not directly control security behaviour and is not suitable for a generic platform security policy."
     },
     "policy_type": {
       "description": "Policy type is used to determine which resources (networks) the policy can be associated with.\nA policy can be associated with a network only if the network has the matching policyType in its network profile.\nDifferent policy types may support some of the Firewall Rules features. Possible values: [\"VPC_POLICY\"]",
@@ -46,8 +46,8 @@
       "description": "The Action to perform when the client connection triggers the rule. Can currently be either\n\"allow\", \"deny\", \"apply_security_profile_group\" or \"goto_next\".",
       "required": true,
       "type": "string",
-      "security_impact":true,
-      "rationale": "This controls what happens when traffic matches the firewall rule, including whether it is allowed, denied, passed to another rule, or sent for inspection. Because the action directly determines enforcement behaviour, a generic platform policy can restrict unsafe permissive actions or require inspection-oriented behaviour where a security baseline applies."
+      "security_impact":false,
+      "rationale": "This defines the functional action performed by the firewall rule. The appropriate value depends on the intended network design and traffic requirements, so there is no universally secure value for a generic policy."
     },
     "rule.description": {
       "description": "A description of the rule.",
@@ -88,8 +88,8 @@
       "description": "An optional name for the rule. This field is not a unique identifier\nand can be updated.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This provides a human-readable name for the firewall rule. Enterprise governance can require firewall rules to follow standard naming conventions so security controls can be consistently identified, audited, and managed. A generic platform policy can enforce an approved naming pattern without requiring a team-specific name."
+      "security_impact": false,
+      "rationale":"This is a descriptive identifier for the firewall rule. It does not directly enforce security behaviour and is not suitable for a generic platform security policy."
     },
     "rule.security_profile_group": {
       "description": "A fully-qualified URL of a SecurityProfile resource instance.\nExample:\nhttps://networksecurity.googleapis.com/v1/projects/{project}/locations/{location}/securityProfileGroups/my-security-profile-group\nMust be specified if action is 'apply_security_profile_group'.",
