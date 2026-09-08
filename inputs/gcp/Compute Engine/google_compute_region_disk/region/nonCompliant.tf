@@ -7,7 +7,7 @@ resource "google_compute_region_disk" "non_compliant_example_1" {
   size = 200
 
   replica_zones = [
-    "us-east1-b",
-    "us-east1-c"
+    "us-central1-a",
+    "us-central1-f"
   ]
 }

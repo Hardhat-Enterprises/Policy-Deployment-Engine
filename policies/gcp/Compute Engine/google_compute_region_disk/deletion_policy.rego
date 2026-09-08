@@ -6,13 +6,13 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_disk.var
 conditions := [
     [
         {
-            "situation_description": "Regional disk must prevent deletion through Terraform.",
+            "situation_description": "Regional disks should be protected from accidental deletion.",
             "remedies": [
                 "Set deletion_policy to PREVENT."
             ]
         },
         {
-            "condition": "Require deletion protection.",
+            "condition": "Require deletion protection for the regional disk.",
             "attribute_path": ["deletion_policy"],
             "values": ["PREVENT"],
             "policy_type": "whitelist"
@@ -20,5 +20,6 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
