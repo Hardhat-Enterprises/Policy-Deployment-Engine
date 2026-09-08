@@ -1,301 +1,295 @@
-#!/usr/bin/env python3
-"""One-shot cutover: collapse the mirrored inputs/ + policies/ trees into one.
+"""Deferred GCP cutover. Dry-run by default; never invokes git writes, Terraform or OPA.
 
-BEFORE                                        AFTER
-  policies/gcp/<S>/<R>/<arg>.rego               policies/gcp/config.tf
-  policies/gcp/<S>/<R>/_vars.rego               policies/gcp/<S>/<R>/_vars.rego
-  inputs/gcp/<S>/<R>/<arg>/compliant.tf         policies/gcp/<S>/<R>/<arg>/policy.rego
-  inputs/gcp/<S>/<R>/<arg>/nonCompliant.tf      policies/gcp/<S>/<R>/<arg>/compliant.tf
-  inputs/gcp/<S>/<R>/<arg>/config.tf  (x1000+)  policies/gcp/<S>/<R>/<arg>/nonCompliant.tf
-  inputs/plan_cache/gcp/<sha>.json              plan_cache/gcp/<sha>.json
-
-_vars.rego does NOT move: it already sits at the resource level, which is where the
-target layout wants it.
-
-This script ONLY moves and deletes files. It never edits file contents, never runs git,
-terraform or opa, and never commits, merges or pushes. Review and commit are yours.
-
-    python scripts/migration/restructure_gcp.py            # dry run (default), changes nothing
-    python scripts/migration/restructure_gcp.py --apply    # perform the moves
-
-Everything is discovered from the tree, so however many policies exist at cutover is
-however many get migrated.
+The input is current dev's flat policies and fixture-local <sha>.json plans.
+The output co-locates policy.rego, both fixtures and their plan under policies/.
+One shared config is selected by normalized frequency; differing configs remain
+local overrides. Policy bodies, fixture bytes and effective hashes are preserved.
 """
+from __future__ import annotations
+
 import argparse
+from collections import defaultdict
+from dataclasses import dataclass, field
 import hashlib
+import json
+from pathlib import Path
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 
-PLATFORM = "gcp"
-VARS_FILE = "_vars.rego"
-POLICY_FILE = "policy.rego"
-CONFIG_FILE = "config.tf"
-FIXTURE_FILES = ("compliant.tf", "nonCompliant.tf")
-EXPECTED_FIXTURE_ENTRIES = set(FIXTURE_FILES) | {CONFIG_FILE}
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from scripts.auto_test.auto_test import (
+    PLAN_FILE_RE, canonical_text_bytes, fixture_files, fixture_sha,
+    plan_cache_path, sha_for_files,
+)
+
+FIXTURES = ("compliant.tf", "nonCompliant.tf")
 
 
 class Abort(Exception):
-    """A preflight check failed; nothing has been touched."""
+    """The source or destination cannot be migrated without ambiguity."""
 
 
-def sha256_lf(path):
-    """Hash with CRLF normalised, so a Windows checkout compares equal to Linux."""
-    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+@dataclass
+class Operation:
+    kind: str
+    source: Path
+    destination: Path | None
 
 
-# --------------------------------------------------------------------------- #
-# Discovery
-# --------------------------------------------------------------------------- #
-def discover(repo):
-    """Return (policies, cache_files) for the current tree.
-
-    ``policies`` is one dict per argument policy. Nothing is read beyond directory
-    listings (config.tf bytes are read later, by the preflight identity check).
-    """
-    policies_gcp = repo / "policies" / PLATFORM
-    inputs_gcp = repo / "inputs" / PLATFORM
-
-    policies = []
-    for rego in sorted(policies_gcp.rglob("*.rego")):
-        if rego.name == VARS_FILE:
-            continue
-        service, resource, argument = rego.parts[-3], rego.parts[-2], rego.stem
-        policies.append({
-            "rego": rego,
-            "service": service,
-            "resource": resource,
-            "argument": argument,
-            "fixture_dir": inputs_gcp / service / resource / argument,
-            "target_dir": policies_gcp / service / resource / argument,
-        })
-
-    cache_dir = repo / "inputs" / "plan_cache" / PLATFORM
-    cache_files = sorted(cache_dir.glob("*.json")) if cache_dir.is_dir() else []
-    return policies, cache_files
+@dataclass
+class Migration:
+    root: Path
+    operations: list[Operation] = field(default_factory=list)
+    # logical (service, resource, argument) -> effective hash before the move
+    hashes: dict[tuple[str, str, str], str] = field(default_factory=dict)
+    # Every affected source is checked again before the first write.
+    fingerprints: dict[Path, str] = field(default_factory=dict)
+    preserved: dict[Path, str] = field(default_factory=dict)
+    already_migrated: bool = False
 
 
-# --------------------------------------------------------------------------- #
-# Preflight: every check runs before any mutation; any failure aborts
-# --------------------------------------------------------------------------- #
-def preflight(repo, policies, allow_any_branch, allow_dirty):
-    problems = []
-
-    for required in ("policies/gcp", "inputs/gcp", "scripts/auto_test"):
-        if not (repo / required).is_dir():
-            problems.append(f"not a Policy-Deployment-Engine checkout: {required}/ is missing")
-    if problems:
-        raise Abort(problems)
-
-    # A dirty tree makes the post-migration diff unreviewable.
-    status = subprocess.run(["git", "status", "--porcelain"], cwd=repo,
-                            capture_output=True, text=True)
-    if status.returncode != 0:
-        problems.append("could not run 'git status' -- is this a git repository?")
-    elif status.stdout.strip() and not allow_dirty:
-        n = len(status.stdout.strip().splitlines())
-        problems.append(f"working tree has {n} uncommitted change(s); commit or stash first "
-                        "(or pass --allow-dirty if you know what you are doing)")
-
-    branch = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=repo,
-                            capture_output=True, text=True).stdout.strip()
-    if branch != "dev" and not allow_any_branch:
-        problems.append(f"on branch '{branch}', expected 'dev' "
-                        "(pass --allow-any-branch to override)")
-
-    if not policies:
-        problems.append("no argument policies found under policies/gcp -- nothing to migrate")
-
-    # Every policy must have a complete fixture dir, and every fixture dir a policy.
-    fixture_dirs_seen = set()
-    for p in policies:
-        fx = p["fixture_dir"]
-        if not fx.is_dir():
-            problems.append(f"policy has no fixture dir: {p['rego']} -> expected {fx}/")
-            continue
-        fixture_dirs_seen.add(fx.resolve())
-        entries = {e.name for e in fx.iterdir()}
-        missing = EXPECTED_FIXTURE_ENTRIES - entries
-        extra = entries - EXPECTED_FIXTURE_ENTRIES
-        if missing:
-            problems.append(f"{fx}: missing {sorted(missing)}")
-        if extra:
-            problems.append(f"{fx}: unexpected entries {sorted(extra)} -- clean these up first")
-
-    inputs_gcp = repo / "inputs" / PLATFORM
-    for fx in sorted(d for d in inputs_gcp.rglob("*") if d.is_dir() and any(d.glob("*.tf"))):
-        if fx.resolve() not in fixture_dirs_seen:
-            rel = fx.relative_to(inputs_gcp)
-            problems.append(f"fixture dir has no policy: {fx}/ -> expected "
-                            f"policies/{PLATFORM}/{rel}.rego")
-
-    # The canonical-config premise: every config.tf must be byte-identical.
-    configs = sorted(inputs_gcp.rglob(CONFIG_FILE))
-    if configs:
-        digests = {}
-        for c in configs:
-            digests.setdefault(sha256_lf(c), []).append(c)
-        if len(digests) > 1:
-            problems.append(f"{CONFIG_FILE} files are NOT all identical "
-                            f"({len(digests)} distinct contents) -- one canonical copy is unsafe:")
-            for digest, paths in sorted(digests.items(), key=lambda kv: -len(kv[1])):
-                problems.append(f"    {digest[:12]}  x{len(paths)}  e.g. {paths[0]}")
-
-    # Nothing may already exist at a target path.
-    for t in (repo / "policies" / PLATFORM / CONFIG_FILE, repo / "plan_cache"):
-        if t.exists():
-            problems.append(f"target already exists: {t} -- has this migration already run?")
-    for p in policies:
-        if p["target_dir"].exists():
-            problems.append(f"target already exists: {p['target_dir']}/")
-
-    if problems:
-        raise Abort(problems)
+def fingerprint(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-# --------------------------------------------------------------------------- #
-# The plan: an ordered list of (kind, src, dst) operations; dst None means delete
-# --------------------------------------------------------------------------- #
-def build_plan(repo, policies, cache_files):
-    ops = []
-    policies_gcp = repo / "policies" / PLATFORM
-
-    # 1. Promote one config.tf to the platform root; the rest are deleted below.
-    canonical = policies[0]["fixture_dir"] / CONFIG_FILE
-    ops.append(("move-config", canonical, policies_gcp / CONFIG_FILE))
-
-    # 2-4. Per policy: rego into its own dir, fixtures alongside it, duplicate config gone.
-    for p in policies:
-        ops.append(("move-policy", p["rego"], p["target_dir"] / POLICY_FILE))
-        for name in FIXTURE_FILES:
-            ops.append(("move-fixture", p["fixture_dir"] / name, p["target_dir"] / name))
-        dup = p["fixture_dir"] / CONFIG_FILE
-        if dup != canonical:
-            ops.append(("delete-config", dup, None))
-
-    # 5. Plan cache to the repo root.
-    for f in cache_files:
-        ops.append(("move-cache", f, repo / "plan_cache" / PLATFORM / f.name))
-
-    # 6. Placeholder platforms under inputs/ are obsolete once inputs/ is gone.
-    #    policies/aws and policies/azure keep theirs.
-    for placeholder in sorted((repo / "inputs").glob("*/.gitkeep")):
-        ops.append(("delete-placeholder", placeholder, None))
-
-    return ops
-
-
-def summarise(ops):
-    counts = {}
-    for kind, _, _ in ops:
-        counts[kind] = counts.get(kind, 0) + 1
-    return counts
-
-
-# --------------------------------------------------------------------------- #
-# Execution: moves and deletes only
-# --------------------------------------------------------------------------- #
-def execute(repo, ops):
-    for _kind, src, dst in ops:
-        if dst is None:
-            src.unlink()
-        else:
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.move(str(src), str(dst))
-
-    # Remove directories the moves emptied, deepest first, up to and including inputs/.
-    inputs_root = repo / "inputs"
-    removed = 0
-    if inputs_root.is_dir():
-        for d in sorted((p for p in inputs_root.rglob("*") if p.is_dir()),
-                        key=lambda p: len(p.parts), reverse=True):
-            if not any(d.iterdir()):
-                d.rmdir()
-                removed += 1
-        if not any(inputs_root.iterdir()):
-            inputs_root.rmdir()
-            removed += 1
-        else:
-            print("\n  NOTE: inputs/ is not empty, leaving it in place. Remaining:")
-            for item in sorted(p.relative_to(repo) for p in inputs_root.rglob("*"))[:20]:
-                print(f"    {item}")
-    return removed
-
-
-LABELS = {
-    "move-config": "config.tf promoted to policies/gcp/",
-    "move-policy": "<argument>.rego -> <argument>/policy.rego",
-    "move-fixture": "fixture .tf -> policy directory",
-    "move-cache": "plan cache -> plan_cache/gcp/",
-    "delete-config": "duplicate config.tf deleted",
-    "delete-placeholder": "obsolete inputs/ placeholder deleted",
-}
-
-def main(argv=None):
-    ap = argparse.ArgumentParser(
-        description="Collapse inputs/ + policies/ into one self-contained policies/ tree.")
-    ap.add_argument("--apply", action="store_true",
-                    help="Perform the moves. Without it this is a dry run that changes nothing.")
-    ap.add_argument("--repo-root", default=None,
-                    help="Repo to migrate (default: the repo this script lives in).")
-    ap.add_argument("--allow-any-branch", action="store_true",
-                    help="Skip the 'must be on dev' check.")
-    ap.add_argument("--allow-dirty", action="store_true",
-                    help="Skip the clean-working-tree check.")
-    args = ap.parse_args(argv)
-
-    repo = Path(args.repo_root).resolve() if args.repo_root else Path(__file__).resolve().parents[2]
-    mode = "APPLY (files will be moved)" if args.apply else "DRY RUN (nothing will change)"
-    print(f"Repository: {repo}")
-    print(f"Mode:       {mode}\n")
-
-    policies, cache_files = discover(repo)
-    print(f"Discovered: {len(policies)} argument policies, {len(cache_files)} cached plans")
-
+def contained(root: Path, path: Path) -> None:
     try:
-        preflight(repo, policies, args.allow_any_branch, args.allow_dirty)
-    except Abort as exc:
-        problems = exc.args[0]
-        print(f"\n[ABORT] {len(problems)} preflight problem(s); nothing was touched:\n")
-        for p in problems[:40]:
-            print(f"  - {p}")
-        if len(problems) > 40:
-            print(f"  ... and {len(problems) - 40} more")
-        return 1
-    print("Preflight:  all checks passed\n")
+        path.resolve().relative_to(root)
+    except ValueError:
+        raise Abort(f"Path escapes the selected repository: {path}") from None
+    if path.is_symlink():
+        raise Abort(f"Symlinks cannot be migrated safely: {path}")
 
-    ops = build_plan(repo, policies, cache_files)
-    counts = summarise(ops)
 
-    print("Planned operations:")
-    for kind in ("move-config", "move-policy", "move-fixture", "move-cache",
-                 "delete-config", "delete-placeholder"):
-        if kind in counts:
-            print(f"  {counts[kind]:>6}  {LABELS[kind]}")
-    print(f"  {'-' * 6}")
-    print(f"  {len(ops):>6}  total\n")
+def valid_plan(path: Path) -> None:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict) or not isinstance(data.get("planned_values"), dict):
+            raise ValueError("missing planned_values object")
+    except (OSError, ValueError) as exc:
+        raise Abort(f"Invalid Terraform plan {path}: {exc}") from exc
 
-    print("Sample (first 3 policies):")
-    for _kind, src, dst in [o for o in ops if o[0] in ("move-policy", "move-fixture")][:9]:
-        print(f"    {src.relative_to(repo)}")
-        print(f"      -> {dst.relative_to(repo)}")
 
-    if not args.apply:
-        print("\nDry run complete -- nothing was changed.")
-        print("Re-run with --apply to perform the migration.")
+def source_plan(directory: Path, files: dict[str, Path], sha: str) -> Path:
+    """Accept only the current hash or a provably equivalent old text spelling."""
+    alternatives = {sha_for_files(files, lambda b: b),
+                    sha_for_files(files, lambda b: canonical_text_bytes(b).replace(b"\n", b"\r\n"))}
+    candidates = sorted(directory.glob("*.json"))
+    if len(candidates) != 1:
+        raise Abort(f"{directory}: expected exactly one committed plan, found {len(candidates)}; "
+                    "sync dev and refresh this fixture before migration")
+    plan = candidates[0]
+    if not PLAN_FILE_RE.fullmatch(plan.name) or plan.stem not in alternatives | {sha}:
+        raise Abort(f"{plan}: missing or stale plan; expected {sha}.json. "
+                    "Rebuild it with dev's harness before migration")
+    valid_plan(plan)
+    return plan
+
+
+def _verify_migrated(root: Path, nested: list[Path]) -> Migration:
+    shared = root / "policies/gcp/config.tf"
+    if not shared.is_file():
+        raise Abort(f"Partial migration: missing shared config {shared}")
+    plan = Migration(root, already_migrated=True)
+    seen = set()
+    for policy in nested:
+        rel = policy.relative_to(root / "policies/gcp")
+        if len(rel.parts) != 4:
+            raise Abort(f"Unexpected nested policy path: {policy}")
+        directory = policy.parent
+        required = {"policy.rego", *FIXTURES}
+        files = {p.name for p in directory.iterdir() if p.is_file()}
+        if not required <= files:
+            raise Abort(f"Partial migration: incomplete argument directory {directory}")
+        for child in directory.iterdir():
+            contained(root, child)
+            if not child.is_file() or (child.name not in required | {"config.tf"}
+                                      and not PLAN_FILE_RE.fullmatch(child.name)):
+                raise Abort(f"Unexpected entry in migrated argument: {child}")
+        sha = fixture_sha(directory, root)
+        expected = plan_cache_path(directory, root)
+        plans = list(directory.glob("*.json"))
+        if plans != [expected]:
+            raise Abort(f"Partial migration: expected only {expected}")
+        valid_plan(expected)
+        identity = tuple(rel.parts[:3])
+        if identity in plan.hashes:
+            raise Abort(f"Duplicate policy identity: {identity}")
+        plan.hashes[identity] = sha
+        seen.add(directory.resolve())
+    for tf in (root / "policies/gcp").rglob("*.tf"):
+        if tf != shared and tf.parent.resolve() not in seen:
+            raise Abort(f"Partial migration: fixture without a policy: {tf}")
+    return plan
+
+
+def prepare(root: Path) -> Migration:
+    """Discover and fully validate the cutover, without modifying any file."""
+    root = Path(root).resolve()
+    policies_root = root / "policies/gcp"
+    inputs_root = root / "inputs/gcp"
+    if not policies_root.is_dir():
+        raise Abort(f"Not a GCP policy checkout: {policies_root} is missing")
+    regos = sorted(policies_root.rglob("*.rego"))
+    flat = [p for p in regos if p.name not in {"_vars.rego", "policy.rego"}]
+    nested = [p for p in regos if p.name == "policy.rego"]
+    old_files = [p for p in inputs_root.rglob("*") if p.is_file() and p.name != ".gitkeep"]
+    if nested:
+        if flat or old_files:
+            raise Abort("Partial/mixed migration: both old and new policy/fixture paths exist")
+        return _verify_migrated(root, nested)
+    if not flat:
+        raise Abort("No policies found to migrate")
+    shared = policies_root / "config.tf"
+    if shared.exists():
+        raise Abort(f"Partial migration: target already exists: {shared}")
+    if (root / "plan_cache").exists() or (root / "inputs/plan_cache").exists():
+        raise Abort("Legacy central plan cache remains; sync dev's fixture-local plans before cutover")
+
+    result = Migration(root)
+    records = []
+    config_groups = defaultdict(list)
+    accounted = set()
+    for policy in flat:
+        rel = policy.relative_to(policies_root)
+        if len(rel.parts) != 3:
+            raise Abort(f"Unexpected legacy policy path: {policy}")
+        service, resource, filename = rel.parts
+        argument = filename[:-len(".rego")]
+        identity = (service, resource, argument)
+        source = inputs_root / service / resource / argument
+        target = policies_root / service / resource / argument
+        if target.exists():
+            raise Abort(f"Target already exists: {target}")
+        if not source.is_dir():
+            raise Abort(f"Policy has no fixture directory: {policy}")
+        required = {*FIXTURES, "config.tf"}
+        for name in required:
+            if not (source / name).is_file():
+                raise Abort(f"Missing fixture source: {source / name}")
+        for entry in source.iterdir():
+            if not entry.is_file() or (entry.name not in required and not entry.name.endswith(".json")):
+                raise Abort(f"Unexpected fixture entry: {entry}; clean it up before cutover")
+        files = {name: source / name for name in required}
+        sha = sha_for_files(files)
+        committed = source_plan(source, files, sha)
+        config_groups[canonical_text_bytes(files["config.tf"].read_bytes())].append(files["config.tf"])
+        records.append((identity, policy, source, target, committed, sha))
+        result.hashes[identity] = sha
+        accounted.update(p.resolve() for p in source.iterdir())
+    leftovers = [p for p in old_files if p.resolve() not in accounted]
+    if leftovers:
+        raise Abort(f"Orphan inputs or unrecognized files: {leftovers[0]} ({len(leftovers)} total)")
+
+    # Stable tie-break: lexical repository-relative source path, independent of discovery order.
+    canonical_group = min(config_groups.values(), key=lambda group: (
+        -len(group), min(p.relative_to(root).as_posix() for p in group)))
+    canonical = min(canonical_group, key=lambda p: p.relative_to(root).as_posix())
+    canonical_bytes = canonical_text_bytes(canonical.read_bytes())
+    result.operations.append(Operation("shared-config", canonical, shared))
+    for identity, policy, source, target, committed, sha in records:
+        result.operations.append(Operation("policy", policy, target / "policy.rego"))
+        for name in FIXTURES:
+            result.operations.append(Operation("fixture", source / name, target / name))
+        config = source / "config.tf"
+        if config != canonical:
+            if canonical_text_bytes(config.read_bytes()) == canonical_bytes:
+                result.operations.append(Operation("duplicate-config", config, None))
+            else:
+                result.operations.append(Operation("config-override", config, target / "config.tf"))
+        result.operations.append(Operation("plan", committed, target / f"{sha}.json"))
+        # Check the proposed effective file set before any moves, using source bytes.
+        effective = {name: source / name for name in FIXTURES}
+        effective["config.tf"] = canonical if canonical_text_bytes(config.read_bytes()) == canonical_bytes else config
+        if sha_for_files(effective) != sha:
+            raise Abort(f"Effective fixture hash would change: {identity}")
+
+    destinations = set()
+    for operation in result.operations:
+        contained(root, operation.source)
+        result.fingerprints[operation.source] = fingerprint(operation.source)
+        if operation.destination is not None:
+            contained(root, operation.destination)
+            key = operation.destination.resolve()
+            if key in destinations or operation.destination.exists():
+                raise Abort(f"Destination collision: {operation.destination}")
+            destinations.add(key)
+            result.preserved[operation.destination] = result.fingerprints[operation.source]
+    for vars_path in policies_root.rglob("_vars.rego"):
+        contained(root, vars_path)
+        result.fingerprints[vars_path] = fingerprint(vars_path)
+        result.preserved[vars_path] = result.fingerprints[vars_path]
+    return result
+
+
+def apply(plan: Migration) -> None:
+    """Apply a validated plan; recheck sources and targets before the first mutation."""
+    if plan.already_migrated:
+        return
+    for source, expected in plan.fingerprints.items():
+        contained(plan.root, source)
+        if not source.is_file() or fingerprint(source) != expected:
+            raise Abort(f"Source changed since preflight: {source}")
+    for operation in plan.operations:
+        if operation.destination is not None:
+            contained(plan.root, operation.destination)
+            if operation.destination.exists():
+                raise Abort(f"Destination appeared since preflight: {operation.destination}")
+    for operation in plan.operations:
+        if operation.destination is None:
+            operation.source.unlink()
+        else:
+            operation.destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(operation.source), str(operation.destination))
+    # Only remove empty directories inside the selected old GCP tree.
+    old = plan.root / "inputs/gcp"
+    for directory in sorted((p for p in old.rglob("*") if p.is_dir()),
+                            key=lambda p: len(p.parts), reverse=True):
+        contained(plan.root, directory)
+        if not any(directory.iterdir()):
+            directory.rmdir()
+    if old.is_dir() and not any(old.iterdir()):
+        old.rmdir()
+    for destination, expected in plan.preserved.items():
+        if not destination.is_file() or fingerprint(destination) != expected:
+            raise Abort(f"Post-migration content verification failed: {destination}")
+    after = prepare(plan.root)
+    if after.hashes != plan.hashes:
+        raise Abort("Post-migration identity/hash verification failed")
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[2])
+    parser.add_argument("--apply", action="store_true", help="Apply the fully preflighted moves; default is dry-run")
+    args = parser.parse_args(argv)
+    root = args.repo_root.resolve()
+    try:
+        plan = prepare(root)
+        if plan.already_migrated:
+            print(f"[OK] Already migrated: verified {len(plan.hashes)} policy identities and committed plans; no changes")
+            return 0
+        counts = defaultdict(int)
+        for operation in plan.operations:
+            counts[operation.kind] += 1
+        print(f"{'APPLY' if args.apply else 'DRY RUN'}: {root}")
+        print(f"Verified {len(plan.hashes)} policy identities and unchanged effective fixture hashes")
+        for kind, count in sorted(counts.items()):
+            print(f"  {kind}: {count}")
+        if args.apply:
+            status = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"],
+                                    cwd=root, capture_output=True, text=True)
+            if status.returncode or status.stdout.strip():
+                raise Abort("Apply requires a clean Git checkout; commit or stash changes first")
+            apply(plan)
+            print("[OK] Moves and content/hash verification complete. Nothing staged, committed or pushed")
+        else:
+            print("Dry run complete; nothing changed. Use --apply only at the final cutover")
         return 0
-
-    print("\nApplying...")
-    removed = execute(repo, ops)
-    print(f"Done. {len(ops)} operation(s) applied, {removed} empty director(ies) removed.\n")
-    print("This script has NOT staged, committed or pushed anything. Next:")
-    print("    git add -A")
-    print("    git status --short | head")
-    print("    python scripts/linters/linter.py --tree all --platform gcp")
-    print("    python scripts/auto_test/auto_test.py gcp --verify-plan-cache")
-    print("    python scripts/auto_test/auto_test.py gcp")
-    return 0
+    except (Abort, OSError, ValueError) as exc:
+        print(f"[ABORT] {exc}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":

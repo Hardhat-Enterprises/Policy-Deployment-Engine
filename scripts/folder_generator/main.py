@@ -87,6 +87,9 @@ def copy_files(files, src_dir, dest_dir):
 
 def create_policy_files(cloud, service, resource, policy_name):
     paths = get_cloud_paths(cloud)
+    if not os.path.isfile(os.path.join(paths["policy_dir"], "config.tf")):
+        messagebox.showerror("Migration required", "The shared platform config.tf is missing. Complete the layout migration before generating policies.")
+        return
     # The service folder is the docs subcategory VERBATIM (spaces and all) — every
     # other tool reconciles against docs/gcp/<service>, so slugifying it here produced
     # directories ("Cloud_Storage") that the linter then rejected.

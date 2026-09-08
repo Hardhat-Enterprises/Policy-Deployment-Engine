@@ -1,8 +1,9 @@
 # 🛡️ Policy Deployment Engine — Linters
 
 A single linter, `scripts/linters/linter.py`, enforces structure and
-cross-consistency across two trees — `docs/` and `policies/` — treating
-`docs/` as the source of truth that `policies/` must reconcile to. It uses only the Python standard library (no extra installs).
+cross-consistency across three trees — `docs/`, `inputs/`, `policies/` —
+treating `docs/` as the source of truth that `inputs/` and `policies/` must
+reconcile to. It uses only the Python standard library (no extra installs).
 
 There are four supporting scripts:
 
@@ -13,12 +14,16 @@ There are four supporting scripts:
   measured against the base tree — so a pre-existing finding inside a file you
   merely touched is reported as context, not as your fault.
 - `check_branch_name.py` — enforces the branch naming convention.
+- `../check_resource.py` — not a linter itself: the single entry point that runs
+  all of these plus the per-resource gate (doc completeness, argument coverage,
+  OPA test), in the order CI runs them. It is what contributors are told to run
+  and what CI's `policy_check` job calls with `--gate-only`.
 - `branch_scope.py` — enforces that a `Service/<platform>/<service_slug>/<resource_type>`
   branch changes **only** that resource's files (`docs/` JSON, `inputs/`,
-  `policies/`), plus additions to `inputs/plan_cache/`. It catches the two
-  silent mistakes — editing the shared harness and wiping the plan cache —
-  neither of which fails any test on the branch that caused it. Rules are
-  documented in `Guide/Policy_writing_tutorial/branch-scope.md`.
+  `policies/`). It catches the two silent mistakes — editing the shared harness
+  and sweeping up another resource's files — neither of which fails any test on
+  the branch that caused it. Rules are documented in
+  `Guide/Policy_writing_tutorial/branch-scope.md`.
 - `policy_lint.py` — deterministic *content*-quality rules over a policy kit's
   declared `conditions`/`variables` (hard-coded literals, trivial messages,
   fixture drift, ...). It answers whether the policy is any good, not just
@@ -33,7 +38,8 @@ There are four supporting scripts:
 # from the repo root
 python scripts/linters/linter.py                      # lint every tree
 python scripts/linters/linter.py --tree docs
-python scripts/linters/linter.py --tree policies --platform gcp
+python scripts/linters/linter.py --tree inputs --platform gcp
+python scripts/linters/linter.py --tree policies
 python scripts/linters/linter.py --no-content-checks  # structural only (skip §3 checks)
 ```
 
@@ -48,13 +54,14 @@ The structural pass never opens a `.tf`/`.rego` file (it does parse docs JSON).
 - **docs/** — only the platform folders (`gcp`, `aws`, `azure`); `gcp/<service>/`
   holds one `*.json` per resource, each matching the doc schema (`last_updated`,
   `provider_version`, `arguments`).
-- **policies/** — reconciles **exactly** to docs:
-  `policies/gcp/<service>/<resource>/<argument>/` where `<service>` and `<resource>`
+- **inputs/** — reconciles **exactly** to docs:
+  `inputs/gcp/<service>/<resource>/<argument>/` where `<service>` and `<resource>`
   match a `docs/gcp/<service>/<resource>.json`, and `<argument>` is a **non-block**
-  argument key in that doc. Each argument dir contains exactly `policy.rego`,
-  `compliant.tf` and `nonCompliant.tf` — nothing else. Each resource dir may add one
-  `_vars.rego` (underscore-prefixed so it is never mistaken for an argument dir), and
-  `policies/gcp/` carries the single shared `config.tf`.
+  argument key in that doc. Each argument dir must contain `compliant.tf`,
+  `config.tf`, `nonCompliant.tf` (terraform artifacts tolerated; anything else flagged).
+- **policies/** — same taxonomy, but each argument is a single `<argument>.rego`
+  file plus an optional per-resource `_vars.rego` (underscore-prefixed so it is
+  never mistaken for a policy).
 
 ---
 
@@ -122,13 +129,13 @@ python scripts/linters/branch_scope.py --staged           # what you are about t
 python scripts/linters/branch_scope.py --base origin/dev  # the whole branch vs dev (CI)
 ```
 
-**CI (`.github/workflows/branch-scope.yml`):** a `branch_scope` job runs
+**CI (the `Branch scope` job in `.github/workflows/policy_check_PR.yaml`):** it runs
 `branch_scope.py --branch <head ref> --base origin/<base>` on every pull request
-from a `Service/` branch. It is a **separate workflow with no `paths:` filter**
-on purpose: `policy_check_PR.yaml` only runs when `docs/`, `inputs/` or
-`policies/` changed, so a branch whose only change is to `scripts/` or to a
-stray committed binary would never trigger it — and those are exactly the
-changes the scope check exists to catch.
+from a `Service/` branch. It was its own workflow until that one dropped its
+`paths:` filter — the filter was the reason, since a branch whose only change is
+to `scripts/` or to a stray committed binary would not have triggered it, and
+those are exactly the changes this check exists to catch. That workflow now runs
+on every pull request, so the job lives there.
 
 **CI (`.github/workflows/policy_check_PR.yaml`):** a `lint` job runs
 (1) `linter.py --tree all --no-content-checks` as a hard whole-tree structural

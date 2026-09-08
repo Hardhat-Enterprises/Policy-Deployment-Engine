@@ -30,20 +30,20 @@ Finding = policy_lint.Finding
 # _owned_triples
 # --------------------------------------------------------------------------- #
 def test_owned_triples_from_a_policy_file():
-    changed = {"policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego"}
+    changed = {"policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego"}
     assert rpl._owned_triples(changed) == {("gcp", "BigQuery", "google_bigquery_dataset")}
 
 
 def test_owned_triples_from_an_input_fixture_file():
-    changed = {"inputs/gcp/BigQuery/google_bigquery_dataset/dataset_id/compliant.tf"}
+    changed = {"policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/compliant.tf"}
     assert rpl._owned_triples(changed) == {("gcp", "BigQuery", "google_bigquery_dataset")}
 
 
 def test_owned_triples_dedupes_across_multiple_files_in_the_same_resource():
     changed = {
-        "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego",
+        "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego",
         "policies/gcp/BigQuery/google_bigquery_dataset/_vars.rego",
-        "inputs/gcp/BigQuery/google_bigquery_dataset/dataset_id/compliant.tf",
+        "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/compliant.tf",
     }
     assert rpl._owned_triples(changed) == {("gcp", "BigQuery", "google_bigquery_dataset")}
 
@@ -59,8 +59,8 @@ def test_owned_triples_ignores_docs_and_shallow_paths():
 
 def test_owned_triples_spans_multiple_resource_types():
     changed = {
-        "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego",
-        "policies/gcp/Cloud Storage/google_storage_bucket/location.rego",
+        "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego",
+        "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego",
     }
     assert rpl._owned_triples(changed) == {
         ("gcp", "BigQuery", "google_bigquery_dataset"),
@@ -75,7 +75,7 @@ def test_finding_path_for_a_policy_finding():
     finding = Finding("BigQuery", "google_bigquery_dataset", "dataset_id",
                        "hard-coded-value", "msg")
     path = rpl._finding_path("gcp", "BigQuery", "google_bigquery_dataset", finding)
-    assert path == "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego"
+    assert path == "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego"
 
 
 def test_finding_path_for_a_vars_finding():
@@ -89,16 +89,16 @@ def test_finding_path_for_a_fixture_finding_is_the_argument_directory():
     finding = Finding("BigQuery", "google_bigquery_dataset", "dataset_id",
                        "fixture-drift", "msg")
     path = rpl._finding_path("gcp", "BigQuery", "google_bigquery_dataset", finding)
-    assert path == "inputs/gcp/BigQuery/google_bigquery_dataset/dataset_id"
+    assert path == "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id"
 
 
 def test_finding_owned_when_the_exact_policy_file_changed():
-    path = "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego"
+    path = "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego"
     assert rpl._finding_owned(path, {path})
 
 
 def test_finding_owned_when_a_file_under_the_fixture_directory_changed():
-    directory = "inputs/gcp/BigQuery/google_bigquery_dataset/dataset_id"
+    directory = "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id"
     changed = {f"{directory}/compliant.tf"}
     assert rpl._finding_owned(directory, changed)
 
@@ -107,8 +107,8 @@ def test_finding_not_owned_for_a_sibling_argument():
     # The contributor touched dataset_id.rego; a pre-existing error on a
     # different argument in the same resource type must not be attributed to
     # them.
-    changed = {"policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego"}
-    other = "policies/gcp/BigQuery/google_bigquery_dataset/max_time_travel_hours.rego"
+    changed = {"policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego"}
+    other = "policies/gcp/BigQuery/google_bigquery_dataset/max_time_travel_hours/policy.rego"
     assert not rpl._finding_owned(other, changed)
 
 
@@ -132,13 +132,13 @@ def test_policy_lint_findings_keeps_only_owned_errors(monkeypatch):
 
     monkeypatch.setattr(policy_lint, "lint_resource", fake_lint_resource)
 
-    changed = {"policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego"}
+    changed = {"policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego"}
     triples = rpl._owned_triples(changed)
 
     owned, backlog = rpl._policy_lint_findings(triples, changed, root="/repo")
 
     assert [f.rule for _, f in owned] == ["hard-coded-value"]
-    assert owned[0][0] == "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego"
+    assert owned[0][0] == "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego"
     # The sibling-argument error is backlog; the warning is never counted at all.
     assert backlog == 1
 
@@ -161,8 +161,8 @@ def test_policy_lint_findings_covers_multiple_owned_triples(monkeypatch):
     monkeypatch.setattr(policy_lint, "lint_resource", fake_lint_resource)
 
     changed = {
-        "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego",
-        "policies/gcp/Cloud Storage/google_storage_bucket/location.rego",
+        "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego",
+        "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego",
     }
     triples = rpl._owned_triples(changed)
 
@@ -185,13 +185,13 @@ def test_policy_lint_findings_owns_a_fixture_finding_via_the_argument_directory(
 
     monkeypatch.setattr(policy_lint, "lint_resource", fake_lint_resource)
 
-    changed = {"inputs/gcp/BigQuery/google_bigquery_dataset/dataset_id/compliant.tf"}
+    changed = {"policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/compliant.tf"}
     triples = rpl._owned_triples(changed)
 
     owned, backlog = rpl._policy_lint_findings(triples, changed, root="/repo")
 
     assert len(owned) == 1
-    assert owned[0][0] == "inputs/gcp/BigQuery/google_bigquery_dataset/dataset_id"
+    assert owned[0][0] == "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id"
     assert backlog == 0
 
 
@@ -233,7 +233,7 @@ def test_finding_counts_ignores_warnings():
 # --------------------------------------------------------------------------- #
 # _split_new_and_inherited — new vs inherited
 # --------------------------------------------------------------------------- #
-DATASET_REGO = "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id.rego"
+DATASET_REGO = "policies/gcp/BigQuery/google_bigquery_dataset/dataset_id/policy.rego"
 
 
 def _owned(*findings):
@@ -378,7 +378,7 @@ def test_subtract_baseline_lints_a_real_base_worktree_and_removes_it(git_repo, m
         seen_roots.append(Path(root))
         return [_hard_coded("literal 'projects/PDE' (base wording)")]
 
-    monkeypatch.setattr(policy_lint, "lint_resource", fake_lint_resource)
+    monkeypatch.setattr(policy_lint, "lint_resource_baseline", fake_lint_resource)
 
     new, inherited = rpl._subtract_baseline(
         _owned(_hard_coded("literal 'projects/PDE' (head wording)")))
@@ -401,7 +401,7 @@ def test_base_tree_is_removed_even_when_linting_it_raises(git_repo, monkeypatch)
         seen_roots.append(Path(root))
         raise policy_lint.PolicyLintError("opa fell over")
 
-    monkeypatch.setattr(policy_lint, "lint_resource", exploding_lint_resource)
+    monkeypatch.setattr(policy_lint, "lint_resource_baseline", exploding_lint_resource)
 
     with pytest.raises(policy_lint.PolicyLintError):
         rpl._subtract_baseline(_owned(_hard_coded()))
@@ -428,7 +428,7 @@ def test_only_targets_with_a_finding_at_head_are_linted_on_the_base(git_repo, mo
         linted.append((platform, service, resource_type))
         return []
 
-    monkeypatch.setattr(policy_lint, "lint_resource", fake_lint_resource)
+    monkeypatch.setattr(policy_lint, "lint_resource_baseline", fake_lint_resource)
 
     # The base targets come from the owned findings, not from the changed set:
     # a resource type the change touched but left clean never reaches the base
@@ -447,7 +447,7 @@ def test_print_inherited_says_nothing_when_there_is_nothing_inherited(capsys):
 
 
 def test_print_inherited_summarises_by_rule_and_elides_a_long_list(capsys):
-    inherited = [(f"policies/gcp/BigQuery/google_bigquery_dataset/arg_{i}.rego",
+    inherited = [(f"policies/gcp/BigQuery/google_bigquery_dataset/arg_{i}/policy.rego",
                   _hard_coded(f"m{i}")) for i in range(rpl.INHERITED_PREVIEW + 5)]
     rpl._print_inherited(inherited)
     out = capsys.readouterr().out

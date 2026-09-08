@@ -60,6 +60,12 @@ import os
 import re
 import sys
 from datetime import datetime
+from pathlib import Path
+import subprocess
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from scripts.auto_test.auto_test import PLAN_FILE_RE, alternate_fixture_shas, plan_cache_path
+from scripts.docgen.lib.canonical import canonical_for
+
 
 # --------------------------------------------------------------------------- #
 # Editable allow-lists — extend these as the docs tree grows.
@@ -98,6 +104,100 @@ DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
 COLLECTION_RE = re.compile(r"^(?:list|set|map)\((string|bool|number|int|float)\)$")
 
+
+def ignored_under(root):
+    """Paths under ``root`` that git ignores — untracked and excluded.
+
+    One `git ls-files` for the whole tree, so the per-directory checks below are
+    set lookups. A file that is *tracked* never appears here even if a later
+    .gitignore rule would match it, which is the behaviour wanted: a binary
+    `tfplan` that reached dev has to be reported, however well ignored it would be
+    today.
+
+    Returns None outside a git checkout (or with no git on PATH), and the callers
+    then fall back to INPUT_ALLOWED_TF_FILES.
+    """
+    try:
+        proc = subprocess.run(
+            ["git", "ls-files", "--others", "--ignored", "--exclude-standard", "-z", "--", str(root)],
+            capture_output=True, text=True)
+    except (OSError, ValueError):
+        return None
+    if proc.returncode != 0:
+        return None
+    return {os.path.normpath(p) for p in proc.stdout.split("\0") if p}
+
+class DocsCanonicalValidator:
+    """Docs content check: canonical arguments carry their canonical assessment.
+
+    Some arguments mean the same thing on every resource — a top-level
+    ``location``/``region``/``zone``, and the common keys on the split IAM resources.
+    Deciding those per resource produced 14 different answers to the same question,
+    three of which were right for reasons the generic answer could not express (see
+    ``canonical.EXEMPTIONS``) and eleven of which were the same sentence rewritten.
+
+    A CONTENT check, not a structural one, and deliberately so. The structural pass is
+    a hard tree-wide gate on every pull request; a rule that can be broken by editing
+    any one of ~400 docs files does not belong there, or one contributor's drift turns
+    every other contributor's pull request red. As a content check it reaches people
+    the right way round: ``run_precommit_linter`` attributes it to whoever changed the
+    file, and the whole-tree ALL run reports the rest.
+    """
+
+    def __init__(self, docs_root, logger):
+        self.docs_root = docs_root
+        self.logger = logger
+
+    def validate(self, only_platform=None):
+        for platform in sorted(ALLOWED_PLATFORMS):
+            if only_platform and platform != only_platform:
+                continue
+            root = os.path.join(self.docs_root, platform)
+            if not os.path.isdir(root):
+                continue
+            for service in sorted(os.listdir(root)):
+                service_dir = os.path.join(root, service)
+                if not os.path.isdir(service_dir):
+                    continue
+                for entry in sorted(os.listdir(service_dir)):
+                    if entry.endswith(".json"):
+                        self._check_file(os.path.join(service_dir, entry),
+                                         f"docs/{platform}/{service}/{entry}",
+                                         entry[:-len(".json")])
+
+    def _check_file(self, path, rel, resource):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                doc = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            return                      # DocsValidator reports malformed files
+        arguments = doc.get("arguments")
+        if not isinstance(arguments, dict):
+            return
+
+        for key, entry in arguments.items():
+            if not isinstance(entry, dict) or "security_impact" not in entry:
+                continue                # blocks carry no assessment
+            canon = canonical_for(resource, key)
+            if canon is None:
+                continue
+            impact, rationale = canon
+            for field, want in (("security_impact", impact), ("rationale", rationale)):
+                got = entry.get(field)
+                if got == want:
+                    continue
+                self.logger.log(
+                    f"[content] {rel}: argument '{key}' has a canonical {field} that has "
+                    f"been changed. Restore it with "
+                    f"`python3 scripts/docgen/apply_canonical.py --apply`, or — if this "
+                    f"resource genuinely differs — add it to EXEMPTIONS in "
+                    f"scripts/docgen/lib/canonical.py with the reason "
+                    f"(found {shorten(got)}, expected {shorten(want)})")
+
+def shorten(value, limit=60):
+    """A field value, trimmed to something that fits on a terminal line."""
+    text = json.dumps(value) if not isinstance(value, str) else value
+    return repr(text if len(text) <= limit else text[:limit] + "…")
 
 class ErrorLogger:
     def __init__(self):
@@ -309,6 +409,7 @@ class PoliciesValidator:
         self.root = policies_root
         self.docs = docs_index  # {service: {resource: {arg: type}}}
         self.logger = logger
+        self.ignored = ignored_under(policies_root)
 
     def _entries(self, path):
         try:
@@ -421,18 +522,38 @@ class PoliciesValidator:
     # ----- 3g: argument-dir leaf files ------------------------------------ #
     def validate_argument_dir(self, arg_path, rel):
         entries = self._entries(arg_path)
-        missing = ARGUMENT_REQUIRED_FILES - set(entries)
+        missing = {name for name in ARGUMENT_REQUIRED_FILES if not (Path(arg_path) / name).is_file()}
         if missing:
             self.logger.log(f"{rel}: missing required file(s) {sorted(missing)}")
-
+        try:
+            expected = plan_cache_path(Path(arg_path), Path(self.root).resolve().parent).name
+            alternates = {f"{sha}.json" for sha in alternate_fixture_shas(Path(arg_path))}
+        except (OSError, ValueError) as exc:
+            self.logger.log(f"{rel}: cannot determine committed plan: {exc}")
+            expected, alternates = None, set()
+        if expected and not (Path(arg_path) / expected).is_file():
+            self.logger.log(f"{rel}: missing committed plan '{expected}' (run auto_test and commit its output)")
+        fallback = {".terraform.lock.hcl", "plan", "plan.json", "tfplan", "tfplan.json",
+                    "terraform.tfstate", "terraform.tfstate.backup", "crash.log"}
         for entry in entries:
-            if entry in ARGUMENT_REQUIRED_FILES:
+            full = Path(arg_path) / entry
+            if full.is_file() and entry in ARGUMENT_REQUIRED_FILES | {PLATFORM_CONFIG_FILE, expected}:
                 continue
-            if os.path.isdir(os.path.join(arg_path, entry)):
+            ignored = self.ignored is not None and os.path.normpath(os.path.relpath(full)) in self.ignored
+            if ignored or (self.ignored is None and entry in fallback):
+                continue
+            if full.is_dir():
+                # Local ignored terraform directories are allowed, but tracked children are not.
+                if entry == ".terraform" and (self.ignored is None or all(
+                        os.path.normpath(os.path.relpath(f)) in self.ignored
+                        for f in full.rglob("*") if f.is_file())):
+                    continue
                 self.logger.log(f"{rel}/{entry}: directories not allowed in an argument dir")
+            elif entry.endswith(".json"):
+                why = "named from CRLF line endings (or a UTF-8 BOM)" if entry in alternates else "stale or not a committed plan filename"
+                self.logger.log(f"{rel}/{entry}: unexpected .json ({why}); expected '{expected}'")
             else:
-                self.logger.log(f"{rel}/{entry}: unexpected file (an argument dir holds exactly "
-                                f"{sorted(ARGUMENT_REQUIRED_FILES)})")
+                self.logger.log(f"{rel}/{entry}: unexpected file (git would commit this; remove it or add it to .gitignore)")
 
 
 # =========================================================================== #
@@ -625,10 +746,17 @@ def main(argv=None):
         print(f"\n[*] Linting policies tree at {policies_root}"
               f"{f' (platform: {args.platform})' if args.platform else ''}\n")
         PoliciesValidator(policies_root, docs_index, logger).validate_root(only_platform=args.platform)
+        legacy_inputs = Path(policies_root).parent / "inputs" / "gcp"
+        if (args.platform in (None, "gcp") and legacy_inputs.is_dir()
+                and any(p.is_file() for p in legacy_inputs.rglob("*") if p.name != ".gitkeep")):
+            logger.log("inputs/gcp/: legacy fixture tree remains; complete the layout migration")
 
-    if args.content_checks and do_policies:
+    if args.content_checks:
         print("\n[*] Running content checks\n")
-        ContentChecksValidator(policies_root, logger).validate(only_platform=args.platform)
+        if do_docs:
+            DocsCanonicalValidator(docs_root, logger).validate(only_platform=args.platform)
+        if do_policies:
+            ContentChecksValidator(policies_root, logger).validate(only_platform=args.platform)
 
     if logger.summary():
         sys.exit(1)

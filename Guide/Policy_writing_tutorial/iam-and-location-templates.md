@@ -23,9 +23,9 @@ Each GCP service that supports IAM exposes three separate Terraform resource typ
 
 ### Example: `For API Gateway Gateway`
 
-- `policies/gcp/service name/google_*_iam_binding`
-- `policies/gcp/service name/google_*_iam_member`
-- `policies/gcp/service name/google_*_iam_policy`
+- `inputs/gcp/service name/google_*_iam_binding`
+- `inputs/gcp/service name/google_*_iam_member`
+- `inputs/gcp/service name/google_*_iam_policy`
 
 #### Attributes to Cover
 
@@ -78,15 +78,19 @@ resource "google_sql_database_instance" "instance" {
 
 ### 1. Copy required files
 
-Copy from `templates/gcp` into your attribute folder
-`policies/gcp/<Service>/<IAM resource type>/<attribute>/`:
+Copy the fixture files from `templates/gcp` into your **inputs** attribute folder
+`inputs/gcp/<Service>/<IAM resource type>/<attribute>/`:
 
 - `compliant.tf`
 - `nonCompliant.tf`
-- `policy.rego`
+- `config.tf`
 
-Then copy **one** `_vars.rego` into the IAM resource folder
-`policies/gcp/<Service>/<IAM resource type>/`, beside the attribute folders.
+For the **policies** tree:
+
+- Copy **one** `_vars.rego` into the IAM resource folder
+  `policies/gcp/<Service>/<IAM resource type>/`.
+- Copy `templates/gcp/policy.rego` into that same folder and **rename it to `<attribute>.rego`**
+  (a flat file — there is no per-attribute subfolder).
 
 > **Note:** Each IAM resource type (`_iam_binding`, `_iam_member`, `_iam_policy`) is its own
 > resource folder, so you need **3 separate `_vars.rego` files** — one per IAM resource type.
@@ -115,7 +119,7 @@ GKEHub/
 
 Complete every item before raising a PR:
 
-- [ ] `package` line updated in `<attribute>/policy.rego`
+- [ ] `package` line updated in `<attribute>.rego`
 - [ ] Folder name matches the resource type exactly
 - [ ] `_vars.rego` — all 3 fields filled in: `friendly_resource_name`, `resource_type`, `resource_value_name`
 - [ ] Condition 1 — `["role"]` confirmed in resource JSON
@@ -126,7 +130,7 @@ Complete every item before raising a PR:
 - [ ] Condition 3 — `attribute_path` confirmed (same as condition 2)
 - [ ] Valid roles confirmed from resource documentation — pattern whitelist values updated
 - [ ] `_iam_policy` values updated to full JSON string patterns matching your resource's valid roles
-- [ ] `python3 scripts/auto_test/auto_test.py` run for the resource — policy produces expected pass/fail output
+- [ ] `python3 scripts/check_resource.py` passes for the resource — docs complete, every true arg covered, policy produces the expected pass/fail output
 
 <div align="center">
 

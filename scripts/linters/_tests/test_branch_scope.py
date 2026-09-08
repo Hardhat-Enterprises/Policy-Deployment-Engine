@@ -100,7 +100,7 @@ def test_own_docs_json_is_in_scope():
 
 def test_own_inputs_fixture_is_in_scope():
     assert bs.path_in_scope(
-        "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
+        "policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
         PLATFORM, FOLDER, RTYPE)
 
 
@@ -119,7 +119,7 @@ def test_another_resource_in_the_same_service_is_out_of_scope():
 
 def test_a_resource_whose_name_merely_starts_with_ours_is_out_of_scope():
     assert not bs.path_in_scope(
-        "policies/gcp/Cloud Storage/google_storage_bucket_iam_binding/role.rego",
+        "policies/gcp/Cloud Storage/google_storage_bucket_iam_binding/role/policy.rego",
         PLATFORM, FOLDER, RTYPE)
 
 
@@ -149,28 +149,57 @@ def test_a_bare_root_file_is_out_of_scope():
 # --------------------------------------------------------------------------- #
 # classify
 # --------------------------------------------------------------------------- #
+# A committed plan's filename is the sha of the *.tf beside it; only the shape
+# matters here, so any 64 hex characters will do.
+SHA = "a" * 64
+
+
+
 def test_adding_your_own_files_is_allowed():
-    assert classify("A", "policies/gcp/Cloud Storage/google_storage_bucket/location.rego") is None
+    assert classify("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego") is None
     assert classify("M", "docs/gcp/Cloud Storage/google_storage_bucket.json") is None
 
 
-def test_adding_a_plan_cache_entry_is_allowed():
-    assert classify("A", "inputs/plan_cache/gcp/abc123.json") is None
+def test_committing_your_own_plan_is_allowed():
+    plan = f"policies/gcp/Cloud Storage/google_storage_bucket/location/{SHA}.json"
+    assert classify("A", plan) is None
+    assert classify("M", plan) is None
 
 
-def test_deleting_a_plan_cache_entry_is_a_plan_cache_finding():
-    # Reported as plan-cache-modified rather than deleted-file: a wiped cache is
-    # one problem with one fix, not a thousand separate deletions.
-    assert classify("D", "inputs/plan_cache/gcp/abc123.json") == "plan-cache-modified"
+def test_deleting_your_own_stale_plan_is_allowed():
+    # Editing a fixture changes its sha, and the harness prunes the plan of the
+    # previous version as it writes the new one. That deletion is the contributor
+    # doing the right thing.
+    assert classify(
+        "D", f"policies/gcp/Cloud Storage/google_storage_bucket/location/{SHA}.json"
+    ) is None
 
 
-def test_modifying_a_plan_cache_entry_is_a_plan_cache_finding():
-    assert classify("M", "inputs/plan_cache/gcp/abc123.json") == "plan-cache-modified"
+def test_deleting_someone_elses_plan_is_still_out_of_scope():
+    assert classify(
+        "D", f"policies/gcp/Compute Engine/google_compute_image/family/{SHA}.json"
+    ) == "deleted-file"
+
+
+def test_reviving_the_legacy_plan_cache_is_its_own_finding():
+    # One message about a stale layout, not a thousand out-of-scope files.
+    assert classify("A", "inputs/plan_cache/gcp/abc123.json") == "legacy-plan-cache"
+    assert classify("M", "inputs/plan_cache/gcp/abc123.json") == "legacy-plan-cache"
+
+
+def test_deleting_the_legacy_plan_cache_is_allowed():
+    assert classify("D", "inputs/plan_cache/gcp/abc123.json") is None
 
 
 def test_deleting_your_own_file_is_still_a_deletion():
     assert classify(
-        "D", "policies/gcp/Cloud Storage/google_storage_bucket/location.rego"
+        "D", "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego"
+    ) == "deleted-file"
+
+
+def test_a_non_plan_json_deletion_in_scope_is_still_a_deletion():
+    assert classify(
+        "D", "policies/gcp/Cloud Storage/google_storage_bucket/location/plan.json"
     ) == "deleted-file"
 
 
@@ -202,9 +231,9 @@ def test_stray_junk_is_out_of_scope():
 def test_check_is_clean_for_an_honest_branch():
     entries = [
         ("M", "docs/gcp/Cloud Storage/google_storage_bucket.json"),
-        ("A", "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"),
-        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location.rego"),
-        ("A", "inputs/plan_cache/gcp/abc123.json"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego"),
+        ("A", f"policies/gcp/Cloud Storage/google_storage_bucket/location/{SHA}.json"),
     ]
     assert bs.check(entries, PLATFORM, FOLDER, RTYPE) == []
 
@@ -213,7 +242,7 @@ def test_check_reports_each_violation_once_sorted_by_rule_then_path():
     entries = [
         ("A", "opa.exe"),
         ("M", "scripts/auto_test/auto_test.py"),
-        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location.rego"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego"),
     ]
     findings = bs.check(entries, PLATFORM, FOLDER, RTYPE)
     assert [(f.rule, f.path) for f in findings] == [
@@ -245,9 +274,10 @@ def test_changed_entries_parses_statuses_spaces_and_renames(monkeypatch):
     """
     recorded = (
         b"M\0docs/gcp/Cloud Storage/google_storage_bucket.json\0"
-        b"A\0inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf\0"
-        b"D\0policies/gcp/Cloud Storage/google_storage_bucket/old.rego\0"
-        b"R096\0inputs/plan_cache/gcp/aaa.json\0inputs/plan_cache/gcp/bbb.json\0"
+        b"A\0policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf\0"
+        b"D\0policies/gcp/Cloud Storage/google_storage_bucket/old/policy.rego\0"
+        b"R096\0policies/gcp/Cloud Storage/google_storage_bucket/location/aaa.json\0"
+        b"policies/gcp/Cloud Storage/google_storage_bucket/location/bbb.json\0"
     )
     monkeypatch.setattr(bs, "_git", lambda *args: recorded)
     monkeypatch.setattr(
@@ -256,8 +286,8 @@ def test_changed_entries_parses_statuses_spaces_and_renames(monkeypatch):
 
     assert bs.changed_entries("origin/dev") == [
         ("M", "docs/gcp/Cloud Storage/google_storage_bucket.json"),
-        ("A", "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"),
-        ("D", "policies/gcp/Cloud Storage/google_storage_bucket/old.rego"),
-        ("D", "inputs/plan_cache/gcp/aaa.json"),
-        ("A", "inputs/plan_cache/gcp/bbb.json"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"),
+        ("D", "policies/gcp/Cloud Storage/google_storage_bucket/old/policy.rego"),
+        ("D", "policies/gcp/Cloud Storage/google_storage_bucket/location/aaa.json"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/bbb.json"),
     ]

@@ -37,7 +37,6 @@ def tree(tmp_path, monkeypatch):
     (arg_dir / "policy.rego").write_text("package terraform.gcp.security.x\n", encoding="utf-8")
 
     monkeypatch.setattr(auto_test, "POLICIES_ROOT", policies)
-    monkeypatch.setattr(auto_test, "PLAN_CACHE_ROOT", tmp_path / "plan_cache")
     return tmp_path, policies, arg_dir
 
 
@@ -123,10 +122,10 @@ class TestFixtureSha:
 
 
 class TestPlanCachePath:
-    def test_lands_under_plan_cache_platform(self, tree):
+    def test_lands_beside_fixture(self, tree):
         tmp, _policies, arg_dir = tree
         path = auto_test.plan_cache_path(arg_dir)
-        assert path.parent == tmp / "plan_cache" / "gcp"
+        assert path.parent == arg_dir
         assert path.name == f"{auto_test.fixture_sha(arg_dir)}.json"
 
 

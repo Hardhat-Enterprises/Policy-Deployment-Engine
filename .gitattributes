@@ -1,10 +1,50 @@
-# Terraform fixtures and Rego policies are hashed byte-for-byte by the plan cache
-# (scripts/auto_test/auto_test.py: fixture_sha). Pin them to LF so a Windows checkout
-# and a Linux CI runner see identical bytes.
+# Line endings are load-bearing in this repo, not cosmetic.
 #
-# The committed blobs are already LF, so adding this changes nothing in git history —
-# it stops a CRLF blob being committed in future. auto_test also normalises CRLF before
-# hashing, which is what makes existing Windows worktrees work; this is the belt to
-# that pair of braces.
-*.tf    text eol=lf
-*.rego  text eol=lf
+# A fixture's committed plan is named for the sha256 of the *.tf beside it
+# (scripts/auto_test/auto_test.py: fixture_sha). Before this file existed a
+# contributor on Windows defaults (core.autocrlf=true) had CRLF in their working
+# tree while git stored LF, so their fixture hashed to a different sha than the
+# same fixture on every LF checkout: the plan cache hit locally and passed, then
+# CI and the portal computed a different <sha>.json, found no plan, and reported
+# `fixture-missing-plan` against every argument of the resource. Whole branches
+# of finished work read as zero.
+#
+# fixture_sha now normalises CRLF and a UTF-8 BOM away before hashing, so the sha
+# is checkout-independent on its own. This file is the other half: it stops the
+# CRLF bytes entering the repository in the first place, which keeps diffs,
+# rename detection and every other tool that reads these files honest.
+#
+# The default is deliberately global rather than a list of extensions. The
+# failure it prevents is silent and expensive, and an extension list only
+# protects the types someone remembered to add — the next fixture format, helper
+# script or generated report added to the tree would arrive unprotected. `text=auto`
+# leaves git's own binary detection in charge of what counts as text, so this is
+# safe to apply tree-wide.
+* text=auto eol=lf
+
+# Spelled out for the types the harness or the linters hash or parse, so the
+# guarantee is visible to anyone reading this file rather than implied by the
+# line above. These are redundant with `* text=auto eol=lf` by design.
+*.tf     text eol=lf
+*.rego   text eol=lf
+*.json   text eol=lf
+*.py     text eol=lf
+*.md     text eol=lf
+*.txt    text eol=lf
+*.yaml   text eol=lf
+*.yml    text eol=lf
+*.sh     text eol=lf
+*.toml   text eol=lf
+*.html   text eol=lf
+*.lock   text eol=lf
+
+# Genuinely binary: never touched, never diffed as text. Stated explicitly so the
+# outcome does not depend on content sniffing.
+*.png    binary
+*.PNG    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.pdf    binary
+*.zip    binary

@@ -2,18 +2,15 @@
 <h1 align="center">Terraform inputs</h1>
 
 > You generate a plan here mainly to **inspect it and find your attribute path**. You do
-> **not** commit `plan.json` — when you run the test harness (`auto_test.py`), it produces and
-> caches the plan for you under `plan_cache/`.
+> **not** commit the `plan` / `plan.json` you make by hand below — they are gitignored. The
+> test harness (`auto_test.py`) writes the plan that *is* committed: a `<sha>.json` in this
+> same directory, named for the hash of your `*.tf`. Commit that one, and nothing else.
 
 ### 1. terraform init
 
-Make sure you are in the attribute directory you are writing your policy on:
+Make sure you are in the inputs directory of the attribute you are writing your policy on:
 
-`policies/gcp/<Service>/<resource>/<attribute>/`
-
-Running `terraform` by hand there needs a provider block, which is no longer kept per
-attribute. Copy `policies/gcp/config.tf` in temporarily, and delete it (along with
-`plan`, `plan.json` and `.terraform/`) before you commit.
+`inputs/gcp/<Service>/<resource>/<attribute>/`
 
 
     terraform init

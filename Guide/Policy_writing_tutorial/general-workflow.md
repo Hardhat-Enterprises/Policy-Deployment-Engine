@@ -6,12 +6,10 @@
 1. Get assigned a service from PDE Leadership (e.g. `Cloud Functions`).  
 2. Research the service and identify security-relevant arguments.  
 
-3. Create the required folder structure. Everything for one attribute lives in **one**
-   folder:
-   - `policies/gcp/<Service>/<resource>/<attribute>/` — one folder **per attribute**,
-     holding `policy.rego`, `compliant.tf` and `nonCompliant.tf`
-   - `policies/gcp/<Service>/<resource>/_vars.rego` — a single file for the whole
-     resource, sitting beside the attribute folders
+3. Create the required folder structure. Note the two trees are **not** symmetrical:
+   - `inputs/gcp/<Service>/<resource>/<attribute>/` — one folder **per attribute** (holds the fixtures)
+   - `policies/gcp/<Service>/<resource>/` — the policy is a **flat file** `<attribute>.rego` here,
+     plus a single `_vars.rego` for the whole resource (not a folder per attribute)
 
    `<Service>` is the docs-taxonomy folder name (e.g. `Cloud Functions`, with spaces);
    `<resource>` and `<attribute>` are the exact Terraform resource type and argument names.
@@ -19,9 +17,7 @@
 4. Create and configure the fixtures (copy them from `templates/gcp`):
    - `compliant.tf` (compliant example)  
    - `nonCompliant.tf` (non-compliant example)  
-
-   You do **not** create a `config.tf`. There is one shared provider stub at
-   `policies/gcp/config.tf`, and the test harness copies it in when it runs Terraform.
+   - `config.tf`  
 
 5. (Optional, to discover the attribute path) Generate a Terraform plan and inspect it:
 
@@ -29,23 +25,24 @@
     terraform plan --out=plan  
     terraform show -json plan > plan.json  
 
-   You don't commit this `plan.json` — the test harness generates and caches plans for you
-   under `plan_cache/`. (To plan by hand you need a `config.tf` in the directory; copy
-   `policies/gcp/config.tf` in temporarily and delete it before you commit.)
+   You don't commit this `plan.json` — it is gitignored. The test harness writes the plan that
+   *is* committed: a `<sha>.json` in the fixture's own directory, named for the hash of its
+   `*.tf`.
 
 6. Use the plan JSON to determine your attribute path.  
 
 7. Write your:
-   - `<attribute>/policy.rego` (policy logic)  
+   - `<attribute>.rego` (policy logic)  
    - `_vars.rego` (resource metadata — one per resource)  
 
-8. Test your policy. The linter runs automatically via pre-commit, or run it directly:
+8. Check your work. One command runs everything CI will run — branch name, branch scope,
+   lint, doc completeness, argument coverage, and the `terraform plan` + `opa eval` test:
 
-    python3 scripts/linters/linter.py --platform gcp
+    python3 scripts/check_resource.py
 
-   Then run the OPA test harness (it handles `terraform plan`, plan caching, and `opa eval`):
-
-    python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource>"
+   If it says every check passed, CI will agree. See
+   [Testing your policies](testing-policies.md#top) for what each check means and how to run
+   the individual tools when you are chasing one failure.
 
 9. Fix any errors and re-test until successful.  
 
@@ -74,6 +71,9 @@
 - Attribute paths must match the structure of `plan.json`  
 - Always test before pushing  
 - Documentation must be completed before raising a PR  
+- If the portal stops scanning your branch and asks you to merge `dev` to catch up, do that **and**
+  re-run the test harness — see
+  [Merge dev into your branch to catch up](common-errors.md#harness-out-of-date)  
 
 
 <div align="center">

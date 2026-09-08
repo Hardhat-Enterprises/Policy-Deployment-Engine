@@ -26,137 +26,227 @@ CLI_CONFIG_FILE = CACHE_ROOT / "cli.tfrc"
 MIRROR_DIR = CACHE_ROOT / "mirror"
 CACHE_SETUP_SCRIPT = Path(__file__).resolve().parent / "cache_setup.sh"
 
-# --- Committed plan-JSON cache --------------------------------------------
-# `terraform plan` (provider schema load) is ~90% of per-policy time, but the
-# fixtures are static, so the resulting plan.json only changes when a fixture's
-# *.tf or the provider version changes. We cache plan.json under
-# plan_cache/<platform>/<sha>.json (committed). On a run, a cache hit feeds
-# OPA directly and skips terraform entirely; a miss runs terraform once and writes
-# the cache. The target provider version is read from provider_version.txt (the
-# single source of truth shared with cache_setup.sh) so a provider bump
-# invalidates every cached plan.
+# Committed plans live beside their fixtures. Every consumer uses the same
+# effective-file resolver and hash, including migrations and temporary test trees.
 TARGET_PROVIDER_VERSION = (Path(__file__).resolve().parent / "provider_version.txt").read_text().strip()
 POLICIES_ROOT = REPO_ROOT / "policies"
-PLAN_CACHE_ROOT = REPO_ROOT / "plan_cache"
-
-# Layout constants. A policy is a self-contained directory:
-#   policies/<platform>/<service>/<resource>/<argument>/{policy.rego,compliant.tf,nonCompliant.tf}
-# with the per-resource _vars.rego one level up and ONE provider stub per platform at
-# policies/<platform>/config.tf (it used to be duplicated into every argument dir).
 PLATFORM_CONFIG_NAME = "config.tf"
 FIXTURE_TF_FILES = ("compliant.tf", "nonCompliant.tf")
 POLICY_FILE = "policy.rego"
 VARS_FILE = "_vars.rego"
+PLAN_FILE_RE = re.compile(r"^[0-9a-f]{64}\.json$")
+UTF8_BOM = b"\xef\xbb\xbf"
 
 
-def platform_of(policy_dir: Path) -> str:
-    """The <platform> segment of policies/<platform>/<service>/<resource>/<argument>.
+def policy_root(policy_dir: Path, repo_root: Path | None = None) -> Path:
+    """Resolve the owning policies root; an explicit root never falls back elsewhere."""
+    directory = Path(policy_dir).resolve()
+    candidates = [Path(repo_root).resolve() / "policies"] if repo_root is not None else [
+        p for p in directory.parents if p.name == "policies"]
+    for root in candidates:
+        try:
+            parts = directory.relative_to(root).parts
+        except ValueError:
+            continue
+        if len(parts) == 4 and parts[0] in {"gcp", "aws", "azure"}:
+            return root
+    raise ValueError(f"Not an argument directory under policies/<platform>/<service>/<resource>: {directory}")
 
-    Derived relative to the repo's policies/ root rather than by scanning the absolute
-    path for a component named "policies" — otherwise a checkout that itself lives under
-    a directory of that name would resolve to the wrong segment.
-    """
-    rel = policy_dir.resolve().relative_to(POLICIES_ROOT.resolve())
-    return rel.parts[0]
+
+def platform_of(policy_dir: Path, repo_root: Path | None = None) -> str:
+    return Path(policy_dir).resolve().relative_to(policy_root(policy_dir, repo_root)).parts[0]
 
 
-def fixture_files(policy_dir: Path) -> dict[str, Path]:
-    """The .tf set terraform sees for one argument: the argument's own fixtures plus
-    the shared platform config.tf, keyed by the name it gets in the workspace."""
-    files = {p.name: p for p in policy_dir.glob("*.tf")}
-    files[PLATFORM_CONFIG_NAME] = POLICIES_ROOT / platform_of(policy_dir) / PLATFORM_CONFIG_NAME
+def fixture_files(policy_dir: Path, repo_root: Path | None = None) -> dict[str, Path]:
+    """Terraform's effective *.tf files; local config replaces the shared default."""
+    directory = Path(policy_dir).resolve()
+    root = policy_root(directory, repo_root)
+    files = {p.name: p for p in directory.glob("*.tf") if p.is_file()}
+    config = files.get(PLATFORM_CONFIG_NAME, root / platform_of(directory, repo_root) / PLATFORM_CONFIG_NAME)
+    if not config.is_file():
+        raise FileNotFoundError(f"Missing effective config.tf for {directory}: {config}")
+    files[PLATFORM_CONFIG_NAME] = config
     return files
 
 
-def fixture_sha(policy_dir: Path) -> str:
-    """Stable hash of a fixture: its *.tf contents + the target provider version.
+def canonical_text_bytes(data: bytes) -> bytes:
+    """A text file's bytes reduced to the form every checkout agrees on.
 
-    CRLF is normalised to LF first. Git stores these files with LF but checks them out
-    as CRLF on Windows (core.autocrlf), so hashing raw bytes gives a Windows machine a
-    different key than Linux for byte-identical content — i.e. a 100% miss against the
-    committed cache. Normalising makes the key platform-independent.
+    CRLF (and a lone CR) collapse to LF and a leading UTF-8 BOM is dropped. Only
+    ever used for hashing — nothing is rewritten on disk.
 
-    config.tf is hashed under its own name in sorted position even though it now lives
-    outside the fixture dir, so keys are unchanged from when it was duplicated in-place.
-    Sorting by filename (not by Path) keeps the order identical on case-insensitive
-    filesystems.
+    This is what makes fixture_sha checkout-independent. Terraform reads CRLF and
+    LF identically, so the two spellings of a fixture plan to the same document;
+    hashing the raw bytes made them two different fixtures anyway. A contributor
+    on Windows defaults (core.autocrlf=true) therefore computed a sha nobody else
+    could reproduce: their plan cache hit locally, and on every LF checkout — CI
+    and the portal included — the expected <sha>.json was a different name, the
+    plan looked absent, and every argument of the resource came back
+    `fixture-missing-plan`. Normalising here fixes that for any checkout, however
+    the contributor's git is configured; .gitattributes then keeps the bytes
+    themselves LF in the repository.
+
+    LF is the canonical form, so the sha of an all-LF tree is unchanged — which is
+    the name dev and CI already carry for all but the handful of fixtures that were
+    committed with CRLF bytes (renamed in the change that introduced this).
     """
-    files = fixture_files(policy_dir)
+    if data.startswith(UTF8_BOM):
+        data = data[len(UTF8_BOM):]
+    return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
+def sha_for_files(files: dict[str, Path], transform=canonical_text_bytes) -> str:
+    """Hash named effective files. Also used by the read-only legacy migration adapter."""
     h = hashlib.sha256()
     h.update(f"provider={TARGET_PROVIDER_VERSION}\n".encode())
     for name in sorted(files):
         h.update(name.encode())
         h.update(b"\0")
-        h.update(files[name].read_bytes().replace(b"\r\n", b"\n"))
+        h.update(transform(files[name].read_bytes()))
         h.update(b"\0")
     return h.hexdigest()
 
 
-def plan_cache_path(policy_dir: Path) -> Path:
-    """plan_cache/<platform>/<sha>.json for a policy's fixture."""
-    return PLAN_CACHE_ROOT / platform_of(policy_dir) / f"{fixture_sha(policy_dir)}.json"
+def fixture_sha(policy_dir: Path, repo_root: Path | None = None) -> str:
+    return sha_for_files(fixture_files(policy_dir, repo_root))
 
 
-# One lock per cache key. Workers are THREADS in a single process, so a pid-based
-# temp name is not unique between them: fixtures with byte-identical .tf content hash
-# to the same key (a handful legitimately do), which would race two writers onto one
-# temp path. Serialising per key also stops two threads planning the same fixture twice.
-_sha_locks: dict[str, Lock] = {}
-_sha_locks_guard = Lock()
+def plan_cache_path(policy_dir: Path, repo_root: Path | None = None) -> Path:
+    return Path(policy_dir) / f"{fixture_sha(policy_dir, repo_root)}.json"
 
 
-def _sha_lock(sha: str) -> Lock:
-    with _sha_locks_guard:
-        return _sha_locks.setdefault(sha, Lock())
+def _sha_over(policy_dir: Path, transform) -> str:
+    return sha_for_files(fixture_files(policy_dir), transform)
+
+
+def _to_crlf(data: bytes) -> bytes:
+    """Every line ending as CRLF — what a core.autocrlf=true checkout writes."""
+    return canonical_text_bytes(data).replace(b"\n", b"\r\n")
+
+
+def alternate_fixture_shas(input_dir: Path) -> list[str]:
+    """Names, other than fixture_sha, that this exact fixture's plan may carry.
+
+    Both are pre-normalisation spellings of the *same* *.tf, which is why either
+    can be renamed onto the canonical name without re-planning:
+
+    * the raw bytes as they sit on disk — the sha a contributor computed while
+      their working tree still held CRLF (or a UTF-8 BOM);
+    * the bytes projected to CRLF — the sha that same contributor computed for a
+      fixture git has since stored as LF. This is the one that matters in CI and
+      on the portal, whose checkouts are LF: the plan committed from a Windows
+      working tree is named for bytes that no longer exist anywhere in the repo,
+      and projecting forward is the only way to recognise it.
+
+    Canonical-equal entries are dropped, so an all-LF fixture returns [].
+    """
+    canonical = fixture_sha(input_dir)
+    out = []
+    for transform in (lambda b: b, _to_crlf):
+        sha = _sha_over(input_dir, transform)
+        if sha != canonical and sha not in out:
+            out.append(sha)
+    return out
+
+
+def find_denormalised_plan(input_dir: Path) -> Path | None:
+    """A committed plan for these *.tf under a pre-normalisation name, if present."""
+    for sha in alternate_fixture_shas(input_dir):
+        candidate = input_dir / f"{sha}.json"
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def is_committed_plan(path: Path) -> bool:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        return isinstance(value, dict) and isinstance(value.get("planned_values"), dict)
+    except (OSError, ValueError):
+        return False
+
+
+def adopt_denormalised_plan(input_dir: Path, cache_path: Path) -> bool:
+    """Rename a CRLF-era plan onto its canonical name. True if one was adopted.
+
+    A plan named for one of alternate_fixture_shas is the plan for exactly these
+    *.tf — the same terraform document under a name computed before fixture_sha
+    normalised line endings. Renaming it is strictly better than re-planning: the
+    contents are already right, and re-planning costs the contributor a terraform
+    run and, on a fresh clone, a 121MB provider download. It also means the fix for
+    an affected branch is a rename anyone can produce from any checkout, rather
+    than a re-run each contributor must do on the machine that caused it.
+
+    The narrowness matters. The tempting version of this — "adopt the single
+    <64-hex>.json in the directory if it parses as a plan" — would quietly undo the
+    property the sha naming exists to provide: that a fixture edited without
+    re-running the harness is *caught*, rather than silently tested against the
+    plan of its old config. A stale plan also parses, and is also the only .json in
+    the directory. Keying on the alternate shas keeps that guarantee whole, because
+    the match is cryptographic: only these *.tf, under a different spelling of
+    their line endings, can produce that name. A fixture that was genuinely edited
+    produces none of them.
+
+    Transitional. Once .gitattributes has kept CRLF out of the tree for a release
+    or two, no such file will exist and this can go.
+    """
+    if cache_path.exists():
+        return False
+    denormalised = find_denormalised_plan(input_dir)
+    if denormalised is None or not is_committed_plan(denormalised):
+        return False
+    try:
+        os.replace(denormalised, cache_path)
+    except OSError:
+        return False
+    return True
+
+
+# Fixtures own distinct plan files. Lock by destination (rather than only hash),
+# and use unique temp names so duplicate invocations cannot collide on a write.
+_plan_locks: dict[str, Lock] = {}
+_plan_locks_guard = Lock()
 
 
 def get_or_build_plan(policy_dir: Path, cache_path: Path, verbose: bool = False) -> Path | None:
-    """Return the cached plan.json if present; otherwise run terraform and cache it."""
-    if cache_path.exists():
+    key = str(cache_path.resolve())
+    with _plan_locks_guard:
+        lock = _plan_locks.setdefault(key, Lock())
+    with lock:
+        adopt_denormalised_plan(policy_dir, cache_path)
+        if not is_committed_plan(cache_path):
+            plan_json = run_terraform_commands(policy_dir, verbose)
+            if plan_json is None:
+                return None
+            # Reject incomplete output before publishing or deleting the previous plan.
+            try:
+                document = json.loads(plan_json)
+                if not isinstance(document, dict) or not isinstance(document.get("planned_values"), dict):
+                    return None
+            except (TypeError, json.JSONDecodeError):
+                return None
+            tmp = cache_path.with_name(f"{cache_path.name}.{uuid.uuid4().hex}.tmp")
+            try:
+                tmp.write_text(plan_json, encoding="utf-8")
+                os.replace(tmp, cache_path)
+            finally:
+                tmp.unlink(missing_ok=True)
+        prune_stale_plans(policy_dir, keep=cache_path)
         return cache_path
-    with _sha_lock(cache_path.stem):
-        if cache_path.exists():          # another thread built it while we waited
-            return cache_path
-        plan_json = run_terraform_commands(policy_dir, verbose)
-        if plan_json is None:
-            return None
-        cache_path.parent.mkdir(parents=True, exist_ok=True)
-        # Write to a unique temp then rename: os.replace is atomic within a filesystem
-        # (the temp is a sibling), so an interrupted run can never leave a truncated
-        # cache file that a later run would treat as a valid hit.
-        tmp = cache_path.with_name(f"{cache_path.name}.{uuid.uuid4().hex}.tmp")
-        try:
-            tmp.write_text(plan_json, encoding="utf-8")
-            os.replace(tmp, cache_path)
-        finally:
-            tmp.unlink(missing_ok=True)
-    return cache_path
 
 
-def prune_plan_cache(policies_root: Path, used_paths: set[Path]) -> None:
-    """Delete cached plans no fixture references — only safe after a full-platform run."""
-    repo_policies = POLICIES_ROOT.resolve()
-    try:
-        rel = policies_root.resolve().relative_to(repo_policies)
-    except ValueError:
-        print("plan-cache prune skipped: the policies root is outside the repo policies/ tree.")
-        return
-    if len(rel.parts) > 1:
-        print(f"plan-cache prune skipped: run is scoped to '{policies_root}', not a whole "
-              "platform — a scoped run can't know which cached plans are orphaned.")
-        return
-    platforms = {p.parent.name for p in used_paths}
+def prune_stale_plans(input_dir: Path, keep: Path) -> int:
+    """Delete every .json in a fixture dir except ``keep``. Returns the count."""
     removed = 0
-    for plat in platforms:
-        pdir = PLAN_CACHE_ROOT / plat
-        if not pdir.is_dir():
+    for f in input_dir.glob("*.json"):
+        if f.name == keep.name:
             continue
-        keep = {p.name for p in used_paths if p.parent.name == plat}
-        for f in pdir.glob("*.json"):    # never *.tmp — those belong to a live writer
-            if f.name not in keep:
-                f.unlink()
-                removed += 1
-    print(f"plan-cache prune: removed {removed} orphaned plan(s).")
+        try:
+            f.unlink()
+            removed += 1
+        except OSError:
+            pass
+    return removed
 
 
 def ensure_cache_ready() -> None:
@@ -586,6 +676,22 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     # format can still be matched via a valid id value.
     name_map = get_resource_name_map(plan_path, str(resource_type), resource_value_name)
     unique_names = set(name_map.keys())
+
+    # A policy whose declared resource type matches nothing in the plan is inert:
+    # there is nothing to flag, so nothing goes unflagged and the check would pass
+    # while testing nothing at all. Every fixture is required to contain compliant
+    # and non-compliant examples of the resource under test, so zero matches always
+    # means the policy's _vars.rego names the wrong type.
+    if not unique_names:
+        actual_types = get_all_resource_types(plan_path)
+        reason = (
+            f"Policy declares resource_type '{resource_type}', which matches no resource "
+            f"in the plan. Types present: "
+            f"{', '.join(actual_types) if actual_types else 'NONE'}"
+        )
+        thread_safe_print(f"Check failed: {reason}\n")
+        return make_failure(attribute, reason, service, resource)
+
     candidates = unique_names | {v for v in name_map.values() if v}
     # Match only within the "Non-Compliant Resources:" portion(s) of the message,
     # never the remedy/advisory text — otherwise an approved value echoed in a
@@ -729,6 +835,16 @@ def discover_policies(policies_search_root: Path):
         seen.add(policy_dir.resolve())
         malformed.append((policy_dir, f"terraform fixtures with no {POLICY_FILE}"))
 
+    for rego in sorted(policies_search_root.rglob("*.rego")):
+        if rego.name not in {POLICY_FILE, VARS_FILE} and "_helpers" not in rego.parts:
+            malformed.append((rego.parent / rego.stem, f"legacy policy file {rego}; run the layout migration"))
+    for directory, _ in pairs[:]:
+        try:
+            fixture_files(directory)
+        except (OSError, ValueError) as exc:
+            pairs.remove((directory, directory / POLICY_FILE))
+            malformed.append((directory, str(exc)))
+
     return pairs, malformed
 
 
@@ -747,50 +863,26 @@ def write_report(results: list, path: str) -> None:
 
 
 def verify_plan_cache(pairs, verbose: bool = False) -> int:
-    """Read-only check: every fixture's hash has a committed plan file. Returns exit code.
-
-    Deliberately NOT a count comparison. Fixtures with byte-identical .tf content hash to
-    the same key and legitimately share one cached plan, so the number of cache files is
-    normally LOWER than the number of policies. Requiring equality would fail a healthy repo.
-    """
-    missing = []
-    used = set()
-    for policy_dir, _ in pairs:
-        cache_path = plan_cache_path(policy_dir)
-        used.add(cache_path.resolve())
-        if not cache_path.exists():
-            missing.append((policy_dir, cache_path))
-
-    platforms = {platform_of(d) for d, _ in pairs}
-    on_disk = set()
-    for plat in platforms:
-        pdir = PLAN_CACHE_ROOT / plat
-        if pdir.is_dir():
-            on_disk |= {f.resolve() for f in pdir.glob("*.json")}
-    orphans = on_disk - used
-
-    print(f"[*] {len(pairs)} fixture(s) -> {len(used)} distinct plan(s) "
-          f"(distinct <= fixtures; identical fixtures share a cached plan)")
-
-    if orphans:
-        # Informational only: a scoped run legitimately sees plans it does not reference.
-        print(f"[*] {len(orphans)} cached plan(s) not referenced by this run "
-              "(expected for a scoped run; use --prune-plan-cache on a full run to remove).")
-        if verbose:
-            for f in sorted(orphans):
-                print(f"      {f.name}")
-
-    if missing:
-        print(f"[FAIL] {len(missing)} fixture(s) have no cached plan:")
-        for policy_dir, cache_path in sorted(missing):
-            print(f"  {policy_dir}")
-            print(f"      expected {cache_path}")
-        print("Run auto_test without --verify-plan-cache to build them "
-              "(needs terraform), then commit the new plan_cache/ files.")
-        return 1
-
-    print("[OK] every fixture has a cached plan.")
-    return 0
+    """Read-only: require each fixture's expected, parseable plan and no stale plans."""
+    errors = []
+    for directory, _ in pairs:
+        try:
+            expected = plan_cache_path(directory)
+            if not expected.is_file():
+                errors.append(f"{directory}: missing committed plan {expected.name}")
+            else:
+                plan = json.loads(expected.read_text(encoding="utf-8"))
+                if not isinstance(plan, dict) or not isinstance(plan.get("planned_values"), dict):
+                    errors.append(f"{expected}: not a Terraform plan")
+            for sibling in directory.glob("*.json"):
+                if sibling != expected:
+                    errors.append(f"{sibling}: unexpected or stale plan; expected {expected.name}")
+        except (OSError, ValueError) as exc:
+            errors.append(f"{directory}: {exc}")
+    for error in errors:
+        print(f"[FAIL] {error}")
+    print(f"[{ 'FAIL' if errors else 'OK' }] checked {len(pairs)} fixture-local plans")
+    return 1 if errors else 0
 
 
 def main():
@@ -823,9 +915,6 @@ def main():
                              "Default: the whole repo (policies/), or policies/<target>.")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("--workers", type=int, default=4, help="Number of parallel workers (default: 4)")
-    parser.add_argument("--prune-plan-cache", action="store_true",
-                        help="After a whole-platform/-repo run, delete cached plans no fixture "
-                             "references (orphans from changed/removed fixtures). Ignored for scoped runs.")
     parser.add_argument("--verify-plan-cache", action="store_true",
                         help="Read-only: check every fixture has a committed plan, then exit. "
                              "Runs no terraform and no OPA, and writes nothing.")
@@ -863,7 +952,9 @@ def main():
     # provider cache if at least one plan is missing (a fully-cached run needs no
     # terraform/provider at all).
     pair_cache = {(d, p): plan_cache_path(d) for d, p in pairs}
-    misses = sum(1 for cp in pair_cache.values() if not cp.exists())
+    for (directory, _), cache in pair_cache.items():
+        adopt_denormalised_plan(directory, cache)
+    misses = sum(1 for cp in pair_cache.values() if not is_committed_plan(cp))
     if misses:
         print(f"[*] {misses}/{len(pairs)} plan(s) not cached — ensuring terraform provider cache…")
         ensure_cache_ready()
@@ -908,19 +999,6 @@ def main():
                           f"{fmt_duration(time.monotonic() - start_time)}", end="", flush=True)
         if not args.verbose:
             print()  # newline after the progress line
-
-    if args.prune_plan_cache:
-        # Don't prune if a fixture's terraform failed: we couldn't regenerate that
-        # plan offline, so its cache (if any) must not be treated as orphaned.
-        tf_failed = any(
-            r.get("failure", {}).get("reason", "").startswith("Terraform failed")
-            for r in results
-        )
-        if tf_failed:
-            print("plan-cache prune skipped: some fixtures failed terraform "
-                  "(cannot safely identify orphans).")
-        else:
-            prune_plan_cache(policies_search_root, set(pair_cache.values()))
 
     # Emit the machine-readable report BEFORE the failure exit below, so a run with
     # failing policies still writes the full report (including passed: false entries).
