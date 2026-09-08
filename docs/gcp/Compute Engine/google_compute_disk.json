@@ -21,7 +21,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale":"Controls whether a snapshot is taken before disk destruction. This is an operational backup and disaster-recovery workflow decision left to teams, not a platform-level security control. It does not affect confidentiality, integrity, or access control of the disk."
+      "rationale": "Controls whether a snapshot is taken before disk destruction. This is an operational backup and disaster-recovery workflow decision left to teams, not a platform-level security control. It does not affect confidentiality, integrity, or access control of the disk."
     },
     "create_snapshot_before_destroy_prefix": {
       "description": "This will set a custom name prefix for the snapshot that's created when the disk is deleted.",
@@ -242,7 +242,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Specifies the Cloud KMS (CMEK) key protecting the source image from which this disk is created. When the source image is CMEK-protected, this key is required to read it, keeping the encryption chain under customer key control. Policy should require that this field is populated (non-blank) when CMEK is used for source images, ensuring customer-managed encryption continuity."
+      "rationale": "Specifies the Cloud KMS (CMEK) key protecting the source image from which this disk is created. This key is required to maintain the customer-controlled encryption chain throughout the disk lineage. Policy requires that this field contains a valid KMS key self-link, ensuring customer-managed encryption continuity for all disks with a source image encryption key block."
     },
     "source_image_encryption_key.kms_key_service_account": {
       "description": "The service account used for the encryption request for the given KMS key.\nIf absent, the Compute Engine Service Agent service account is used.",
