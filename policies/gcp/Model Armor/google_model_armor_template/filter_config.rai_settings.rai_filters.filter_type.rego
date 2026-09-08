@@ -1,7 +1,7 @@
-package terraform.gcp.security.model_Armor.google_model_armor_template.filter_config_rai_settings_rai_filters_filter_type
+package terraform.gcp.security.model_armor.google_model_armor_template.filter_config_rai_settings_rai_filters_filter_type
 
 import data.terraform.helpers
-import data.terraform.gcp.security.model_Armor.google_model_armor_template.vars
+import data.terraform.gcp.security.model_armor.google_model_armor_template.vars
 
 
 
@@ -20,5 +20,7 @@ conditions := [
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
