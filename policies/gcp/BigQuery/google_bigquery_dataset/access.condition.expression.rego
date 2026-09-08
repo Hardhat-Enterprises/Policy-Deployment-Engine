@@ -1,28 +1,27 @@
-package terraform.gcp.security.bigquery.google_bigquery_dataset.access_user_by_email
+package terraform.gcp.security.bigquery.google_bigquery_dataset.access_condition_expression
 
 import data.terraform.gcp.security.bigquery.google_bigquery_dataset.vars
 
 conditions := [
     [
         {
-            "situation_description": "A dataset access entry grants an individual account outside the organisation's approved domains, putting dataset contents in the hands of an identity the organisation cannot control.",
+            "situation_description": "A dataset access condition uses an empty or unconditional expression, causing the access binding to apply without a meaningful restriction.",
             "remedies": [
-                "Grant access to an account in an approved organisational domain",
-                "Or remove the external account if it does not require access"
+                "Replace the unconditional expression with a meaningful CEL condition that restricts when the access binding applies"
             ]
         },
         {
-            "condition": "Require user email addresses to use an approved organisational domain",
-            "attribute_path": ["access", "user_by_email"],
-            "values": vars.variables.approved_domains,
-            "policy_type": "whitelist"
+            "condition": "Reject clearly unconditional access conditions",
+            "attribute_path": ["access", "condition", "expression"],
+            "values": ["", "true", "1 == 1"],
+            "policy_type": "blacklist"
         }
     ]
 ]
 
-approved_email(email) if {
-    some domain in vars.variables.approved_domains
-    endswith(lower(email), sprintf("@%s", [lower(domain)]))
+unsafe_expression(expression) if {
+    bad_value := conditions[0][1].values[_]
+    expression == bad_value
 }
 
 non_compliant_resources := {
@@ -33,10 +32,12 @@ non_compliant_resources := {
     access_blocks := object.get(resource.values, "access", [])
     some access_block in access_blocks
 
-    email := object.get(access_block, "user_by_email", null)
-    email != null
-    email != ""
-    not approved_email(email)
+    condition_blocks := object.get(access_block, "condition", [])
+    some condition_block in condition_blocks
+
+    expression := object.get(condition_block, "expression", null)
+    expression != null
+    unsafe_expression(expression)
 }
 
 non_compliant_names := {
@@ -65,7 +66,10 @@ message := [
         [vars.variables.friendly_resource_name, resource_count]
     ),
     [
-        conditions[0][0].situation_description,
+        sprintf(
+            "Situation 1: %s",
+            [conditions[0][0].situation_description]
+        ),
         sprintf(
             "Non-Compliant Resources: %s",
             [concat(", ", display_names)]
