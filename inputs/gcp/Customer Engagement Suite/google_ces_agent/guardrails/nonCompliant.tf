@@ -5,7 +5,7 @@ resource "google_ces_agent" "non_compliant_example_1" {
   location         = "australia-southeast1"
 
   guardrails = [
-  "projects/example-project/locations/australia-southeast1/apps/example-app/guardrails/unapproved-guardrail_1"
+  "projects/example-project/locations/australia-southeast1/apps/example-app/guardrails/unapproved-guardrail"
 ]
    
 
