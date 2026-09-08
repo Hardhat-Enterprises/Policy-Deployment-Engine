@@ -11,8 +11,8 @@ conditions := [[
     {
         "condition": "resource is whitelisted",
         "attribute_path": ["resource"],
-        "values": ["projects/123456789"],
-        "policy_type": "whitelist"
+        "values": ["projects/*", [["123456789"]]],
+        "policy_type": "pattern whitelist"
     }
 ]]
 

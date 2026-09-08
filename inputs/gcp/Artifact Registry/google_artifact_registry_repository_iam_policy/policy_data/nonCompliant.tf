@@ -10,6 +10,6 @@ data "google_iam_policy" "nc" {
 resource "google_artifact_registry_repository_iam_policy" "non_compliant_example_1" {
   project     = "my-project"
   location    = "australia-southeast1"
-  repository  = "nc"
+  repository  = "c"
   policy_data = data.google_iam_policy.nc.policy_data
 }
