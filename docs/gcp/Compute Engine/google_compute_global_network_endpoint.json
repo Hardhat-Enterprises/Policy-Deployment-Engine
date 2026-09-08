@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deletion-blocking flags follow the prevent-destructive-loss archetype: enforcing PREVENT protects against accidental or malicious destruction of the resource, so this is treated as security-relevant."
     },
     "fqdn": {
       "description": "Fully qualified domain name of network endpoint.\nThis can only be specified when network_endpoint_type of the NEG is INTERNET_FQDN_PORT.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to an external destination domain. Platform policy cannot meaningfully validate arbitrary external domains, so this is treated as a reference rather than a security control, consistent with how internal resource references are handled."
     },
     "global_network_endpoint_group": {
       "description": "The global network endpoint group this endpoint is part of.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the network endpoint group). Per the project's core rule, resource references are not themselves security controls — the endpoint group's own security is enforced at its own resource policies."
     },
     "ip_address": {
       "description": "IPv4 address external endpoint.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to an external destination IP address. Platform policy cannot meaningfully restrict target IP addresses, so this is treated as a reference rather than a security control, consistent with how internal resource references are handled."
     },
     "port": {
       "description": "Port number of the external endpoint.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A routing parameter that pairs with the destination address/domain; it does not itself represent a security decision independent of which destination is being targeted."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project determines resource ownership/location, similar to other identifier fields; it is not itself a security control."
     }
   }
 }

@@ -1,6 +1,6 @@
-package terraform.gcp.security.BigQuery.google_bigquery_job.query_connection_properties_value
+package terraform.gcp.security.bigquery.google_bigquery_job.query_connection_properties_value
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_job.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_job.vars
 
 conditions := [
     [
@@ -15,5 +15,7 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

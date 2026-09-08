@@ -1,5 +1,5 @@
 resource "google_firestore_database" "non_compliant_example_1" {
-  project                           = "nc"
+  project                           = "c"
   name                              = "non_compliant_example_1"
   location_id                       = "nam5"
   type                              = "FIRESTORE_NATIVE"
