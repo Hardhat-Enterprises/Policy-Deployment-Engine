@@ -1,9 +1,10 @@
 resource "google_compute_autoscaler" "non_compliant_example_1" {
   name   = "non-compliant-example-1"
-  zone   = "us-central1-f"
+  zone   = "australia-southeast2-a"
   target = "google_compute_instance_group_manager.foobar.id"
   project = "pde"
   deletion_policy = "DELETE"
+  
   autoscaling_policy {
     max_replicas    = 5
     min_replicas    = 1
