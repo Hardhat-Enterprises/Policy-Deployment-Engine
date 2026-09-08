@@ -5,7 +5,11 @@ resource "google_discovery_engine_control" "compliant_example_1" {
   location      = "us"
   engine_id     = "engine-id"
   control_id    = "compliant-example-1"
+<<<<<<< HEAD
   display_name  = "Approved-location control"
+=======
+  display_name  = "Example control"
+>>>>>>> origin/dev
   solution_type = "SOLUTION_TYPE_SEARCH"
   use_cases     = ["SEARCH_USE_CASE_SEARCH"]
 
