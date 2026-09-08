@@ -6,14 +6,14 @@ import data.terraform.gcp.security.network_services.google_network_services_grpc
 conditions := [
     [
         {
-            "situation_description": "The gRPC route is not protected against unintended destructive removal.",
+            "situation_description": "The gRPC route can be destroyed through Terraform, which can remove an active traffic-routing control and affect the availability and integrity of service routing.",
             "remedies": [
-                "Set deletion_policy to PREVENT so destruction of the gRPC route is blocked by default.",
-                "Require an explicit and reviewed configuration change before allowing destructive removal of the resource."
+                "Set deletion_policy to PREVENT so Terraform cannot destroy the gRPC route during routine apply or destroy operations.",
+                "Require an explicit reviewed configuration change before removing the routing control."
             ]
         },
         {
-            "condition": "deletion_policy must provide protection against destructive loss",
+            "condition": "deletion_policy must protect the routing control against destructive loss",
             "attribute_path": ["deletion_policy"],
             "values": ["PREVENT"],
             "policy_type": "whitelist"
