@@ -6,22 +6,16 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_disk.var
 conditions := [
     [
         {
-            "situation_description": "A valid service account should be used for source image KMS encryption requests.",
+            "situation_description": "An explicit service account should be configured for source image KMS encryption requests instead of relying on the default service agent.",
             "remedies": [
-                "Configure source_image_encryption_key.kms_key_service_account using a valid Google service account email."
+                "Set source_image_encryption_key.kms_key_service_account to a non-empty service account identity."
             ]
         },
         {
-            "condition": "source_image_encryption_key.kms_key_service_account must be configured.",
+            "condition": "source_image_encryption_key.kms_key_service_account must be explicitly configured.",
             "attribute_path": ["source_image_encryption_key", 0, "kms_key_service_account"],
             "values": [""],
             "policy_type": "blacklist"
-        },
-        {
-            "condition": "source_image_encryption_key.kms_key_service_account must use a valid service account email format.",
-            "attribute_path": ["source_image_encryption_key", 0, "kms_key_service_account"],
-            "values": ["^[a-z][a-z0-9-]*@[a-z][a-z0-9-]*[.]iam[.]gserviceaccount[.]com$"],
-            "policy_type": "pattern whitelist"
         }
     ]
 ]
