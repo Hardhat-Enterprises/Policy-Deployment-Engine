@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument controls Terraform resource lifecycle behaviour. DELETE, ABANDON and PREVENT determine how Terraform manages destruction or removal from state, but they do not directly affect authentication, authorization, encryption, confidentiality, integrity, or exposure. Therefore, this argument is operational rather than security impacting."
+      "security_impact": true,
+      "rationale": "The deletion policy controls whether Terraform can destroy the gRPC route. Setting it to PREVENT blocks destructive deletion and protects the resource from accidental loss. DELETE permits destruction, while ABANDON removes the resource from Terraform management. Therefore, PREVENT acts as a destroy-blocking security control against destructive resource loss."
     },
     "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
@@ -36,13 +36,13 @@
       "type": "map(string)",
       "security_impact": false,
       "rationale": "Labels are metadata for resource organization and cost allocation. They do not affect the routing behavior or security properties of the GrpcRoute itself. Label enforcement addresses governance and compliance, not the security of this resource's configuration."
-    }, 
+    },
     "location": {
       "description": "Location (region) of the GRPCRoute resource to be created. Only the value 'global' is currently allowed; defaults to 'global' if omitted.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The Terraform provider restricts this argument to the literal value global. Other locations fail provider validation before a plan can be created, so there is no configurable security choice for a policy to enforce. Therefore, this argument does not require a separate security policy."
+      "security_impact": true,
+      "rationale": "Location is a security-impacting data residency control. The gRPC route must remain within an approved deployment location to satisfy organisational residency requirements. The provider currently supports global for this resource, so the policy enforces global as the approved location and prevents configurations outside the permitted residency boundary."
     },
     "meshes": {
       "description": "List of meshes this GrpcRoute is attached to, as one of the routing rules to route the requests served by the mesh.",
