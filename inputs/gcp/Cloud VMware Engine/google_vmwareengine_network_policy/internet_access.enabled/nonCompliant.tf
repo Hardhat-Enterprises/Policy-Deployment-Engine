@@ -8,6 +8,6 @@ resource "google_vmwareengine_network_policy" "non_compliant_example_1" {
         enabled = true
     }
     external_ip {
-        enabled = true
+        enabled = false
     }
 }

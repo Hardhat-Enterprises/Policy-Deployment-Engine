@@ -35,7 +35,7 @@ resource "google_apphub_application" "compliant_example_2"{
 resource "google_apphub_application" "compliant_example_3"{
   project = "PDE"
   location = "australia-southeast1"
-  application_id = "c3"
+  application_id = "c1"
   scope {
     type = "REGIONAL"
   }
@@ -52,7 +52,7 @@ resource "google_apphub_application" "compliant_example_3"{
 resource "google_apphub_application" "compliant_example_4"{
   project = "PDE"
   location = "australia-southeast1"
-  application_id = "c4"
+  application_id = "c1"
   scope {
     type = "REGIONAL"
   }
