@@ -1,9 +1,9 @@
 resource "google_compute_autoscaler" "non_compliant_example_1" {
   name   = "non-compliant-example-1"
-  target = "google_compute_instance_group_manager.foobar.id"
   zone   = "us-central1-f"
+  target = "google_compute_instance_group_manager.foobar.id"
   project = "pde"
-
+  deletion_policy = "DELETE"
   autoscaling_policy {
     max_replicas    = 5
     min_replicas    = 1
@@ -11,14 +11,6 @@ resource "google_compute_autoscaler" "non_compliant_example_1" {
 
     cpu_utilization {
       target = 0.5
-    }
-
-    scale_in_control {
-        time_window_sec = 5
-
-        max_scaled_in_replicas {
-          percent = 70
-        }
     }
   }
 }
