@@ -1,4 +1,4 @@
-﻿resource "google_network_services_lb_route_extension" "non_compliant_example_1" {
+resource "google_network_services_lb_route_extension" "non_compliant_example_1" {
   name     = "noncompliant-lb-route-extension"
   project  = "test-project"
   location = "australia-southeast1"

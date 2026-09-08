@@ -1,7 +1,7 @@
 resource "google_network_services_lb_route_extension" "non_compliant_example_1" {
   name     = "noncompliant-lb-route-extension"
   project  = "test-project"
-  location = "australia-southeast1"
+  location = "us-central1"
 
   forwarding_rules = [
     "projects/test-project/regions/australia-southeast1/forwardingRules/test-forwarding-rule"
@@ -20,7 +20,7 @@ resource "google_network_services_lb_route_extension" "non_compliant_example_1" 
     extensions {
       name            = "extension-1"
       service         = "projects/test-project/regions/australia-southeast1/backendServices/test-backend"
-      fail_open       = true
+      fail_open       = false
       forward_headers = ["X-Request-Id", "X-Correlation-Id"]
     }
   }
