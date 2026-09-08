@@ -1,4 +1,5 @@
 resource "google_compute_region_network_firewall_policy_rule" "compliant_example_1" {
+
   rule_name       = "compliant_example_1"
   action          = "allow"
   direction       = "INGRESS"
