@@ -77,8 +77,8 @@
       "description": "List of user-specified file type groups to transform. If specified, only the files with these filetypes will be transformed.\n\nIf empty, all supported files will be transformed. Supported types may be automatically added over time.\n\nIf a file type is set in this field that isn't supported by the Deidentify action then the job will fail and will not be successfully created/started. Possible values: [\"IMAGE\", \"TEXT_FILE\", \"CSV\", \"TSV\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Narrows which file types are deidentified. Left empty every supported type is transformed, including types added by the service over time; naming a subset means files of every other type are copied through untransformed, so sensitive content survives in the output while the job still reports success. Policy should require this to be left empty so that coverage tracks the service, and treat any explicit subset as an exception that has to be justified."
+      "security_impact": false,
+      "rationale": "File type selection determines which files are processed for deidentification and is an operational data processing choice rather than a platform security control."
     },
     "inspect_job.actions.deidentify.transformation_config": {
       "type": "block",
@@ -238,8 +238,8 @@
       "description": "When true, excludes type information of the findings.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Strips the infoType from every finding the job produces, and type information is included by default. With it on, the output records that something matched but not what matched, so a reviewer cannot tell a test string from a credit card number and cannot triage or prioritise. That degrades the security signal the scan exists to produce, the safe value is the default, and the rule needs nothing specific to any team, so policy should require it to stay false."
+      "security_impact": false,
+      "rationale": "Excluding infoTypes adjusts inspection scope and reporting behaviour. It is an operational data classification choice rather than a security exposure or access control."
     },
     "inspect_job.inspect_config.include_quote": {
       "description": "When true, a contextual quote from the data that triggered a finding is included in the response.",
@@ -252,8 +252,8 @@
       "description": "Only returns findings equal or above this threshold. See https://cloud.google.com/dlp/docs/likelihood for more info Default value: \"POSSIBLE\" Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The reporting threshold for the whole scan: matches below it are discarded and never appear as findings. Raising it to LIKELY or VERY_LIKELY makes a scan quietly report less while still completing successfully, which is indistinguishable from clean data at the point where anyone looks. Policy should cap how strict this may be set, keeping it at or below the default so that a team cannot tune real sensitive data out of its own results."
+      "security_impact": false,
+      "rationale": "The minimum likelihood threshold tunes detection sensitivity and false positive rates. It is an operational inspection setting rather than a platform security control."
     },
     "inspect_job.inspect_config.custom_info_types": {
       "type": "block",
@@ -391,8 +391,8 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This is the list that decides what the scan actually looks for. Left unspecified the service chooses detectors itself and may run all of them; naming a short list restricts detection to exactly those types, so anything outside it is never reported no matter how much of it the data contains. The names come from a published vendor reference rather than from a team's own naming, so a baseline set can be required generically. Policy should enforce a minimum baseline of detectors, held as a parameterised list, that every scan must include."
+      "security_impact": false,
+      "rationale": "This value identifies a Google Cloud DLP infoType used by the inspection configuration. It is a vendor-defined identifier and is not a generic platform security policy target."
     },
     "inspect_job.inspect_config.info_types.version": {
       "description": "Version of the information type to use. By default, the version is set to stable",
@@ -442,7 +442,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "A per detector version of the same soft finding cap. It shapes how much output a single infoType contributes rather than whether that infoType is detected, and the limits are not enforced strictly within an inspect job."
+      "rationale": "This setting limits the number of findings returned for an infoType. It controls reporting volume and operational output rather than access, exposure, or security boundaries."
     },
     "inspect_job.inspect_config.limits.max_findings_per_info_type.info_type": {
       "type": "block",
@@ -454,7 +454,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Identifies which detector a findings limit applies to. It selects the target of a limit rather than deciding what is scanned, and the limit itself is not an enforceable cap inside an inspect job."
+      "rationale": "This field identifies the infoType to which the findings limit applies. It is an identifier reference and does not itself enforce a security control."
     },
     "inspect_job.inspect_config.limits.max_findings_per_info_type.info_type.version": {
       "description": "Version of the information type to use. By default, the version is set to stable",
@@ -652,8 +652,8 @@
       "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The expression whose matches are removed from results. An over broad pattern here is the most direct way to disable detection while leaving every detector apparently configured, and nothing in the job output reveals how much was dropped. Policy should require exclusion patterns to be narrow and reviewed, and should reject catch all expressions, which is a rule about the shape of the value rather than its team specific content."
+      "security_impact": false,
+      "rationale": "This regex defines team-specific data matching and exclusion behaviour. Its meaning depends on the organisation's data and inspection requirements, so it is outside generic platform security policy scope."
     },
     "inspect_job.inspect_config.rule_set.rules.hotword_rule": {
       "type": "block",
@@ -878,15 +878,15 @@
       "description": "A list of regular expressions matching file paths to exclude. All files in the bucket that match at\nleast one of these regular expressions will be excluded from the scan.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Removes matching file paths from the scan entirely, and a file matching any one expression is skipped. A loose expression here silently carves a hole in coverage that nothing in the job output reveals, and exclusions written for one directory layout tend to outlive it. Policy should require exclusions to be specific and reviewable and should reject catch all expressions, which is a constraint on the shape of the value rather than on a team's paths."
+      "security_impact": false,
+      "rationale": "This value defines custom file path exclusion patterns used to scope inspection. It is an operational data selection setting rather than a platform security control."
     },
     "inspect_job.storage_config.cloud_storage_options.file_set.regex_file_set.include_regex": {
       "description": "A list of regular expressions matching file paths to include. All files in the bucket\nthat match at least one of these regular expressions will be included in the set of files,\nexcept for those that also match an item in excludeRegex. Leaving this field empty will\nmatch all files by default (this is equivalent to including .* in the list)",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines which paths are in scope, and leaving it empty matches everything. Once populated it becomes an allowlist, so any path not anticipated when it was written is never scanned, and new directories are excluded by default rather than included. Policy should prefer the empty default, with narrowing treated as an exception that has to be justified and revisited."
+      "security_impact": false,
+      "rationale": "This value defines custom file path inclusion patterns used to scope inspection. It is an operational data selection setting rather than a platform security control."
     },
     "inspect_job.storage_config.datastore_options": {
       "type": "block",
@@ -964,8 +964,8 @@
       "description": "Name describing the field.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Nominates columns whose cell values are copied and stored beside every finding for traceability. That is source data leaving the inspected system and landing in findings storage, so choosing a column that is itself sensitive turns the findings table into a second copy of it. Policy should require identifying fields to be limited to non sensitive keys and to the minimum needed to trace a row."
+      "security_impact": false,
+      "rationale": "This value identifies a column in the source data schema. Column names are application and dataset-specific identifiers rather than generic platform security policy targets."
     },
     "inspect_job.storage_config.timespan_config": {
       "type": "block",
@@ -1024,8 +1024,8 @@
       "description": "With this option a job is started a regular periodic basis. For example: every day (86400 seconds).\n\nA scheduled start time will be skipped if the previous execution has not ended when its scheduled time occurs.\n\nThis value must be set to a time duration greater than or equal to 1 day and can be no longer than 60 days.\n\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Sets how often the scan runs, and the API allows anything from one day up to sixty. At the loose end of that band sensitive data can sit undetected for two months, so the value is really the detection latency of the control, and the outer bound is available by default. Policy should enforce a maximum interval so that every scheduled scan revisits its data within a defined window."
+      "security_impact": false,
+      "rationale": "This setting determines how frequently the inspection job runs. Scheduling frequency is an operational configuration choice rather than a platform security control."
     }
   }
 }
