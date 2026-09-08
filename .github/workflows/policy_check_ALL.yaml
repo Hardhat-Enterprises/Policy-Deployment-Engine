@@ -30,6 +30,22 @@ jobs:
         with:
           python-version: '3.x'
 
+      # Report-only, and deliberately BEFORE the lint gate so it is still reported
+      # on a run the lint then fails. `.gitattributes` normalises new content at
+      # check-in, but it does not retro-fix blobs already committed on a branch cut
+      # before it landed, and git does not renormalise on merge — so such a branch
+      # can still carry CRLF onto dev. Nothing breaks when it does (fixture_sha
+      # canonicalises before hashing), but the files then read as modified in every
+      # clean checkout, which is how #750's two errors ended up attributed to
+      # whoever happened to be committing.
+      #
+      # continue-on-error on purpose: a hard whole-tree gate on this would be the
+      # very failure it exists to catch — one CRLF file anywhere on dev would turn
+      # every contributor's pull request red at once. dev-only, advisory, visible.
+      - name: Line endings (report only)
+        continue-on-error: true
+        run: python3 scripts/linters/check_line_endings.py
+
       - name: Lint (whole tree, structural + content)
         run: python3 scripts/linters/linter.py --tree all --platform gcp
 
