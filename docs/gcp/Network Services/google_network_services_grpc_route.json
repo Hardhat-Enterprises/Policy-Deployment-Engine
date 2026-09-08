@@ -7,7 +7,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls whether Terraform may destroy the gRPC route during Terraform-managed infrastructure changes. Because the route defines active service routing, unintended deletion through IaC can remove that routing control and disrupt service availability. Setting deletion_policy to PREVENT blocks destructive Terraform operations unless the protection is deliberately changed first, providing a generic prevent-destructive-loss control within managed infrastructure workflows. Policy should therefore require PREVENT."
+      "rationale": "Controls how Terraform handles destruction of the gRPC route. When set to PREVENT, Terraform fails an apply or destroy operation that would delete the route; DELETE permits the deletion, while ABANDON removes the route from Terraform management without deleting it. Because the gRPC route is an active network routing control, requiring PREVENT reduces the risk of that control being unintentionally removed through the organisation's managed infrastructure-as-code workflow. This protection is specifically against Terraform-managed destructive changes and does not claim to prevent deletion through other Google Cloud interfaces. Policy should require PREVENT as a generic prevent-destructive-loss control."
     },
     "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
