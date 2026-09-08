@@ -203,6 +203,17 @@ def test_a_non_plan_json_deletion_in_scope_is_still_a_deletion():
     ) == "deleted-file"
 
 
+def test_anything_under_the_old_inputs_tree_is_legacy_layout():
+    """After the cutover inputs/ does not exist, so touching it is one mistake with
+    one remedy — merge and use the nested layout — whatever the status. This rule
+    deliberately sits ahead of the deletion rule: a branch working from the old
+    layout should be told that once, not told off per file it removes."""
+    for status in ("A", "M", "D"):
+        assert classify(
+            status, "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"
+        ) == "legacy-layout"
+
+
 def test_editing_the_harness_is_a_shared_harness_edit():
     assert classify("M", "scripts/auto_test/auto_test.py") == "shared-harness-edit"
     assert classify("M", "policies/_helpers/helpers.rego") == "shared-harness-edit"

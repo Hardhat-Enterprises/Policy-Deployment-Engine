@@ -753,7 +753,7 @@ def run_policy_check_pair(policy_dir: Path, policy_file: Path, policies_root: Pa
     if plan_path is None:
         return make_failure(attribute, "Terraform failed to compile!", service, resource)
 
-    # plan_path is the persistent plan_cache file — never delete it here.
+    # plan_path is the fixture's committed <sha>.json — never delete it here.
     message_query, vars_query = get_policy_metadata(
         policy_file, service, resource, attribute)
 

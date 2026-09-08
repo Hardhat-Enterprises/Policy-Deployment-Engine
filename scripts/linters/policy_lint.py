@@ -62,7 +62,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 # cached plan belongs to this fixture". Importing keeps the two in lockstep: a
 # provider bump changes the sha in both places at once.
 from scripts.auto_test.auto_test import (  # noqa: E402
-    find_denormalised_plan, plan_cache_path, sha_for_files)
+    find_denormalised_plan, plan_cache_path)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HELPERS_DIR = REPO_ROOT / "policies" / "_helpers"
@@ -457,18 +457,16 @@ def _resolve_helpers(policies_root, helpers_dir=None):
 # --------------------------------------------------------------------------- #
 # Plan cache
 # --------------------------------------------------------------------------- #
-def plan_cache_for(input_dir, repo_root=None, *, legacy=False):
-    """The current plan path; legacy lookup is private to baseline comparison."""
-    directory = Path(input_dir)
-    if not legacy:
-        return plan_cache_path(directory, repo_root)
-    sha = sha_for_files({p.name: p for p in directory.glob("*.tf")})
-    local = directory / f"{sha}.json"
-    if local.exists():
-        return local
-    relative = directory.relative_to(Path(repo_root) / "inputs")
-    old = Path(repo_root) / "inputs" / "plan_cache" / relative.parts[0] / local.name
-    return old if old.exists() else local
+def plan_cache_for(input_dir):
+    """``<input_dir>/<sha>.json`` — the committed plan, beside the fixture's *.tf.
+
+    Straight through to ``auto_test.plan_cache_path`` (the pipeline's own
+    definition of which plan belongs to a fixture), so a provider bump changes
+    the expected filename here and in the harness at the same time. No root
+    rebasing is needed any more: the plan lives inside the directory it is for,
+    so a fixture tree under ``_tests/`` resolves inside itself for free.
+    """
+    return plan_cache_path(Path(input_dir))
 
 
 # --------------------------------------------------------------------------- #
@@ -921,7 +919,7 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     if not input_dir.is_dir() or not any(input_dir.glob("*.tf")):
         return []
 
-    cache = plan_cache_for(input_dir, root, legacy=legacy_layout)
+    cache = plan_cache_for(input_dir)
     if not cache.exists():
         # Reported repo-relative: the finding is read in CI logs and on the portal,
         # where an absolute path of the checkout means nothing.
@@ -931,7 +929,7 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
         # a UTF-8 BOM, so it was named for the pre-normalisation sha. Naming the
         # remedy is the difference between a rename and every contributor on the
         # branch re-running terraform for a file whose contents are already correct.
-        denormalised = None if legacy_layout else find_denormalised_plan(input_dir)
+        denormalised = find_denormalised_plan(input_dir)
         if denormalised is not None:
             return [Finding(service, resource_type, stem, "fixture-missing-plan",
                             f"no committed plan at {where} — but {denormalised.name} is "

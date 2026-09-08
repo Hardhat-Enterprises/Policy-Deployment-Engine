@@ -70,7 +70,7 @@ RULES = {
     "legacy-layout": "GCP fixtures now live beside policy.rego under policies/.",
     "out-of-scope-file": (
         "The file is not part of this branch's resource type. A Service/ branch may "
-        "change only its own docs JSON, inputs/ fixtures and policies/ files."),
+        "change only its own docs JSON and its own policies/ directory."),
     "deleted-file": (
         "The branch deletes a file. Nothing on a resource branch needs a deletion — "
         "not even inside your own folder; rename by adding the new file. The one "
