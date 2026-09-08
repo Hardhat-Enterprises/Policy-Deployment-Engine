@@ -1,14 +1,14 @@
 resource "google_gkeonprem_vmware_cluster" "non_compliant_example_1" {
   name = "non_compliant_example_1"
   project = "PDE"
-  location = "us-west1"
+  location = "australia_southeast1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   description = "test cluster"
   on_prem_version = "1.13.1-gke.35"
   annotations = {}
   network_config {
-    service_address_cidr_blocks = ["8.8.8.8/12"]
-    pod_address_cidr_blocks = ["17.5.7.3/16"]
+    service_address_cidr_blocks = ["10.96.0.0/12"]
+    pod_address_cidr_blocks = ["192.168.0.0/16"]
     host_config {
       dns_servers = ["10.254.41.1"]
       ntp_servers = ["216.239.35.8"]
@@ -62,7 +62,7 @@ resource "google_gkeonprem_vmware_cluster" "non_compliant_example_1" {
   }
   authorization {
     admin_users {
-      username = "testuser@apple.com"
+      username = "testuser@gmail.com"
     }
   }
   anti_affinity_groups {

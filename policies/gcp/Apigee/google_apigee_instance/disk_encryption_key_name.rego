@@ -16,8 +16,12 @@ conditions := [
         {
             "condition": "Check if disk_encryption_key_name uses an approved Australian KMS location",
             "attribute_path": ["disk_encryption_key_name"],
+            # Anchored on the location segment of the key path. The full key
+            # format is documented in the remedies: a pattern target only ever
+            # constrains the segments it captures, so spelling the rest of the
+            # path out here would pin a project id without checking anything.
             "values": [
-                "projects/.+/locations/*/keyRings/.+/cryptoKeys/.+",
+                "locations/*/keyRings/",
                 [["australia-southeast1", "australia-southeast2"]]
             ],
             "policy_type": "pattern whitelist"

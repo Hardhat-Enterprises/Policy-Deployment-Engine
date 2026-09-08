@@ -3,7 +3,7 @@ resource "google_kms_key_ring_import_job" "non_compliant_example_1" {
   import_job_id    = "non_compliant_example_1"
   key_ring         = "projects/my-project/locations/global/keyRings/my-ring"
   import_method    = "RSA_OAEP_3072_SHA1_AES_256" # not in whitelist
-  protection_level = "SOFTWARE"
+  protection_level = "EXTERNAL"
 }
 
 # EXTERNAL protection_level requires a stronger method

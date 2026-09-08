@@ -3,7 +3,7 @@
 
 resource "google_bigquery_analytics_hub_listing_subscription" "non_compliant_example_1" {
   location         = "US"
-  data_exchange_id = "nc"
+  data_exchange_id = "c"
   listing_id       = "non_compliant_example_1"
 
   destination_dataset {

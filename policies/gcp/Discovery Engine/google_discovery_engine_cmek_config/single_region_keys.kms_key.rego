@@ -6,6 +6,12 @@ import data.terraform.gcp.security.discovery_engine.google_discovery_engine_cmek
 
 #Pattern whitelist wouldnt work, too many arguments
 
+# policy_lint reports hard-coded-value on the value below, and the finding stands.
+# A pattern whitelist only judges values that MATCH its target: one that does not
+# match the shape is never flagged at all. This argument's non-compliant example
+# is the empty string, so converting would make the fixture pass for the wrong
+# reason. Either _helpers needs a pattern whitelist that fails a non-matching
+# value, or the fixture needs a wrongly-scoped (not malformed) example.
 conditions := [
     [
     {
@@ -21,6 +27,8 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := result.message
+
+details := result.details
