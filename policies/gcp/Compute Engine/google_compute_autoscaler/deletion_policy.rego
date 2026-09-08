@@ -1,6 +1,6 @@
 package terraform.gcp.security.compute_engine.google_compute_autoscaler.deletion_policy 
 import data.terraform.helpers
-import data.terraform.gcp.security.compute_engine.google_compute_engine.vars
+import data.terraform.gcp.security.compute_engine.google_compute_autoscaler.vars
 
 conditions := [
     [
