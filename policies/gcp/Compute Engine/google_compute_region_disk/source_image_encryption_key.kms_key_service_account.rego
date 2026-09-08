@@ -6,16 +6,16 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_disk.var
 conditions := [
     [
         {
-            "situation_description": "An explicit service account should be configured for source image KMS encryption requests instead of relying on the default service agent.",
+            "situation_description": "Source image KMS encryption should use the default Compute Engine Service Agent instead of a custom service account.",
             "remedies": [
-                "Set source_image_encryption_key.kms_key_service_account to a non-empty service account identity."
+                "Remove kms_key_service_account from source_image_encryption_key to use the default Compute Engine Service Agent."
             ]
         },
         {
-            "condition": "source_image_encryption_key.kms_key_service_account must be explicitly configured.",
+            "condition": "A custom source image KMS service account should not be configured.",
             "attribute_path": ["source_image_encryption_key", 0, "kms_key_service_account"],
-            "values": [""],
-            "policy_type": "blacklist"
+            "values": [null],
+            "policy_type": "whitelist"
         }
     ]
 ]
