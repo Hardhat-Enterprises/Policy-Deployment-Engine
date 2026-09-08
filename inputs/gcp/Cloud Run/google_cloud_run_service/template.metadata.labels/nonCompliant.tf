@@ -4,7 +4,7 @@ resource "google_cloud_run_service" "non_compliant_example_1" {
   project  = "my-gcp-project"
 
   metadata {
-    namespace = "wrong-project"
+    namespace = "my-gcp-project"
   }
 
   template {

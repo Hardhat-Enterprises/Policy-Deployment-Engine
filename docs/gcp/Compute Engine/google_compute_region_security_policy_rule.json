@@ -6,43 +6,43 @@
       "description": "The Action to perform when the rule is matched. The following are the valid actions:\n\n* allow: allow access to target.\n\n* deny(STATUS): deny access to target, returns the HTTP response code specified. Valid values for STATUS are 403, 404, and 502.\n\n* rate_based_ban: limit client traffic to the configured threshold and ban the client if the traffic exceeds the threshold. Configure parameters for this action in RateLimitOptions. Requires rateLimitOptions to be set.\n\n* redirect: redirect to a different target. This can either be an internal reCAPTCHA redirect, or an external URL-based redirect via a 302 response. Parameters for this action can be configured via redirectOptions. This action is only supported in Global Security Policies of type CLOUD_ARMOR.\n\n* throttle: limit client traffic to the configured threshold. Configure parameters for this action in rateLimitOptions. Requires rateLimitOptions to be set for this.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field controls whether the rule allows, denies or redirects matching traffic. The correct action depends on the purpose of the rule, so it is an architectural choice rather than a generic security policy target."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting controls whether the security rule can be deleted. An incorrect setting could remove important protection and leave the service exposed to harmful traffic."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when you create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field is only used to describe the resource. It does not affect the behaviour or security of the rule."
     },
     "preview": {
       "description": "If set to true, the specified action is not enforced.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting controls whether the security rule is enforced. If it is enabled in preview mode, harmful traffic may not be blocked."
     },
     "priority": {
       "description": "An integer indicating the priority of a rule in the list.\nThe priority must be a positive value between 0 and 2147483647.\nRules are evaluated from highest to lowest priority where 0 is the highest priority and 2147483647 is the lowest priority.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field controls the order in which rules are evaluated. The correct order depends on how the team has designed the rule set, so it is an architectural choice rather than a general security policy target."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies the Google Cloud project that the resource belongs to. It is a resource reference rather than a security setting that should be constrained."
     },
     "region": {
       "description": "The Region in which the created Region Security Policy rule should reside.",
@@ -55,8 +55,8 @@
       "description": "The name of the security policy this rule belongs to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies the parent security policy that the rule belongs to. It is a resource reference rather than a security setting that should be constrained."
     },
     "match": {
       "type": "block",
@@ -67,8 +67,8 @@
       "description": "Preconfigured versioned expression. If this field is specified, config must also be specified.\nAvailable preconfigured expressions along with their requirements are: SRC_IPS_V1 - must specify the corresponding srcIpRange field in config. Possible values: [\"SRC_IPS_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects the type of matching used by the rule. The correct choice depends on how the rule is designed, so there is no single security rule that applies to every environment."
     },
     "match.config": {
       "type": "block",
@@ -79,8 +79,8 @@
       "description": "CIDR IP address range. Maximum number of srcIpRanges allowed is 10.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field specifies which source IP addresses the rule matches. The correct IP ranges depend on each organisation, so there is no single security rule that applies to everyone."
     },
     "match.expr": {
       "type": "block",
@@ -91,8 +91,8 @@
       "description": "Textual representation of an expression in Common Expression Language syntax. The application context of the containing message determines which well-known feature set of CEL is supported.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field contains the condition used to match traffic. The correct expression depends on the organisation's requirements, so there is no single secure expression for every environment."
     },
     "network_match": {
       "type": "block",
@@ -103,50 +103,50 @@
       "description": "Destination IPv4/IPv6 addresses or CIDR prefixes, in standard text format.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field chooses which destination IP addresses the rule looks at. The correct addresses depend on the organisation's network, so there is no single security rule that would be suitable for everyone."
     },
     "network_match.dest_ports": {
       "description": "Destination port numbers for TCP/UDP/SCTP. Each element can be a 16-bit unsigned decimal number (e.g. \"80\") or range (e.g. \"0-1023\").",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field chooses which destination ports the rule looks at. Different services use different ports, so a port that is correct for one system may not be correct for another."
     },
     "network_match.ip_protocols": {
       "description": "IPv4 protocol / IPv6 next header (after extension headers). Each element can be an 8-bit unsigned decimal number (e.g. \"6\"), range (e.g. \"253-254\"), or one of the following protocol names: \"tcp\", \"udp\", \"icmp\", \"esp\", \"ah\", \"ipip\", or \"sctp\".",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field chooses which network protocols the rule applies to. Protocols such as TCP, UDP and ICMP can all be valid depending on the service, so none of them is automatically secure or insecure."
     },
     "network_match.src_asns": {
       "description": "BGP Autonomous System Number associated with the source IP address.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field matches traffic based on the network provider it comes from. Which providers should be matched depends on the organisation, so there is no universal security value for this field."
     },
     "network_match.src_ip_ranges": {
       "description": "Source IPv4/IPv6 addresses or CIDR prefixes, in standard text format.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field specifies which source IP addresses the rule matches. The correct IP ranges depend on each organisation's network, so there is no single security rule that would work for everyone."
     },
     "network_match.src_ports": {
       "description": "Source port numbers for TCP/UDP/SCTP. Each element can be a 16-bit unsigned decimal number (e.g. \"80\") or range (e.g. \"0-1023\").",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field controls which source ports the rule matches. Very broad or wildcard port matching could include traffic that was not intended and expose internal services, but the required source ports depend on the application's network design, so a generic port value cannot be enforced."
     },
     "network_match.src_region_codes": {
       "description": "Two-letter ISO 3166-1 alpha-2 country code associated with the source IP address.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This field can restrict traffic to approved geographic regions. Requiring geographic restrictions can support perimeter security and data residency controls."
     },
     "network_match.user_defined_fields": {
       "type": "block",
@@ -157,15 +157,15 @@
       "description": "Name of the user-defined field, as given in the definition.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field is the name of a custom packet field defined elsewhere in the configuration. It is a metadata identifier or reference, and resource names or identifiers are not constrained by a general security policy."
     },
     "network_match.user_defined_fields.values": {
       "description": "Matching values of the field. Each element can be a 32-bit unsigned decimal or hexadecimal (starting with \"0x\") number (e.g. \"64\") or range (e.g. \"0x400-0x7ff\").",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field contains traffic-specific match values used by a network security rule. The appropriate values depend on the application, protocol, and traffic being filtered, so defining or constraining them at the platform level would be overly restrictive and team-dependent rather than a generic security control."
     },
     "preconfigured_waf_config": {
       "type": "block",
@@ -181,15 +181,15 @@
       "description": "A list of target rule IDs under the WAF rule set to apply the preconfigured WAF exclusion.\nIf omitted, it refers to all the rule IDs under the WAF rule set.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting decides which WAF protection rules are excluded. Incorrect exclusions could prevent important security checks from protecting the application"
     },
     "preconfigured_waf_config.exclusion.target_rule_set": {
       "description": "Target WAF rule set to apply the preconfigured WAF exclusion.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies the specific preconfigured WAF rule set to which an exclusion applies. It is a reference to a particular WAF rule set rather than a generic enforceable security standard, so no universally secure value can be defined for this attribute."
     },
     "preconfigured_waf_config.exclusion.request_cookie": {
       "type": "block",
@@ -200,15 +200,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value. Possible values: [\"CONTAINS\", \"ENDS_WITH\", \"EQUALS\", \"EQUALS_ANY\", \"STARTS_WITH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting controls how broadly a request cookie is excluded from security inspection. A broad option could allow all values of that cookie to bypass important checks. "
     },
     "preconfigured_waf_config.exclusion.request_cookie.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field specifies the cookie value that is excluded from inspection. The correct value depends on the application, so there is no single security rule that applies to every environment."
     },
     "preconfigured_waf_config.exclusion.request_header": {
       "type": "block",
@@ -219,15 +219,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value. Possible values: [\"CONTAINS\", \"ENDS_WITH\", \"EQUALS\", \"EQUALS_ANY\", \"STARTS_WITH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines how a request header is matched, such as EQUALS or STARTS_WITH. It controls matching logic rather than a security level, so the correct operator depends on the application's exclusion requirements."
     },
     "preconfigured_waf_config.exclusion.request_header.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field contains the application-specific header value to be excluded from inspection. The required value depends on the application, so it cannot be generically enforced as a security policy."
     },
     "preconfigured_waf_config.exclusion.request_query_param": {
       "type": "block",
@@ -238,15 +238,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value. Possible values: [\"CONTAINS\", \"ENDS_WITH\", \"EQUALS\", \"EQUALS_ANY\", \"STARTS_WITH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines how a query parameter is matched for an exclusion. It is a functional matching option rather than a security control, so the correct operator depends on the application's exclusion requirements."
     },
     "preconfigured_waf_config.exclusion.request_query_param.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field specifies the query parameter value that is excluded from inspection. The correct value depends on the application, so there is no single security rule that applies to every environment."
     },
     "preconfigured_waf_config.exclusion.request_uri": {
       "type": "block",
@@ -257,15 +257,15 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value. Possible values: [\"CONTAINS\", \"ENDS_WITH\", \"EQUALS\", \"EQUALS_ANY\", \"STARTS_WITH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines how a request URI is matched for an exclusion. It controls matching behaviour rather than security posture, so the correct operator depends on the application's routing and exclusion requirements."
     },
     "preconfigured_waf_config.exclusion.request_uri.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field specifies the web address value that is excluded from inspection. The correct value depends on the application, so there is no single security rule that applies to every environment."
     },
     "rate_limit_options": {
       "type": "block",
@@ -276,36 +276,36 @@
       "description": "Can only be specified if the action for the rule is \"rate_based_ban\".\nIf specified, determines the time (in seconds) the traffic will continue to be banned by the rate limit after the rate falls below the threshold.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field decides how long a client remains blocked after exceeding the rate limit. The right duration depends on the service and its traffic, so there is no single secure value that works for every environment."
     },
     "rate_limit_options.conform_action": {
       "description": "Action to take for requests that are under the configured rate limit threshold.\nValid option is \"allow\" only.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field controls what happens when traffic stays within the rate limit. The only supported option is allow, so there is no security choice for a policy to enforce."
     },
     "rate_limit_options.enforce_on_key": {
       "description": "Determines the key to enforce the rateLimitThreshold on. Possible values are:\n* ALL: A single rate limit threshold is applied to all the requests matching this rule. This is the default value if \"enforceOnKey\" is not configured.\n* IP: The source IP address of the request is the key. Each IP has this limit enforced separately.\n* HTTP_HEADER: The value of the HTTP header whose name is configured under \"enforceOnKeyName\". The key value is truncated to the first 128 bytes of the header value. If no such header is present in the request, the key type defaults to ALL.\n* XFF_IP: The first IP address (i.e. the originating client IP address) specified in the list of IPs under X-Forwarded-For HTTP header. If no such header is present or the value is not a valid IP, the key defaults to the source IP address of the request i.e. key type IP.\n* HTTP_COOKIE: The value of the HTTP cookie whose name is configured under \"enforceOnKeyName\". The key value is truncated to the first 128 bytes of the cookie value. If no such cookie is present in the request, the key type defaults to ALL.\n* HTTP_PATH: The URL path of the HTTP request. The key value is truncated to the first 128 bytes.\n* SNI: Server name indication in the TLS session of the HTTPS request. The key value is truncated to the first 128 bytes. The key type defaults to ALL on a HTTP session.\n* REGION_CODE: The country/region from which the request originates.\n* TLS_JA3_FINGERPRINT: JA3 TLS/SSL fingerprint if the client connects using HTTPS, HTTP/2 or HTTP/3. If not available, the key type defaults to ALL.\n* TLS_JA4_FINGERPRINT: JA4 TLS/SSL fingerprint if the client connects using HTTPS, HTTP/2 or HTTP/3. If not available, the key type defaults to ALL.\n* USER_IP: The IP address of the originating client, which is resolved based on \"userIpRequestHeaders\" configured with the security policy. If there is no \"userIpRequestHeaders\" configuration or an IP address cannot be resolved from it, the key type defaults to IP. Possible values: [\"ALL\", \"IP\", \"HTTP_HEADER\", \"XFF_IP\", \"HTTP_COOKIE\", \"HTTP_PATH\", \"SNI\", \"REGION_CODE\", \"TLS_JA3_FINGERPRINT\", \"TLS_JA4_FINGERPRINT\", \"USER_IP\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field decides how requests are grouped for rate limiting, such as by IP address, cookie or header. The appropriate grouping method depends on the application's architecture and traffic model, so it is an architectural choice rather than a general security control."
     },
     "rate_limit_options.enforce_on_key_name": {
       "description": "Rate limit key name applicable only for the following key types:\nHTTP_HEADER -- Name of the HTTP header whose value is taken as the key value.\nHTTP_COOKIE -- Name of the HTTP cookie whose value is taken as the key value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "this field names the header or cookie used to identify requests for rate limiting. The correct name depends on the application, so there is no single security value that works for every environment."
     },
     "rate_limit_options.exceed_action": {
       "description": "Action to take for requests that are above the configured rate limit threshold, to deny with a specified HTTP response code.\nValid options are deny(STATUS), where valid values for STATUS are 403, 404, 429, and 502.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This field determines the action applied when requests exceed the configured rate limit. Because this behavior forms part of the rule's DDoS and abuse-mitigation enforcement, a platform policy should require an approved denial action when the threshold is exceeded."
     },
     "rate_limit_options.ban_threshold": {
       "type": "block",
@@ -316,15 +316,15 @@
       "description": "Number of HTTP(S) requests for calculating the threshold.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field sets how many requests are needed before a client can be banned. The right number depends on normal traffic levels, so there is no single secure value for every service."
     },
     "rate_limit_options.ban_threshold.interval_sec": {
       "description": "Interval over which the threshold is computed.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field sets the time period used to measure the ban threshold. The right time period depends on how the service is normally used, so there is no single secure value for every environment."
     },
     "rate_limit_options.enforce_on_key_configs": {
       "type": "block",
@@ -335,15 +335,15 @@
       "description": "Rate limit key name applicable only for the following key types:\nHTTP_HEADER -- Name of the HTTP header whose value is taken as the key value.\nHTTP_COOKIE -- Name of the HTTP cookie whose value is taken as the key value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field names the header or cookie used to group requests for rate limiting. The correct name depends on the application, so there is no single security value that works for every environment."
     },
     "rate_limit_options.enforce_on_key_configs.enforce_on_key_type": {
       "description": "Determines the key to enforce the rateLimitThreshold on. Possible values are:\n* ALL: A single rate limit threshold is applied to all the requests matching this rule. This is the default value if \"enforceOnKeyConfigs\" is not configured.\n* IP: The source IP address of the request is the key. Each IP has this limit enforced separately.\n* HTTP_HEADER: The value of the HTTP header whose name is configured under \"enforceOnKeyName\". The key value is truncated to the first 128 bytes of the header value. If no such header is present in the request, the key type defaults to ALL.\n* XFF_IP: The first IP address (i.e. the originating client IP address) specified in the list of IPs under X-Forwarded-For HTTP header. If no such header is present or the value is not a valid IP, the key defaults to the source IP address of the request i.e. key type IP.\n* HTTP_COOKIE: The value of the HTTP cookie whose name is configured under \"enforceOnKeyName\". The key value is truncated to the first 128 bytes of the cookie value. If no such cookie is present in the request, the key type defaults to ALL.\n* HTTP_PATH: The URL path of the HTTP request. The key value is truncated to the first 128 bytes.\n* SNI: Server name indication in the TLS session of the HTTPS request. The key value is truncated to the first 128 bytes. The key type defaults to ALL on a HTTP session.\n* REGION_CODE: The country/region from which the request originates.\n* TLS_JA3_FINGERPRINT: JA3 TLS/SSL fingerprint if the client connects using HTTPS, HTTP/2 or HTTP/3. If not available, the key type defaults to ALL.\n* TLS_JA4_FINGERPRINT: JA4 TLS/SSL fingerprint if the client connects using HTTPS, HTTP/2 or HTTP/3. If not available, the key type defaults to ALL.\n* USER_IP: The IP address of the originating client, which is resolved based on \"userIpRequestHeaders\" configured with the security policy. If there is no \"userIpRequestHeaders\" configuration or an IP address cannot be resolved from it, the key type defaults to IP. Possible values: [\"ALL\", \"IP\", \"HTTP_HEADER\", \"XFF_IP\", \"HTTP_COOKIE\", \"HTTP_PATH\", \"SNI\", \"REGION_CODE\", \"TLS_JA3_FINGERPRINT\", \"TLS_JA4_FINGERPRINT\", \"USER_IP\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects the type of value used to group requests for rate limiting, such as an IP address, cookie or header. This is an architectural traffic-grouping choice rather than a general security policy target."
     },
     "rate_limit_options.rate_limit_threshold": {
       "type": "block",
@@ -354,15 +354,15 @@
       "description": "Number of HTTP(S) requests for calculating the threshold.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field sets how many requests are allowed before rate limiting begins. The right number depends on the normal traffic of the service, so there is no single secure value for every environment."
     },
     "rate_limit_options.rate_limit_threshold.interval_sec": {
       "description": "Interval over which the threshold is computed.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field sets the time period used to measure the rate limit. The right time period depends on how the service is normally used, so there is no single secure value for every environment."
     }
   }
 }
