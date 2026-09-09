@@ -10,12 +10,12 @@ conditions := [
         {
             "condition": "Service account not valid",
             "attribute_path" : ["config_template",0,"auth_config_template",0,"service_account",0,"service_account"],
-            "values" : ["service@pde.com"],
-            "policy_type" : "whitelist" 
+            "values" : ["*@*", [["service"], ["pde.com"]]],
+            "policy_type" : "pattern whitelist" 
         }
     ]
 ]
 
 summary := helpers.get_multi_summary(conditions, vars.variables)
 message := summary.message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+details := summary.details
