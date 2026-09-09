@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This controls how Terraform handles deletion of the firewall policy. Although deleting a firewall policy can remove security controls, the appropriate lifecycle behaviour depends on how the resource is managed and decommissioned. Requiring PREVENT for every team would impose an operational lifecycle rule rather than a universally applicable security constraint."
+      "security_impact": true,
+      "rationale": "Deleting a hierarchical firewall policy can remove security controls that protect network traffic. Setting deletion_policy to PREVENT provides a generic safeguard against accidental destruction of the policy and the resulting loss of those controls."
     },
     "description": {
       "description": "An optional description of this resource.",
@@ -135,8 +135,8 @@
       "description": "Destination IP address range in CIDR format. Required for\nEGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This defines the destination CIDR ranges matched by an egress rule and therefore controls how broadly the rule can affect outbound traffic. A generic policy can detect unrestricted ranges such as 0.0.0.0/0 or ::/0 and prevent them from being used with overly permissive allow rules, reducing unintended broad egress exposure."
+      "security_impact": false,
+      "rationale": "This specifies the destination CIDR ranges that an egress rule matches. Whether a broad or narrow destination range is secure depends on the rule action and the intended network design. A range such as 0.0.0.0/0 may be appropriate for a deny rule but risky for an allow rule, so this attribute cannot be evaluated securely in isolation by a generic policy."
     },
     "rule.match.dest_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for destination\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of destination region codes allowed is 5000.",
@@ -149,8 +149,8 @@
       "description": "Names of Network Threat Intelligence lists.\nThe IPs in these lists will be matched against traffic destination.",
       "required": false,
       "type": "list(string)",
-      "security_impact":true,
-      "rationale": "This matches destination IP addresses contained in Google Cloud threat-intelligence lists. These lists can represent known-malicious or otherwise security-significant destinations, so a generic policy can require security-safe handling of such matches, for example ensuring known-malicious destinations are denied rather than explicitly allowed."
+      "security_impact": false,
+      "rationale": "This selects Network Threat Intelligence lists used to match destination traffic. The security effect depends on the rule action applied to those matches; using a threat-intelligence list with a deny rule can strengthen security, while other combinations have different purposes. The attribute alone therefore has no universally secure value."
     },
     "rule.match.src_address_groups": {
       "description": "Address groups which should be matched against the traffic source.\nMaximum number of source address groups is 10.",
@@ -170,8 +170,8 @@
       "description": "Source IP address range in CIDR format. Required for\nINGRESS rules.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This defines the source CIDR ranges matched by an ingress rule and therefore controls how broadly incoming traffic can match the rule. A generic policy can detect unrestricted ranges such as 0.0.0.0/0 or ::/0 and prevent them from being combined with overly permissive allow rules, reducing unnecessary public exposure."
+      "security_impact": false,
+      "rationale": "This specifies the source CIDR ranges matched by an ingress rule. Whether a particular range is secure depends on the rule action and the intended access requirements. A broad source range may be appropriate for a deny rule but unsafe for some allow rules, so no generic secure value can be enforced for this attribute in isolation."
     },
     "rule.match.src_region_codes": {
       "description": "Region codes whose IP addresses will be used to match for source\nof traffic. Should be specified as 2 letter country code defined as per\nISO 3166 alpha-2 country codes. ex.\"US\"\nMaximum number of source region codes allowed is 5000.",
@@ -184,8 +184,8 @@
       "description": "Names of Network Threat Intelligence lists.\nThe IPs in these lists will be matched against traffic source.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This matches source IP addresses contained in Google Cloud threat-intelligence lists. Because some lists represent known-malicious sources, a generic policy can enforce safe treatment of those matches, such as preventing a rule from explicitly allowing traffic identified as malicious."
+      "security_impact": false,
+      "rationale": "This selects Network Threat Intelligence lists used to match source traffic. The security outcome depends on how matching traffic is handled by the rule action. Because the attribute only defines what traffic is matched and does not itself allow or deny that traffic, there is no universally secure value that a generic policy can require."
     },
     "rule.match.layer4_config": {
       "type": "block",
