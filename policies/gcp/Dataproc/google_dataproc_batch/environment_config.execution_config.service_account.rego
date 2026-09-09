@@ -6,19 +6,25 @@ import data.terraform.gcp.security.dataproc.google_dataproc_batch.vars
 conditions := [
     [
         {
-            "situation_description": "Dataproc Batch runs as a default or unmanaged identity rather than a dedicated least-privilege service account.",
+            "situation_description": "Dataproc Batch runs as a default Google-managed identity rather than a dedicated least-privilege service account.",
             "remedies": [
-                "Set service_account to a dedicated project-managed service account of the form <name>@<project>.iam.gserviceaccount.com, not a default compute identity."
+                "Set service_account to a dedicated project-managed service account of the form <name>@<project>.iam.gserviceaccount.com."
             ]
         },
         {
-            "condition": "The workload must run as a dedicated project-managed service account.",
+            "condition": "A dedicated service account must be configured.",
+            "attribute_path": ["environment_config", 0, "execution_config", 0, "service_account"],
+            "values": [null, ""],
+            "policy_type": "blacklist"
+        },
+        {
+            "condition": "Default Google-managed service accounts must not be used.",
             "attribute_path": ["environment_config", 0, "execution_config", 0, "service_account"],
             "values": [
-                "*@*",
-                [["dataproc-sa", "spark-sa", "batch-sa"], ["test-project.iam.gserviceaccount.com"]]
+                "@*",
+                [["developer.gserviceaccount.com", "compute.gserviceaccount.com", "appspot.gserviceaccount.com"]]
             ],
-            "policy_type": "pattern whitelist"
+            "policy_type": "pattern blacklist"
         }
     ]
 ]

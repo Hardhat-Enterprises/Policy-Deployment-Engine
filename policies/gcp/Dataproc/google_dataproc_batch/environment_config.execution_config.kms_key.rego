@@ -6,17 +6,23 @@ import data.terraform.gcp.security.dataproc.google_dataproc_batch.vars
 conditions := [
     [
         {
-            "situation_description": "Dataproc Batch is not encrypted with a customer-managed key held in an approved region.",
+            "situation_description": "Dataproc Batch is not encrypted with a customer-managed Cloud KMS key held in an approved region.",
             "remedies": [
-                "Set kms_key to a customer-managed Cloud KMS key of the form projects/<project>/locations/<region>/keyRings/<ring>/cryptoKeys/<key>, held in an approved region."
+                "Set kms_key to a customer-managed key of the form projects/*/locations/*/keyRings/*/cryptoKeys/*, held in an approved region."
             ]
         },
         {
-            "condition": "The KMS key must be a customer-managed key in an approved region.",
+            "condition": "A customer-managed Cloud KMS key must be configured.",
+            "attribute_path": ["environment_config", 0, "execution_config", 0, "kms_key"],
+            "values": [null, ""],
+            "policy_type": "blacklist"
+        },
+        {
+            "condition": "The key must be held in an approved region.",
             "attribute_path": ["environment_config", 0, "execution_config", 0, "kms_key"],
             "values": [
-                "projects/*/locations/*/keyRings/*/cryptoKeys/*",
-                [["test-project"], ["australia-southeast1", "australia-southeast2"], ["test-ring"], ["test-key"]]
+                "/locations/*/keyRings/",
+                [["australia-southeast1", "australia-southeast2"]]
             ],
             "policy_type": "pattern whitelist"
         }
