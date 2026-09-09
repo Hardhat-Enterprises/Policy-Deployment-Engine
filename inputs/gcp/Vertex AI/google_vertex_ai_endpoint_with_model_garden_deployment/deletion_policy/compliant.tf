@@ -1,18 +1,3 @@
-terraform {
-  required_providers {
-    google = {
-      source = "hashicorp/google"
-      version = "= 7.37.0"
-    }
-  }
-}
-
-provider "google" {
-  project = "example-project"
-  region = "australia-southeast1"
-  access_token = "offline-plan-placeholder"
-}
-
 resource "google_vertex_ai_endpoint_with_model_garden_deployment" "compliant_example_1" {
   location = "australia-southeast1"
   hugging_face_model_id = "Qwen/Qwen3-0.6B"

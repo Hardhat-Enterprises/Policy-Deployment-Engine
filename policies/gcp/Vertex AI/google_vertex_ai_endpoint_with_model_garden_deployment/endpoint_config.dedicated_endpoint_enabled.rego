@@ -1,4 +1,4 @@
-package terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint_with_model_garden_deployment.endpoint_config.dedicated_endpoint_enabled
+package terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint_with_model_garden_deployment.endpoint_config_dedicated_endpoint_enabled
 
 import data.terraform.helpers
 import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint_with_model_garden_deployment.vars

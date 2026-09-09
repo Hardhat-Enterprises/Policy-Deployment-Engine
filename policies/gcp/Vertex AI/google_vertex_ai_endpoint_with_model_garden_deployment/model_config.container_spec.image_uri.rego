@@ -1,4 +1,4 @@
-package terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint_with_model_garden_deployment.model_config.container_spec.image_uri
+package terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint_with_model_garden_deployment.model_config_container_spec_image_uri
 
 import data.terraform.helpers
 import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint_with_model_garden_deployment.vars

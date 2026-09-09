@@ -1,4 +1,4 @@
-package terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint_with_model_garden_deployment.model_config.container_spec.env.value
+package terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint_with_model_garden_deployment.model_config_container_spec_env_value
 
 import data.terraform.helpers
 import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint_with_model_garden_deployment.vars

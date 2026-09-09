@@ -1,4 +1,4 @@
-﻿resource "google_vertex_ai_endpoint_with_model_garden_deployment" "non_compliant_example_1" {
+resource "google_vertex_ai_endpoint_with_model_garden_deployment" "non_compliant_example_1" {
   location = "australia-southeast1"
   hugging_face_model_id = "Qwen/Qwen3-0.6B"
   deletion_policy = "PREVENT"
