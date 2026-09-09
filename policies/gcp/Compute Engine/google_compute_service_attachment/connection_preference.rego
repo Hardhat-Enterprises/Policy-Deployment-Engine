@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_service_attachment.connection_preference # Edit here 
+package terraform.gcp.security.compute_engine.google_compute_service_attachment.connection_preference 
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_service_attachment.vars
 

@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_service_attachment.propagated_connection_limit # Edit here 
+package terraform.gcp.security.compute_engine.google_compute_service_attachment.propagated_connection_limit 
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_service_attachment.vars
 
@@ -13,8 +13,8 @@ conditions := [
         {
             "condition": "propagated_connection_limit must be configured to be under 50",
             "attribute_path": ["propagated_connection_limit"],
-            "values": ["ACCEPT_MANUAL"],
-            "policy_type": "whitelist"
+            "values": [null, 16],
+            "policy_type": "range"
         }
     ]
 ]

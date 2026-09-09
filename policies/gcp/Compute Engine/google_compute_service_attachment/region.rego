@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_service_attachment.region # Edit here 
+package terraform.gcp.security.compute_engine.google_compute_service_attachment.region 
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_service_attachment.vars
 

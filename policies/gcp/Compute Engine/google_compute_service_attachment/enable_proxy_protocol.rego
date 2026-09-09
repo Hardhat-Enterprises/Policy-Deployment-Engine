@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_service_attachment.enable_proxy_protocol # Edit here 
+package terraform.gcp.security.compute_engine.google_compute_service_attachment.enable_proxy_protocol 
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_service_attachment.vars
 

@@ -8,5 +8,5 @@ resource "google_compute_service_attachment" "non_compliant_example_1" {
   connection_preference    = "ACCEPT_MANUAL"
   nat_subnets              = ["google_compute_subnetwork.psc_ilb_nat.id"]
   target_service           = "google_compute_forwarding_rule.psc_ilb_target_service.id"
-  show_nat_ips             = true
+  show_nat_ips             = "true"
 }

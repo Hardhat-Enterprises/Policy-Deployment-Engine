@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_service_attachment.consumer_accept_lists.network_url# Edit here 
+package terraform.gcp.security.compute_engine.google_compute_service_attachment.consumer_accept_lists.network_url
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_service_attachment.vars
 
