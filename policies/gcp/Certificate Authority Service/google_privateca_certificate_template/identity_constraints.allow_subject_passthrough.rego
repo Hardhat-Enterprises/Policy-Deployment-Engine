@@ -3,6 +3,8 @@ package terraform.gcp.security.certificate_authority_service.google_privateca_ce
 import data.terraform.helpers
 import data.terraform.gcp.security.certificate_authority_service.google_privateca_certificate_template.vars
 
+# Reject subject passthrough so certificate requests cannot supply unrestricted identities.
+
 conditions := [
     [
         {
