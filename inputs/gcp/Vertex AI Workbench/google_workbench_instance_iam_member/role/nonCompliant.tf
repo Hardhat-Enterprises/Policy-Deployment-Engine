@@ -3,5 +3,5 @@ resource "google_workbench_instance_iam_member" "non_compliant_example_1" {
   location = "australia-southeast2-a"
   name     = "non_compliant_example_1"
   role     = "roles/owner"
-  member   = "user:admin@example.com"
+  member   = "user:viewer@example.com"
 }
