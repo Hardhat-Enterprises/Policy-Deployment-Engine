@@ -6,36 +6,36 @@
       "description": "The connection profile identifier.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the connection profile but does not control authentication, authorization, encryption, network exposure, or data protection."
     },
     "create_without_validation": {
       "description": "Create the connection profile without validating it.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Datastream validates the connection before creation. It should be false so invalid credentials, unreachable endpoints, and incompatible connection settings are detected before the profile is accepted."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls protection against unintended profile deletion. PREVENT reduces the risk of accidental removal and disruption to dependent streams; DELETE or ABANDON permits removal from Terraform management."
     },
     "display_name": {
       "description": "Display name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable name only and does not change the connection profile's security posture."
     },
     "labels": {
       "description": "Labels.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides resource metadata for organisation and filtering but does not directly enforce access control, encryption, connectivity, or data protection."
     },
     "location": {
       "description": "The name of the location this connection profile is located in.",
@@ -48,8 +48,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the owning Google Cloud project but does not itself define IAM, encryption, network access, or another reusable security control; approved project identifiers are environment-specific."
     },
     "bigquery_profile": {
       "type": "block",
@@ -65,36 +65,36 @@
       "description": "Hostname for the SSH tunnel.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the SSH tunnel endpoint. Its approved value is environment-specific, and the argument alone does not prove that the endpoint is trusted or securely configured."
     },
     "forward_ssh_connectivity.password": {
       "description": "SSH password.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific SSH credential material. It does not configure a platform-level security control, and a reusable policy cannot determine whether the password is strong, rotated, or appropriately scoped."
     },
     "forward_ssh_connectivity.port": {
       "description": "Port for the SSH tunnel.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the SSH service port. A non-default port does not provide a meaningful security control, while an incorrect value primarily causes connectivity failure."
     },
     "forward_ssh_connectivity.private_key": {
       "description": "SSH private key.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific SSH credential material. Although key-based authentication may be preferred, the argument does not itself configure a reusable platform-level control or prove that the key is trusted and securely managed."
     },
     "forward_ssh_connectivity.username": {
       "description": "Username for the SSH tunnel.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the SSH account but does not reveal whether that account has least privilege; approved usernames are environment-specific."
     },
     "gcs_profile": {
       "type": "block",
@@ -105,15 +105,15 @@
       "description": "The Cloud Storage bucket name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a team-specific destination bucket. It does not configure the bucket's platform-level IAM, encryption, retention, or public-access protections."
     },
     "gcs_profile.root_path": {
       "description": "The root path inside the Cloud Storage bucket.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a team-specific path within the destination bucket. It organises replicated data but does not create an access-control or encryption boundary."
     },
     "mongodb_profile": {
       "type": "block",
@@ -124,29 +124,29 @@
       "description": "Password for the MongoDB connection. Mutually exclusive with\nsecretManagerStoredPassword.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific MongoDB credential material. The platform-level control is the use of secret_manager_stored_password, rather than validating the password value itself."
     },
     "mongodb_profile.replica_set": {
       "description": "Name of the replica set.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the MongoDB replica set used for connectivity but does not independently enforce a security control."
     },
     "mongodb_profile.secret_manager_stored_password": {
       "description": "A reference to a Secret Manager resource name storing the MongoDB\nconnection password. Mutually exclusive with password.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References a Secret Manager secret instead of embedding the MongoDB password directly. Requiring a structurally valid secret version resource supports centralised secret storage, access control, auditing, and rotation."
     },
     "mongodb_profile.username": {
       "description": "Username for the MongoDB connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the database account, but the value alone cannot establish that its database privileges follow least privilege."
     },
     "mongodb_profile.host_addresses": {
       "type": "block",
@@ -157,15 +157,15 @@
       "description": "Hostname for the connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a MongoDB endpoint. Approved hosts are environment-specific, and the value alone does not establish transport security or endpoint trust."
     },
     "mongodb_profile.host_addresses.port": {
       "description": "Port for the connection.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the database service port. An incorrect value primarily affects connectivity and does not independently enforce a security control."
     },
     "mongodb_profile.srv_connection_format": {
       "type": "block",
@@ -181,29 +181,29 @@
       "description": "PEM-encoded certificate of the CA that signed the source database\nserver's certificate.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific certificate material to the MongoDB TLS configuration. The certificate value itself is not a reusable platform-level setting because trust depends on the team's certificate authority."
     },
     "mongodb_profile.ssl_config.client_certificate": {
       "description": "PEM-encoded certificate that will be used by the replica to\nauthenticate against the source database server. If this field\nis used then the 'clientKey' and the 'caCertificate' fields are\nmandatory.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific MongoDB client certificate material. It does not independently configure a reusable platform-level control, and certificate trust and validity cannot be established from a generic value check"
     },
     "mongodb_profile.ssl_config.client_key": {
       "description": "PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'client_certificate' and the\n'ca_certificate' fields are mandatory.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific MongoDB private-key material. The reusable platform-level control is storing the key through secret_manager_stored_client_key, not validating the key value itself."
     },
     "mongodb_profile.ssl_config.secret_manager_stored_client_key": {
       "description": "A reference to a Secret Manager resource name storing the\nPEM-encoded private key. Mutually exclusive with clientKey.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References a Secret Manager secret for the MongoDB TLS client key. Requiring a structurally valid secret version resource reduces direct private-key exposure and supports controlled access and rotation."
     },
     "mongodb_profile.standard_connection_format": {
       "type": "block",
@@ -214,8 +214,8 @@
       "description": "Specifies whether the client connects directly to the\nhost[:port] in the connection URI.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Chooses direct MongoDB topology behaviour and is deprecated; it primarily affects connection routing rather than enforcing authentication, encryption, or access control."
     },
     "mysql_profile": {
       "type": "block",
@@ -226,36 +226,36 @@
       "description": "Hostname for the MySQL connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the MySQL endpoint. Approved hosts are environment-specific, and the value alone does not establish transport security or endpoint trust."
     },
     "mysql_profile.password": {
       "description": "Password for the MySQL connection.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific MySQL credential material. The platform-level control is the use of secret_manager_stored_password, rather than validating the password value itself."
     },
     "mysql_profile.port": {
       "description": "Port for the MySQL connection.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the database service port. An incorrect value primarily affects connectivity and does not independently enforce a security control."
     },
     "mysql_profile.secret_manager_stored_password": {
       "description": "A reference to a Secret Manager resource name storing the user's password.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References a Secret Manager secret instead of embedding the MySQL password directly. Requiring a structurally valid secret version resource supports centralised secret storage, access control, auditing, and rotation."
     },
     "mysql_profile.username": {
       "description": "Username for the MySQL connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the database account, but the value alone cannot establish that its database privileges follow least privilege."
     },
     "mysql_profile.ssl_config": {
       "type": "block",
@@ -266,22 +266,22 @@
       "description": "PEM-encoded certificate of the CA that signed the source database\nserver's certificate.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific certificate material to the MySQL TLS configuration. The certificate value itself is not a reusable platform-level setting because trust depends on the team's certificate authority."
     },
     "mysql_profile.ssl_config.client_certificate": {
       "description": "PEM-encoded certificate that will be used by the replica to\nauthenticate against the source database server. If this field\nis used then the 'clientKey' and the 'caCertificate' fields are\nmandatory.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific MySQL client certificate material. It does not independently configure a reusable platform-level control, and certificate trust and validity cannot be established from a generic value check."
     },
     "mysql_profile.ssl_config.client_key": {
       "description": "PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'client_certificate' and the\n'ca_certificate' fields are mandatory.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific MySQL private-key material. It does not configure a reusable platform-level setting, and a generic policy cannot establish the key's ownership, strength, rotation, or protection."
     },
     "oracle_profile": {
       "type": "block",
@@ -292,50 +292,50 @@
       "description": "Connection string attributes",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies database-specific connection parameters. Their meanings vary by environment, so this map does not provide a consistent, reusable security control by itself."
     },
     "oracle_profile.database_service": {
       "description": "Database for the Oracle connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the Oracle database service but does not independently enforce authentication, encryption, or access control."
     },
     "oracle_profile.hostname": {
       "description": "Hostname for the Oracle connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Oracle endpoint. Approved hosts are environment-specific, and the value alone does not establish transport security or endpoint trust."
     },
     "oracle_profile.password": {
       "description": "Password for the Oracle connection.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific Oracle credential material. The platform-level control is the use of secret_manager_stored_password, rather than validating the password value itself."
     },
     "oracle_profile.port": {
       "description": "Port for the Oracle connection.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the database service port. An incorrect value primarily affects connectivity and does not independently enforce a security control."
     },
     "oracle_profile.secret_manager_stored_password": {
       "description": "A reference to a Secret Manager resource name storing the user's password.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References a Secret Manager secret instead of embedding the Oracle password directly. Requiring a structurally valid secret version resource supports centralised secret storage, access control, auditing, and rotation."
     },
     "oracle_profile.username": {
       "description": "Username for the Oracle connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the database account, but the value alone cannot establish that its database privileges follow least privilege."
     },
     "postgresql_profile": {
       "type": "block",
@@ -346,43 +346,43 @@
       "description": "Database for the PostgreSQL connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the PostgreSQL database but does not independently enforce authentication, encryption, or access control."
     },
     "postgresql_profile.hostname": {
       "description": "Hostname for the PostgreSQL connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the PostgreSQL endpoint. Approved hosts are environment-specific, and the value alone does not establish transport security or endpoint trust."
     },
     "postgresql_profile.password": {
       "description": "Password for the PostgreSQL connection.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific PostgreSQL credential material. The platform-level control is the use of secret_manager_stored_password, rather than validating the password value itself."
     },
     "postgresql_profile.port": {
       "description": "Port for the PostgreSQL connection.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the database service port. An incorrect value primarily affects connectivity and does not independently enforce a security control."
     },
     "postgresql_profile.secret_manager_stored_password": {
       "description": "A reference to a Secret Manager resource name storing the user's password.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References a Secret Manager secret instead of embedding the PostgreSQL password directly. Requiring a structurally valid secret version resource supports centralised secret storage, access control, auditing, and rotation."
     },
     "postgresql_profile.username": {
       "description": "Username for the PostgreSQL connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the database account, but the value alone cannot establish that its database privileges follow least privilege."
     },
     "postgresql_profile.ssl_config": {
       "type": "block",
@@ -398,22 +398,22 @@
       "description": "PEM-encoded server root CA certificate.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific CA certificate material required by the selected PostgreSQL verification mode. The certificate value itself does not configure a reusable platform-level control."
     },
     "postgresql_profile.ssl_config.server_and_client_verification.client_certificate": {
       "description": "PEM-encoded certificate used by the source database to authenticate the\nclient identity (i.e., the Datastream's identity). This certificate is\nsigned by either a root certificate trusted by the server or one or more\nintermediate certificates (which is stored with the leaf certificate) to\nlink to this certificate to the trusted root certificate.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific PostgreSQL client certificate material required by the selected mutual-TLS mode. Its trust and validity cannot be established through a generic policy."
     },
     "postgresql_profile.ssl_config.server_and_client_verification.client_key": {
       "description": "PEM-encoded private key associated with the client certificate.\nThis value will be used during the SSL/TLS handshake, allowing\nthe PostgreSQL server to authenticate the client's identity,\ni.e. identity of the stream.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific PostgreSQL private-key material required by the selected mutual-TLS mode. It does not independently select or configure the platform-level verification mode."
     },
     "postgresql_profile.ssl_config.server_verification": {
       "type": "block",
@@ -424,8 +424,8 @@
       "description": "PEM-encoded server root CA certificate.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific CA certificate material required by the selected PostgreSQL server-verification mode. The certificate value itself does not configure a reusable platform-level control."
     },
     "private_connectivity": {
       "type": "block",
@@ -436,8 +436,8 @@
       "description": "A reference to a private connection resource. Format: 'projects/{project}/locations/{location}/privateConnections/{name}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific private connection material required by the selected connectivity mode. The connection value itself does not configure a reusable platform-level control."
     },
     "sql_server_profile": {
       "type": "block",
@@ -448,43 +448,43 @@
       "description": "Database for the SQL Server connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the SQL Server database but does not independently enforce authentication, encryption, or access control."
     },
     "sql_server_profile.hostname": {
       "description": "Hostname for the SQL Server connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the SQL Server endpoint. Approved hosts are environment-specific, and the value alone does not establish transport security or endpoint trust."
     },
     "sql_server_profile.password": {
       "description": "Password for the SQL Server connection.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies team-specific SQL Server credential material. The platform-level control is the use of secret_manager_stored_password, rather than validating the password value itself."
     },
     "sql_server_profile.port": {
       "description": "Port for the SQL Server connection.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the database service port. An incorrect value primarily affects connectivity and does not independently enforce a security control."
     },
     "sql_server_profile.secret_manager_stored_password": {
       "description": "A reference to a Secret Manager resource name storing the user's password.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References a Secret Manager secret instead of embedding the SQL Server password directly. Requiring a structurally valid secret version resource supports centralised secret storage, access control, auditing, and rotation."
     },
     "sql_server_profile.username": {
       "description": "Username for the SQL Server connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the SQL Server user. Approved users are environment-specific, and the value alone does not establish transport security or endpoint trust."
     }
   }
 }
