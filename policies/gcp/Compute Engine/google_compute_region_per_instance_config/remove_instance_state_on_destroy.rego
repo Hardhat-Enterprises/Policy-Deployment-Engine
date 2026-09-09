@@ -11,7 +11,7 @@ conditions := [
             ]
         },
         {
-            "condition": "remove_instance_on_destroy must be configured to false",
+            "condition": "remove_instance_state_on_destroy must be configured to false",
             "attribute_path": ["remove_instance_state_on_destroy"],
             "values": [true],
             "policy_type": "blacklist"
