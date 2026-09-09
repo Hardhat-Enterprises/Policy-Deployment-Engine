@@ -18,5 +18,5 @@ resource "google_model_armor_floorsetting" "non_compliant_example_1" {
     }
   }
 
-  enable_floor_setting_enforcement = false
+  enable_floor_setting_enforcement = true
 }

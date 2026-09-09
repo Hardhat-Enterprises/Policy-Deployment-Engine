@@ -1,7 +1,7 @@
 resource "google_certificate_manager_certificate_issuance_config" "non_compliant_example_1" {
   project     = "sit764-policy-project"
   name        = "non_compliant_example_1"
-  description = "Non-compliant certificate issuance config using unapproved CA pool"
+  description = "Compliant certificate issuance config using approved CA pool"
   location    = "global"
 
   certificate_authority_config {

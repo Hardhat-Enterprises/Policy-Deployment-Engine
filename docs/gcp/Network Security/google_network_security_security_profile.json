@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the prevent-destructive-loss archetype: a generic platform policy can require this be set to 'PREVENT' so a security-enforcing profile cannot be accidentally destroyed via terraform apply/destroy, without needing to know anything team-specific."
     },
     "description": {
       "description": "An optional description of the security profile. The Max length is 512 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Cosmetic free-text field with no bearing on the profile's enforcement behaviour."
     },
     "labels": {
       "description": "A map of key/value label pairs to assign to the resource.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Organisational metadata for filtering/billing; does not affect enforcement."
     },
     "location": {
       "description": "The location of the security profile.\nThe default value is 'global'.",
@@ -34,22 +34,22 @@
       "description": "The name of the security profile resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier only; naming has no security bearing."
     },
     "parent": {
       "description": "The name of the parent this security profile belongs to.\nFormat: 'organizations/{organization_id}' or 'projects/{project_id}'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which org/project owns the resource. A generic platform policy cannot constrain this without hardcoding a specific organisation or project ID, which is team-specific and out of scope."
     },
     "type": {
       "description": "The type of security profile. Possible values: [\"THREAT_PREVENTION\", \"URL_FILTERING\", \"CUSTOM_MIRRORING\", \"CUSTOM_INTERCEPT\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A functional/architectural enum with no insecure value — it selects which protection mechanism the profile implements, not how securely it's configured. Every value is a legitimate, equally valid choice depending on the team's use case."
     },
     "custom_intercept_profile": {
       "type": "block",
@@ -60,8 +60,8 @@
       "description": "The Intercept Endpoint Group to which matching traffic should be intercepted.\nFormat: projects/{project_id}/locations/global/interceptEndpointGroups/{endpoint_group_id}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another resource (the intercept endpoint group). We secure the referenced resource itself, not the pointer to it; a generic policy can't meaningfully constrain which specific endpoint group is referenced."
     },
     "custom_mirroring_profile": {
       "type": "block",
@@ -72,15 +72,15 @@
       "description": "The target downstream Mirroring Deployment Groups.\nThis field is used for Packet Broker mirroring endpoint groups to specify\nthe deployment groups that the packet should be mirrored to by the broker.\nFormat: projects/{project_id}/locations/global/mirroringDeploymentGroups/{deployment_group_id}",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference list pointing at other resources (deployment groups). Same reasoning as other endpoint/deployment group references — we secure those resources directly, not this pointer."
     },
     "custom_mirroring_profile.mirroring_endpoint_group": {
       "description": "The target Mirroring Endpoint Group.\nWhen a mirroring rule with this security profile attached matches a packet,\na replica will be mirrored to the location-local target in this group.\nFormat: projects/{project_id}/locations/global/mirroringEndpointGroups/{endpoint_group_id}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another resource (the mirroring endpoint group). Not a policy target for the same reason as other resource references."
     },
     "threat_prevention_profile": {
       "type": "block",
@@ -96,15 +96,15 @@
       "description": "Threat action override. For some threat types, only a subset of actions applies. Possible values: [\"ALERT\", \"ALLOW\", \"DEFAULT_ACTION\", \"DENY\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This is an override of default antivirus protection for a given protocol. A generic policy can require the action not be 'ALLOW', preventing an override that silently permits known-malicious traffic on that protocol, without needing to know anything team-specific."
     },
     "threat_prevention_profile.antivirus_overrides.protocol": {
       "description": "Required protocol to match. Possible values: [\"SMTP\", \"SMB\", \"POP3\", \"IMAP\", \"HTTP2\", \"HTTP\", \"FTP\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which protocol the override applies to; every protocol value is equally legitimate to target. The actual security lever is the paired 'action' field, not the protocol selector itself."
     },
     "threat_prevention_profile.severity_overrides": {
       "type": "block",
@@ -115,15 +115,15 @@
       "description": "Threat action override. Possible values: [\"ALERT\", \"ALLOW\", \"DEFAULT_ACTION\", \"DENY\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This overrides default threat-prevention behaviour for a severity tier. A generic policy can require the action not be 'ALLOW' for high-severity tiers, preventing an override that silently permits dangerous threats."
     },
     "threat_prevention_profile.severity_overrides.severity": {
       "description": "Severity level to match. Possible values: [\"CRITICAL\", \"HIGH\", \"INFORMATIONAL\", \"LOW\", \"MEDIUM\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which severity tier the override applies to; every value is a legitimate target. The actual security lever is the paired 'action' field."
     },
     "threat_prevention_profile.threat_overrides": {
       "type": "block",
@@ -134,15 +134,15 @@
       "description": "Threat action. Possible values: [\"ALERT\", \"ALLOW\", \"DEFAULT_ACTION\", \"DENY\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Threat overrides take priority over severity overrides, so this is the most direct lever for silently permitting a known threat. A generic policy can require the action not be 'ALLOW'."
     },
     "threat_prevention_profile.threat_overrides.threat_id": {
       "description": "Vendor-specific ID of a threat to override.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to a specific vendor threat ID. A generic policy can't meaningfully constrain which threat ID is targeted without hardcoding one; the security lever is the paired 'action' field."
     },
     "url_filtering_profile": {
       "type": "block",
@@ -158,22 +158,22 @@
       "description": "The action to take when the filter is applied. Possible values: [\"ALLOW\", \"DENY\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Unlike the threat-prevention override actions, this isn't overriding a protective default — url_filters is designed to hold both ALLOW and DENY rules simultaneously as ordinary configuration (e.g. allow a set of business domains, deny a restricted set). Both values are equally legitimate depending on the team's intent, similar to how IAM 'role' assignment is left to team discretion."
     },
     "url_filtering_profile.url_filters.priority": {
       "description": "The priority of the filter within the URL filtering profile.\nMust be an integer from 0 and 2147483647, inclusive. Lower integers indicate higher priorities.\nThe priority of a filter must be unique within a URL filtering profile.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An ordering selector with no inherently insecure value; it's an operational detail of how multiple filters interact, not a security lever itself."
     },
     "url_filtering_profile.url_filters.urls": {
       "description": "A list of domain matcher strings that a domain name gets compared with to determine if the filter is applicable.\nA domain name must match with at least one of the strings in the list for a filter to be applicable.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Matches the 'network address ranges/CIDR blocks' pattern — team-specific addressing/domain lists are the team's own business decision, not a structural platform-level security control."
     }
   }
 }
