@@ -8,7 +8,7 @@ conditions := [
         {
             "situation_description": "Dataproc Session Template does not specify a dedicated service account, which may result in use of a default identity with overly broad permissions.",
             "remedies": [
-                "Configure a dedicated service account with least-privilege permissions.",
+                "Configure a dedicated service account with least-privilege permissions."
             ]
         },
         {

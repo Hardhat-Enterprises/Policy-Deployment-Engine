@@ -8,7 +8,7 @@ conditions := [
         {
             "situation_description": "Dataproc Session Template does not explicitly require service account authentication for user workloads.",
             "remedies": [
-                "Configure user workload authentication to use SERVICE_ACCOUNT.",
+                "Configure user workload authentication to use SERVICE_ACCOUNT."
             ]
         },
         {

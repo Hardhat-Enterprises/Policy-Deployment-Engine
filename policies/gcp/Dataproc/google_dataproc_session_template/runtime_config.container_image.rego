@@ -6,16 +6,16 @@ import data.terraform.gcp.security.dataproc.google_dataproc_session_template.var
 conditions := [
     [
         {
-            "situation_description": "Dataproc Session Template uses a container image from a public container registry.",
+            "situation_description": "Dataproc Session Template does not specify a controlled container image for the workload runtime.",
             "remedies": [
-                "Use a container image from an approved trusted registry."
+                "Configure an approved container image for the workload runtime."
             ]
         },
         {
-            "condition": "Container image must not use public container registries.",
+            "condition": "A container image must be configured.",
             "attribute_path": ["runtime_config", 0, "container_image"],
-            "values": ["*", [["gcr.io", "docker.io", "index.docker.io", "quay.io"]]],
-            "policy_type": "pattern blacklist"
+            "values": ["", null],
+            "policy_type": "blacklist"
         }
     ]
 ]
