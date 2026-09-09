@@ -1,9 +1,9 @@
 resource "google_workflows_workflow" "non_compliant_example_1" {
   name          = "non_compliant_example_1"
   project       = "pde"
-  region        = "us-central1"
+  region        = "australia-southeast1"
   description   = "description"
-  deletion_protection = false
+  deletion_protection = true
   user_env_vars = {
     api_key = "key123"
     password = "password123"

@@ -1,7 +1,7 @@
 resource "google_cloudbuildv2_connection" "compliant_example_1" {
   project  = "compliant_example_1"
   location = "australia-southeast2"
-  name     = "my-connection"
+  name     = "compliant_example_1"
 
   bitbucket_data_center_config {
     host_uri                      = "https://bitbucket.example.com"
