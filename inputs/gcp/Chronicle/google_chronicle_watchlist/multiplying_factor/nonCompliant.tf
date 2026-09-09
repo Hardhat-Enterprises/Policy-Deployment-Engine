@@ -3,8 +3,8 @@ resource "google_chronicle_watchlist" "non_compliant_example_1" {
   location           = "australia-southeast1"
   instance           = "00000000-0000-0000-0000-000000000000"
   watchlist_id       = "non_compliant_example_1"
-  description        = "Watchlist with too low multiplier"
-  display_name       = "Low Risk List"
+  description        = "Critical assets"
+  display_name       = "Secure Watchlist"
   multiplying_factor = 0.3
 
   entity_population_mechanism {
@@ -12,6 +12,6 @@ resource "google_chronicle_watchlist" "non_compliant_example_1" {
   }
 
   watchlist_user_preferences {
-    pinned = false
+    pinned = true
   }
 }

@@ -6,7 +6,7 @@ resource "google_lustre_instance" "non_compliant_example_1" {
   description                 = "non_compliant_example_1"
   filesystem                  = "fs2"
   capacity_gib                = 18000
-  network                     = "network2"
+  network                     = "network1"
   per_unit_storage_throughput = 15000
   labels = {
     test = "value"

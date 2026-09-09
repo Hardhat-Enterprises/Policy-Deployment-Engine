@@ -13,11 +13,13 @@ conditions := [
     {
       "condition": "Restrict table storage location to approved GCS prefixes",
       "attribute_path": ["hive_options", 0,"storage_descriptor", 0, "location_uri"],
-      "values": ["gs://org-au-biglake-data/data/"],
-      "policy_type": "whitelist"
+      "values": ["*://*/data/", [["gs"], ["org-au-biglake-data"]]],
+      "policy_type": "pattern whitelist"
     }
   ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
