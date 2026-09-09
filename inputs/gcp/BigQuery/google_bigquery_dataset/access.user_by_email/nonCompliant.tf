@@ -5,7 +5,7 @@ resource "google_bigquery_dataset" "non_compliant_example_1" {
 
   access {
     role          = "VIEWER"
-    user_by_email = "invalid@example.com"
+    user_by_email = "invalid@gmail.com"
   }
 
 }
