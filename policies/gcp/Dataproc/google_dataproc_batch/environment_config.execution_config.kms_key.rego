@@ -12,17 +12,11 @@ conditions := [
             ]
         },
         {
-            "condition": "A customer-managed Cloud KMS key must be configured.",
-            "attribute_path": ["environment_config", 0, "execution_config", 0, "kms_key"],
-            "values": [null, ""],
-            "policy_type": "blacklist"
-        },
-        {
-            "condition": "The key must be held in an approved region.",
+            "condition": "The key must be a full customer-managed Cloud KMS resource name in an approved region.",
             "attribute_path": ["environment_config", 0, "execution_config", 0, "kms_key"],
             "values": [
-                "/locations/*/keyRings/",
-                [["australia-southeast1", "australia-southeast2"]]
+                "projects/*/locations/*/keyRings/*/cryptoKeys/*",
+                [["test-project"], ["australia-southeast1", "australia-southeast2"], ["test-ring"], ["test-key"]]
             ],
             "policy_type": "pattern whitelist"
         }
