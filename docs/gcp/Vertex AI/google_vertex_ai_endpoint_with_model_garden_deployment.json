@@ -183,8 +183,8 @@
       "description": "If true, the endpoint will be exposed through a dedicated\nDNS [Endpoint.dedicated_endpoint_dns]. Your request to the dedicated DNS\nwill be isolated from other users' traffic and will have better\nperformance and reliability. Note: Once you enabled dedicated endpoint,\nyou won't be able to send request to the shared DNS\n{region}-aiplatform.googleapis.com. The limitations will be removed soon.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Selects dedicated DNS and traffic isolation for performance and reliability. The description does not establish that enabling this flag restricts public access or enforces authentication; it is not a generic access-control requirement."
+      "security_impact": true,
+      "rationale": "Enables a dedicated DNS endpoint that isolates prediction traffic from the shared endpoint. This is a network traffic-isolation control; a platform policy can require dedicated endpoint access where the approved architecture requires traffic separation. Private connectivity is enforced separately through Private Service Connect."
     },
     "endpoint_config.endpoint_display_name": {
       "description": "The user-specified display name of the endpoint. If not set, a\ndefault name will be used.",
@@ -254,8 +254,8 @@
       "description": "If true, the model will deploy with a cached version instead of directly\ndownloading the model artifacts from Hugging Face. This is suitable for\nVPC-SC users with limited internet access.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether model artifacts are obtained from a cache rather than downloaded directly from Hugging Face. Requiring cached artifacts can support restricted-network and VPC-SC deployment controls by reducing the need for direct external artifact retrieval."
+      "security_impact": false,
+      "rationale": "Selects whether model artifacts are obtained from a cache instead of downloaded directly from Hugging Face. This is an operational data-management and artifact-delivery choice. It does not itself enforce network isolation or a security boundary, so a generic platform policy should not prescribe the caching setting."
     },
     "model_config.model_display_name": {
       "description": "The user-specified display name of the uploaded model. If not\nset, a default name will be used.",
