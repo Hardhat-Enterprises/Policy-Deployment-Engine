@@ -12,11 +12,25 @@ conditions := [
         },
         {
             "condition": "Senstitive information keywords in plaintext must not be containted in metadata",
-            "attribute_path": ["preserved_state", 0, "metadata"],
-            "values": ["password", "api_key"],
-            "policy_type": "blacklist"
+            "attribute_path": ["preserved_state", 0, "metadata", "password"],
+            "values": ["*", [["password"]]],
+            "policy_type": "pattern blacklist"
+        },
+        {
+            "condition": "Senstitive information keywords in plaintext must not be containted in metadata",
+            "attribute_path": ["preserved_state", 0, "metadata", "api_key"],
+            "values": ["*", [["api_key"]]],
+            "policy_type": "pattern blacklist"
+        },
+        {
+            "condition": "Senstitive information keywords in plaintext must not be containted in metadata",
+            "attribute_path": ["preserved_state", 0, "metadata", "access_token"],
+            "values": ["*", [["access_token"]]],
+            "policy_type": "pattern blacklist"
         }
     ]
+    
+    
 ]
 
 result  := helpers.get_multi_summary(conditions, vars.variables)

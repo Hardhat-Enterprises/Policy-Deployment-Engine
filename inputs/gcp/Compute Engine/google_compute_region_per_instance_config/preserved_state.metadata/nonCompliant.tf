@@ -6,8 +6,9 @@ resource "google_compute_region_per_instance_config" "non_compliant_example_1" {
 
   preserved_state {
     metadata = {
-      password = "password123"
-      api_key = "realapikey123"
+      password = "password"
+      api_key = "api_key"
+      access_token = "access_token"
     } 
 }
 }
