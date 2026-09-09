@@ -1,83 +1,83 @@
 {
-  "last_updated": "2026-06-23T08:26:44Z",
+  "last_updated": "2026-09-09T00:00:00Z",
   "provider_version": "7.37.0",
   "arguments": {
     "access_type": {
       "description": "The access type of this regional endpoint. This field is reflected in the PSC Forwarding Rule configuration to enable global access. Possible values: [\"GLOBAL\", \"REGIONAL\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the private regional endpoint is reachable regionally or globally. GLOBAL access broadens the reachable scope, so policy should require the organization-approved access type."
     },
     "address": {
       "description": "The IP Address of the Regional Endpoint. When no address is provided, an IP from the subnetwork is allocated. Use one of the following formats: * IPv4 address as in '10.0.0.1' * Address resource URI as in 'projects/{project}/regions/{region}/addresses/{address_name}'\n\n~> **Note:** This field accepts both a reference to a Compute Address resource, which is the resource name of which format is given in the description, and IP literal value. If the user chooses to input a reserved address value; they need to make sure that the reserved address is in IPv4 version, its purpose is GCE_ENDPOINT, its type is INTERNAL and its status is RESERVED. If the user chooses to input an IP literal, they need to make sure that it's a valid IPv4 address (x.x.x.x) within the subnetwork.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies an IP literal or a reference to a reserved address resource. It is an endpoint addressing/reference choice that requires environment-specific values rather than a generic security rule."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Prevents accidental or unauthorized Terraform destruction of critical regional endpoint infrastructure. A policy should require the deletion-blocking value PREVENT."
     },
     "description": {
       "description": "A description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive metadata only and does not control endpoint reachability, access, or data protection."
     },
     "labels": {
       "description": "User-defined labels.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides resource metadata and governance information but does not directly control endpoint reachability, access, or data protection."
     },
     "location": {
       "description": "The location of the RegionalEndpoint.",
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "rationale": "Controls the deployment location. Restricting it to a parameterized list of approved regions supports data-residency and infrastructure-placement requirements."
     },
     "name": {
       "description": "The name of the RegionalEndpoint.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the regional endpoint but does not directly control its reachability, access, or data protection."
     },
     "network": {
       "description": "The name of the VPC network for this private regional endpoint. Format: 'projects/{project}/global/networks/{network}'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a VPC network resource. Resource-reference arguments are outside generic policy scope and should not be constrained using hardcoded organization-specific names."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the owning project. It is a resource-placement identifier and requires organization-specific project values rather than a generic platform security rule."
     },
     "subnetwork": {
       "description": "The name of the subnetwork from which the IP address will be allocated. Format: 'projects/{project}/regions/{region}/subnetworks/{subnetwork}'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the subnetwork used for address allocation. It is a resource-reference and network-architecture choice rather than a generic security control."
     },
     "target_google_api": {
       "description": "The service endpoint this private regional endpoint connects to. Format: '{apiname}.{region}.rep.googleapis.com' Example: \\\"cloudkms.us-central1.rep.googleapis.com\\\".",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Google API service endpoint to which the resource connects. It is a service/reference and architectural choice rather than a generic secure-or-insecure configuration."
     }
   }
 }
