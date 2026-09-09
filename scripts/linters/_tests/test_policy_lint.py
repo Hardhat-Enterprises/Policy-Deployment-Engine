@@ -113,7 +113,7 @@ def test_unknown_policy_type_is_an_error_not_a_warning(tmp_path):
 
 
 def test_unknown_policy_type_is_silent_on_every_valid_type(tmp_path):
-    # The rule must accept all six, including the two-word ones — flagging a
+    # The rule must accept all seven, including the two-word ones — flagging a
     # valid type would block every pattern/element policy in the tree.
     root = build_tree(tmp_path, "policy_smells")
     template = (root / "policies" / "gcp" / "Backup for GKE"

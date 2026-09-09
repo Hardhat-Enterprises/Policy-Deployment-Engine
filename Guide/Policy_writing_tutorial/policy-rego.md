@@ -92,7 +92,7 @@ The attribute path would be:
 
 ### Different ways to write your policy
 
-The engine dispatches on `policy_type`, and it knows **exactly six** values:
+The engine dispatches on `policy_type`, and it knows **exactly seven** values:
 
 | `policy_type` | Use it when |
 |---|---|
@@ -102,6 +102,7 @@ The engine dispatches on `policy_type`, and it knows **exactly six** values:
 | `pattern blacklist` | A wildcard-extracted part of the value must not be one of these |
 | `pattern whitelist` | A wildcard-extracted part of the value must be one of these |
 | `element blacklist` | No element of an array may **contain** one of these substrings |
+| `element pattern whitelist` | Every element of an array must match a wildcard shape |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
@@ -290,6 +291,27 @@ Blocks **array** attributes whose elements contain any blacklisted **substring**
         "attribute_path": ["resource_names"],
         "values": ["attacker-project", "test-project", "dev-", "-sandbox"],
         "policy_type": "element blacklist"
+      }
+    ]
+```
+
+### Element Pattern Whitelist
+
+Allows only **array** attributes whose **every** element matches a required wildcard
+shape. `values` is a single pattern string; each `*` matches one path segment (one or
+more non-`/` characters), so a `*` never spans a separator. This is the positive
+(allowlist) counterpart to `element blacklist` for lists of resource paths.
+```rego
+    [
+      {
+        "situation_description": "Guardrails must be explicit platform resource paths",
+        "remedies": ["Reference a concrete guardrail resource path"]
+      },
+      {
+        "condition": "Guardrails must match the platform path shape",
+        "attribute_path": ["guardrails"],
+        "values": ["projects/*/locations/*/apps/*/guardrails/*"],
+        "policy_type": "element pattern whitelist"
       }
     ]
 ```

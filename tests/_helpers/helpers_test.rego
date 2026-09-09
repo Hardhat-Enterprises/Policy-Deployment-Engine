@@ -2,7 +2,7 @@ package terraform.helpers_test
 
 # Policy Orchestration Test Suite — unknown policy_type handling
 #
-# helpers.rego dispatches exactly six policy types. A policy naming a seventh
+# helpers.rego dispatches exactly seven policy types. A policy naming an eighth
 # used to build an {"error": ...} object and discard it: the object has no
 # "name" key, so find_failing_resources intersected it into the empty set and
 # the condition reported "None - All passed". These tests pin the replacement —
@@ -52,12 +52,13 @@ test_every_valid_type_is_accepted if {
 	}
 }
 
-# The dispatch table and the accepted set must be the same six: a type listed as
+# The dispatch table and the accepted set must be the same: a type listed as
 # valid but with no select_policy_logic rule would evaluate to nothing at all.
-test_valid_policy_types_is_exactly_the_six if {
+test_valid_policy_types_is_exactly_the_seven if {
 	{t | some t in helpers.valid_policy_types} == {
 		"blacklist", "whitelist", "range",
 		"pattern blacklist", "pattern whitelist", "element blacklist",
+		"element pattern whitelist",
 	}
 }
 
@@ -111,7 +112,7 @@ test_one_bad_type_refuses_the_whole_summary if {
 }
 
 # The message must be actionable: what is wrong, what is allowed, what to do.
-test_error_message_names_all_six_valid_types if {
+test_error_message_names_all_seven_valid_types if {
 	summary := helpers.get_multi_summary(
 		[[meta, {"attribute_path": ["location"], "policy_type": "nonsense"}]],
 		mock_variables,
