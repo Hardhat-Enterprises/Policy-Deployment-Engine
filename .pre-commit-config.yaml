@@ -10,8 +10,25 @@
 # - branch-scope-check keeps a Service/ branch to its own resource's files. It
 #   runs with --staged so it sees what you are about to commit, which is where a
 #   stray `git add .` gets caught — before it is ever pushed.
+# - resource-gate runs the checks that only make sense for one resource: doc
+#   completeness, true-arg coverage, and the OPA test. --gate-only because the
+#   three hooks above already cover the rest of scripts/check_resource.py.
 #
-# Both do their own git inspection, so pass_filenames is false and always_run
+#   --changed-only keeps it off the critical path of a commit that has nothing to
+#   do with the resource: the gate reads the resource's docs JSON, fixtures and
+#   policies, so a commit touching none of them cannot change its verdict. A commit
+#   that touches only the docs JSON still gets doc completeness and coverage — both
+#   are file reads — but skips the OPA test, since no *.tf or *.rego moved and
+#   neither the plan nor the policy verdicts can have.
+#
+#   --if-cached covers the remaining case. With every plan committed the OPA test is
+#   0.2-0.8s (0.8s is the largest resource in the repo, 34 arguments), cheaper than
+#   the linting above it; but a fixture you just edited has no committed plan, and
+#   building one means running terraform — which on a fresh clone also downloads the
+#   121MB provider mirror. A git hook may not do minutes of network to you, so it
+#   skips instead and says to run the full command before pushing.
+#
+# They all do their own git inspection, so pass_filenames is false and always_run
 # is true (the script decides whether there is anything to check).
 repos:
   - repo: local
@@ -31,6 +48,12 @@ repos:
       - id: branch-scope-check
         name: Branch scope (own resource only)
         entry: python scripts/linters/branch_scope.py --staged
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: resource-gate
+        name: Resource gate (docs, coverage, OPA)
+        entry: python scripts/check_resource.py --gate-only --if-cached --changed-only
         language: system
         pass_filenames: false
         always_run: true
