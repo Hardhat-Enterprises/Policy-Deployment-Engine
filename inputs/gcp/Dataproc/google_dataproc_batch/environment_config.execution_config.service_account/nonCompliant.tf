@@ -8,6 +8,7 @@ resource "google_dataproc_batch" "non_compliant_example_1" {
 
   environment_config {
     execution_config {
+      service_account = "123456789-compute@developer.gserviceaccount.com"
     }
   }
 }

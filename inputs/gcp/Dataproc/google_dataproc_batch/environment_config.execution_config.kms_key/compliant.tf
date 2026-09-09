@@ -8,7 +8,7 @@ resource "google_dataproc_batch" "compliant_example_1" {
 
   environment_config {
     execution_config {
-      kms_key = "kms-key"
+      kms_key = "projects/test-project/locations/australia-southeast1/keyRings/test-ring/cryptoKeys/test-key"
     }
   }
 }

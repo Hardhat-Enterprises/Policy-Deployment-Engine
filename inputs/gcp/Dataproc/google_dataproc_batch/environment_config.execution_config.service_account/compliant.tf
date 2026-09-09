@@ -8,7 +8,7 @@ resource "google_dataproc_batch" "compliant_example_1" {
 
   environment_config {
     execution_config {
-      service_account = "dataproc-sa@my-project.iam.gserviceaccount.com"
+      service_account = "dataproc-sa@test-project.iam.gserviceaccount.com"
     }
   }
 }
