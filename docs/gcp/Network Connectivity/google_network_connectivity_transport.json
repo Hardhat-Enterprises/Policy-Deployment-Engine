@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-23T08:26:44Z",
+  "last_updated": "2026-09-06T00:00:00Z",
   "provider_version": "7.37.0",
   "arguments": {
     "advertised_routes": {
@@ -20,8 +20,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls Terraform lifecycle behavior but does not directly control transport connectivity, routing, or remote network access."
+      "security_impact": true,
+      "rationale": "Prevents accidental or unauthorized Terraform destruction of critical transport infrastructure. A policy should require the deletion-blocking value PREVENT."
     },
     "description": {
       "description": "An optional description of this resource.",
@@ -55,8 +55,8 @@
       "description": "Resource URL of the Network that will be peered with this Transport. This field must be provided during resource creation and cannot be changed.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines which VPC network is peered with the Transport. Connecting an unapproved network can cross intended trust boundaries, so the network should be restricted to approved resources."
+      "security_impact": false,
+      "rationale": "References the VPC network peered with the Transport. It is a resource-reference argument and cannot be generically constrained without hardcoding organization-specific resource names."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
@@ -69,8 +69,8 @@
       "description": "Key used for establishing a connection with the remote transport. This key can only be provided if the profile supports an INPUT key flow and the resource is in the PENDING_KEY state.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The activation key is sensitive connection material, but it is connection-specific and should be protected as a secret rather than compared against a hardcoded allowlist or generic policy value."
+      "security_impact": true,
+      "rationale": "Contains sensitive connection material used to establish the remote transport. Policy should prevent plaintext or hardcoded secret exposure and require approved secret-handling practices."
     },
     "region": {
       "description": "The region of this resource. This is required to construct the resource name, but is not sent to the API since the region is already contained in the parent field.",
@@ -83,15 +83,15 @@
       "description": "The user supplied account id for the CSP associated with the remote profile.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the remote cloud service provider account associated with the Transport. Restricting this value helps prevent connectivity from being established with an unauthorized remote account."
+      "security_impact": false,
+      "rationale": "Identifies an external provider account. It is an organization-specific external reference and cannot be generalized into a platform policy without hardcoding tenant-specific values."
     },
     "remote_profile": {
       "description": "Resource URL of the remoteTransportProfile that this Transport is\nconnecting to.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines which remote transport profile the Transport connects to. An unapproved remote profile could establish connectivity with an unintended provider or endpoint, so only approved profiles should be allowed."
+      "security_impact": false,
+      "rationale": "Selects a remote transport profile and therefore an architectural connectivity type. The referenced resource name is not inherently secure or insecure and should not be hardcoded in generic policy."
     },
     "stack_type": {
       "description": "IP version stack for the established connectivity. Possible values: [\"IPV4_IPV6\", \"IPV4_ONLY\"]",
