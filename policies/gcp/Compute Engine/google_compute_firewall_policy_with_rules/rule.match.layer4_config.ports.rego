@@ -6,15 +6,15 @@ import data.terraform.gcp.security.compute_engine.google_compute_firewall_policy
 conditions := [
     [
         {
-            "situation_description": "Firewall policy rules should not allow unrestricted TCP or UDP port ranges.",
+            "situation_description": "Firewall rules must explicitly restrict the ports they match.",
             "remedies": [
-                "Restrict rule.match.layer4_config.ports to only the ports required by the workload."
+                "Specify only the ports required by the workload."
             ]
         },
         {
-            "condition": "Firewall policy rule matches the unrestricted port range.",
+            "condition": "Ports must not be omitted, empty, or unrestricted.",
             "attribute_path": ["rule", 0, "match", 0, "layer4_config", 0, "ports"],
-            "values": ["0-65535"],
+            "values": [null, [], "0-65535"],
             "policy_type": "blacklist"
         }
     ]

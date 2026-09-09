@@ -16,7 +16,6 @@ resource "google_compute_firewall_policy_with_rules" "non_compliant_example_1" {
 
       layer4_config {
         ip_protocol = "tcp"
-        ports       = ["0-65535"]
       }
     }
   }
