@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls how Terraform handles removal of the resource. PREVENT blocks Terraform-managed deletion, DELETE allows Terraform to delete the resource, and ABANDON removes the resource from Terraform management without deleting it. This setting does not prevent deletion through the Google Cloud API, gcloud, or console, so it does not enforce a cloud-side security boundary or change the live platform security posture. It is therefore a Terraform lifecycle management control rather than a generic platform security policy target."
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is permitted to destroy the GRPC Route. Requiring PREVENT blocks destructive Terraform apply or destroy operations that would remove the route, protecting the resource from accidental or unauthorised deletion through managed infrastructure changes. Because it directly prevents unintended destruction of the resource, deletion_policy is a generic prevent-destructive-loss security control. Policy should require PREVENT."
     },
     "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
