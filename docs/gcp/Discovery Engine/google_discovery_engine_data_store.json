@@ -27,8 +27,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": " This is used to control terraform lifecycle behaviour, does not control access or the ability to change data via Terraform. Thus does not require a policy"
+      "security_impact": true,
+      "rationale": " This is used to control terraform lifecycle behaviou, prevents it from destroying the data store. Setting this to PREVENT is used to safeguard against deletionof the resource, A generic policy should have this set to PREVENT/ ABANDON."
     },
     "display_name": {
       "description": "The display name of the data store. This field must be a UTF-8 encoded\nstring with a length limit of 128 characters.",
@@ -194,7 +194,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "Controls the use of native embedded text instead of OCR extracted text in parsed PDF files, funcitonal parsing accuracy choice does not affect security"
+      "rationale": "Controls the use of native embedded text instead of OCR extracted text in parsed PDF files, functional parsing accuracy choice does not affect security"
     },
     "document_processing_config.parsing_config_overrides": {
       "type": "block",
