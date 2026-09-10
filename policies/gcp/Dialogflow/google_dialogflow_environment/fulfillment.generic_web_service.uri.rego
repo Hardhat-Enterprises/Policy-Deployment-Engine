@@ -14,8 +14,8 @@ conditions := [
         {
             "condition": "Check that fulfillment.generic_web_service.uri begins with https://.",
             "attribute_path": ["fulfillment",0, "generic_web_service",0, "uri"],
-            "values": ["https://example.com/webhook"],
-            "policy_type": "whitelist"
+            "values": ["*://", [["https"]]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
