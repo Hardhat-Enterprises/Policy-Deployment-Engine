@@ -59,6 +59,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 from dataclasses import dataclass, asdict
@@ -101,6 +102,19 @@ LEGACY_PLAN_CACHE_PREFIX = "inputs/plan_cache/"
 
 # A committed plan is named for the sha of the *.tf beside it (auto_test.fixture_sha).
 PLAN_FILE_RE = re.compile(r"^[0-9a-f]{64}\.json$")
+
+# How wide a directory the recovery recipe is allowed to name.
+#
+# `git checkout origin/dev -- .` would also overwrite a resource type the
+# contributor legitimately edited, if that type already exists on `dev` (a merged
+# extra, a resubmission). Under the three content roots the recipe therefore
+# names the resource type itself — `inputs/gcp/Cloud Storage/google_storage_bucket`
+# — so a sibling resource is restored precisely and the contributor's own kit is
+# never inside the command. Everywhere else the top-level directory is safe:
+# nothing under `.github/`, `Guide/`, `scripts/` or `tests/` is ever one
+# contributor's work.
+CONTENT_ROOTS = ("docs/", "inputs/", "policies/")
+RESOURCE_DEPTH = 4
 
 SERVICE_PREFIX = "Service/"
 
@@ -232,6 +246,55 @@ def changed_entries(base, head="HEAD"):
     return _parse_name_status(_git("diff", "-z", "--name-status", ref, head))
 
 
+def _git_text(*args):
+    """stdout of a git command as text, or None if it failed.
+
+    Used for the advisory context lines only: a missing upstream or a base ref
+    that cannot be described must never turn a scope report into an error.
+    """
+    proc = subprocess.run(["git", *args], capture_output=True, text=True)
+    if proc.returncode != 0:
+        return None
+    out = proc.stdout.strip()
+    return out or None
+
+
+def base_description(base):
+    """``(sha7, committer date)`` for ``base``, or None if it cannot be read.
+
+    Printed so a contributor can tell *which* `dev` they were compared against.
+    A branch that merged `dev` a month ago and never merged again is measured
+    against that month-old merge-base, and nothing else on screen says so.
+    """
+    described = _git_text("log", "-1", "--abbrev=7",
+                          "--format=%h\t%cd", "--date=format:%Y-%m-%d %H:%M", base)
+    if not described or "\t" not in described:
+        return None
+    sha, _, when = described.partition("\t")
+    return sha, when
+
+
+def upstream_gap():
+    """``(upstream_name, behind, ahead)`` for HEAD against its upstream, else None.
+
+    ``behind``/``ahead`` are counted from the local branch's point of view, so
+    ``ahead`` is the number of commits that exist locally and not on GitHub —
+    the ones an unpushed `git merge origin/dev` leaves behind, which is exactly
+    the case that makes a contributor believe their branch is current when the
+    portal can still only see the old one.
+    """
+    name = _git_text("rev-parse", "--abbrev-ref", "@{u}")
+    if not name:
+        return None
+    counts = _git_text("rev-list", "--left-right", "--count", "@{u}...HEAD")
+    if not counts:
+        return None
+    parts = counts.split()
+    if len(parts) != 2 or not all(p.isdigit() for p in parts):
+        return None
+    return name, int(parts[0]), int(parts[1])
+
+
 # --------------------------------------------------------------------------- #
 # Scope
 # --------------------------------------------------------------------------- #
@@ -335,6 +398,142 @@ def check(entries, platform, folder, resource_type, base="dev"):
 
 
 # --------------------------------------------------------------------------- #
+# The recovery recipe
+# --------------------------------------------------------------------------- #
+# Every per-rule remedy names one file, because a rule is about one file. On the
+# branch this was written for that read as "run this 2,737 times": the report
+# listed 2,737 findings and the three commands on screen each fixed one of them.
+# The recipe below is built from the *whole* finding list rather than the
+# truncated display list, so what is printed is the command that finishes the
+# job, whatever its size.
+
+# Characters that stop a double-quoted shell word being literal.
+_UNSAFE_IN_DQUOTES = set('"$`\\!')
+
+
+def _quote(path):
+    """``path`` as one shell word: bare when it can be, double-quoted otherwise.
+
+    Every service folder in this repo has a space in it and several have
+    parentheses, so most resource paths need quoting; nothing in the tree needs
+    more than double quotes, and a path that somehow does falls back to the
+    single-quoted form.
+    """
+    if all(c.isalnum() or c in "._-/" for c in path):
+        return path
+    if any(c in _UNSAFE_IN_DQUOTES for c in path):
+        return shlex.quote(path)
+    return f'"{path}"'
+
+
+def recovery_group(path):
+    """The directory the recipe names on ``path``'s behalf.
+
+    Under the three content roots that is the resource type itself
+    (``inputs/<platform>/<Service folder>/<resource_type>``), so a sibling's kit
+    is named exactly and the contributor's own is never inside the command; the
+    top-level directory everywhere else; and the legacy plan cache as a whole,
+    because a branch that resurrected it did so wholesale.
+    """
+    if path.startswith(LEGACY_PLAN_CACHE_PREFIX):
+        return LEGACY_PLAN_CACHE_PREFIX.rstrip("/")
+    parts = path.split("/")
+    if path.startswith(CONTENT_ROOTS):
+        return "/".join(parts[:RESOURCE_DEPTH])
+    return parts[0]
+
+
+def _ordered(paths):
+    """Shared roots first, then resource paths; alphabetical within each depth."""
+    return sorted(paths, key=lambda p: (p.count("/"), p))
+
+
+def recovery_plan(findings):
+    """``(restore, remove)`` — the paths for one ``git checkout`` and one ``git rm``.
+
+    A finding is a removal when the file is not on the base at all (an addition,
+    or the resurrected plan cache); everything else is a restore, including the
+    shared-harness edits, which is what restoring them is.
+
+    A directory that has to be restored is never *also* named for removal — the
+    checkout would put the files back and the removal would then take the whole
+    directory away. When both apply to the same group the additions are listed
+    file by file instead.
+    """
+    restore, added = set(), []
+    for finding in findings:
+        if finding.rule == "legacy-plan-cache" or (
+                finding.rule == "out-of-scope-file" and finding.status == "A"):
+            added.append(finding.path)
+        else:
+            restore.add(recovery_group(finding.path))
+
+    remove = set()
+    for path in added:
+        group = recovery_group(path)
+        remove.add(path if group in restore else group)
+
+    return _ordered(restore), _ordered(remove)
+
+
+def recovery_lines(findings, base):
+    """The ``How to fix all of the above`` block, as a list of lines."""
+    restore, remove = recovery_plan(findings)
+    if not restore and not remove:
+        return []
+
+    lines = ["", "How to fix all of the above",
+             "  (one command each — not one per file listed above)"]
+    step = 0
+    if restore:
+        step += 1
+        lines.append(f"  {step}. Put the files back the way {base} has them:")
+        lines.append(f"       git checkout {base} -- "
+                     + " ".join(_quote(p) for p in restore))
+    if remove:
+        step += 1
+        lines.append(f"  {step}. Drop the files {base} does not have "
+                     f"(they came from your branch):")
+        lines.append(f"       git rm -r -- " + " ".join(_quote(p) for p in remove))
+    step += 1
+    lines.append(f"  {step}. Check what is left, then commit and push:")
+    lines.append("       git status")
+    lines.append('       git commit -m "Restore shared files from dev"')
+    lines.append("       git push")
+    return lines
+
+
+def context_lines(base, staged=False):
+    """What the findings were measured against, and whether GitHub has seen it.
+
+    The second half exists because "Already up to date" from ``git merge`` is
+    true of the local branch and says nothing about the one the portal reads: a
+    merge that was never pushed leaves the branch on GitHub as many commits
+    behind as it was before.
+    """
+    lines = []
+    if staged:
+        lines.append("Compared your staged + unstaged changes against "
+                     f"the scope of this branch (base for the commands below: {base}).")
+    else:
+        described = base_description(base)
+        if described:
+            lines.append(f"Compared against {base} @ {described[0]} ({described[1]})")
+        else:
+            lines.append(f"Compared against {base}")
+
+    gap = upstream_gap()
+    if gap:
+        name, behind, ahead = gap
+        lines.append(f"Your branch is {ahead} commit(s) ahead of and "
+                     f"{behind} commit(s) behind {name}.")
+        if ahead:
+            lines.append(f"Your branch on GitHub is {ahead} commit(s) behind your "
+                         f"local branch — run git push.")
+    return lines
+
+
+# --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
 def _print_rules():
@@ -343,9 +542,13 @@ def _print_rules():
         print(f"{rule_id.ljust(width)}  {description}")
 
 
-def _report(findings, max_per_rule):
+def _report(findings, max_per_rule, base="origin/dev", staged=False):
     """Human-readable report. Findings are grouped by rule so the explanation is
-    printed once and a wiped plan cache does not scroll the real message away."""
+    printed once and a wiped plan cache does not scroll the real message away.
+
+    The per-rule sections say *why* each file is a problem, one file's remedy as
+    the example; the block after them says how to fix all of them at once.
+    """
     by_rule = {}
     for finding in findings:
         by_rule.setdefault(finding.rule, []).append(finding)
@@ -362,7 +565,13 @@ def _report(findings, max_per_rule):
 
     total = len(findings)
     print(f"\n{total} violation(s) in {len(by_rule)} rule(s).")
-    print("Your branch may only change the files for its own resource type. "
+    for line in context_lines(base, staged):
+        print(line)
+
+    for line in recovery_lines(findings, base):
+        print(line)
+
+    print("\nYour branch may only change the files for its own resource type. "
           "See Guide/Policy_writing_tutorial/branch-scope.md")
 
 
@@ -436,7 +645,7 @@ def main(argv=None):
         print(f"       This branch owns: docs/{platform}/{folder}/{resource_type}.json, "
               f"inputs/{platform}/{folder}/{resource_type}/, "
               f"policies/{platform}/{folder}/{resource_type}/")
-        _report(findings, args.max_per_rule)
+        _report(findings, args.max_per_rule, base=args.base, staged=args.staged)
     else:
         print(f"[OK] {branch} changes only its own resource "
               f"({platform}/{folder}/{resource_type}); "
