@@ -398,8 +398,8 @@
       "description": "Literal value of the environment variable. Defaults to \"\" and the maximum allowed length is 32768 characters. Variable references are not supported in Cloud Run.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This sets a literal environment variable value; sensitive data should use secret references instead, so no policy is needed on the literal field."
+      "security_impact": true,
+      "rationale": "Literal environment variables risk exposing plaintext secrets; policy enforces that credentials are not stored in plaintext environment values and should use secret references instead."
     },
     "template.containers.env.value_source": {
       "type": "block",
@@ -415,8 +415,8 @@
       "description": "The name of the secret in Cloud Secret Manager. Format: {secretName} if the secret is in the same project. projects/{project}/secrets/{secretName} if the secret is in a different project.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies which Secret Manager secret is injected into the container; policy can restrict to approved secrets to prevent unauthorized credential access."
+      "security_impact": false,
+      "rationale": "References a specific secret name which is an external pointer; policy cannot validate tenant-specific secret names without violating multi-tenant constraints."
     },
     "template.containers.env.value_source.secret_key_ref.version": {
       "description": "The Cloud Secret Manager secret version. Can be 'latest' for the latest value or an integer for a specific version.",
@@ -913,8 +913,8 @@
       "description": "The name of the secret in Cloud Secret Manager. Format: {secret} if the secret is in the same project. projects/{project}/secrets/{secret} if the secret is in a different project.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies which Secret Manager secret is mounted as a volume; policy can restrict to approved secrets to prevent unauthorized credential exposure."
+      "security_impact": false,
+      "rationale": "References a specific secret name which is an external resource pointer; constraining specific secret names would violate multi-tenant policy rules."
     },
     "template.volumes.secret.items": {
       "type": "block",
