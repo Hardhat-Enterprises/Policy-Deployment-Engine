@@ -398,8 +398,8 @@
       "description": "Literal value of the environment variable. Defaults to \"\" and the maximum allowed length is 32768 characters. Variable references are not supported in Cloud Run.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "A literal environment variable value is an opaque string whose content varies by application; a platform policy cannot reliably distinguish sensitive material from routine configuration without application-specific context, making this field unsuitable as a policy target."
+      "security_impact": true,
+      "rationale": "Literal environment variable values risk exposing plaintext secrets such as API keys or passwords in Terraform configuration. Policy should discourage storing credentials as plaintext environment variables and enforce adoption of Secret Manager references via value_source.secret_key_ref to ensure secrets are managed securely."
     },
     "template.containers.env.value_source": {
       "type": "block",
