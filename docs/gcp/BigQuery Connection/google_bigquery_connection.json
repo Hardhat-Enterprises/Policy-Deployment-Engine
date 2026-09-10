@@ -65,8 +65,8 @@
       "description": "The user’s AWS IAM Role that trusts the Google-owned AWS IAM user Connection.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines which external AWS IAM role is trusted to be assumed for this connection. An incorrect or overly permissive role here establishes a cross-cloud trust and access boundary, making this a genuine security control rather than a simple identifier."
+      "security_impact": false,
+      "rationale": "A reference/pointer to a specific external AWS IAM role. A generic platform policy cannot meaningfully constrain which specific cross-account role a team should trust without hardcoding team-specific values, so this is treated as a reference rather than a security control."
     },
     "azure": {
       "type": "block",
@@ -77,15 +77,15 @@
       "description": "The id of customer's directory that host the data.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Defines which Azure Active Directory tenant is trusted for this federated connection. An incorrect tenant ID could result in cross-tenant data access or a broken trust boundary, making this a genuine security control."
+      "security_impact": false,
+      "rationale": "A reference/pointer to a specific external Azure AD tenant. A generic platform policy cannot meaningfully constrain which specific tenant a team should trust without hardcoding team-specific values, so this is treated as a reference rather than a security control."
     },
     "azure.federated_application_client_id": {
       "description": "The Azure Application (client) ID where the federated credentials will be hosted.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies which Azure Application hosts the federated credentials used for authentication. An incorrect value could route authentication through an untrusted or unintended application, making this part of the credential trust chain rather than a simple identifier."
+      "security_impact": false,
+      "rationale": "A reference/pointer to a specific external Azure Application. A generic platform policy cannot meaningfully constrain which specific application should host federated credentials without hardcoding team-specific values, so this is treated as a reference rather than a security control."
     },
     "cloud_resource": {
       "type": "block",
@@ -108,8 +108,8 @@
       "description": "Cloud Spanner database role for fine-grained access control. The Cloud Spanner admin should have provisioned the database role with appropriate permissions, such as 'SELECT' and 'INSERT'. Other users should only use roles provided by their Cloud Spanner admins. The database role name must start with a letter, and can only contain letters, numbers, and underscores. For more details, see https://cloud.google.com/spanner/docs/fgac-about.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field is explicitly described as controlling fine-grained access control for the Spanner database. An overly permissive or incorrect role directly affects what data the connection can access, making this a clear security control."
+      "security_impact": false,
+      "rationale": "A functional connection parameter specifying which database role to connect as. Choosing a specific role is a team-dependent configuration choice rather than a structural platform-level security control."
     },
     "cloud_spanner.max_parallelism": {
       "description": "Allows setting max parallelism per query when executing on Spanner independent compute resources. If unspecified, default values of parallelism are chosen that are dependent on the Cloud Spanner instance configuration. 'useParallelism' and 'useDataBoost' must be set when setting max parallelism.",
