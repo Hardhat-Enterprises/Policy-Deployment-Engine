@@ -10,6 +10,6 @@ resource "google_logging_project_exclusion" "compliant_example_1" {
 resource "google_logging_project_exclusion" "compliant_example_2" {
   name        = "compliant_example_2"
   project     = "my-project"
-  description = "Exclude debug logs from dev namespace - COMPLIANT"
+  description = "Exclude health check logs - COMPLIANT"
   filter      = "resource.labels.namespace_name = \"dev\" AND severity = \"DEBUG\""
 }
