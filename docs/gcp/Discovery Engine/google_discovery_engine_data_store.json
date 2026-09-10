@@ -27,8 +27,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": " This is used to control terraform lifecycle behaviour, does not control access or the ability to change data via Terraform. Thus does not require a policy"
     },
     "display_name": {
       "description": "The display name of the data store. This field must be a UTF-8 encoded\nstring with a length limit of 128 characters.",
@@ -88,15 +88,15 @@
       "description": "If set true, automatic refresh is disabled for the DataStore.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the automatic content refresh toggle for the data store, operational scheduling choice that affects how indexed content is updated is not a security control."
     },
     "advanced_site_search_config.disable_initial_index": {
       "description": "If set true, initial indexing is disabled for the DataStore.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the initial indexing being disabled when the data store is created. Operational choice that is a setup choice for the team, not a security control."
     },
     "document_processing_config": {
       "type": "block",
@@ -117,15 +117,15 @@
       "description": "The token size limit for each chunk.\nSupported values: 100-500 (inclusive). Default value: 500.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Setting that sets the token size limit for document chunk. This is a functional performance tuning parameter, does not affect security controls"
     },
     "document_processing_config.chunking_config.layout_based_chunking_config.include_ancestor_headings": {
       "description": "Whether to include appending different levels of headings to chunks from the middle of the document to prevent context loss.\nDefault value: False.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is used to control the appending of ancestor headings to preserve context, not a security control"
     },
     "document_processing_config.default_parsing_config": {
       "type": "block",
@@ -146,43 +146,43 @@
       "description": "If true, the LLM based annotation is added to the image during parsing.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Is used to toggle LLM based annotation of images when parsing, functional feature that does not affect security"
     },
     "document_processing_config.default_parsing_config.layout_parsing_config.enable_table_annotation": {
       "description": "If true, the LLM based annotation is added to the table during parsing.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Is used to toggle LLM based annotation of tables when parsing, a functional feature that does not affect security controls"
     },
     "document_processing_config.default_parsing_config.layout_parsing_config.exclude_html_classes": {
       "description": "List of HTML classes to exclude from the parsed content.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Is used to specify the HTML classes to be excluded from parsed content, filters content and is not a security control"
     },
     "document_processing_config.default_parsing_config.layout_parsing_config.exclude_html_elements": {
       "description": "List of HTML elements to exclude from the parsed content.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Filters HTML elements to exclude from the parsed content, does not affect security control"
     },
     "document_processing_config.default_parsing_config.layout_parsing_config.exclude_html_ids": {
       "description": "List of HTML ids to exclude from the parsed content.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Filters HTML IDS to exclude from the parsed content, does not affect security control"
     },
     "document_processing_config.default_parsing_config.layout_parsing_config.structured_content_types": {
       "description": "Contains the required structure types to extract from the document. Supported values: 'shareholder-structure'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Filters the content to be extracted when being parsed,functional data-extraction choice, not a security feature"
     },
     "document_processing_config.default_parsing_config.ocr_parsing_config": {
       "type": "block",
@@ -193,8 +193,8 @@
       "description": "If true, will use native text instead of OCR text on pages containing native text.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the use of native embedded text instead of OCR extracted text in parsed PDF files, funcitonal parsing accuracy choice does not affect security"
     },
     "document_processing_config.parsing_config_overrides": {
       "type": "block",
@@ -205,8 +205,8 @@
       "description": "The identifier for this object. Format specified above.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "is used to identify the file type for which the configuration is being overridden, a functional config that has no security implications"
     },
     "document_processing_config.parsing_config_overrides.digital_parsing_config": {
       "type": "block",
@@ -222,43 +222,43 @@
       "description": "If true, the LLM based annotation is added to the image during parsing.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+      "security_impact": false,
+      "rationale": "Is used to toggle LLM based annotation of images when parsing for overrides, functional feature that does not affect security"
+    }, 
     "document_processing_config.parsing_config_overrides.layout_parsing_config.enable_table_annotation": {
       "description": "If true, the LLM based annotation is added to the table during parsing.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Is used to toggle LLM based annotation of tables(for overrides) when parsing, a functional feature that does not affect security controls"
     },
     "document_processing_config.parsing_config_overrides.layout_parsing_config.exclude_html_classes": {
       "description": "List of HTML classes to exclude from the parsed content.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Filters HTML classes to exclude from the parsed content(for overrides), does not affect security contro"
     },
     "document_processing_config.parsing_config_overrides.layout_parsing_config.exclude_html_elements": {
       "description": "List of HTML elements to exclude from the parsed content.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Filters HTML elements to exclude from the parsed content(for overrides), does not affect security control"
     },
     "document_processing_config.parsing_config_overrides.layout_parsing_config.exclude_html_ids": {
       "description": "List of HTML ids to exclude from the parsed content.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Filters HTML IDS to exclude from the parsed content(for overrides), does not affect security control"
     },
     "document_processing_config.parsing_config_overrides.layout_parsing_config.structured_content_types": {
       "description": "Contains the required structure types to extract from the document. Supported values: 'shareholder-structure'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the structured content type to extract for a specific file type override. Functional data-extraction choice tied to the teams document format."
     },
     "document_processing_config.parsing_config_overrides.ocr_parsing_config": {
       "type": "block",
@@ -269,8 +269,8 @@
       "description": "If true, will use native text instead of OCR text on pages containing native text.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the preference of embedded text over OCR text for a specific file type override. Functional parsing accuracy type and not a security control."
     }
   }
 }
