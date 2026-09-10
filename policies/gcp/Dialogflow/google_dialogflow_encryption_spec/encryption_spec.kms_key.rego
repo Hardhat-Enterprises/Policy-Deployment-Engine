@@ -8,14 +8,30 @@ conditions := [
         {
             "situation_description": "A customer-managed encryption key is not configured for the Dialogflow encryption specification.",
             "remedies": [
-                "Configure encryption_spec.kms_key with a customer-managed encryption key."
+                "Configure encryption_spec.kms_key with a customer-managed Cloud KMS key.",
+                "Example format: projects/PROJECT/locations/REGION/keyRings/RING/cryptoKeys/KEY"
             ]
         },
         {
-            "condition": "Check that encryption_spec.kms_key is not empty.",
+            "condition": "encryption_spec.kms_key must be configured.",
             "attribute_path": ["encryption_spec", 0, "kms_key"],
-            "values": [""],
+            "values": [null, ""],
             "policy_type": "blacklist"
+        }
+    ],
+    [
+        {
+            "situation_description": "The Dialogflow encryption key is not configured as a fully qualified Cloud KMS crypto key resource path.",
+            "remedies": [
+                "Use a fully qualified customer-managed Cloud KMS key path.",
+                "Example format: projects/PROJECT/locations/REGION/keyRings/RING/cryptoKeys/KEY"
+            ]
+        },
+        {
+            "condition": "encryption_spec.kms_key must use a Cloud KMS resource path.",
+            "attribute_path": ["encryption_spec", 0, "kms_key"],
+            "values": ["*", [["projects"]]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
