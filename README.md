@@ -48,6 +48,7 @@ All branches must follow one of these patterns:
     `Cloud Run (v2 API)` → `cloud_run_v2_api`. It maps back to exactly one folder.
   - `<resource_type>`: a documented resource (a `docs/<platform>/<folder>/<resource>.json`)
 - `feature/<feature_name>` - For general features and any non-resource maintenance/cleanup work (e.g., `feature/add-logging`)
+- `Task/<topic_slug>` - Instructor-assigned tasks. The portal creates the branch for you; do not rename it.
 
 This `Service/...` branch is what scopes the per-resource CI gate to the resource you're
 working on (doc completeness, policy/input coverage, and the OPA test).
@@ -97,6 +98,7 @@ When you commit, the pre-commit hooks will run automatically:
 
 Allowed branch names:
   - feature/<name>
+  - Task/<topic_slug>  (instructor-assigned task branches)
   - Service/<platform>/<service_slug>/<resource_type>
       e.g. Service/gcp/cloud_run_v2_api/google_cloud_run_v2_service
   - (protected: dev)
@@ -199,7 +201,8 @@ rather than re-deriving a path or a hash — which is why a provider bump, or th
 
 | Tool | What it does | Docs |
 |------|--------------|------|
-| `scripts/docgen/` | Generates the `docs/` JSON (one file per resource, every argument) from the Terraform provider **schema**. | [README](scripts/docgen/README.md) |
+| `scripts/check_resource.py` | **Start here.** Runs every check CI runs against your branch — branch name, scope, lint, doc completeness, argument coverage, OPA test — and names the one that failed. | [Testing your policies](Guide/Policy_writing_tutorial/testing-policies.md) |
+| `scripts/docgen/` | Generates the `docs/` JSON (one file per resource, every argument) from the Terraform provider **schema**; `apply_canonical.py` re-applies the locked cross-cutting assessments (location/region/zone, IAM) to existing files. | [README](scripts/docgen/README.md) |
 | `scripts/linters/` | Validates that `docs/`, `inputs/`, and `policies/` reconcile (structure + content) and checks the branch-name convention. | [README](scripts/linters/readme-linters.md) |
 | `scripts/auto_test/` | `terraform plan` + `opa eval` harness over the fixtures, with a committed plan cache and an offline project-local provider cache. | "Testing Your Policies Locally" above |
 | `scripts/folder_generator/` | Small GUI to scaffold a new resource's input + policy files from `templates/`. | [README](scripts/folder_generator/README.md) |
@@ -208,14 +211,34 @@ rather than re-deriving a path or a hash — which is why a provider bump, or th
 
 Two GitHub Actions workflows in `.github/workflows/`:
 
-- **`policy_check_PR`** — runs on every PR that touches `docs/`, `inputs/`, or `policies/`:
-  - *lint* job (all PRs): branch-name convention → whole-tree **structural** lint → a
-    **content** lint scoped to the files this PR changed (the repo-wide backlog never blocks you).
+- **`policy_check_PR`** — runs on **every** pull request (no `paths:` filter: GitHub never treats
+  a workflow that did not run as satisfied, so a filtered-out workflow would block a required
+  check forever). Steps and jobs skip on what the PR actually changed instead — a skipped *job*
+  reports `skipped`, which does satisfy a required check:
+  - *lint* job (all PRs): branch-name convention → whole-tree **structural** lint → the tools'
+    own **test suite** → a **content** lint scoped to the files this PR changed (the repo-wide
+    backlog never blocks you). The last three skip when nothing they read has changed.
+  - *Branch scope* job (only `Service/...` PRs): the branch may change only its own resource's
+    files.
   - *policy_check* job (only `Service/...` PRs): the per-resource gate — doc completeness
     (real `security_impact` + rationale), policy/input coverage for every `true` arg, and the
     `terraform plan` + OPA test. It then applies a `CI-Approved` / `CI-Review-Required` label.
-- **`policy_check_ALL`** — manual (`workflow_dispatch`) full-tree sweep: whole-tree lint + the
-  complete OPA suite.
+- **`policy_check_ALL`** — full-tree sweep on every push to `dev`, and on demand
+  (`workflow_dispatch`): whole-tree lint + the complete OPA suite. It publishes the
+  `policy-results` artifact the PDE Portal backend reads for the repo-wide baseline, so don't
+  rename that upload.
+- **`pr-target`** — closes any pull request that does not target `dev` or `main`, with an
+  explanation on the PR. Its own workflow because it runs on `pull_request_target`, which needs
+  different permissions.
+
+**One required status check: `PR checks`.** It is the `gate` job at the end of `policy_check_PR`,
+which passes only when every other job in that workflow succeeded or was legitimately skipped.
+GitHub has no way to require a *workflow*, only a single check — so naming each job in the ruleset
+would leave the next job anyone adds required by nobody. Requiring the gate covers them all.
+
+The *lint* and *policy_check* jobs run the same script you run locally
+(`scripts/check_resource.py`, with `--gate-only` for the resource job since the lint job has
+already covered the rest), so a green local run means a green CI run.
 
 A PR is blocked when a lint error lands on a file it changed, or (for `Service/` PRs) when the
 per-resource gate fails. Terraform and OPA versions are pinned in the workflows for
