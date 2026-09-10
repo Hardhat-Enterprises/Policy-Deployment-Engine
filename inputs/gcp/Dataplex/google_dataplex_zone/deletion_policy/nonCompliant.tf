@@ -7,7 +7,7 @@ resource "google_dataplex_zone" "non_compliant_example_1" {
   }
 
   lake     = "google_dataplex_lake.basic.name"
-  location = "us-west1"
+  location = "australia-southeast1"
   name     = "non_compliant_example_1"
 
   resource_spec {
