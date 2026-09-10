@@ -1,6 +1,6 @@
 resource "google_dataplex_asset" "non_compliant_example_1" {
   name            = "non_compliant_example_1"
-  location        = "us-west1"
+  location        = "australia-southeast1"
   project         = "my-project-name"
   deletion_policy = "PREVENT"
 

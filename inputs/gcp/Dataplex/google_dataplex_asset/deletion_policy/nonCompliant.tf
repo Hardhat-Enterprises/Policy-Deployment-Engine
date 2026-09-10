@@ -1,6 +1,6 @@
 resource "google_dataplex_asset" "non_compliant_example_1" {
   name            = "non_compliant_example_1"
-  location        = "us-west1"
+  location        = "australia-southeast1"
   project         = "my-project-name"
   deletion_policy = "DELETE"
 
@@ -8,7 +8,7 @@ resource "google_dataplex_asset" "non_compliant_example_1" {
   dataplex_zone = "google_dataplex_zone.basic_zone.name"
 
   discovery_spec {
-    enabled = false
+    enabled = true
   }
 
   resource_spec {
