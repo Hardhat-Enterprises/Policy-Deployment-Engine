@@ -1,13 +1,13 @@
 resource "google_access_context_manager_service_perimeter_egress_policy" "compliant_example_1" {
   perimeter = "accessPolicies/123456/servicePerimeters/my_perimeter"
-  title     = "allow-approved-egress-identity"
+  title = "compliant_example_1"
 
   egress_from {
-    identities = ["serviceAccount:approved-sa@my-project.iam.gserviceaccount.com"]
+    identities = ["serviceAccount:service-123456789@example-project.iam.gserviceaccount.com"]
   }
 
   egress_to {
-    resources = ["projects/123456789"]
+    resources = ["projects/example-project-number"]
 
     operations {
       service_name = "bigquery.googleapis.com"

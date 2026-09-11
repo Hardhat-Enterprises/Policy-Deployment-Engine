@@ -6,13 +6,13 @@ import data.terraform.gcp.security.access_context_manager_vpc_service_controls.g
 conditions := [[
     {
         "situation_description": "Ensure dry-run egress policies only allow approved source identities.",
-        "remedies": ["Replace unapproved egress_from.identities values with approved identities such as 'serviceAccount:approved-sa@my-project.iam.gserviceaccount.com'."]
+        "remedies": ["Replace unapproved egress_from.identities values with approved identities such as 'serviceAccount:example-approved-sa@example-project.iam.gserviceaccount.com'."]
     },
     {
         "condition": "egress_from.identities only contains approved identities",
         "attribute_path": ["egress_from", 0, "identities"],
-        "values": ["serviceAccount:approved-sa@my-project.iam.gserviceaccount.com"],
-        "policy_type": "whitelist"
+        "values": ["allUsers", "allAuthenticatedUsers"],
+        "policy_type": "blacklist"
     }
 ]]
 

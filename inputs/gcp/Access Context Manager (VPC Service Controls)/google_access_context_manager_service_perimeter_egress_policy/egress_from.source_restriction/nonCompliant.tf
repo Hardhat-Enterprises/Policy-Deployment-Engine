@@ -1,6 +1,6 @@
 resource "google_access_context_manager_service_perimeter_egress_policy" "non_compliant_example_1" {
   perimeter = "accessPolicies/123456789/servicePerimeters/storage_perimeter"
-  title     = "non_compliant_example_1"
+  title = "non_compliant_example_1"
 
   egress_from {
     identity_type       = "ANY_SERVICE_ACCOUNT"
@@ -8,6 +8,6 @@ resource "google_access_context_manager_service_perimeter_egress_policy" "non_co
   }
 
   egress_to {
-    resources = ["projects/123456789"]
+    resources = ["projects/example-project-number"]
   }
 }
