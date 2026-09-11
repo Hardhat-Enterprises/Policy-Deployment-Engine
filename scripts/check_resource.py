@@ -17,7 +17,8 @@ tells you which one failed:
   4. Doc completeness      every leaf argument in docs/<platform>/<folder>/<resource>.json
                            has a REAL boolean ``security_impact`` (the "true/false"
                            placeholder the linter tolerates tree-wide is rejected
-                           here) and a non-empty ``rationale``
+                           here) and a non-empty ``rationale``, and no argument in
+                           the base branch's copy of the doc is missing from it
   5. True-arg coverage     every argument with ``security_impact: true`` has both a
                            policy ``policies/.../<resource>/<arg>.rego`` and a fixture
                            ``inputs/.../<resource>/<arg>/``
@@ -186,9 +187,10 @@ def base_ref():
     is right for a pre-commit hook and wrong here, so say so rather than silently
     checking less than the name of this script promises.
     """
-    r = subprocess.run(["git", "rev-parse", "--verify", "--quiet", "origin/dev"],
+    ref = f"origin/{os.getenv('GITHUB_BASE_REF') or 'dev'}"
+    r = subprocess.run(["git", "rev-parse", "--verify", "--quiet", ref],
                        cwd=REPO, capture_output=True, text=True)
-    return "origin/dev" if r.returncode == 0 else None
+    return ref if r.returncode == 0 else None
 
 
 def step_branch_name(report, branch):
@@ -256,6 +258,38 @@ def check_doc_completeness(doc):
         if not (isinstance(rationale, str) and rationale.strip()):
             errors.append(f"arg '{name}': rationale must be filled in (found {rationale!r})")
     return errors
+
+
+def check_no_lost_args(doc, base_doc):
+    """Arguments in the base branch's copy of the doc that this branch's lacks.
+
+    ``check_doc_completeness`` can only judge what is inside ``arguments``, so a
+    leaf deleted cleanly from it passes by construction. ``base_doc`` is None when
+    there is no base to compare with.
+    """
+    if base_doc is None:
+        return []
+    mine = set(doc.get("arguments", {}))
+    lost = [k for k in base_doc.get("arguments", {}) if k not in mine]
+    if not lost:
+        return []
+    return [f"{len(lost)} argument(s) in the base branch's doc are missing from this "
+            "branch's `arguments`: " + ", ".join(lost)]
+
+
+def load_base_doc(base, rel_path):
+    """The base branch's version of a doc, or None when it has none (a new doc, no
+    base ref locally, or a base copy that is not valid JSON)."""
+    if base is None:
+        return None
+    r = subprocess.run(["git", "show", f"{base}:{rel_path}"],
+                       cwd=REPO, capture_output=True, text=True, encoding="utf-8")
+    if r.returncode != 0:
+        return None
+    try:
+        return json.loads(r.stdout)
+    except json.JSONDecodeError:
+        return None
 
 
 def check_true_arg_coverage(doc, platform, folder, resource):
@@ -374,13 +408,19 @@ def main(argv=None):
 
     doc = json.loads(doc_path.read_text(encoding="utf-8"))
 
-    doc_errors = check_doc_completeness(doc)
+    base = base_ref()
+    base_version = load_base_doc(base, f"{DOCS}/{platform}/{folder}/{resource}.json")
+    doc_errors = check_no_lost_args(doc, base_version) + check_doc_completeness(doc)
     if doc_errors:
-        report.fail("Doc completeness", f"{len(doc_errors)} argument(s) incomplete")
+        report.fail("Doc completeness", f"{len(doc_errors)} finding(s)")
         for e in doc_errors:
             print(f"      - {e}")
     else:
-        report.ok("Doc completeness", "every argument has a real security_impact and a rationale")
+        compared = (f"nothing lost against {base}" if base_version is not None
+                    else "no base doc to compare with — run `git fetch origin`"
+                    if base is None else f"new doc, not on {base}")
+        report.ok("Doc completeness", "every argument has a real security_impact and a "
+                                      f"rationale; {compared}")
 
     cover_errors = check_true_arg_coverage(doc, platform, folder, resource)
     if cover_errors:
