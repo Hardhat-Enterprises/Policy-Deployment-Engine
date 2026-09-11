@@ -246,17 +246,6 @@ FIXTURE_DRIFT_EXEMPT = {
         "`managed` and `self_managed` are mutually exclusive. Demonstrating a "
         "non-compliant self_managed private key means the compliant example cannot "
         "use self_managed at all, so it uses `managed` instead."),
-    ("Certificate Manager", "google_certificate_manager_certificate_map_entry",
-     "matcher"): (
-        {"hostname"},
-        "`matcher` and `hostname` are mutually exclusive. The compliant example "
-        "cannot set the matcher it is meant not to use, so it sets a hostname."),
-    ("Cloud Platform", "google_folder_organization_policy", "constraint"): (
-        {"boolean_policy", "list_policy", "restore_policy"},
-        "Each constraint is of a fixed type — compute.disableSerialPortAccess is a "
-        "boolean constraint, serviceuser.services a list one — and the three policy "
-        "blocks are mutually exclusive. Varying the constraint under test therefore "
-        "varies which block is populated."),
     ("Cloud Storage", "google_storage_object_acl", "predefined_acl"): (
         {"role_entity"},
         "`predefined_acl` and `role_entity` are mutually exclusive. The compliant "
