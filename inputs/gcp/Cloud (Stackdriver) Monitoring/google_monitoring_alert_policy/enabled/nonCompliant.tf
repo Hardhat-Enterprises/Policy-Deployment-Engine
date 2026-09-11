@@ -5,7 +5,7 @@ resource "google_monitoring_alert_policy" "non_compliant_example_1" {
   combiner     = "OR"
 
   conditions {
-    display_name = "nc"
+    display_name = "c"
     condition_threshold {
       filter          = "metric.type=\"compute.googleapis.com/instance/disk/write_bytes_count\" AND resource.type=\"gce_instance\""
       duration        = "60s"

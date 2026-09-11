@@ -1,7 +1,7 @@
 resource "google_os_config_v2_policy_orchestrator_for_organization" "non_compliant_example_1" {
-    policy_orchestrator_id = "p1"
+    policy_orchestrator_id = "po"
     organization_id = "121623553414"
-    state = "ACTIVE"
+    state = "STOPPED"
     action = "DELETE"
 
     orchestrated_resource {
