@@ -1,6 +1,6 @@
 resource "google_access_context_manager_service_perimeter_dry_run_egress_policy" "non_compliant_example_1" {
   perimeter = "accessPolicies/123456/servicePerimeters/my_perimeter"
-  title     = "allow-any-identity-egress"
+  title     = "non_compliant_example_1"
 
   egress_from {
     identity_type = "ANY_IDENTITY"

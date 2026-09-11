@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument controls Terraform deletion behaviour only. It does not define who can send egress traffic, where traffic can go, or which services, methods, permissions, roles, identities, or resources are allowed by the dry-run egress policy."
+      "security_impact": true,
+      "rationale": "This argument controls deletion behaviour for the dry-run egress policy. Deletion-blocking or deletion-policy arguments are security-impacting because they help prevent accidental destruction or removal of security perimeter policy definitions."
     },
     "perimeter": {
       "description": "The name of the Service Perimeter to add this resource to.",
@@ -21,7 +21,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This argument is a human-readable title used for identification. The provider description states that it does not affect behaviour, so it does not directly change the security posture of the dry-run egress rule."
+      "rationale": "This argument is a cosmetic and descriptive field used to label the dry-run egress policy. It does not enforce access, identity, network, data boundary, or lifecycle protection behaviour, so it is outside the security-impact model."
     },
     "egress_from": {
       "type": "block",
@@ -46,8 +46,8 @@
       "description": "Whether to enforce traffic restrictions based on 'sources' field. If the 'sources' field is non-empty, then this field must be set to 'SOURCE_RESTRICTION_ENABLED'. Possible values: [\"SOURCE_RESTRICTION_ENABLED\", \"SOURCE_RESTRICTION_DISABLED\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument controls whether source restrictions are enforced when sources are configured. The provider description states that when sources is non-empty this field must be set to SOURCE_RESTRICTION_ENABLED, so the security-relevant source values are better assessed through the source and identity arguments rather than this flag alone."
+      "security_impact": true,
+      "rationale": "This argument controls whether source restrictions are enabled for dry-run egress matching. Because an unspecified or disabled source restriction can weaken enforcement of source-based controls, it is security-impacting under the enable-security-features archetype."
     },
     "egress_from.sources": {
       "type": "block",
@@ -91,8 +91,8 @@
       "description": "A list of IAM roles that represent the set of operations that the sources\nspecified in the corresponding 'EgressFrom'\nare allowed to perform.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This argument defines IAM roles representing operations that the matching source can perform. Overly permissive roles can broaden allowed access outside the perimeter, so it is security-impacting and is covered by the egress_to_roles policy."
+      "security_impact": false,
+      "rationale": "This argument specifies IAM roles used in egress operations. Restricting which IAM roles teams may use is team-specific and overreaching for this generic platform policy set, so it is not treated as security-impacting here."
     },
     "egress_to.operations": {
       "type": "block",

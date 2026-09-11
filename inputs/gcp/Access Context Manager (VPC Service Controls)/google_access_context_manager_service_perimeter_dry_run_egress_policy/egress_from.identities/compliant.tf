@@ -1,6 +1,6 @@
 resource "google_access_context_manager_service_perimeter_dry_run_egress_policy" "compliant_example_1" {
   perimeter = "accessPolicies/123456/servicePerimeters/my_perimeter"
-  title     = "allow-approved-egress-identity"
+  title     = "compliant_example_1"
 
   egress_from {
     identities = ["serviceAccount:approved-sa@my-project.iam.gserviceaccount.com"]

@@ -1,6 +1,7 @@
 resource "google_access_context_manager_service_perimeter_dry_run_egress_policy" "compliant_example_1" {
-  perimeter = "accessPolicies/123456/servicePerimeters/my_perimeter"
+  perimeter       = "accessPolicies/123456/servicePerimeters/my_perimeter"
   title     = "compliant_example_1"
+  deletion_policy = "ABANDON"
 
   egress_from {
     identity_type = "ANY_SERVICE_ACCOUNT"
@@ -13,7 +14,7 @@ resource "google_access_context_manager_service_perimeter_dry_run_egress_policy"
       service_name = "bigquery.googleapis.com"
 
       method_selectors {
-        method = "google.cloud.bigquery.v2.JobService.GetJob"
+        permission = "bigquery.tables.get"
       }
     }
   }

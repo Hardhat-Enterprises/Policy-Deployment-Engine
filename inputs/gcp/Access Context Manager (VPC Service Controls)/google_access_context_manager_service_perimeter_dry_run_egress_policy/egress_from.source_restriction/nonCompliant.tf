@@ -3,7 +3,8 @@ resource "google_access_context_manager_service_perimeter_dry_run_egress_policy"
   title     = "non_compliant_example_1"
 
   egress_from {
-    identity_type = "ANY_SERVICE_ACCOUNT"
+    identity_type       = "ANY_SERVICE_ACCOUNT"
+    source_restriction = "SOURCE_RESTRICTION_DISABLED"
   }
 
   egress_to {
@@ -13,7 +14,7 @@ resource "google_access_context_manager_service_perimeter_dry_run_egress_policy"
       service_name = "bigquery.googleapis.com"
 
       method_selectors {
-        method = "*"
+        permission = "bigquery.tables.get"
       }
     }
   }
