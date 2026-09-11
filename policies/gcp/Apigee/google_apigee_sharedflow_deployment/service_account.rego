@@ -4,28 +4,16 @@ import data.terraform.gcp.security.apigee.google_apigee_sharedflow_deployment.va
 conditions := [
     [
         {
-            "situation_description": "service_account must be explicitly set with a valid GCP service account in the format {ACCOUNT_ID}@{PROJECT}.iam.gserviceaccount.com",
+            "situation_description": "Sharedflow deployment does not specify a dedicated service account, allowing it to operate without a scoped identity and violating the principle of least privilege.",
             "remedies": [
-                "Set service_account to a dedicated service account in the format {ACCOUNT_ID}@{PROJECT}.iam.gserviceaccount.com"
+                "Set service_account to a dedicated service account in the format {ACCOUNT_ID}@{PROJECT}.iam.gserviceaccount.com. The GCP API validates the format at apply time."
             ]
         },
         {
-            "condition": "check service_account is not null or empty",
+            "condition": "Check if a dedicated service account is configured",
             "attribute_path": ["service_account"],
-            "values": [null, ""],
+            "values": [null],
             "policy_type": "blacklist"
-        },
-        {
-            "condition": "check service_account matches GCP service account format",
-            "attribute_path": ["service_account"],
-            "values": [
-                "*@*.iam.gserviceaccount.com",
-                [
-                    ["apigee-sa"],
-                    ["example-project"]
-                ]
-            ],
-            "policy_type": "pattern whitelist"
         }
     ]
 ]
