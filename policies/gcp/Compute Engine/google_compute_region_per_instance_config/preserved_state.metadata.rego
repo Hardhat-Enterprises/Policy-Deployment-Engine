@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_region_per_instance_config.preserved_state.metadata
+package terraform.gcp.security.compute_engine.google_compute_region_per_instance_config.preserved_state_metadata
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_region_per_instance_config.vars
 
