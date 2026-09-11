@@ -12,8 +12,8 @@ conditions := [
         {
             "condition": "Check registrant contact email",
             "attribute_path": ["contact_settings", 0, "registrant_contact", 0, "email"],
-            "values": ["admin@example.com"],
-            "policy_type": "whitelist"
+            "values": ["*@*", [["admin"], ["example.com"]]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]

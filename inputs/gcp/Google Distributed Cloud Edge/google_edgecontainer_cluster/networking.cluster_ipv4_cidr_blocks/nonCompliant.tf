@@ -9,14 +9,12 @@ resource "google_edgecontainer_cluster" "non_compliant_example_1" {
   } #Policy to be tested 
  
   authorization {
-    #invalid/unapproved admin email
     admin_users {
-      username = "invalid@example.com"
-    } #Required
+      username = "hpandya368@gmail.com"
+    }
   }
 
   fleet {
-    #hardcoded project number instead of dynamic lookup
-    project = "projects/1234567890"
-  } #Required
+   project = "projects/gdce-dev"
+} #Required
 }
