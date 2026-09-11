@@ -48,6 +48,7 @@ All branches must follow one of these patterns:
     `Cloud Run (v2 API)` → `cloud_run_v2_api`. It maps back to exactly one folder.
   - `<resource_type>`: a documented resource (a `docs/<platform>/<folder>/<resource>.json`)
 - `feature/<feature_name>` - For general features and any non-resource maintenance/cleanup work (e.g., `feature/add-logging`)
+- `Task/<topic_slug>` - Instructor-assigned tasks. The portal creates the branch for you; do not rename it.
 
 This `Service/...` branch is what scopes the per-resource CI gate to the resource you're
 working on (doc completeness, policy/input coverage, and the OPA test).
@@ -97,6 +98,7 @@ When you commit, the pre-commit hooks will run automatically:
 
 Allowed branch names:
   - feature/<name>
+  - Task/<topic_slug>  (instructor-assigned task branches)
   - Service/<platform>/<service_slug>/<resource_type>
       e.g. Service/gcp/cloud_run_v2_api/google_cloud_run_v2_service
   - (protected: dev)
