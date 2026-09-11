@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls whether terraform can delete the resource. Setting it to PREVENT blocks any destroy operation outright, preventing accidental deletion of a critical deployment pipeline."
     },
     "description": {
       "description": "Description of the `DeliveryPipeline`. Max length is 255 characters.",
@@ -72,8 +72,8 @@
       "description": "Skaffold profiles to use when rendering the manifest for this stage's `Target`.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.target_id": {
       "description": "The target_id to which this stage points. This field refers exclusively to the last segment of a target name. For example, this field would just be `my-target` (rather than `projects/project/locations/location/targets/my-target`). The location of the `Target` is inferred to be the same as the location of the `DeliveryPipeline` that contains this `Stage`.",
@@ -120,15 +120,15 @@
       "description": "Required. The percentage based deployments that will occur as a part of a `Rollout`. List is expected in ascending order and each integer n is 0 <= n < 100.",
       "required": true,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.verify": {
       "description": "Whether to run verify tests after each percentage deployment.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis": {
       "type": "block",
@@ -139,8 +139,8 @@
       "description": "Required. Duration of the analysis.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.custom_checks": {
       "type": "block",
@@ -151,15 +151,15 @@
       "description": "Optional. Frequency of the custom check.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.custom_checks.id": {
       "description": "Required. Unique identifier for the custom check.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.custom_checks.task": {
       "type": "block",
@@ -175,29 +175,29 @@
       "description": "Optional. Args is the container arguments to use. This overrides the default arguments defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's runtime arguments, which can alter what the container executes or what resources it accesses at runtime."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.custom_checks.task.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's entrypoint, controlling what actually executes at runtime. An uncontrolled override could bypass the container's intended, vetted behaviour."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.custom_checks.task.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets environment variables inside the container, which can carry secrets or alter runtime behaviour in ways that bypass intended controls."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.custom_checks.task.container.image": {
       "description": "Required. Image is the container image to use.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which container image executes as part of the deployment pipeline. An unapproved or unpinned image is a supply-chain risk \u2014 arbitrary code could run as part of the deploy process."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.google_cloud": {
       "type": "block",
@@ -213,22 +213,22 @@
       "description": "Required. The list of alert policy names to check. Format: `projects/{project}/alertPolicies/{alert_policy}`.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.google_cloud.alert_policy_checks.id": {
       "description": "Required. Unique identifier for the alert policy check.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.google_cloud.alert_policy_checks.labels": {
       "description": "Optional. Labels to filter the alert policies.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.postdeploy": {
       "type": "block",
@@ -239,8 +239,8 @@
       "description": "Optional. A sequence of skaffold custom actions to invoke during execution of the postdeploy job.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies arbitrary skaffold custom actions that execute after deployment. Uncontrolled actions could run unapproved code as part of the pipeline."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.predeploy": {
       "type": "block",
@@ -251,8 +251,8 @@
       "description": "Optional. A sequence of skaffold custom actions to invoke during execution of the predeploy job.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies arbitrary skaffold custom actions that execute before deployment. Uncontrolled actions could run unapproved code as part of the pipeline."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.verify_config": {
       "type": "block",
@@ -273,29 +273,29 @@
       "description": "Optional. Args is the container arguments to use. This overrides the default arguments defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's runtime arguments, which can alter what the container executes or what resources it accesses at runtime."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.verify_config.tasks.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's entrypoint, controlling what actually executes at runtime. An uncontrolled override could bypass the container's intended, vetted behaviour."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.verify_config.tasks.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets environment variables inside the container, which can carry secrets or alter runtime behaviour in ways that bypass intended controls."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.verify_config.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which container image executes as part of the deployment pipeline. An unapproved or unpinned image is a supply-chain risk \u2014 arbitrary code could run as part of the deploy process."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment": {
       "type": "block",
@@ -311,29 +311,29 @@
       "description": "Required. Percentage deployment for the phase.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.phase_id": {
       "description": "Required. The ID to assign to the `Rollout` phase. This value must consist of lower-case letters, numbers, and hyphens, start with a letter and end with a letter or a number, and have a max length of 63 characters. In other words, it must match the following regex: `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.profiles": {
       "description": "Skaffold profiles to use when rendering the manifest for this phase. These are in addition to the profiles list specified in the `DeliveryPipeline` stage.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.verify": {
       "description": "Whether to run verify tests after the deployment.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis": {
       "type": "block",
@@ -344,8 +344,8 @@
       "description": "Required. Duration of the analysis.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.custom_checks": {
       "type": "block",
@@ -356,15 +356,15 @@
       "description": "Optional. Frequency of the custom check.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.custom_checks.id": {
       "description": "Required. Unique identifier for the custom check.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.custom_checks.task": {
       "type": "block",
@@ -380,29 +380,29 @@
       "description": "Optional. Args is the container arguments to use. This overrides the default arguments defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's runtime arguments, which can alter what the container executes or what resources it accesses at runtime."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.custom_checks.task.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's entrypoint, controlling what actually executes at runtime. An uncontrolled override could bypass the container's intended, vetted behaviour."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.custom_checks.task.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets environment variables inside the container, which can carry secrets or alter runtime behaviour in ways that bypass intended controls."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.custom_checks.task.container.image": {
       "description": "Required. Image is the container image to use.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which container image executes as part of the deployment pipeline. An unapproved or unpinned image is a supply-chain risk \u2014 arbitrary code could run as part of the deploy process."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.google_cloud": {
       "type": "block",
@@ -418,22 +418,22 @@
       "description": "Required. The list of alert policy names to check. Format: `projects/{project}/alertPolicies/{alert_policy}`.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.google_cloud.alert_policy_checks.id": {
       "description": "Required. Unique identifier for the alert policy check.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.google_cloud.alert_policy_checks.labels": {
       "description": "Optional. Labels to filter the alert policies.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.postdeploy": {
       "type": "block",
@@ -444,8 +444,8 @@
       "description": "Optional. A sequence of skaffold custom actions to invoke during execution of the postdeploy job.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies arbitrary skaffold custom actions that execute after deployment. Uncontrolled actions could run unapproved code as part of the pipeline."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.predeploy": {
       "type": "block",
@@ -456,8 +456,8 @@
       "description": "Optional. A sequence of skaffold custom actions to invoke during execution of the predeploy job.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies arbitrary skaffold custom actions that execute before deployment. Uncontrolled actions could run unapproved code as part of the pipeline."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.verify_config": {
       "type": "block",
@@ -478,29 +478,29 @@
       "description": "Optional. Args is the container arguments to use. This overrides the default arguments defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's runtime arguments, which can alter what the container executes or what resources it accesses at runtime."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.verify_config.tasks.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's entrypoint, controlling what actually executes at runtime. An uncontrolled override could bypass the container's intended, vetted behaviour."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.verify_config.tasks.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets environment variables inside the container, which can carry secrets or alter runtime behaviour in ways that bypass intended controls."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.verify_config.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which container image executes as part of the deployment pipeline. An unapproved or unpinned image is a supply-chain risk \u2014 arbitrary code could run as part of the deploy process."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config": {
       "type": "block",
@@ -516,29 +516,29 @@
       "description": "Whether Cloud Deploy should update the traffic stanza in a Cloud Run Service on the user's behalf to facilitate traffic splitting. This is required to be true for CanaryDeployments, but optional for CustomCanaryDeployments.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.cloud_run.canary_revision_tags": {
       "description": "Optional. A list of tags that are added to the canary revision while the canary phase is in progress.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.cloud_run.prior_revision_tags": {
       "description": "Optional. A list of tags that are added to the prior revision while the canary phase is in progress.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.cloud_run.stable_revision_tags": {
       "description": "Optional. A list of tags that are added to the final stable revision when the stable phase is applied.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes": {
       "type": "block",
@@ -554,43 +554,43 @@
       "description": "Required. Name of the Kubernetes Deployment whose traffic is managed by the specified HTTPRoute and Service.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.gateway_service_mesh.http_route": {
       "description": "Required. Name of the Gateway API HTTPRoute.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.gateway_service_mesh.pod_selector_label": {
       "description": "Optional. The label to use when selecting Pods for the Deployment and Service resources. This label must already be present in both resources.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.gateway_service_mesh.route_update_wait_time": {
       "description": "Optional. The time to wait for route updates to propagate. The maximum configurable time is 3 hours, in seconds format. If unspecified, there is no wait time.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.gateway_service_mesh.service": {
       "description": "Required. Name of the Kubernetes Service.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.gateway_service_mesh.stable_cutback_duration": {
       "description": "Optional. The amount of time to migrate traffic back from the canary Service to the original Service during the stable phase deployment. If specified, must be between 15s and 3600s. If unspecified, there is no cutback time.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.gateway_service_mesh.route_destinations": {
       "type": "block",
@@ -601,15 +601,15 @@
       "description": "Required. The clusters where the Gateway API HTTPRoute resource will be deployed to. Valid entries include the associated entities IDs configured in the Target resource and \"@self\" to include the Target cluster.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.gateway_service_mesh.route_destinations.propagate_service": {
       "description": "Optional. Whether to propagate the Kubernetes Service to the route destination clusters. The Service will always be deployed to the Target cluster even if the HTTPRoute is not. This option may be used to facilitiate successful DNS lookup in the route destination clusters. Can only be set to true if destinations are specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.service_networking": {
       "type": "block",
@@ -620,29 +620,29 @@
       "description": "Required. Name of the Kubernetes Deployment whose traffic is managed by the specified Service.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.service_networking.disable_pod_overprovisioning": {
       "description": "Optional. Whether to disable Pod overprovisioning. If Pod overprovisioning is disabled then Cloud Deploy will limit the number of total Pods used for the deployment strategy to the number of Pods the Deployment has on the cluster.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.service_networking.pod_selector_label": {
       "description": "Optional. The label to use when selecting Pods for the Deployment resource. This label must already be present in the Deployment.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.canary.runtime_config.kubernetes.service_networking.service": {
       "description": "Required. Name of the Kubernetes Service.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.standard": {
       "type": "block",
@@ -653,8 +653,8 @@
       "description": "Whether to verify a deployment.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.standard.analysis": {
       "type": "block",
@@ -665,8 +665,8 @@
       "description": "Required. Duration of the analysis.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.standard.analysis.custom_checks": {
       "type": "block",
@@ -677,15 +677,15 @@
       "description": "Optional. Frequency of the custom check.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.standard.analysis.custom_checks.id": {
       "description": "Required. Unique identifier for the custom check.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.standard.analysis.custom_checks.task": {
       "type": "block",
@@ -701,29 +701,29 @@
       "description": "Optional. Args is the container arguments to use. This overrides the default arguments defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's runtime arguments, which can alter what the container executes or what resources it accesses at runtime."
     },
     "serial_pipeline.stages.strategy.standard.analysis.custom_checks.task.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's entrypoint, controlling what actually executes at runtime. An uncontrolled override could bypass the container's intended, vetted behaviour."
     },
     "serial_pipeline.stages.strategy.standard.analysis.custom_checks.task.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets environment variables inside the container, which can carry secrets or alter runtime behaviour in ways that bypass intended controls."
     },
     "serial_pipeline.stages.strategy.standard.analysis.custom_checks.task.container.image": {
       "description": "Required. Image is the container image to use.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which container image executes as part of the deployment pipeline. An unapproved or unpinned image is a supply-chain risk \u2014 arbitrary code could run as part of the deploy process."
     },
     "serial_pipeline.stages.strategy.standard.analysis.google_cloud": {
       "type": "block",
@@ -739,22 +739,22 @@
       "description": "Required. The list of alert policy names to check. Format: `projects/{project}/alertPolicies/{alert_policy}`.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.standard.analysis.google_cloud.alert_policy_checks.id": {
       "description": "Required. Unique identifier for the alert policy check.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.standard.analysis.google_cloud.alert_policy_checks.labels": {
       "description": "Optional. Labels to filter the alert policies.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational/monitoring configuration (timing, references to existing resources, or verification criteria) rather than an access or execution control \u2014 does not create new access paths or execute arbitrary code."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy": {
       "type": "block",
@@ -765,8 +765,8 @@
       "description": "Optional. A sequence of skaffold custom actions to invoke during execution of the postdeploy job.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies arbitrary skaffold custom actions that execute after deployment. Uncontrolled actions could run unapproved code as part of the pipeline."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks": {
       "type": "block",
@@ -782,29 +782,29 @@
       "description": "Optional. Args is the container arguments to use. This overrides the default arguments defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's runtime arguments, which can alter what the container executes or what resources it accesses at runtime."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's entrypoint, controlling what actually executes at runtime. An uncontrolled override could bypass the container's intended, vetted behaviour."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets environment variables inside the container, which can carry secrets or alter runtime behaviour in ways that bypass intended controls."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which container image executes as part of the deployment pipeline. An unapproved or unpinned image is a supply-chain risk \u2014 arbitrary code could run as part of the deploy process."
     },
     "serial_pipeline.stages.strategy.standard.predeploy": {
       "type": "block",
@@ -815,8 +815,8 @@
       "description": "Optional. A sequence of skaffold custom actions to invoke during execution of the predeploy job.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies arbitrary skaffold custom actions that execute before deployment. Uncontrolled actions could run unapproved code as part of the pipeline."
     },
     "serial_pipeline.stages.strategy.standard.predeploy.tasks": {
       "type": "block",
@@ -832,29 +832,29 @@
       "description": "Optional. Args is the container arguments to use. This overrides the default arguments defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's runtime arguments, which can alter what the container executes or what resources it accesses at runtime."
     },
     "serial_pipeline.stages.strategy.standard.predeploy.tasks.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's entrypoint, controlling what actually executes at runtime. An uncontrolled override could bypass the container's intended, vetted behaviour."
     },
     "serial_pipeline.stages.strategy.standard.predeploy.tasks.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets environment variables inside the container, which can carry secrets or alter runtime behaviour in ways that bypass intended controls."
     },
     "serial_pipeline.stages.strategy.standard.predeploy.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which container image executes as part of the deployment pipeline. An unapproved or unpinned image is a supply-chain risk \u2014 arbitrary code could run as part of the deploy process."
     },
     "serial_pipeline.stages.strategy.standard.verify_config": {
       "type": "block",
@@ -875,29 +875,29 @@
       "description": "Optional. Args is the container arguments to use. This overrides the default arguments defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's runtime arguments, which can alter what the container executes or what resources it accesses at runtime."
     },
     "serial_pipeline.stages.strategy.standard.verify_config.tasks.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Overrides the container's entrypoint, controlling what actually executes at runtime. An uncontrolled override could bypass the container's intended, vetted behaviour."
     },
     "serial_pipeline.stages.strategy.standard.verify_config.tasks.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets environment variables inside the container, which can carry secrets or alter runtime behaviour in ways that bypass intended controls."
     },
     "serial_pipeline.stages.strategy.standard.verify_config.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines which container image executes as part of the deployment pipeline. An unapproved or unpinned image is a supply-chain risk \u2014 arbitrary code could run as part of the deploy process."
     }
   }
 }
