@@ -4,6 +4,6 @@ resource "google_alloydb_instance" "compliant_example_1" {
   instance_type = "PRIMARY"
 
   database_flags = {
-    "alloydb.iam_authentication" = "on"
+    
   }
 }
