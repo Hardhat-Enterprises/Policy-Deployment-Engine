@@ -6,50 +6,50 @@
       "description": "Optional text the user can provide for additional, unstructured context.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is free-text informational metadata providing additional context for the exclusion. It has no effect on what traffic is excluded or how the exclusion behaves. Constraining it would not improve security posture."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls whether Terraform can destroy the security feedback exclusion list. The default value of DELETE allows unrestricted destructive operations. Deleting a security feedback resource removes the exclusion list, which could cause previously excluded legitimate traffic (such as penetration tests or internal systems) to suddenly trigger false-positive security alerts and potentially be blocked by security actions. A generic platform policy can require this to be set to PREVENT, blocking accidental or unauthorized deletion at the platform level without requiring team-specific values."
     },
     "display_name": {
       "description": "The display name of the feedback.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a display name for the exclusion list. It is purely informational metadata with no effect on what traffic is excluded or how the exclusion behaves. Constraining it would not improve security posture."
     },
     "feedback_id": {
       "description": "Resource ID of the security feedback.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the resource identifier for the security feedback. It is a naming identifier with no effect on security posture. A generic policy cannot constrain it without hardcoding team-specific naming schemes."
     },
     "feedback_type": {
       "description": "The type of feedback being submitted. Possible values: [\"EXCLUDED_DETECTION\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the type of feedback. Currently the only possible value is EXCLUDED_DETECTION. Since there is only one accepted value, a policy cannot meaningfully constrain this — every instance of this resource will use the same value. No security distinction exists between options."
     },
     "org_id": {
       "description": "The Apigee Organization associated with the Apigee Security Feedback,\nin the format 'organizations/{{org_name}}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to the parent Apigee Organization. The value is inherently team- or project-specific. A generic platform policy cannot constrain it without hardcoding specific organization identifiers. The security of the organization itself is governed by the google_apigee_organization resource."
     },
     "reason": {
       "description": "The reason for the feedback. Possible values: [\"INTERNAL_SYSTEM\", \"NON_RISK_CLIENT\", \"NAT\", \"PENETRATION_TEST\", \"OTHER\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This classifies why the exclusion is being made (internal system, non-risk client, NAT, penetration test, or other). All values are legitimate reasons for creating an exclusion. The reason is informational metadata that categorises the exclusion but does not change its behaviour. Constraining it would not improve security posture."
     },
     "feedback_contexts": {
       "type": "block",
@@ -60,15 +60,15 @@
       "description": "The attribute the user is providing feedback about. Possible values: [\"ATTRIBUTE_ENVIRONMENTS\", \"ATTRIBUTE_IP_ADDRESS_RANGES\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies whether the exclusion targets environments or IP address ranges. Both are legitimate exclusion scopes depending on the team's use case. A generic policy cannot determine which scope is appropriate without team-specific knowledge of their exclusion requirements."
     },
     "feedback_contexts.values": {
       "description": "The values of the attribute the user is providing feedback about, separated by commas.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the actual environment names or IP/CIDR ranges being excluded from abuse detection. The values are inherently team-specific — they depend on which environments or IP ranges the team needs to exclude (e.g. pen testing IPs, internal system ranges). A generic policy cannot constrain these without hardcoding team-specific values."
     }
   }
 }
