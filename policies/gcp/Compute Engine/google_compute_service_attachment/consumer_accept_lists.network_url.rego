@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_service_attachment.consumer_accept_lists.network_url
+package terraform.gcp.security.compute_engine.google_compute_service_attachment.consumer_accept_lists_network_url
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_service_attachment.vars
 
@@ -13,7 +13,7 @@ conditions := [
         {
             "condition": "network_url must be configured and not left empty",
             "attribute_path": ["consumer_accept_lists", 0, "network_url"],
-            "values": ["", ],
+            "values": ["",  null],
             "policy_type": "blacklist"
         }
     ]
