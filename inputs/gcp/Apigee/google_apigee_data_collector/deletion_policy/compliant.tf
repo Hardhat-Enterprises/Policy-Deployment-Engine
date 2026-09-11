@@ -1,7 +1,7 @@
 resource "google_apigee_data_collector" "compliant_example_1" {
   org_id            = "organizations/PDE-Apigee-Project"
-  data_collector_id = "dc_compliant_test"
+  data_collector_id = "dc_example_test"
   type              = "STRING"
-  description       = "Compliant example"
+  description       = "Example data collector"
   deletion_policy   = "PREVENT"
 }
