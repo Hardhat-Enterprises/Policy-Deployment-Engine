@@ -1,4 +1,4 @@
-package terraform.gcp.security.Container_Azure.google_container_azure_cluster.control_plane.ssh_config.authorized_key
+package terraform.gcp.security.Container_Azure.google_container_azure_cluster.control_plane_ssh_config_authorized_key
 
 import data.terraform.helpers
 import data.terraform.gcp.security.Container_Azure.google_container_azure_cluster.vars

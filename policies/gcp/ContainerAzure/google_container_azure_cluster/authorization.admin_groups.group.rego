@@ -1,4 +1,4 @@
-package terraform.gcp.security.Container_Azure.google_container_azure_cluster.authorization.admin_groups.group
+package terraform.gcp.security.Container_Azure.google_container_azure_cluster.authorization_admin_groups_group
 
 import data.terraform.helpers
 import data.terraform.gcp.security.Container_Azure.google_container_azure_cluster.vars

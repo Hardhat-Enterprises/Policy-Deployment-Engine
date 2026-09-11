@@ -1,4 +1,4 @@
-package terraform.gcp.security.Container_Azure.google_container_azure_cluster.control_plane.replica_placements.azure_availability_zone
+package terraform.gcp.security.Container_Azure.google_container_azure_cluster.control_plane_replica_placements_azure_availability_zone
 
 import data.terraform.helpers
 import data.terraform.gcp.security.Container_Azure.google_container_azure_cluster.vars

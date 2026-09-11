@@ -199,7 +199,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "The field controls the Azure availability zone used for control-plane replica placement, but it does not itself determine security controls such as access, encryption, authentication, or network exposure. While geographic placement can be relevant to residency, enforcing a global regional/zone whitelist is broader than the security semantics of this specific field. The field should therefore remain false rather than introducing a policy that pins or restricts specific Azure availability zones."
+      "rationale": "The Azure availability zone controls the geographic placement of control-plane replicas and can affect deployment resilience and regional placement requirements. Policy should restrict this attribute to approved availability zones."
     },
     "control_plane.replica_placements.subnet_id": {
       "description": "For a given replica, the ARM ID of the subnet where the control plane VM is deployed. Make sure it's a subnet under the virtual network in the cluster configuration.",
@@ -231,7 +231,6 @@
       "type": "string",
       "security_impact": true,
       "rationale": "Controls SSH-based administrative access to control plane machines. Policy should require valid, appropriately managed SSH keys and reject weak or improperly formatted keys without pinning a specific team's or user's key."
-    }
     },
     "fleet": {
       "type": "block",
@@ -272,3 +271,4 @@
       "rationale": "The field is an identifier/reference to an external Azure VNet resource and does not directly configure security controls such as access, encryption, or network exposure. Policy should therefore remain agnostic to the specific referenced resource rather than pinning or restricting the VNet ID."
     }
   }
+}
