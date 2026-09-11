@@ -73,6 +73,55 @@ def test_block_arguments_are_not_assessed():
 
 
 # --------------------------------------------------------------------------- #
+# Lost arguments: in the base branch's doc, gone from this branch's
+# --------------------------------------------------------------------------- #
+LEAF = {"security_impact": False, "rationale": "r"}
+BASE = {"arguments": {"name": LEAF, "fleet": {"type": "block"}, "fleet.project": LEAF}}
+
+
+def test_an_unchanged_doc_loses_nothing():
+    assert cr.check_no_lost_args(BASE, BASE) == []
+
+
+def test_a_deleted_leaf_is_named():
+    # A clean deletion passes the linter and check_doc_completeness alike: what is
+    # left in `arguments` is complete. Only the base branch knows it was there.
+    doc = {"arguments": {"name": LEAF, "fleet": {"type": "block"}}}
+    assert cr.check_doc_completeness(doc) == []
+    findings = cr.check_no_lost_args(doc, BASE)
+    assert len(findings) == 1
+    assert "fleet.project" in findings[0]
+
+
+def test_a_new_doc_is_not_compared():
+    assert cr.check_no_lost_args({"arguments": {"name": LEAF}}, None) == []
+
+
+def test_step_4_fails_naming_a_leaf_the_branch_deleted(monkeypatch, capsys):
+    # End to end through main(): the real doc on this checkout, against a base copy
+    # that still has one more leaf — the same as the branch having deleted it.
+    rel = Path("docs/gcp/API Hub/google_apihub_plugin.json")
+    real = json.loads((project_root / rel).read_text(encoding="utf-8"))
+    base = {**real, "arguments": {**real["arguments"], "deleted_leaf": LEAF}}
+    monkeypatch.setattr(cr, "load_base_doc", lambda ref, path: base)
+    assert cr.main(["--branch", "Service/gcp/api_hub/google_apihub_plugin",
+                    "--gate-only"]) == 1
+    out = capsys.readouterr().out
+    assert "[FAIL] Doc completeness" in out
+    assert "deleted_leaf" in out
+
+
+def test_the_base_doc_is_read_from_git():
+    base = cr.base_ref()
+    if base is None:
+        pytest.skip("no origin/dev locally")
+    rel = "docs/gcp/API Hub/google_apihub_plugin.json"
+    assert "arguments" in cr.load_base_doc(base, rel)
+    assert cr.load_base_doc(base, "docs/gcp/nope/nope.json") is None
+    assert cr.load_base_doc(None, rel) is None
+
+
+# --------------------------------------------------------------------------- #
 # True-arg coverage
 # --------------------------------------------------------------------------- #
 def _resource_tree(tmp_path, *, policy=None, fixture=None):
