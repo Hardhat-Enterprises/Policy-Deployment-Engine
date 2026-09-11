@@ -4,20 +4,21 @@ import data.terraform.helpers
 import data.terraform.gcp.security.Container_Azure.google_container_azure_cluster.vars
 
 conditions := [[
-	{
-		"situation_description": "The authorization.admin_users.username attribute must not use an explicitly prohibited administrator username.",
-		"remedies": ["Remove the prohibited administrator username from the authorization.admin_users.username attribute."],
-	},
-	{
-		"condition": "Check if the admin_users username is not a prohibited username.",
-		"attribute_path": ["authorization", 0, "admin_users", 0, "username"],
-		"values": ["UNAUTHORIZED_ADMIN_USER"],
-		"policy_type": "blacklist",
-	},
+    {
+        "situation_description": "If the authorization.admin_users.username attribute uses a reserved unauthorized administrator identifier, an unintended account may be granted administrative access to the cluster.",
+        "remedies": ["Use a valid administrator username that identifies only an intended cluster administrator."],
+    },
+    {
+        "condition": "Check that the admin_users username does not use the reserved unauthorized administrator naming pattern.",
+        "attribute_path": ["authorization", 0, "admin_users", 0, "username"],
+        "values": [
+            "UNAUTHORIZED-*-USER",
+            [["ADMIN"]],
+        ],
+        "policy_type": "pattern blacklist",
+    },
 ]]
 
 result := helpers.get_multi_summary(conditions, vars.variables)
-
 message := result.message
-
 details := result.details

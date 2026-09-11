@@ -11,7 +11,7 @@ resource "google_container_azure_cluster" "non_compliant_example_1" {
     }
 
     admin_groups {
-      group = "UNAUTHORIZED_ADMIN_GROUP"
+      group = "all-admins@example.com"
     }
   }
 

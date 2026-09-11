@@ -7,7 +7,7 @@ resource "google_container_azure_cluster" "non_compliant_example_1" {
 
   authorization {
     admin_users {
-      username = "UNAUTHORIZED_ADMIN_USER"
+      username = "UNAUTHORIZED-ADMIN-USER"
     }
 
     admin_groups {

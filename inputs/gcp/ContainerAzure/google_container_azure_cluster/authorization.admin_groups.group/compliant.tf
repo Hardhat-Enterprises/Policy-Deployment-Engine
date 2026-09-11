@@ -11,7 +11,7 @@ resource "google_container_azure_cluster" "compliant_example_1" {
     }
 
     admin_groups {
-      group = "admins@example.com"
+      group = "platform-admins@example.com"
     }
   }
 
