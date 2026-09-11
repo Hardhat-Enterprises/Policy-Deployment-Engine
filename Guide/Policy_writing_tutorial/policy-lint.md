@@ -206,6 +206,100 @@ The whole point of the pair is to isolate a single variable: if two things diffe
 flags the non-compliant resource, you cannot tell which of the two the policy actually caught.
 Fix it by making every other attribute identical between the two files.
 
+Two kinds of difference are **not** reported, because neither is a second variable:
+
+- **Naming your examples.** `odb_subnet_id = "compliant-example-1"` against
+  `"non-compliant-example-1"` is one label written twice. Any value that starts
+  `compliant-`/`compliant_` on the compliant side and `non-compliant-`/`non_compliant_` on the
+  other is read as naming, not drift. (Many GCP id fields reject underscores, which is why the
+  hyphenated form is what you have to write.)
+- **Values the provider derives from the one under test.** `google_service_account.email` is
+  built out of `account_id`; a regional resource's `target` URL contains its `region`. Changing
+  the argument necessarily changes them.
+
+### When the provider gives you no choice
+
+Occasionally the argument under test belongs to a set Terraform allows only one of —
+`predefined_acl` and `role_entity` on a `google_storage_object_acl`, `managed` and
+`self_managed` on a certificate. Showing a compliant and a non-compliant value of one of them
+*forces* the other to differ, and there is no version of the fixture that terraform will accept
+without that second difference.
+
+**Check first that it really is forced.** Most of these findings are an attribute that simply
+drifted while the fixture was being written, and those are yours to fix. The test that it is
+forced is simple: if you make the two files differ only on the argument under test, does
+`terraform plan` refuse the fixture? If it plans fine, the difference was yours to remove.
+
+Some of these you never have to declare at all:
+
+- **Write-only secrets.** A provider that takes a secret takes it twice — `private_key` and
+  `private_key_wo` (write-only, kept out of state), plus `private_key_wo_version`. Only one of
+  the pair may be set, so a fixture testing `private_key` has to carry the compliant secret as
+  `private_key_wo`. The linter recognises the `_wo` / `_wo_version` suffixes and treats the trio
+  as one setting, so none of them is ever reported as drift against the others. Nothing to
+  declare.
+- **The maintainer list.** A handful of older cases are listed in `FIXTURE_DRIFT_EXEMPT` in
+  `scripts/linters/policy_lint.py`. You cannot add to that one — it lives under `scripts/`, which
+  a `Service/` branch may not change.
+
+For everything else, declare it in your own resource's folder.
+
+### drift_exemptions.json
+
+An optional file inside your resource's policy folder — your branch owns it, so you can add it
+yourself and it can never conflict with another student's:
+
+    policies/<platform>/<service folder>/<resource_type>/drift_exemptions.json
+
+The key is the argument under test (the same name as your `.rego` file and your fixture folder).
+`keys` lists the *other* members of the mutually exclusive set, and `reason` says why the
+provider will not let you set both:
+
+    {
+      "private_key": {
+        "keys": ["private_key_wo"],
+        "reason": "Terraform allows only one of private_key or private_key_wo to be set."
+      }
+    }
+
+Two things to know before you reach for it:
+
+- **It is checked, not trusted.** The portal's AI review reads each entry during the policy
+  review and verifies it against the official Terraform registry documentation for this
+  resource, at the provider version your `docs/` JSON was generated from. An entry the
+  documentation does not support is rejected there and blocks the resource, with the normal
+  rebuttal path — so if you believe the rejection is wrong, escalate with your `terraform plan`
+  error output as evidence.
+- **A stale entry is a finding.** If the fixture is later rewritten so it no longer needs the
+  exemption, `drift-exemption-stale` fires. An entry that silences nothing today would silence a
+  real difference tomorrow.
+
+## drift-exemption-invalid
+
+Your `drift_exemptions.json` cannot be used as written. The file exempts **nothing** until this
+is fixed — a malformed entry never silences a finding by accident.
+
+Causes, all reported against the entry (or against `drift_exemptions` for the file itself):
+
+- the file is not valid JSON, or its top level is not an object;
+- an entry is not an object of the shape `{"keys": [...], "reason": "..."}`;
+- `keys` is missing, empty, or holds anything but non-empty argument names;
+- `reason` is missing or blank — an entry without a reason is a silenced finding, not a
+  recorded fact;
+- the entry's key, or one of its `keys`, is not a documented argument of this resource. Check it
+  against `docs/<platform>/<service folder>/<resource_type>.json`; a typo here exempts nothing
+  while looking like it works.
+
+## drift-exemption-stale
+
+An entry names a key the fixture does not actually differ on, so it is silencing nothing — and
+would quietly hide a real second difference if one appeared later. Remove the key, or the whole
+entry if that was its only one.
+
+You will also see this if you declared a pair the linter already handles without a file (the
+`_wo` write-only suffixes above), or one already in the maintainer list. The entry is redundant
+in both cases; deleting it changes nothing about whether your fixture passes.
+
 Bad — `public_access_prevention.rego`, but `storage_class` moved too:
 
     # compliant.tf
@@ -278,11 +372,15 @@ the two files are numbered independently of each other:
 
 ## fixture-missing-plan
 
-There's no committed plan cache for this fixture pair at `inputs/plan_cache/gcp/<sha>.json`. Run
-the test harness locally and commit what it produces:
+There's no committed plan for this fixture pair. Every fixture directory holds one, named
+`<sha>.json` for the hash of the `*.tf` beside it. Run the test harness locally and commit what
+it writes into your fixture directories:
 
     python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
-    git add inputs/plan_cache/
+    git add "inputs/gcp/<Service>/<resource type>"
+
+If you changed a fixture, the same run also deletes the plan of its previous version — commit
+that deletion too.
 
 See [Testing your policies](testing-policies.md#top) for the full local test loop.
 
