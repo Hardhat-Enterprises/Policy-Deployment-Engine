@@ -13,6 +13,6 @@ project = "735927692082"
   #synonyms_action
 
   redirect_action {
-    redirect_uri = "https://badexample.com/special-landing-page"
+    redirect_uri = "http://badexample.com/special-landing-page"
   }
  }
