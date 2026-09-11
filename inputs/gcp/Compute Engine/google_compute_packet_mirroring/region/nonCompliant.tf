@@ -1,14 +1,14 @@
 resource "google_compute_packet_mirroring" "non_compliant_example_1" {
     name = "non-compliant-example-1"
     network {
-        url = google_compute_network.default.id
+        url = "projects/example-project/global/networks/example-network"
     }
     collector_ilb {
-        url = google_compute_forwarding_rule.default.id
+        url = "projects/example-project/regions/australia-southeast1/forwardingRules/example-ilb"
     }
     mirrored_resources {
         subnetworks {
-            url = google_compute_subnetwork.default.id
+            url = "projects/example-project/regions/australia-southeast1/subnetworks/example-subnet"
         }
     }
     region = "us-central1"
