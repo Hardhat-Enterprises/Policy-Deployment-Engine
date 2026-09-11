@@ -9,7 +9,7 @@ resource "google_compute_service_attachment" "compliant_example_1" {
   nat_subnets              = ["google_compute_subnetwork.psc_ilb_nat.id"]
   target_service           = "google_compute_forwarding_rule.psc_ilb_target_service.id"
     consumer_accept_lists {
-      network_url = "network.consumer.url"
+      network_url = "google_compute_network.psc_ilb_consumer_network.self_link"
       connection_limit = 10
     }
 }

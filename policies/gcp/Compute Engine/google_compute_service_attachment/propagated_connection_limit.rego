@@ -13,7 +13,7 @@ conditions := [
         {
             "condition": "propagated_connection_limit must be configured to be under 50",
             "attribute_path": ["propagated_connection_limit"],
-            "values": [null, 16],
+            "values": [0, 15],
             "policy_type": "range"
         }
     ]
