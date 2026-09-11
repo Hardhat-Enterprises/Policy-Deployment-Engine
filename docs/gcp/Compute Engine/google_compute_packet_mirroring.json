@@ -34,7 +34,7 @@
       "description": "Since only one rule can be active at a time, priority is\nused to break ties in the case of two rules that apply to\nthe same instances.",
       "required": false,
       "type": "number",
-      "security_impact": true,
+      "security_impact": false,
       "rationale": "This argument resolves conflicts, determining which rule's configuration takes effect when rules overlap. This has security impacts as incorrect configurations can lead to broader or narrower mirroring rule than intended applying to a given instance, changing what traffic is captured."
     },
     "project": {
@@ -72,22 +72,22 @@
       "description": "IP CIDR ranges that apply as a filter on the source (ingress) or\ndestination (egress) IP in the IP header. Only IPv4 is supported.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "IPv4 CIDR ranges used to filter mirrored traffic by source or destination IP. The filter argument itself has critical security impacts in it filters and captures traffic while this argument configures the scope."
+      "security_impact": false,
+      "rationale": "IPv4 CIDR ranges used to filter mirrored traffic by source or destination IP. The filter argument filters and captures traffic while this argument itself configures its scope."
     },
     "filter.direction": {
       "description": "Direction of traffic to mirror. Default value: \"BOTH\" Possible values: [\"INGRESS\", \"EGRESS\", \"BOTH\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines whether inbound traffic, outbound traffic, or both get copied. This argument has security impacts in that it controls what traffic is captured."
+      "security_impact": false,
+      "rationale": "Determines whether inbound traffic, outbound traffic, or both get copied. This argument has no security impacts in that it controls what traffic is captured."
     },
     "filter.ip_protocols": {
       "description": "Possible IP protocols including tcp, udp, icmp and esp",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Restricts mirroring to specific protocols. This argument has security impacts in that it determines what kind of protocol types are captured."
+      "security_impact": false,
+      "rationale": "Restricts mirroring to specific protocols. This argument has no security impacts in that it determines what kind of protocol types are captured."
     },
     "mirrored_resources": {
       "type": "block",
@@ -98,8 +98,8 @@
       "description": "All instances with these tags will be mirrored.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Instances carrying specified network tags will be mirrored. This argument has direct security impacts as it directly determines which instances' traffic gets copied."
+      "security_impact": false,
+      "rationale": "Instances carrying specified network tags will be mirrored. This argument has no direct security impacts as it directly determines which instances' traffic gets copied."
     },
     "mirrored_resources.instances": {
       "type": "block",
