@@ -11,22 +11,22 @@ conditions := [
             ]
         },
         {
-            "condition": "Senstitive information keywords in plaintext must not be containted in metadata",
+            "condition": "Metadata variables that are associated with sensitive data must not contain information in plaintext",
             "attribute_path": ["preserved_state", 0, "metadata", "password"],
-            "values": ["*", [["password"]]],
-            "policy_type": "pattern blacklist"
+            "values": ["", null],
+            "policy_type": "whitelist"
         },
         {
-            "condition": "Senstitive information keywords in plaintext must not be containted in metadata",
+            "condition": "Metadata variables that are associated with sensitive data must not contain information in plaintext",
             "attribute_path": ["preserved_state", 0, "metadata", "api_key"],
-            "values": ["*", [["api_key"]]],
-            "policy_type": "pattern blacklist"
+            "values": ["", null],
+            "policy_type": "whitelist"
         },
         {
-            "condition": "Senstitive information keywords in plaintext must not be containted in metadata",
+            "condition": "Metadata variables that are associated with sensitive data must not contain information in plaintext",
             "attribute_path": ["preserved_state", 0, "metadata", "access_token"],
-            "values": ["*", [["access_token"]]],
-            "policy_type": "pattern blacklist"
+            "values": ["", null],
+            "policy_type": "whitelist"
         }
     ]
     
