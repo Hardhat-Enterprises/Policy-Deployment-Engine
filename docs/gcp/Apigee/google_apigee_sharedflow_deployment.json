@@ -35,7 +35,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This argument sets the runtime identity of the deployed sharedflow and determines what GCP resources and APIs it can access. According to GCP documentation, the service account represents the identity of the deployed proxy and determines what permissions it has. When left unset, the deployment may operate without a scoped identity, violating the principle of least privilege. A generic platform policy can require that this field is explicitly set (non-empty) for every deployment, ensuring teams assign a dedicated service account with appropriately scoped permissions rather than relying on defaults or no identity."
+      "rationale": "This argument sets the runtime identity of the deployed sharedflow and determines what GCP resources and APIs it can access. Per GCP documentation, the service account represents the identity of the deployed proxy and determines what permissions it has. The format must be {ACCOUNT_ID}@{PROJECT}.iam.gserviceaccount.com. When left unset, the deployment operates without a scoped identity, violating the principle of least privilege. The policy enforces both presence (blacklist null/empty) and structural format validation via pattern whitelist (*@*.iam.gserviceaccount.com). The allowed values in the pattern whitelist are organisation-configurable placeholders; the structural pattern itself is the platform-level control, consistent with the kms_key_name pattern used in Artifact Registry policies."
     },
     "sharedflow_id": {
       "description": "Id of the Sharedflow to be deployed.",
