@@ -223,6 +223,10 @@ jobs:
       - name: Set up plugin cache config
         run: bash scripts/auto_test/cache_setup.sh
 
+      # Doc completeness compares the resource doc with the base branch's copy.
+      - name: Fetch base branch
+        run: git fetch --depth=1 origin "$GITHUB_BASE_REF"
+
       - name: Per-resource gate (doc completeness, coverage, OPA)
         id: policy-checks
         env:
