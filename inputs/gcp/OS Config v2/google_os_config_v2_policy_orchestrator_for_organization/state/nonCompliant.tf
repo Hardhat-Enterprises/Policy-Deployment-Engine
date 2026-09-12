@@ -3,7 +3,7 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "non_complia
   organization_id        = "123456789"
 
   state  = "STOPPED"
-  action = "DELETE"
+  action = "UPSERT"
 
   orchestrated_resource {
     id = "test-orchestrated-resource-org"
@@ -11,9 +11,7 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "non_complia
     os_policy_assignment_v1_payload {
       os_policies {
         id   = "test-os-policy-org"
-        mode = "VALIDATION"
-
-        allow_no_resource_group_match = true
+        mode = "ENFORCEMENT"
 
         resource_groups {
           resources {
@@ -22,7 +20,7 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "non_complia
             file {
               content = "file-content-tf"
               path    = "/etc/example.conf"
-              state   = "ABSENT"
+              state   = "PRESENT"
             }
           }
         }
@@ -31,7 +29,6 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "non_complia
       instance_filter {
         inventories {
           os_short_name = "windows-10"
-          os_version    = "10.*"
         }
       }
 
@@ -52,7 +49,7 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "non_complia
   orchestration_scope {
     selectors {
       location_selector {
-        included_locations = [""]
+        included_locations = ["us-central1-a"]
       }
     }
   }
