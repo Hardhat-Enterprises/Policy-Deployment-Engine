@@ -6,33 +6,38 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_feature_online_sto
 conditions := [
     [
         {
-            "situation_description": "The Feature Online Store does not use a customer-managed encryption key, so data is not always encrypted with a CMEK.",
+            "situation_description": "The Feature Online Store key is not a valid customer-managed encryption key.",
             "remedies": [
-                "Set 'encryption_spec.kms_key_name' to a Cloud KMS key in the form projects/PROJECT/locations/LOCATION/keyRings/RING/cryptoKeys/KEY."
+                "Set 'encryption_spec.kms_key_name' to projects/{project}/locations/{location}/keyRings/{keyring}/cryptoKeys/{key}"
             ]
         },
         {
-            "condition": "A customer-managed encryption key must be set",
+            "condition": "kms_key_name must not be empty or invalid",
             "attribute_path": ["encryption_spec", 0, "kms_key_name"],
-            "values": [null],
+            "values": [null, "", "invalid-kms-key"],
             "policy_type": "blacklist"
         }
     ],
     [
         {
-            "situation_description": "The Feature Online Store CMEK key is in a region outside the approved Australian regions.",
+            "situation_description": "The Feature Online Store CMEK key must follow the approved key pattern.",
             "remedies": [
-                "Set 'encryption_spec.kms_key_name' to a Cloud KMS key whose location is australia-southeast1 or australia-southeast2."
+                "Use format: projects/{project}/locations/{location}/keyRings/{keyring}/cryptoKeys/{key}"
             ]
         },
         {
-            "condition": "CMEK key location must not be a non-approved region",
+            "condition": "kms_key_name must follow approved CMEK key pattern",
             "attribute_path": ["encryption_spec", 0, "kms_key_name"],
             "values": [
                 "projects/*/locations/*/keyRings/*/cryptoKeys/*",
-                [["__none__"], ["us-central1", "us-east1", "europe-west1", "global"], ["__none__"], ["__none__"]]
+                [
+                    ["example-project", "project-1", "project-2"],
+                    ["australia-southeast1", "australia-southeast2"],
+                    ["example-ring", "artifact-ring", "platform-ring"],
+                    ["example-key", "artifact-key", "repo-key"]
+                ]
             ],
-            "policy_type": "pattern blacklist"
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
