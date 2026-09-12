@@ -46,7 +46,6 @@
       "type": "block",
       "description": "Execution configuration for a workload.",
       "required": false
-
     },
     "environment_config.execution_config.idle_ttl": {
       "description": "The duration to keep the session alive while it's idling.\nExceeding this threshold causes the session to terminate. Minimum value is 10 minutes; maximum value is 14 day.\nDefaults to 1 hour if not set. If both ttl and idleTtl are specified for an interactive session, the conditions\nare treated as OR conditions: the workload will be terminated when it has been idle for idleTtl or when ttl has\nbeen exceeded, whichever occurs first.",
@@ -60,35 +59,35 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Specifies the cloud kms key used to encrypt the workload. "
+      "rationale": "Customer-managed encryption keys protect data for session execution workloads. The policy must require kms_key to be explicitly set and non-empty, without pinning any specific key resource name."
     },
     "environment_config.execution_config.network_tags": {
       "description": "Tags used for network traffic control.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Network tags can affect the firewall rules and network controls applied to the workload. "
+      "security_impact": false,
+      "rationale": "Network tags are references to team-defined firewall groupings rather than an enforceable platform control, so a generic platform policy cannot meaningfully constrain them."
     },
     "environment_config.execution_config.service_account": {
       "description": "Service account that used to execute workload.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "The service account determines the identity used by the workload and therefore the permissions available to it."
+      "rationale": "The run-as identity determines the privilege of the workload. The policy must require an explicit, non-default service account and must not pin any specific team-owned account."
     },
     "environment_config.execution_config.staging_bucket": {
       "description": "A Cloud Storage bucket used to stage workload dependencies, config files, and store\nworkload output and other ephemeral data, such as Spark history files. If you do not specify a staging bucket,\nCloud Dataproc will determine a Cloud Storage location according to the region where your workload is running,\nand then create and manage project-level, per-location staging and temporary buckets.\nThis field requires a Cloud Storage bucket name, not a gs://... URI to a Cloud Storage bucket.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The staging bucket can hold workload dependencies, configuration, and output data, so the bucked used by the workload can affect data protection. "
+      "security_impact": false,
+      "rationale": "The staging bucket is a reference to another resource rather than a platform policy target; its protections are governed by the bucket resource itself."
     },
     "environment_config.execution_config.subnetwork_uri": {
       "description": "Subnetwork configuration for workload execution.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the subnetwork used by the workload and can affect which network resources and controls it can reach. "
+      "security_impact": false,
+      "rationale": "The subnetwork URI is a network pointer to a team-chosen resource rather than a platform policy target; the relevant controls belong to the subnetwork itself."
     },
     "environment_config.execution_config.ttl": {
       "description": "The duration after which the workload will be terminated.\nWhen the workload exceeds this duration, it will be unconditionally terminated without waiting for ongoing\nwork to finish. If ttl is not specified for a session workload, the workload will be allowed to run until it\nexits naturally (or run forever without exiting). If ttl is not specified for an interactive session,\nit defaults to 24 hours. If ttl is not specified for a batch that uses 2.1+ runtime version, it defaults to 4 hours.\nMinimum value is 10 minutes; maximum value is 14 days. If both ttl and idleTtl are specified (for an interactive session),\nthe conditions are treated as OR conditions: the workload will be terminated when it has been idle for idleTtl or\nwhen ttl has been exceeded, whichever occurs first.",
@@ -162,21 +161,21 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the container image used for workload runtime, which determines the software and dependencies running in the workload. "
+      "rationale": "The container image determines what code executes in the session. The policy must require the image to come from an approved registry and forbid untrusted or unpinned sources."
     },
     "runtime_config.properties": {
       "description": "A mapping of property names to values, which are used to configure workload execution.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Runtime properties can change how the workload runs, including settings that effect security and data handling. "
+      "security_impact": false,
+      "rationale": "Runtime properties are a free-form configuration map of team engine choices that a generic platform policy cannot meaningfully constrain."
     },
     "runtime_config.version": {
       "description": "Version of the session runtime.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The runtime version determines the software environment used by the workload, so restricting versions helps avoid unsupported or vulnerable runtimes. "
+      "security_impact": false,
+      "rationale": "Runtime version selection is a team choice from vendor-supported versions and is therefore out of scope for platform security policy."
     },
     "spark_connect_session": {
       "type": "block",
