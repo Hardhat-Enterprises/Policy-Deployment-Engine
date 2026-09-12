@@ -13,8 +13,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the project in which the encryption specification is created. Platform policy should not constrain team-specific project identifiers or references."
     },
     "encryption_spec": {
       "type": "block",
@@ -25,8 +25,8 @@
       "description": "The name of customer-managed encryption key that is used to secure a resource and its sub-resources.\nIf empty, the resource is secured by the default Google encryption key.\nOnly the key in the same location as this resource is allowed to be used for encryption.\nFormat: projects/{project}/locations/{location}/keyRings/{keyRing}/cryptoKeys/{key}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets the customer-managed encryption key used to protect the resource and its sub-resources. A policy should require this value to be non-empty so customer-managed encryption is used instead of the default Google-managed key; it must not require a specific key because keys are team and project specific."
     }
   }
 }
