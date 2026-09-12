@@ -6,9 +6,23 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_index_endpoint_dep
 conditions := [
     [
         {
-            "situation_description": "An allowed JWT audience is a wildcard or overly broad value. Audiences must be specific so only intended clients are accepted.",
+            "situation_description": "The deployed index does not set a list of allowed JWT audiences, so access is not restricted to intended audiences.",
             "remedies": [
-                "Set each entry in 'audiences' to a specific intended audience, not a wildcard or empty value."
+                "Set 'audiences' to the list of intended audiences."
+            ]
+        },
+        {
+            "condition": "audiences must be set",
+            "attribute_path": ["deployed_index_auth_config", 0, "auth_provider", 0, "audiences"],
+            "values": [null],
+            "policy_type": "blacklist"
+        }
+    ],
+    [
+        {
+            "situation_description": "An allowed JWT audience is a wildcard or overly broad value. Audiences must be specific.",
+            "remedies": [
+                "Set each entry in 'audiences' to a specific intended audience, not a wildcard."
             ]
         },
         {

@@ -6,6 +6,20 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_index_endpoint_dep
 conditions := [
     [
         {
+            "situation_description": "The deployed index does not set a list of allowed JWT issuers, so authentication is not restricted to trusted issuers.",
+            "remedies": [
+                "Set 'allowed_issuers' to a list of trusted service accounts."
+            ]
+        },
+        {
+            "condition": "allowed_issuers must be set",
+            "attribute_path": ["deployed_index_auth_config", 0, "auth_provider", 0, "allowed_issuers"],
+            "values": [null],
+            "policy_type": "blacklist"
+        }
+    ],
+    [
+        {
             "situation_description": "An allowed JWT issuer is not a Google service account. Only service-account issuers should be trusted.",
             "remedies": [
                 "Set each entry in 'allowed_issuers' to a service account of the form name@project.iam.gserviceaccount.com."
