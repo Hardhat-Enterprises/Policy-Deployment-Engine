@@ -10,9 +10,15 @@ gh-CLI-via-subprocess pattern as manage_pr_labels.py.
 import os
 import sys
 import subprocess
+import re
+
 
 MARKER = "<!-- pde-apc-result -->"
 
+def next_update_count(old_body: str) -> int:
+    """Count the next edit of an existing APC comment."""
+    match = re.search(r"^Updates: ([0-9]+)$", old_body, re.MULTILINE)
+    return int(match.group(1)) + 1 if match else 1
 
 def find_existing_comment_id(pr_number: str) -> str | None:
     """Return the numeric ID of the existing APC comment, if any."""
@@ -38,7 +44,9 @@ def find_existing_comment_id(pr_number: str) -> str | None:
     return comment_ids[-1] if comment_ids else None
 
 
-def build_comment_body(pr_number: str, check_outcome: str) -> str:
+def build_comment_body(
+    pr_number: str, check_outcome: str, update_count: int = 0
+) -> str:
     """Build the short, sticky APC comment body per issue #405's spec:
     short status + a link to the latest full log, no inline error detail."""
     status_emoji = "\u2705 PASSED" if check_outcome == "success" else "\u274c FAILED"
@@ -51,6 +59,7 @@ def build_comment_body(pr_number: str, check_outcome: str) -> str:
         f"### \U0001f50d APC Result: {status_emoji}\n\n"
         f"See full details in the [workflow run log]({run_url}).\n\n"
         f"Please reference latest auto-test comment.\n\n"
+        f"Updates: {update_count}\n\n"
         f"{MARKER}"
     )
 
@@ -60,6 +69,22 @@ def create_or_update_comment(pr_number: str, body: str) -> int:
     existing_id = find_existing_comment_id(pr_number)
 
     if existing_id:
+        old_comment = subprocess.run(
+            [
+                "gh", "api",
+                f"repos/{{owner}}/{{repo}}/issues/comments/{existing_id}",
+                "--jq", ".body",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        if old_comment.returncode != 0:
+            print(f"Could not read existing APC comment: {old_comment.stderr}")
+            return 1
+
+        count = next_update_count(old_comment.stdout)
+        body = body.replace("Updates: 0\n", f"Updates: {count}\n", 1)
+
         print(f"Existing APC comment found (id={existing_id}) - updating it.")
         result = subprocess.run(
             ["gh", "api", f"repos/{{owner}}/{{repo}}/issues/comments/{existing_id}",

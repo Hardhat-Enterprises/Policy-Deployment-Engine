@@ -167,3 +167,69 @@ def test_comment_write_failure_returns_nonzero():
         )
 
     assert result == 1
+
+def test_comment_body_shows_update_count():
+    body = manage_pr_comment.build_comment_body(
+        "481", "success", update_count=2
+    )
+
+    assert "Updates: 2" in body
+
+@pytest.mark.parametrize(
+    ("old_body", "expected"),
+    [
+        ("APC Result\n<!-- pde-apc-result -->", 1),
+        ("APC Result\nUpdates: 2\n<!-- pde-apc-result -->", 3),
+    ],
+)
+def test_next_update_count(old_body, expected):
+    assert manage_pr_comment.next_update_count(old_body) == expected
+
+def test_existing_comment_increments_count_before_patch():
+    new_body = manage_pr_comment.build_comment_body("481", "success")
+    old_body = "APC Result\nUpdates: 2\n<!-- pde-apc-result -->"
+
+    with (
+        patch.object(
+            manage_pr_comment,
+            "find_existing_comment_id",
+            return_value="202",
+        ),
+        patch.object(
+            manage_pr_comment.subprocess,
+            "run",
+            side_effect=[
+                completed_process(stdout=old_body),
+                completed_process(),
+            ],
+        ) as run_mock,
+    ):
+        result = manage_pr_comment.create_or_update_comment("481", new_body)
+
+    assert result == 0
+    assert "issues/comments/202" in run_mock.call_args_list[0].args[0][2]
+    patch_command = run_mock.call_args_list[1].args[0]
+    assert "issues/comments/202" in patch_command[2]
+    assert "Updates: 3" in patch_command[-1]
+
+def test_read_failure_does_not_patch_comment():
+    body = manage_pr_comment.build_comment_body("481", "success")
+
+    with (
+        patch.object(
+            manage_pr_comment,
+            "find_existing_comment_id",
+            return_value="202",
+        ),
+        patch.object(
+            manage_pr_comment.subprocess,
+            "run",
+            return_value=completed_process(
+                returncode=1, stderr="GitHub API failure"
+            ),
+        ) as run_mock,
+    ):
+        result = manage_pr_comment.create_or_update_comment("481", body)
+
+    assert result == 1
+    assert run_mock.call_count == 1
