@@ -3,4 +3,11 @@ resource "google_vertex_ai_index_endpoint_deployed_index" "non_compliant_example
   region            = "australia-southeast1"
   index             = "projects/example-project/locations/australia-southeast1/indexes/example-index"
   index_endpoint    = "projects/example-project/locations/australia-southeast1/indexEndpoints/example-endpoint"
+
+  deployed_index_auth_config {
+    auth_provider {
+      allowed_issuers = ["attacker@gmail.com"]
+      audiences       = ["example-audience"]
+    }
+  }
 }
