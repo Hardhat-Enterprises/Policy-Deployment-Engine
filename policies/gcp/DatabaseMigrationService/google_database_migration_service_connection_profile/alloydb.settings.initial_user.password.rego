@@ -1,4 +1,4 @@
-package terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.oracle_private_connectivity_private_connection
+package terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.alloydb_settings_initial_user_password
 
 import data.terraform.gcp.security.database_migration_service.google_database_migration_service_connection_profile.vars
 
@@ -9,13 +9,14 @@ violating_resources contains name if {
     resource := input.planned_values.root_module.resources[_]
     resource.type == resource_type
     name := resource.values[resource_value_name]
-    not resource.values.oracle[0].private_connectivity[0].private_connection
+    v := resource.values.alloydb[0].settings[0].initial_user[0].password
+    v != "secure-password"
 }
 
 message := [
-    "Situation 1: Oracle profiles must use private connectivity.",
+    "Situation 1: AlloyDB initial user password is not set to the approved secure value.",
     sprintf("Non-Compliant Resources: %s", [concat(", ", violating_resources)]),
-    "Potential Remedies: Set private_connectivity.private_connection to a valid URI.",
+    "Potential Remedies: Set alloydb.settings.initial_user.password to the approved secure value.",
 ] if {
     count(violating_resources) > 0
 }

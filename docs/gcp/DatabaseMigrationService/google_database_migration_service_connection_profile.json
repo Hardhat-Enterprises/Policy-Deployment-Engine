@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls Terraform deletion behaviour for the connection profile resource. It does not directly configure database access, encryption, networking, or authentication."
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the connection profile. Preventing deletion helps avoid accidental removal of database migration connectivity configuration."
     },
     "display_name": {
       "description": "The connection profile display name.",
@@ -97,8 +97,8 @@
       "description": "The initial password for the user.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Stores an initial database password value for provisioning. Secret handling is security-sensitive operationally, but this field is not a policy-enforceable configuration choice in this resource."
+      "security_impact": true,
+      "rationale": "Sets the initial AlloyDB user password. This is sensitive credential material and directly affects access to the database."
     },
     "alloydb.settings.initial_user.user": {
       "description": "The database username.",
@@ -209,8 +209,8 @@
       "description": "The database flags passed to the Cloud SQL instance at startup.",
       "required": false,
       "type": "map(string)",
-      "security_impact": false,
-      "rationale": "Database flags tune Cloud SQL instance behaviour. This generic map can affect runtime configuration but is not a single direct security control in this policy set."
+      "security_impact": true,
+      "rationale": "Configures Cloud SQL database flags. Database flags can affect authentication, network exposure, logging, encryption, and other security-relevant behaviour."
     },
     "cloudsql.settings.database_version": {
       "description": "The database engine type and version.\nCurrently supported values located at https://cloud.google.com/database-migration/docs/reference/rest/v1/projects.locations.connectionProfiles#sqldatabaseversion",
@@ -399,7 +399,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides the private key for client certificate authentication. It is sensitive credential material and should be protected, but the policy decision is the SSL mode."
+      "rationale": "Provides private key material for MySQL SSL client authentication. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
     },
     "mysql.ssl.type": {
       "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
@@ -462,14 +462,14 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Defines the SSH tunnel endpoint used for Oracle connectivity. An incorrect or unapproved host can route migration traffic through an unsafe destination."
+      "rationale": "Configures the host used for Oracle forward SSH connectivity. This affects the network path used to reach the database."
     },
     "oracle.forward_ssh_connectivity.password": {
       "description": "Input only. SSH password. Only one of 'password' and 'private_key' can be configured.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides SSH password material. It is sensitive credential material and should be protected, but it is not a policy decision in this resource."
+      "rationale": "Provides password material for Oracle forward SSH connectivity. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
     },
     "oracle.forward_ssh_connectivity.port": {
       "description": "Port for the SSH tunnel, default value is 22.",
@@ -483,7 +483,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides SSH private key material. It is sensitive credential material and should be protected, but it is not a policy decision in this resource."
+      "rationale": "Provides private key material for Oracle forward SSH connectivity. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
     },
     "oracle.forward_ssh_connectivity.username": {
       "description": "Required. Username for the SSH tunnel.",
@@ -504,7 +504,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Defines the private connection used to reach the Oracle database. Requiring private connectivity reduces exposure to public network paths."
+      "rationale": "Configures private connectivity for Oracle database access. Requiring private connectivity reduces public network exposure."
     },
     "oracle.ssl": {
       "type": "block",
@@ -518,21 +518,21 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides CA certificate material for SSL verification. It supports encrypted connectivity but is credential material rather than a policy decision in this resource."
+      "rationale": "Provides CA certificate material for Oracle SSL verification. It supports secure connectivity, but the certificate body is sensitive material rather than a stable policy decision in this resource."
     },
     "oracle.ssl.client_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides client certificate material for SSL authentication. It is sensitive credential material rather than a policy decision in this resource."
+      "rationale": "Provides client certificate material for Oracle SSL authentication. It is sensitive credential material rather than a stable policy decision in this resource."
     },
     "oracle.ssl.client_key": {
       "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides the private key for client certificate authentication. It is sensitive credential material and should be protected, but it is not a policy decision in this resource."
+      "rationale": "Provides private key material for Oracle SSL client authentication. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
     },
     "oracle.static_service_ip_connectivity": {
       "type": "block",
@@ -608,8 +608,8 @@
       "description": "Required. The resource name (URI) of the private connection.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines a private connection for PostgreSQL connectivity. This can reduce network exposure, but this branch does not currently include a policy for this field."
+      "security_impact": true,
+      "rationale": "Configures private connectivity for PostgreSQL database access. Requiring private connectivity reduces public network exposure."
     },
     "postgresql.ssl": {
       "type": "block",
@@ -623,21 +623,21 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides CA certificate material for SSL verification. It supports encrypted connectivity but is credential material rather than a policy decision in this resource."
+      "rationale": "Provides CA certificate material for PostgreSQL SSL verification. It supports secure connectivity, but the certificate body is sensitive material rather than a stable policy decision in this resource."
     },
     "postgresql.ssl.client_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides client certificate material for SSL authentication. It is sensitive credential material rather than a policy decision in this resource."
+      "rationale": "Provides client certificate material for PostgreSQL SSL authentication. It is sensitive credential material rather than a stable policy decision in this resource."
     },
     "postgresql.ssl.client_key": {
       "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Provides the private key for client certificate authentication. It is sensitive credential material and should be protected, but the policy decision is the SSL mode."
+      "rationale": "Provides private key material for PostgreSQL SSL client authentication. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
     },
     "postgresql.ssl.type": {
       "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
