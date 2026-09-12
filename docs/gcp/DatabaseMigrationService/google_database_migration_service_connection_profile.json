@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls Terraform deletion behaviour for the connection profile resource. It does not directly configure database access, encryption, networking, or authentication."
     },
     "display_name": {
       "description": "The connection profile display name.",
@@ -48,13 +48,15 @@
       "description": "The connection profile role. Possible values: [\"SOURCE\", \"DESTINATION\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines whether the profile is used as a source or destination. It controls migration role selection, not a direct security enforcement mechanism."
     },
     "alloydb": {
       "type": "block",
       "description": "Specifies required connection parameters, and the parameters required to create an AlloyDB destination cluster.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for AlloyDB connection settings. Security decisions are made by its nested fields rather than this block itself."
     },
     "alloydb.cluster_id": {
       "description": "Required. The AlloyDB cluster ID that this connection profile is associated with.",
@@ -66,14 +68,16 @@
     "alloydb.settings": {
       "type": "block",
       "description": "Immutable. Metadata used to create the destination AlloyDB cluster.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for AlloyDB settings. Security impact is determined by the specific nested configuration fields."
     },
     "alloydb.settings.labels": {
       "description": "Labels for the AlloyDB cluster created by DMS.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are metadata for organisation and filtering. They do not directly configure access, encryption, networking, or authentication."
     },
     "alloydb.settings.vpc_network": {
       "description": "Required. The resource link for the VPC network in which cluster resources are created and from which they are accessible via Private IP. The network must belong to the same project as the cluster.\nIt is specified in the form: 'projects/{project_number}/global/networks/{network_id}'. This is required to create a cluster.",
@@ -85,69 +89,79 @@
     "alloydb.settings.initial_user": {
       "type": "block",
       "description": "Required. Input only. Initial user to setup during cluster creation.",
-      "required": true
+      "required": true,
+      "security_impact": false,
+      "rationale": "Container block for initial AlloyDB user details. The nested username and password fields carry the relevant meaning."
     },
     "alloydb.settings.initial_user.password": {
       "description": "The initial password for the user.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Stores an initial database password value for provisioning. Secret handling is security-sensitive operationally, but this field is not a policy-enforceable configuration choice in this resource."
     },
     "alloydb.settings.initial_user.user": {
       "description": "The database username.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the initial database username. It is an identity label for provisioning and does not by itself grant permissions or enforce a security control."
     },
     "alloydb.settings.primary_instance_settings": {
       "type": "block",
       "description": "Settings for the cluster's primary instance",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for AlloyDB primary instance settings. Security impact is determined by specific nested settings."
     },
     "alloydb.settings.primary_instance_settings.database_flags": {
       "description": "Database flags to pass to AlloyDB when DMS is creating the AlloyDB cluster and instances. See the AlloyDB documentation for how these can be used.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Database flags tune AlloyDB instance behaviour. This generic map can affect runtime configuration but is not a single direct security control in this policy set."
     },
     "alloydb.settings.primary_instance_settings.id": {
       "description": "The database username.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the primary AlloyDB instance created by DMS. It is a resource identifier rather than a direct security control."
     },
     "alloydb.settings.primary_instance_settings.labels": {
       "description": "Labels for the AlloyDB primary instance created by DMS.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are metadata for the AlloyDB primary instance and do not directly enforce security behaviour."
     },
     "alloydb.settings.primary_instance_settings.machine_config": {
       "type": "block",
       "description": "Configuration for the machines that host the underlying database engine.",
-      "required": true
+      "required": true,
+      "security_impact": false,
+      "rationale": "Container block for machine sizing settings. CPU count affects capacity rather than directly enforcing a security control."
     },
     "alloydb.settings.primary_instance_settings.machine_config.cpu_count": {
       "description": "The number of CPU's in the VM instance.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets compute capacity for the AlloyDB primary instance. It affects sizing and performance, not direct security enforcement."
     },
     "cloudsql": {
       "type": "block",
       "description": "Specifies required connection parameters, and, optionally, the parameters required to create a Cloud SQL destination database instance.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for Cloud SQL connection settings. Security decisions are made by its nested fields rather than this block itself."
     },
     "cloudsql.settings": {
       "type": "block",
       "description": "Immutable. Metadata used to create the destination Cloud SQL database.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for Cloud SQL settings. Security impact is determined by the specific nested configuration fields."
     },
     "cloudsql.settings.activation_policy": {
       "description": "The activation policy specifies when the instance is activated; it is applicable only when the instance state is 'RUNNABLE'. Possible values: [\"ALWAYS\", \"NEVER\"]",
@@ -195,8 +209,8 @@
       "description": "The database flags passed to the Cloud SQL instance at startup.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Database flags tune Cloud SQL instance behaviour. This generic map can affect runtime configuration but is not a single direct security control in this policy set."
     },
     "cloudsql.settings.database_version": {
       "description": "The database engine type and version.\nCurrently supported values located at https://cloud.google.com/database-migration/docs/reference/rest/v1/projects.locations.connectionProfiles#sqldatabaseversion",
@@ -257,7 +271,9 @@
     "cloudsql.settings.ip_config": {
       "type": "block",
       "description": "The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance. The IPv4 address cannot be disabled.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for Cloud SQL IP configuration. Security decisions are represented by nested network fields such as SSL, private network, and authorized networks."
     },
     "cloudsql.settings.ip_config.enable_ipv4": {
       "description": "Whether the instance should be assigned an IPv4 address or not.",
@@ -283,40 +299,44 @@
     "cloudsql.settings.ip_config.authorized_networks": {
       "type": "block",
       "description": "The list of external networks that are allowed to connect to the instance using the IP.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for authorized network entries. The actual security decision is the nested network value."
     },
     "cloudsql.settings.ip_config.authorized_networks.expire_time": {
       "description": "The time when this access control entry expires in RFC 3339 format.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets when an authorized-network entry expires. It supports lifecycle control, but the security boundary is the authorized network value itself."
     },
     "cloudsql.settings.ip_config.authorized_networks.label": {
       "description": "A label to identify this entry.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels an authorized-network entry for identification. It does not directly grant or restrict access."
     },
     "cloudsql.settings.ip_config.authorized_networks.ttl": {
       "description": "Input only. The time-to-leave of this access control entry.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the lifetime of an authorized-network entry. It supports lifecycle control, but the security boundary is the authorized network value itself."
     },
     "cloudsql.settings.ip_config.authorized_networks.value": {
       "description": "The allowlisted value for the access control list.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the external network range allowed to connect to the Cloud SQL instance. Overly broad values can expose the database to untrusted networks."
     },
     "mysql": {
       "type": "block",
       "description": "Specifies connection parameters required specifically for MySQL databases.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for MySQL connection settings. Security impact is determined by nested SSL and credential fields."
     },
     "mysql.cloud_sql_id": {
       "description": "If the connection profile is a Cloud SQL database, use this field to provide the Cloud SQL instance ID.",
@@ -356,40 +376,44 @@
     "mysql.ssl": {
       "type": "block",
       "description": "SSL configuration for the destination to connect to the source database.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for MySQL SSL settings. The SSL mode field controls the security behaviour."
     },
     "mysql.ssl.ca_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate.\nThe replica will use this certificate to verify it's connecting to the right host.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides CA certificate material for SSL verification. It supports encrypted connectivity but is credential material rather than a policy decision in this resource."
     },
     "mysql.ssl.client_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides client certificate material for SSL authentication. It is sensitive credential material rather than a policy decision in this resource."
     },
     "mysql.ssl.client_key": {
       "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides the private key for client certificate authentication. It is sensitive credential material and should be protected, but the policy decision is the SSL mode."
     },
     "mysql.ssl.type": {
       "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the SSL mode used for MySQL connectivity. Weak or disabled SSL can expose database migration traffic to interception."
     },
     "oracle": {
       "type": "block",
       "description": "Specifies connection parameters required specifically for Oracle databases.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for Oracle connection settings. Security impact is determined by nested connectivity and SSL fields."
     },
     "oracle.database_service": {
       "description": "Required. Database service for the Oracle connection.",
@@ -429,90 +453,100 @@
     "oracle.forward_ssh_connectivity": {
       "type": "block",
       "description": "SSL configuration for the destination to connect to the source database.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for Oracle SSH connectivity details. Security impact is determined by specific nested host and credential fields."
     },
     "oracle.forward_ssh_connectivity.hostname": {
       "description": "Required. Hostname for the SSH tunnel.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the SSH tunnel endpoint used for Oracle connectivity. An incorrect or unapproved host can route migration traffic through an unsafe destination."
     },
     "oracle.forward_ssh_connectivity.password": {
       "description": "Input only. SSH password. Only one of 'password' and 'private_key' can be configured.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides SSH password material. It is sensitive credential material and should be protected, but it is not a policy decision in this resource."
     },
     "oracle.forward_ssh_connectivity.port": {
       "description": "Port for the SSH tunnel, default value is 22.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the SSH tunnel port. It affects connection routing but is not by itself a direct security control."
     },
     "oracle.forward_ssh_connectivity.private_key": {
       "description": "Input only. SSH private key. Only one of 'password' and 'private_key' can be configured.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides SSH private key material. It is sensitive credential material and should be protected, but it is not a policy decision in this resource."
     },
     "oracle.forward_ssh_connectivity.username": {
       "description": "Required. Username for the SSH tunnel.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the SSH username used for tunnel authentication. It identifies the account but does not by itself enforce a security control."
     },
     "oracle.private_connectivity": {
       "type": "block",
       "description": "Configuration for using a private network to communicate with the source database",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for Oracle private connectivity settings. The nested private connection field carries the security decision."
     },
     "oracle.private_connectivity.private_connection": {
       "description": "Required. The resource name (URI) of the private connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the private connection used to reach the Oracle database. Requiring private connectivity reduces exposure to public network paths."
     },
     "oracle.ssl": {
       "type": "block",
       "description": "SSL configuration for the destination to connect to the source database.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for Oracle SSL material. Specific certificate, key, and SSL mode fields carry the relevant meaning."
     },
     "oracle.ssl.ca_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate.\nThe replica will use this certificate to verify it's connecting to the right host.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides CA certificate material for SSL verification. It supports encrypted connectivity but is credential material rather than a policy decision in this resource."
     },
     "oracle.ssl.client_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides client certificate material for SSL authentication. It is sensitive credential material rather than a policy decision in this resource."
     },
     "oracle.ssl.client_key": {
       "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides the private key for client certificate authentication. It is sensitive credential material and should be protected, but it is not a policy decision in this resource."
     },
     "oracle.static_service_ip_connectivity": {
       "type": "block",
       "description": "This object has no nested fields.\n\nStatic IP address connectivity configured on service project.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for Oracle static service IP connectivity. It does not directly enforce a security control by itself."
     },
     "postgresql": {
       "type": "block",
       "description": "Specifies connection parameters required specifically for PostgreSQL databases.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for PostgreSQL connection settings. Security impact is determined by nested connectivity and SSL fields."
     },
     "postgresql.alloydb_cluster_id": {
       "description": "If the connection profile is an AlloyDB instance, use this field to provide the AlloyDB cluster ID.",
@@ -532,8 +566,8 @@
       "description": "The name of the specific database within the host.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the PostgreSQL database within the host. It is a database selector rather than a direct security control."
     },
     "postgresql.host": {
       "description": "The IP or hostname of the source MySQL database.",
@@ -566,47 +600,51 @@
     "postgresql.private_connectivity": {
       "type": "block",
       "description": "Private connectivity.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for PostgreSQL private connectivity settings. The nested private connection field carries the relevant meaning."
     },
     "postgresql.private_connectivity.private_connection": {
       "description": "Required. The resource name (URI) of the private connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines a private connection for PostgreSQL connectivity. This can reduce network exposure, but this branch does not currently include a policy for this field."
     },
     "postgresql.ssl": {
       "type": "block",
       "description": "SSL configuration for the destination to connect to the source database.",
-      "required": false
+      "required": false,
+      "security_impact": false,
+      "rationale": "Container block for PostgreSQL SSL settings. The SSL mode field controls the security behaviour."
     },
     "postgresql.ssl.ca_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate.\nThe replica will use this certificate to verify it's connecting to the right host.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides CA certificate material for SSL verification. It supports encrypted connectivity but is credential material rather than a policy decision in this resource."
     },
     "postgresql.ssl.client_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides client certificate material for SSL authentication. It is sensitive credential material rather than a policy decision in this resource."
     },
     "postgresql.ssl.client_key": {
       "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides the private key for client certificate authentication. It is sensitive credential material and should be protected, but the policy decision is the SSL mode."
     },
     "postgresql.ssl.type": {
       "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the SSL mode used for PostgreSQL connectivity. Weak or disabled SSL can expose database migration traffic to interception."
     }
   }
 }
