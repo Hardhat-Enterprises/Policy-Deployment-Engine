@@ -79,7 +79,7 @@ RULES = {
         "`attribute_path` ends in a list index; check the whole list with "
         "`element blacklist`."),
     "unknown-policy-type": (
-        "`policy_type` is not one of the six the engine dispatches, so the condition "
+        "`policy_type` is not one of the seven the engine dispatches, so the condition "
         "is never evaluated. Set it to a valid type (lowercase, spaces not "
         "underscores)."),
     "presence-only": (
@@ -402,6 +402,7 @@ def drift_exempt_keys(service, resource_type, stem, resource_dir=None):
 VALID_POLICY_TYPES = (
     "blacklist", "whitelist", "range",
     "pattern blacklist", "pattern whitelist", "element blacklist",
+    "element pattern whitelist",
 )
 
 # Blacklist/whitelist only — a pattern or range policy with empty values means
