@@ -6,16 +6,19 @@ import data.terraform.gcp.security.dataproc.google_dataproc_session_template.var
 conditions := [
     [
         {
-            "situation_description": "Dataproc Session Template does not specify a Cloud KMS key for workload encryption.",
+            "situation_description": "Dataproc Session Template is not encrypted with a customer-managed Cloud KMS key held in an approved region.",
             "remedies": [
-                "Configure a valid Cloud KMS key for workload encryption."
+                "Set kms_key to a customer-managed key of the form projects/*/locations/*/keyRings/*/cryptoKeys/*, held in an approved region."
             ]
         },
         {
-            "condition": "A Cloud KMS key must be configured.",
+            "condition": "The key must be a full customer-managed Cloud KMS resource name in an approved region.",
             "attribute_path": ["environment_config", 0, "execution_config", 0, "kms_key"],
-            "values": ["", null],
-            "policy_type": "blacklist"
+            "values": [
+                "projects/*/locations/*/keyRings/*/cryptoKeys/*",
+                [["test-project"], ["australia-southeast1", "australia-southeast2"], ["test-ring"], ["test-key"]]
+            ],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]

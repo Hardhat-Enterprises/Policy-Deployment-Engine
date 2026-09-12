@@ -6,16 +6,19 @@ import data.terraform.gcp.security.dataproc.google_dataproc_session_template.var
 conditions := [
     [
         {
-            "situation_description": "Dataproc Session Template does not specify a controlled container image for the workload runtime.",
+            "situation_description": "Dataproc Session Template runs a container image from a registry that is not approved.",
             "remedies": [
-                "Configure an approved container image for the workload runtime."
+                "Publish the workload image to an approved Artifact Registry host and reference it from there."
             ]
         },
         {
-            "condition": "A container image must be configured.",
+            "condition": "The container image must come from an approved registry host.",
             "attribute_path": ["runtime_config", 0, "container_image"],
-            "values": ["", null],
-            "policy_type": "blacklist"
+            "values": [
+                "*/",
+                [["australia-southeast1-docker.pkg.dev", "gcr.io"]]
+            ],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]

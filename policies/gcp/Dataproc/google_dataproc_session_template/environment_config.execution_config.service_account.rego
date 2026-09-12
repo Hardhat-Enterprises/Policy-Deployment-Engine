@@ -6,9 +6,9 @@ import data.terraform.gcp.security.dataproc.google_dataproc_session_template.var
 conditions := [
     [
         {
-            "situation_description": "Dataproc Session Template does not specify a dedicated service account, which may result in use of a default identity with overly broad permissions.",
+            "situation_description": "Dataproc Session Template runs as a default Google-managed identity rather than a dedicated least-privilege service account.",
             "remedies": [
-                "Configure a dedicated service account with least-privilege permissions."
+                "Set service_account to a dedicated project-managed service account of the form <name>@<project>.iam.gserviceaccount.com."
             ]
         },
         {
@@ -16,6 +16,15 @@ conditions := [
             "attribute_path": ["environment_config", 0, "execution_config", 0, "service_account"],
             "values": [null, ""],
             "policy_type": "blacklist"
+        },
+        {
+            "condition": "Default Google-managed service accounts must not be used.",
+            "attribute_path": ["environment_config", 0, "execution_config", 0, "service_account"],
+            "values": [
+                "@*",
+                [["developer.gserviceaccount.com", "compute.gserviceaccount.com", "appspot.gserviceaccount.com"]]
+            ],
+            "policy_type": "pattern blacklist"
         }
     ]
 ]
