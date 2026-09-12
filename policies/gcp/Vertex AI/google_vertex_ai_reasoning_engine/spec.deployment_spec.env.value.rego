@@ -6,15 +6,15 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_reasoning_engine.v
 conditions := [
     [
         {
-            "situation_description": "The Reasoning Engine deployment does not set an environment variable value. Configuration should be provided explicitly rather than left unset.",
+            "situation_description": "The Reasoning Engine sets a plaintext secret as an environment variable value. Secrets must come from Secret Manager via secret_env, not be inlined.",
             "remedies": [
-                "Set 'spec.deployment_spec.env.value' for each environment variable, using a Secret Manager reference for sensitive values."
+                "Move the secret to Secret Manager and reference it through spec.deployment_spec.secret_env instead of a plaintext env value."
             ]
         },
         {
-            "condition": "Environment variable value must be set",
+            "condition": "env value must not be a known plaintext secret",
             "attribute_path": ["spec", 0, "deployment_spec", 0, "env", 0, "value"],
-            "values": [null],
+            "values": ["my-secret-password"],
             "policy_type": "blacklist"
         }
     ]
