@@ -12,7 +12,7 @@ conditions := [
             ]
         },
         {
-            "condition": "Check that a dedicated service account is set",
+            "condition": "A dedicated service account must be set",
             "attribute_path": ["spec", 0, "service_account"],
             "values": [null],
             "policy_type": "blacklist"
