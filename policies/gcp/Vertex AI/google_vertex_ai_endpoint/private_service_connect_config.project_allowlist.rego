@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "project_allowlist is missing or contains unapproved projects",
-            "attribute_path": ["private_service_connect_config", 0, "project_allowlist"],
+            "attribute_path": ["private_service_connect_config", 0, "project_allowlist", 0], # 注意末尾增加了 , 0
             "values": ["^approved-project-.*$"],
             "policy_type": "pattern whitelist"
         }

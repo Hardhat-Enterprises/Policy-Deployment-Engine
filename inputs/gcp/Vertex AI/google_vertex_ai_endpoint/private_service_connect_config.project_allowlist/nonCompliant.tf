@@ -8,11 +8,3 @@ resource "google_vertex_ai_endpoint" "non_compliant_example_1" {
     project_allowlist              = ["unapproved-project-999"]
   }
 }
-
-resource "google_vertex_ai_endpoint" "non_compliant_example_2" {
-  name         = "non_compliant_example_2"
-  display_name = "sample-endpoint"
-  location     = "us-central1"
-  
-  # private_service_connect_config block is completely omitted
-}
