@@ -5,7 +5,7 @@ import data.terraform.gcp.security.data_loss_prevention.google_data_loss_prevent
 conditions := [
     [
         {
-            "situation_description": "The stored info type can be destroyed by Terraform, risking loss of the detection control",
+            "situation_description": "The stored info type can be destroyed by Terraform, which is the prevent-destructive-loss archetype",
             "remedies": ["Set deletion_policy to PREVENT"]
         },
         {
