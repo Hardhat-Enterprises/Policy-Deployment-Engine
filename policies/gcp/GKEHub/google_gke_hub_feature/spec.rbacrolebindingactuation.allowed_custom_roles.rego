@@ -4,16 +4,16 @@ import data.terraform.helpers
 import data.terraform.gcp.security.gke_hub.google_gke_hub_feature.vars
 
 conditions := [[
-	{
-		"situation_description": "Fleet RBAC role bindings contain an unapproved custom role",
-		"remedies": ["Use only approved custom roles in allowed_custom_roles"],
-	},
-	{
-		"condition": "Fleet RBAC custom roles must be approved",
-		"attribute_path": ["spec", 0, "rbacrolebindingactuation", 0, "allowed_custom_roles"],
-		"values": ["approved-fleet-role"],
-		"policy_type": "whitelist",
-	},
+        {
+                "situation_description": "Fleet RBAC role bindings allow a built-in privileged Kubernetes role instead of a custom role",
+                "remedies": ["Remove built-in privileged roles and allow only organisation-approved custom ClusterRoles"],
+        },
+        {
+                "condition": "Only custom ClusterRoles may be included in allowed_custom_roles",
+                "attribute_path": ["spec", 0, "rbacrolebindingactuation", 0, "allowed_custom_roles"],
+                "values": ["cluster-admin", "admin", "edit", "view"],
+                "policy_type": "blacklist",
+        },
 ]]
 
 result := helpers.get_multi_summary(conditions, vars.variables)
