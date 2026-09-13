@@ -6,36 +6,36 @@
       "description": "Optional connection id that should be assigned to the created connection.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the resource; it does not itself change security behaviour."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deletion-blocking flags follow the prevent-destructive-loss archetype: enforcing PREVENT protects against accidental or malicious destruction of the resource, so this is treated as security-relevant."
     },
     "description": {
       "description": "A descriptive description for the connection",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-text label with no functional effect on access, exposure, or data protection."
     },
     "friendly_name": {
       "description": "A descriptive name for the connection",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-text label with no functional effect on access, exposure, or data protection."
     },
     "kms_key_name": {
       "description": "Optional. The Cloud KMS key that is used for encryption.\n\nExample: projects/[kms_project_id]/locations/[region]/keyRings/[key_region]/cryptoKeys/[key]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": "Without a customer-managed KMS key (CMEK), BigQuery Connection data is encrypted only with Google-managed keys, reducing customer control over key rotation, access, and revocation."
+      "security_impact": true,
+      "rationale": "Without a customer-managed KMS key (CMEK), BigQuery Connection data is encrypted only with Google-managed keys, reducing customer control over key rotation, access, and revocation.This policy enforces that a kms_key_name value is set at all; validating the full CMEK path shape (projects/*/locations/*/keyRings/*/cryptoKeys/*) is not enforceable with the project's current policy_type primitives, since project/keyring/key names are team-specific and open-ended, not a fixed known set."
     },
     "location": {
       "description": "The geographic location where the connection should reside.\nCloud SQL instance must be in the same location as the connection\nwith following exceptions: Cloud SQL us-central1 maps to BigQuery US, Cloud SQL europe-west1 maps to BigQuery EU.\nExamples: US, EU, asia-northeast1, us-central1, europe-west1.\nSpanner Connections same as spanner region\nAWS allowed regions are aws-us-east-1\nAzure allowed regions are azure-eastus2",
@@ -48,8 +48,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project determines resource ownership/location, similar to other identifier fields; it is not itself a security control."
     },
     "aws": {
       "type": "block",
@@ -65,8 +65,8 @@
       "description": "The user’s AWS IAM Role that trusts the Google-owned AWS IAM user Connection.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to a specific external AWS IAM role. A generic platform policy cannot meaningfully constrain which specific cross-account role a team should trust without hardcoding team-specific values, so this is treated as a reference rather than a security control."
     },
     "azure": {
       "type": "block",
@@ -77,15 +77,15 @@
       "description": "The id of customer's directory that host the data.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to a specific external Azure AD tenant. A generic platform policy cannot meaningfully constrain which specific tenant a team should trust without hardcoding team-specific values, so this is treated as a reference rather than a security control."
     },
     "azure.federated_application_client_id": {
       "description": "The Azure Application (client) ID where the federated credentials will be hosted.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to a specific external Azure Application. A generic platform policy cannot meaningfully constrain which specific application should host federated credentials without hardcoding team-specific values, so this is treated as a reference rather than a security control."
     },
     "cloud_resource": {
       "type": "block",
@@ -101,43 +101,43 @@
       "description": "Cloud Spanner database in the form 'project/instance/database'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the target database; it does not itself change security behaviour."
     },
     "cloud_spanner.database_role": {
       "description": "Cloud Spanner database role for fine-grained access control. The Cloud Spanner admin should have provisioned the database role with appropriate permissions, such as 'SELECT' and 'INSERT'. Other users should only use roles provided by their Cloud Spanner admins. The database role name must start with a letter, and can only contain letters, numbers, and underscores. For more details, see https://cloud.google.com/spanner/docs/fgac-about.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A functional connection parameter specifying which database role to connect as. Choosing a specific role is a team-dependent configuration choice rather than a structural platform-level security control."
     },
     "cloud_spanner.max_parallelism": {
       "description": "Allows setting max parallelism per query when executing on Spanner independent compute resources. If unspecified, default values of parallelism are chosen that are dependent on the Cloud Spanner instance configuration. 'useParallelism' and 'useDataBoost' must be set when setting max parallelism.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A performance/throughput tuning setting; it does not affect access, exposure, or data protection."
     },
     "cloud_spanner.use_data_boost": {
       "description": "If set, the request will be executed via Spanner independent compute resources. 'use_parallelism' must be set when using data boost.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A performance/cost feature toggle; it does not affect access, exposure, or data protection."
     },
     "cloud_spanner.use_parallelism": {
       "description": "If parallelism should be used when reading from Cloud Spanner.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A performance tuning setting; it does not affect access, exposure, or data protection."
     },
     "cloud_spanner.use_serverless_analytics": {
       "description": "If the serverless analytics service should be used to read data from Cloud Spanner. 'useParallelism' must be set when using serverless analytics.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A deprecated performance feature toggle; it does not affect access, exposure, or data protection."
     },
     "cloud_sql": {
       "type": "block",
@@ -148,22 +148,22 @@
       "description": "Database name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the target database; it does not itself change security behaviour."
     },
     "cloud_sql.instance_id": {
       "description": "Cloud SQL instance ID in the form project:location:instance.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Cloud SQL instance). Per the project's core rule, resource references are not themselves security controls — the instance's own security is enforced at its own resource policies."
     },
     "cloud_sql.type": {
       "description": "Type of the Cloud SQL database. Possible values: [\"DATABASE_TYPE_UNSPECIFIED\", \"POSTGRES\", \"MYSQL\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A configuration-type selector for the database engine; it is not itself a security control."
     },
     "cloud_sql.credential": {
       "type": "block",
@@ -174,15 +174,15 @@
       "description": "Password for database.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
+      "security_impact": true,
       "rationale": "An empty password permits anonymous access to the Cloud SQL database, exposing connection-level data to unauthorised users."
     },
     "cloud_sql.credential.username": {
       "description": "Username for database.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the database account; it does not itself change security behaviour independent of the associated password/permissions."
     },
     "configuration": {
       "type": "block",
@@ -193,8 +193,8 @@
       "description": "The ID of the connector. Possible values include 'google-alloydb', 'google-cloudsql-mysql',\n'google-cloudsql-postgres', and other connector IDs supported by the BigQuery Connector framework.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A configuration-type selector identifying which connector implementation to use; it is not itself a security control."
     },
     "configuration.asset": {
       "type": "block",
@@ -205,15 +205,15 @@
       "description": "The name of the database.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the target database; it does not itself change security behaviour."
     },
     "configuration.asset.google_cloud_resource": {
       "description": "The full resource name of the Google Cloud resource.\nFor AlloyDB, this is in the format of\n'//alloydb.googleapis.com/projects/{project}/locations/{region}/clusters/{cluster}/instances/{instance}'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource. Per the project's core rule, resource references are not themselves security controls — the referenced resource's own security is enforced at its own resource policies."
     },
     "configuration.authentication": {
       "type": "block",
@@ -229,8 +229,8 @@
       "description": "Username for the connector.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the connector account; it does not itself change security behaviour independent of the associated password/permissions."
     },
     "configuration.authentication.username_password.password": {
       "type": "block",
@@ -241,8 +241,8 @@
       "description": "The plaintext password.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This field holds the connector's plaintext authentication credential. An empty or weak value permits unauthorised access to the connected external data source, and the resource's own documentation flags this as sensitive data stored in raw Terraform state."
     },
     "configuration.endpoint": {
       "type": "block",
@@ -253,8 +253,8 @@
       "description": "Host and port in the format of 'host:port' for the connector endpoint.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This represents an external destination the connector reaches out to. Consistent with the project's established approach to external endpoint targets, platform policy cannot meaningfully validate arbitrary external hosts, so this is treated as a reference rather than a security control."
     },
     "configuration.network": {
       "type": "block",
@@ -270,8 +270,8 @@
       "description": "The resource name of a network attachment in the format of\n'projects/{project}/regions/{region}/networkAttachments/{networkAttachment}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the network attachment). Per the project's core rule, resource references are not themselves security controls — the referenced resource's own security is enforced at its own resource policies."
     },
     "spark": {
       "type": "block",
@@ -287,8 +287,8 @@
       "description": "Resource name of an existing Dataproc Metastore service in the form of projects/[projectId]/locations/[region]/services/[serviceId].",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Metastore service). Per the project's core rule, resource references are not themselves security controls — the referenced resource's own security is enforced at its own resource policies."
     },
     "spark.spark_history_server_config": {
       "type": "block",
@@ -299,8 +299,8 @@
       "description": "Resource name of an existing Dataproc Cluster to act as a Spark History Server for the connection if the form of projects/[projectId]/regions/[region]/clusters/[cluster_name].",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Dataproc cluster). Per the project's core rule, resource references are not themselves security controls — the referenced resource's own security is enforced at its own resource policies."
     }
   }
 }
