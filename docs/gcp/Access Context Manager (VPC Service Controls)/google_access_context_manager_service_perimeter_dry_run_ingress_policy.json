@@ -58,8 +58,8 @@
       "description": "A Google Cloud resource that is allowed to ingress the perimeter.\nRequests from these resources will be allowed to access perimeter data.\nCurrently only projects are allowed. Format 'projects/{project_number}'\nThe project may be in any Google Cloud organization, not just the\norganization that the perimeter is defined in. '*' is not allowed, the case\nof allowing all Google Cloud resources only is not supported.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies which Google Cloud project resources are allowed to originate requests into the perimeter."
+      "security_impact": false,
+      "rationale": "References the external project resource from which requests originate. This is a resource identifier/reference and should not be constrained by a platform-level security policy."
     },
     "ingress_to": {
       "type": "block",
@@ -77,8 +77,8 @@
       "description": "A list of IAM roles that represent the set of operations that the sources\nspecified in the corresponding 'IngressFrom'\nare allowed to perform.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines IAM roles representing the operations that ingress sources are allowed to perform."
+      "security_impact": false,
+      "rationale": "Specifies IAM roles permitted for ingress. Selecting appropriate roles is a team authorization decision rather than a platform-level security policy target."
     },
     "ingress_to.operations": {
       "type": "block",
@@ -108,8 +108,8 @@
       "description": "Value for permission should be a valid Cloud IAM permission for the\ncorresponding 'serviceName' in 'ApiOperation'.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies Cloud IAM permissions that ingress sources are allowed to exercise for the selected service."
+      "security_impact": false,
+      "rationale": "Specifies granular IAM permissions allowed for ingress operations. These fine-grained authorization choices are best left to team configuration rather than enforced as a platform policy."
     }
   }
 }
