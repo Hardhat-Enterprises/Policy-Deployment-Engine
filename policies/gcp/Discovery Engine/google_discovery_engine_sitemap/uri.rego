@@ -13,8 +13,8 @@ conditions := [
       {
         "condition": "engine_sitemap_uri is mis-configured",
         "attribute_path": ["uri"],
-        "values": ["https://www.valid.com/sitemap.xml"],
-        "policy_type": "whitelist"
+        "values": ["https://*"],
+        "policy_type": "pattern whitelist"
       }
     ]
 ]
