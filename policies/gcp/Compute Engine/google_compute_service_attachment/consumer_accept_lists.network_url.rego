@@ -5,20 +5,6 @@ import data.terraform.gcp.security.compute_engine.google_compute_service_attachm
 conditions := [
     [
         {
-            "situation_description": "network_url is left empty",
-            "remedies": [
-                "Configure network_url with a consumer network url to connect with this service attachment",
-            ]
-        },
-        {
-            "condition": "network_url must not be left empty",
-            "attribute_path": ["consumer_accept_lists", 0, "network_url"],
-            "values": ["",  null],
-            "policy_type": "blacklist"
-        }
-    ],
-    [
-        {
             "situation_description": "network_url is not configured correctly",
             "remedies": [
                 "Configure network_url with a consumer network url format to connect with this service attachment",
