@@ -461,8 +461,8 @@
       "description": "Required. Hostname for the SSH tunnel.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the hostname used for Oracle forward SSH connectivity. Because forward SSH creates the network path used to reach the database, an unsafe or unintended host can route migration traffic through an untrusted endpoint. This branch treats forward SSH as disallowed in favour of private connectivity."
+      "security_impact": false,
+      "rationale": "Specifies the hostname or endpoint reference used by Oracle forward SSH connectivity. This is a resource pointer rather than a platform-level security control, so this branch does not constrain the specific hostname value."
     },
     "oracle.forward_ssh_connectivity.password": {
       "description": "Input only. SSH password. Only one of 'password' and 'private_key' can be configured.",
@@ -503,8 +503,8 @@
       "description": "Required. The resource name (URI) of the private connection.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the private connection used for Oracle database access. Requiring a valid private connection keeps migration traffic on a private network path and avoids public or forward-SSH exposure."
+      "security_impact": false,
+      "rationale": "References a team-managed private connection resource for Oracle connectivity. Because this is an identifier pointing to another resource, this branch does not constrain the specific private connection name or URI."
     },
     "oracle.ssl": {
       "type": "block",
