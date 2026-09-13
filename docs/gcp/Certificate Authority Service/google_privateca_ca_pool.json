@@ -41,8 +41,8 @@
       "description": "The Tier of this CaPool. Possible values: [\"ENTERPRISE\", \"DEVOPS\"]",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "It selects the CA pool service tier and its associated operational capabilities. Tier selection is an architectural and workload-specific choice that should be left to the responsible team rather than mandated by a generic platform policy."
+      "security_impact": true,
+      "rationale": "CA Pool must use the ENTERPRISE tier to enforce admin approval controls and audit logging for all certificate operations. The DEVOPS tier lacks HSM-backed keys and granular audit logging required by organisational policy."
     },
     "encryption_spec": {
       "type": "block",
@@ -109,7 +109,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls which elliptic-curve signature algorithms may be used for issued certificates. Restricting this setting to robust algorithms such as ECDSA P-256 or P-384 prevents the use of weaker or non-approved curve options."
+      "rationale": "Elliptic curve signature algorithm must be restricted to OS-approved types to enforce cryptographic compliance across all certificates issued by the pool."
     },
     "issuance_policy.allowed_key_types.rsa": {
       "type": "block",
@@ -486,8 +486,8 @@
       "description": "When true, publishes each CertificateAuthority's CA certificate and includes its URL in the \"Authority Information Access\"\nX.509 extension in all issued Certificates. If this is false, the CA certificate will not be published and the corresponding\nX.509 extension will not be written in issued certificates.",
       "required": true,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls whether CA certificates are published for use in trust-chain validation. This is an operational PKI distribution requirement rather than a generic security-hardening or exposure-prevention control."
+      "security_impact": true,
+      "rationale": "CA Pool must publish CA certificates so that clients can establish trust with the CA hierarchy. Without this, relying parties cannot validate the chain of trust for issued certificates."
     },
     "publishing_options.publish_crl": {
       "description": "When true, publishes each CertificateAuthority's CRL and includes its URL in the \"CRL Distribution Points\" X.509 extension\nin all issued Certificates. If this is false, CRLs will not be published and the corresponding X.509 extension will not\nbe written in issued certificates. CRLs will expire 7 days from their creation. However, we will rebuild daily. CRLs are\nalso rebuilt shortly after a certificate is revoked.",
