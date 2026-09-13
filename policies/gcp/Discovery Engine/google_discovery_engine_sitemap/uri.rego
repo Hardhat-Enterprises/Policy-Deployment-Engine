@@ -17,8 +17,7 @@ conditions := [
             "values": [
                 "*://*",
                 [
-                    ["https"],
-                    ["example.com", "www.example.com", "www.google.com"]
+                    ["https"]
                 ]
             ],
             "policy_type": "pattern whitelist"
