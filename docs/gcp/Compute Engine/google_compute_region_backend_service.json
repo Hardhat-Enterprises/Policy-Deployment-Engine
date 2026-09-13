@@ -20,8 +20,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Only controls whether Terraform's own destroy/apply workflow is allowed to remove the resource - it has no effect on the deployed resource's actual security posture, and it can still be deleted via gcloud/console/another Terraform state regardless of this setting. Forcing 'PREVENT' platform-wide would also block legitimate CI/CD pipelines that need automated teardown of ephemeral environments. IaC-workflow safety guard, not a security control."
+      "security_impact": true,
+      "rationale": "Deletion-blocking flags fall under the prevent-destructive-loss archetype. A policy should require 'PREVENT' so the resource can't be destroyed by an accidental 'terraform destroy'/'apply', regardless of the fact that this specific guard is enforced by Terraform rather than the GCP API."
     },
     "description": {
       "description": "An optional description of this resource.",
@@ -327,8 +327,8 @@
       "description": "If true, include query string parameters in the cache key\naccording to query_string_whitelist and\nquery_string_blacklist. If neither is set, the entire query\nstring will be included.\n\nIf false, the query string will be excluded from the cache\nkey entirely.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "If false, the query string is dropped from the cache key entirely, so two requests to the same path with different query strings (which often carry per-user or per-session data) can be served each other's cached responses. This is the same mechanism behind known web-cache-deception issues. A policy should require this be true."
+      "security_impact": false,
+      "rationale": "Controls whether query strings are included in cache keys, which is an application-specific caching requirement rather than a mandatory platform security setting. Some applications deliberately strip query strings from the cache key for static assets to prevent cache fragmentation, while others need them included to vary content correctly - this is an architectural caching choice driven by the app's own design, not a universal security control."
     },
     "cdn_policy.cache_key_policy.query_string_blacklist": {
       "description": "Names of query string parameters to exclude in cache keys.\n\nAll other parameters will be included. Either specify\nquery_string_whitelist or query_string_blacklist, not both.\n'&' and '=' will be percent encoded and not treated as\ndelimiters.",
