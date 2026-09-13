@@ -6,29 +6,29 @@
       "description": "ID of the cluster to create. Must start with a lowercase letter,\nuse only lowercase letters and numbers, and be at most 10 characters long.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the identifier used to name and reference the cluster. The provider enforces its format, while the chosen identifier does not alter access controls, network exposure, or other security behaviour."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deleting a cluster can remove compute, storage, networking, and orchestration resources associated with the environment. A generic policy can require deletion_policy to be set to PREVENT to reduce the risk of accidental or unauthorized destruction."
     },
     "description": {
       "description": "User-provided description of the cluster.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field only stores descriptive text for the cluster and does not change access control, network exposure, workload execution, or security enforcement."
     },
     "labels": {
       "description": "[Labels](https://cloud.google.com/compute/docs/labeling-resources) applied\nto the cluster. Labels can be used to organize clusters and to filter them\nin queries.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are metadata used to organize and filter resources. They do not directly control access, connectivity, workload execution, or other security behaviour."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -41,8 +41,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the Google Cloud project that owns the resource. The appropriate project is environment-specific, so a generic policy cannot safely require one particular project identifier."
     },
     "compute_resources": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is an internal identifier used to reference a compute resource elsewhere in the cluster configuration. It does not itself change the security posture of the compute resource."
     },
     "compute_resources.config": {
       "type": "block",
@@ -70,22 +70,22 @@
       "description": "Name of the Compute Engine [machine\ntype](https://cloud.google.com/compute/docs/machine-resource) to use, e.g.\n'n2-standard-2'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the VM machine type used for Flex Start instances. It primarily affects compute capacity, performance, and cost rather than a generic security control."
     },
     "compute_resources.config.new_flex_start_instances.max_duration": {
       "description": "Specifies the time limit for created instances. Instances will be\nterminated at the end of this duration.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets how long Flex Start instances may run before termination. It controls workload lifetime and scheduling rather than access control or security enforcement."
     },
     "compute_resources.config.new_flex_start_instances.zone": {
       "description": "Name of the zone in which VM instances should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the zone where the instances run and must be consistent with the cluster region and other resources. The appropriate zone is an operational placement choice rather than a generic security policy target."
     },
     "compute_resources.config.new_on_demand_instances": {
       "type": "block",
@@ -96,15 +96,15 @@
       "description": "Name of the Compute Engine [machine\ntype](https://cloud.google.com/compute/docs/machine-resource) to use, e.g.\n'n2-standard-2'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the VM machine type for on-demand instances. It affects compute capacity, performance, and cost rather than a generic security control."
     },
     "compute_resources.config.new_on_demand_instances.zone": {
       "description": "Name of the zone in which VM instances should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the zone where on-demand instances run and must match the cluster's regional placement requirements. The exact zone is an operational deployment choice rather than a generic security control."
     },
     "compute_resources.config.new_reserved_instances": {
       "type": "block",
@@ -115,8 +115,8 @@
       "description": "Name of the reservation from which VM instances should be created, in the\nformat 'projects/{project}/zones/{zone}/reservations/{reservation}'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the reservation from which VM instances should be created. The correct reservation is environment-specific and relates to capacity allocation rather than generic security enforcement."
     },
     "compute_resources.config.new_spot_instances": {
       "type": "block",
@@ -127,22 +127,22 @@
       "description": "Name of the Compute Engine [machine\ntype](https://cloud.google.com/compute/docs/machine-resource) to use, e.g.\n'n2-standard-2'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the VM machine type used for Spot instances. It affects capacity, performance, and cost rather than access control or security enforcement."
     },
     "compute_resources.config.new_spot_instances.termination_action": {
       "description": "Specifies the termination action of the instance\nPossible values:\nSTOP\nDELETE",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls whether a Spot VM is stopped or deleted when it is terminated. It is a lifecycle and workload-availability choice rather than a generic security control."
     },
     "compute_resources.config.new_spot_instances.zone": {
       "description": "Name of the zone in which VM instances should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the zone where Spot instances run and must match the cluster's regional placement requirements. The exact zone is an operational deployment choice rather than a generic security control."
     },
     "network_resources": {
       "type": "block",
@@ -153,8 +153,8 @@
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is an internal identifier used to reference the network resource elsewhere in the cluster configuration. It does not itself determine network reachability or enforce a security boundary."
     },
     "network_resources.config": {
       "type": "block",
@@ -170,15 +170,15 @@
       "description": "Name of the network to import, in the format\n'projects/{project}/global/networks/{network}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects an existing VPC network to attach to the cluster. The correct network is specific to the team's architecture and environment, so a generic policy cannot safely require one particular network identifier."
     },
     "network_resources.config.existing_network.subnetwork": {
       "description": "Particular subnetwork to use, in the format\n'projects/{project}/regions/{region}/subnetworks/{subnetwork}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the existing subnetwork used by the cluster. The appropriate subnetwork is an environment-specific network design and routing choice rather than a generic platform security target."
     },
     "network_resources.config.new_network": {
       "type": "block",
@@ -189,15 +189,15 @@
       "description": "Description of the network. Maximum of 2048 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field only stores descriptive text for the network and does not change routing, exposure, firewall behaviour, or access control."
     },
     "network_resources.config.new_network.network": {
       "description": "Name of the network to create, in the format\n'projects/{project}/global/networks/{network}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the VPC network to create for the cluster. The network name is an environment-specific naming and architecture choice and does not by itself enforce a security control."
     },
     "orchestrator": {
       "type": "block",
@@ -213,22 +213,22 @@
       "description": "Default partition to use for submitted jobs that do not explicitly specify\na partition. Required if and only if there is more than one partition, in\nwhich case it must match the id of one of the partitions.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects which Slurm partition receives jobs that do not explicitly specify one. The correct partition depends on the cluster's workload and scheduling design rather than a universal security requirement."
     },
     "orchestrator.slurm.epilog_bash_scripts": {
       "description": "Slurm [epilog scripts](https://slurm.schedmd.com/prolog_epilog.html), which\nwill be executed by compute nodes whenever a node finishes running a job.\nValues must not be empty.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Epilog scripts execute commands on compute nodes after jobs finish. Because arbitrary script content can modify the host, access data, or run privileged actions, these scripts directly affect the security posture and should be restricted to approved content."
     },
     "orchestrator.slurm.prolog_bash_scripts": {
       "description": "Slurm [prolog scripts](https://slurm.schedmd.com/prolog_epilog.html), which\nwill be executed by compute nodes before a node begins running a new job.\nValues must not be empty.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Prolog scripts execute commands on compute nodes before jobs run. Because arbitrary script content can modify the host, access data, or alter workload execution, these scripts directly affect the security posture and should be restricted to approved content."
     },
     "orchestrator.slurm.login_nodes": {
       "type": "block",
@@ -239,50 +239,50 @@
       "description": "Number of login node instances to create.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls the number of login node instances. It primarily affects capacity and availability and does not directly determine how users authenticate or whether the nodes are publicly exposed."
     },
     "orchestrator.slurm.login_nodes.enable_os_login": {
       "description": "Whether [OS Login](https://cloud.google.com/compute/docs/oslogin) should be\nenabled on login node instances.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "OS Login centralizes SSH access using Google Cloud identities and IAM rather than relying only on instance metadata SSH keys. A generic policy can require OS Login on cluster login nodes to strengthen access control and account management."
     },
     "orchestrator.slurm.login_nodes.enable_public_ips": {
       "description": "Whether login node instances should be assigned [external IP\naddresses](https://cloud.google.com/compute/docs/ip-addresses#externaladdresses).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Assigning external IP addresses makes login nodes directly reachable from external networks. A generic security policy can require public IPs to be disabled to reduce unnecessary internet exposure."
     },
     "orchestrator.slurm.login_nodes.labels": {
       "description": "[Labels](https://cloud.google.com/compute/docs/labeling-resources) that\nshould be applied to each login node instance.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "These labels are metadata applied to login node instances for organization and filtering. They do not directly control authentication, network exposure, or workload execution."
     },
     "orchestrator.slurm.login_nodes.machine_type": {
       "description": "Name of the Compute Engine [machine\ntype](https://cloud.google.com/compute/docs/machine-resource) to use for\nlogin nodes, e.g. 'n2-standard-2'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the VM machine type for login nodes. It affects compute capacity, performance, and cost rather than a generic security control."
     },
     "orchestrator.slurm.login_nodes.startup_script": {
       "description": "[Startup\nscript](https://cloud.google.com/compute/docs/instances/startup-scripts/linux)\nto be run on each login node instance. Max 256KB.\nThe script must complete within the system-defined default timeout of 5\nminutes. For tasks that require more time, consider running them in the\nbackground using methods such as '&' or 'nohup'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The startup script executes commands automatically on each login node when it starts. Arbitrary script content can modify system configuration, credentials, software, and access controls, so it directly affects the node's security posture."
     },
     "orchestrator.slurm.login_nodes.zone": {
       "description": "Name of the zone in which login nodes should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the zone where login nodes run and must be consistent with other cluster resources. The exact zone is an operational placement choice rather than a generic security control."
     },
     "orchestrator.slurm.login_nodes.boot_disk": {
       "type": "block",
@@ -293,15 +293,15 @@
       "description": "Size of the disk in gigabytes. Must be at least 10GB.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls login-node boot disk capacity. It affects storage sizing and cost rather than access control, data exposure, or security enforcement."
     },
     "orchestrator.slurm.login_nodes.boot_disk.type": {
       "description": "[Persistent disk\ntype](https://cloud.google.com/compute/docs/disks#disk-types), in the\nformat 'projects/{project}/zones/{zone}/diskTypes/{disk_type}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the persistent disk type used by login nodes. The appropriate disk type depends on performance and cost requirements and is not a generic security setting."
     },
     "orchestrator.slurm.login_nodes.storage_configs": {
       "type": "block",
@@ -312,15 +312,15 @@
       "description": "ID of the storage resource to mount, which must match a key in the\ncluster's [storage_resources](Cluster.storage_resources).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies which configured storage resource is mounted on a login node. The correct storage resource is environment-specific and the identifier itself does not define its permissions or security controls."
     },
     "orchestrator.slurm.login_nodes.storage_configs.local_mount": {
       "description": "A directory inside the VM instance's file system where the storage resource\nshould be mounted (e.g., '/mnt/share').",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the local filesystem path where a storage resource is mounted. The mount path is an operational filesystem layout choice and does not by itself change the storage resource's access controls."
     },
     "orchestrator.slurm.node_sets": {
       "type": "block",
@@ -331,29 +331,29 @@
       "description": "ID of the compute resource on which this nodeset will run. Must match a key\nin the cluster's [compute_resources](Cluster.compute_resources).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This references the compute resource used by the nodeset. The appropriate compute resource is determined by cluster design and the identifier itself does not enforce a security control."
     },
     "orchestrator.slurm.node_sets.id": {
       "description": "Identifier for the nodeset, which allows it to be referenced by partitions.\nMust conform to\n[RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case,\nalphanumeric, and at most 63 characters).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is an identifier used to reference a Slurm nodeset from partitions. It does not directly alter access control, workload privileges, or network exposure."
     },
     "orchestrator.slurm.node_sets.max_dynamic_node_count": {
       "description": "Controls how many additional nodes a cluster can bring online to handle\nworkloads. Set this value to enable dynamic node creation and limit the\nnumber of additional nodes the cluster can bring online. Leave empty if you\ndo not want the cluster to create nodes dynamically, and instead rely only\non static nodes.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This limits the number of additional nodes that Slurm can create dynamically. It is a capacity and scaling control rather than a generic security setting."
     },
     "orchestrator.slurm.node_sets.static_node_count": {
       "description": "Number of nodes to be statically created for this nodeset. The cluster will\nattempt to ensure that at least this many nodes exist at all times.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets the number of nodes that should exist statically in the nodeset. It primarily affects capacity and availability rather than a generic security control."
     },
     "orchestrator.slurm.node_sets.compute_instance": {
       "type": "block",
@@ -364,15 +364,15 @@
       "description": "[Labels](https://cloud.google.com/compute/docs/labeling-resources) that\nshould be applied to each VM instance in the nodeset.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "These labels are metadata applied to compute instances for organization and filtering. They do not directly alter access controls, network exposure, or workload privileges."
     },
     "orchestrator.slurm.node_sets.compute_instance.startup_script": {
       "description": "[Startup\nscript](https://cloud.google.com/compute/docs/instances/startup-scripts/linux)\nto be run on each VM instance in the nodeset. Max 256KB.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The startup script executes commands automatically on each compute instance in the nodeset. Arbitrary script content can modify system configuration, software, credentials, or workload behaviour, so it directly affects the security posture."
     },
     "orchestrator.slurm.node_sets.compute_instance.boot_disk": {
       "type": "block",
@@ -383,15 +383,15 @@
       "description": "Size of the disk in gigabytes. Must be at least 10GB.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls the boot disk capacity of compute instances. It is a storage-sizing and cost choice rather than a generic security control."
     },
     "orchestrator.slurm.node_sets.compute_instance.boot_disk.type": {
       "description": "[Persistent disk\ntype](https://cloud.google.com/compute/docs/disks#disk-types), in the\nformat 'projects/{project}/zones/{zone}/diskTypes/{disk_type}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the persistent disk type used by compute instances. The appropriate type depends on performance and cost requirements rather than a generic security requirement."
     },
     "orchestrator.slurm.node_sets.storage_configs": {
       "type": "block",
@@ -402,15 +402,15 @@
       "description": "ID of the storage resource to mount, which must match a key in the\ncluster's [storage_resources](Cluster.storage_resources).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies which configured storage resource is mounted on compute nodes. The correct storage resource is environment-specific and the identifier itself does not define its security controls."
     },
     "orchestrator.slurm.node_sets.storage_configs.local_mount": {
       "description": "A directory inside the VM instance's file system where the storage resource\nshould be mounted (e.g., '/mnt/share').",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the local filesystem path where a storage resource is mounted on compute nodes. It is an operational filesystem layout choice rather than a generic security control."
     },
     "orchestrator.slurm.partitions": {
       "type": "block",
@@ -421,15 +421,15 @@
       "description": "ID of the partition, which is how users will identify it. Must conform to\n[RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case,\nalphanumeric, and at most 63 characters).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the identifier users use to reference a Slurm partition. Naming a partition does not directly alter authentication, authorization, or workload security."
     },
     "orchestrator.slurm.partitions.node_set_ids": {
       "description": "IDs of the nodesets that make up this partition. Values must match\nSlurmNodeSet.id.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This determines which nodesets belong to a Slurm partition. The appropriate grouping depends on workload scheduling and cluster architecture rather than a universal security requirement."
     },
     "storage_resources": {
       "type": "block",
@@ -440,8 +440,8 @@
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is an internal identifier used to reference a storage resource elsewhere in the cluster configuration. It does not itself change storage permissions, exposure, or data protection."
     },
     "storage_resources.config": {
       "type": "block",
@@ -457,8 +457,8 @@
       "description": "Name of the Cloud Storage bucket to import.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects an existing Cloud Storage bucket to use. The correct bucket is environment-specific, while access control and data-protection settings are managed on the bucket itself rather than through this reference."
     },
     "storage_resources.config.existing_filestore": {
       "type": "block",
@@ -469,8 +469,8 @@
       "description": "Name of the Filestore instance to import, in the format\n'projects/{project}/locations/{location}/instances/{instance}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects an existing Filestore instance to use. The correct instance is environment-specific, while its access and network controls are managed on the Filestore resource itself."
     },
     "storage_resources.config.existing_lustre": {
       "type": "block",
@@ -481,8 +481,8 @@
       "description": "Name of the Managed Lustre instance to import, in the format\n'projects/{project}/locations/{location}/instances/{instance}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects an existing Managed Lustre instance to use. The correct instance is environment-specific, while its security controls are managed on the Lustre resource itself."
     },
     "storage_resources.config.new_bucket": {
       "type": "block",
@@ -493,15 +493,15 @@
       "description": "Name of the Cloud Storage bucket to create.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the name of a Cloud Storage bucket to create. The bucket name is an identifier and does not by itself define access control, encryption, or data exposure."
     },
     "storage_resources.config.new_bucket.storage_class": {
       "description": "If set, uses the provided storage class as the bucket's default storage\nclass.\nPossible values:\nSTANDARD\nNEARLINE\nCOLDLINE\nARCHIVE",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the bucket's storage class and primarily affects data retrieval characteristics and cost. It does not directly control access or data security."
     },
     "storage_resources.config.new_bucket.autoclass": {
       "type": "block",
@@ -512,15 +512,15 @@
       "description": "Enables Auto-class feature.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This enables automatic transitions between Cloud Storage classes based on access patterns. It is a storage lifecycle and cost-management feature rather than a generic security control."
     },
     "storage_resources.config.new_bucket.autoclass.terminal_storage_class": {
       "description": "Terminal storage class of the autoclass bucket\nPossible values:\nNEARLINE\nARCHIVE",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the terminal storage class used by Autoclass. It affects storage lifecycle and cost characteristics rather than access control or security enforcement."
     },
     "storage_resources.config.new_bucket.hierarchical_namespace": {
       "type": "block",
@@ -531,8 +531,8 @@
       "description": "Enables hierarchical namespace setup for the bucket.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This enables hierarchical namespace semantics for the bucket. It changes namespace and filesystem-style behaviour, but the setting alone does not establish a universal access-control or exposure requirement for this cluster resource."
     },
     "storage_resources.config.new_filestore": {
       "type": "block",
@@ -543,29 +543,29 @@
       "description": "Description of the instance. Maximum of 2048 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field only stores descriptive text for the Filestore instance and does not change access control, network exposure, or data protection."
     },
     "storage_resources.config.new_filestore.filestore": {
       "description": "Name of the Filestore instance to create, in the format\n'projects/{project}/locations/{location}/instances/{instance}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the resource name of the Filestore instance to create. The identifier is environment-specific and does not itself determine the instance's security controls."
     },
     "storage_resources.config.new_filestore.protocol": {
       "description": "Access protocol to use for all file shares in the instance. Defaults to NFS\nV3 if not set.\nPossible values:\nNFSV3\nNFSV41 Possible values: [\"PROTOCOL_UNSPECIFIED\", \"NFSV3\", \"NFSV41\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the NFS protocol version used by the Filestore instance. The appropriate protocol depends on client compatibility and workload requirements, and this Cluster Director field does not expose a universal security policy target by itself."
     },
     "storage_resources.config.new_filestore.tier": {
       "description": "Service tier to use for the instance.\nPossible values:\nZONAL\nREGIONAL Possible values: [\"TIER_UNSPECIFIED\", \"ZONAL\", \"REGIONAL\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the Filestore service tier and primarily affects availability, placement, and performance characteristics rather than a generic security control."
     },
     "storage_resources.config.new_filestore.file_shares": {
       "type": "block",
@@ -576,15 +576,15 @@
       "description": "Size of the filestore in GB. Must be between 1024 and 102400, and must meet\nscalability requirements described at\nhttps://cloud.google.com/filestore/docs/service-tiers.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls the storage capacity of the Filestore share. It is a sizing and cost setting rather than a generic security control."
     },
     "storage_resources.config.new_filestore.file_shares.file_share": {
       "description": "Filestore share location",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This names the Filestore share location. The name is an operational identifier and does not itself control who can access the share."
     },
     "storage_resources.config.new_lustre": {
       "type": "block",
@@ -595,36 +595,36 @@
       "description": "Storage capacity of the instance in gibibytes (GiB). Allowed values are\nbetween 18000 and 7632000.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls the capacity of the Managed Lustre instance. It is a sizing and cost setting rather than a generic security control."
     },
     "storage_resources.config.new_lustre.description": {
       "description": "Description of the Managed Lustre instance. Maximum of 2048 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field only stores descriptive text for the Managed Lustre instance and does not change access control, network exposure, or data protection."
     },
     "storage_resources.config.new_lustre.filesystem": {
       "description": "Filesystem name for this instance. This name is used by client-side tools,\nincluding when mounting the instance. Must be 8 characters or less and can\nonly contain letters and numbers.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets the filesystem name used by clients and mounting tools. It is an operational identifier and does not itself define authentication, authorization, or network exposure."
     },
     "storage_resources.config.new_lustre.lustre": {
       "description": "Name of the Managed Lustre instance to create, in the format\n'projects/{project}/locations/{location}/instances/{instance}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the resource name of the Managed Lustre instance to create. The identifier is environment-specific and does not itself determine access controls or data protection."
     },
     "storage_resources.config.new_lustre.per_unit_storage_throughput": {
       "description": "Throughput of the instance in MB/s/TiB. Valid values are 125, 250,\n500, 1000. See [Performance tiers and maximum storage\ncapacities](https://cloud.google.com/managed-lustre/docs/create-instance#performance-tiers)\nfor more information.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets the storage throughput tier for the Managed Lustre instance. It controls performance characteristics rather than access control, exposure, or other security enforcement."
     }
   }
 }
