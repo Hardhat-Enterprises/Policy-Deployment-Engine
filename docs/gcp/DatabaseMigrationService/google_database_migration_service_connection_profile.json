@@ -398,8 +398,8 @@
       "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides private key material for MySQL SSL client authentication. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
+      "security_impact": true,
+      "rationale": "Provides the private key used for MySQL SSL client authentication. Requiring this field ensures client-certificate authentication material is configured."
     },
     "mysql.ssl.type": {
       "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
@@ -462,14 +462,14 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Configures the host used for Oracle forward SSH connectivity. This affects the network path used to reach the database."
+      "rationale": "Configures Oracle forward SSH connectivity. Forward SSH exposes a network access path, so this field is security-impacting."
     },
     "oracle.forward_ssh_connectivity.password": {
       "description": "Input only. SSH password. Only one of 'password' and 'private_key' can be configured.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides password material for Oracle forward SSH connectivity. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
+      "security_impact": true,
+      "rationale": "Provides password material for Oracle forward SSH connectivity. Requiring this field ensures SSH authentication material is configured when forward SSH is used."
     },
     "oracle.forward_ssh_connectivity.port": {
       "description": "Port for the SSH tunnel, default value is 22.",
@@ -482,8 +482,8 @@
       "description": "Input only. SSH private key. Only one of 'password' and 'private_key' can be configured.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides private key material for Oracle forward SSH connectivity. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
+      "security_impact": true,
+      "rationale": "Provides private key material for Oracle forward SSH connectivity. Requiring this field ensures key-based SSH authentication material is configured when forward SSH is used."
     },
     "oracle.forward_ssh_connectivity.username": {
       "description": "Required. Username for the SSH tunnel.",
@@ -517,22 +517,22 @@
       "description": "Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate.\nThe replica will use this certificate to verify it's connecting to the right host.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides CA certificate material for Oracle SSL verification. It supports secure connectivity, but the certificate body is sensitive material rather than a stable policy decision in this resource."
+      "security_impact": true,
+      "rationale": "Provides CA certificate material for Oracle SSL verification. Requiring this field helps validate encrypted database connections."
     },
     "oracle.ssl.client_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides client certificate material for Oracle SSL authentication. It is sensitive credential material rather than a stable policy decision in this resource."
+      "security_impact": true,
+      "rationale": "Provides the client certificate used for Oracle SSL authentication. Requiring this field helps enforce certificate-based database authentication."
     },
     "oracle.ssl.client_key": {
       "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides private key material for Oracle SSL client authentication. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
+      "security_impact": true,
+      "rationale": "Provides the private key used for Oracle SSL client authentication. Requiring this field ensures certificate-based authentication material is configured."
     },
     "oracle.static_service_ip_connectivity": {
       "type": "block",
@@ -622,22 +622,22 @@
       "description": "Input only. The x509 PEM-encoded certificate of the CA that signed the source database server's certificate.\nThe replica will use this certificate to verify it's connecting to the right host.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides CA certificate material for PostgreSQL SSL verification. It supports secure connectivity, but the certificate body is sensitive material rather than a stable policy decision in this resource."
+      "security_impact": true,
+      "rationale": "Provides CA certificate material for PostgreSQL SSL verification. Requiring this field helps validate encrypted database connections."
     },
     "postgresql.ssl.client_certificate": {
       "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides client certificate material for PostgreSQL SSL authentication. It is sensitive credential material rather than a stable policy decision in this resource."
+      "security_impact": true,
+      "rationale": "Provides the client certificate used for PostgreSQL SSL authentication. Requiring this field helps enforce certificate-based database authentication."
     },
     "postgresql.ssl.client_key": {
       "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Provides private key material for PostgreSQL SSL client authentication. It is sensitive credential material and should be protected, but Terraform plans do not reliably expose the literal value for policy validation."
+      "security_impact": true,
+      "rationale": "Provides the private key used for PostgreSQL SSL client authentication. Requiring this field ensures certificate-based authentication material is configured."
     },
     "postgresql.ssl.type": {
       "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
