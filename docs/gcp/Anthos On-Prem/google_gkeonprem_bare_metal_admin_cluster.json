@@ -42,7 +42,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "A resource identifier/pointer to the GCP project the cluster belongs to; project-level access is governed by IAM bindings elsewhere, not by this attribute."
+      "rationale": "Project is not important enough to have security implications."
     },
     "cluster_operations": {
       "type": "block",
@@ -71,7 +71,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Names one entry in an arbitrary key-value argument list; a generic platform policy cannot meaningfully constrain which flag names a customer chooses to pass without hardcoding an exhaustive allow/deny list of kube-apiserver flags, which is not a viable policy target here."
+      "rationale": "argument does not have security impact on the service."
     },
     "control_plane.api_server_args.value": {
       "description": "The value of the arg as it will be passed to the API Server command line.",
@@ -366,7 +366,7 @@
       "required": true,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "The CIDR ranges that place matching nodes into maintenance mode are an operational networking assignment (which nodes get cordoned/drained for maintenance), not a security control."
+      "rationale": "maintenance_address_cidr_blocks does not require specific security considerations."
     },
     "network_config": {
       "type": "block",
@@ -390,7 +390,7 @@
       "required": true,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "The RFC1918 CIDR ranges pods are assigned from are an operational addressing choice for the cluster's internal network plan, outside the scope of a security policy."
+      "rationale": "Pod address CIDR blocks are not important enough to have security implications."
     },
     "network_config.island_mode_cidr.service_address_cidr_blocks": {
       "description": "All services in the cluster are assigned an RFC1918 IPv4 address from these ranges. This field cannot be changed after creation.",
@@ -433,7 +433,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "Controls pod density/resource allocation per node; an operational sizing choice, not an access or exposure control."
+      "rationale": "max_pods_per_node does not require specific security considerations."
     },
     "proxy": {
       "type": "block",
@@ -445,14 +445,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": false,
-      "rationale": "Defines the endpoints excluded from proxy routing; a network configuration choice, not an access-control setting."
+      "rationale": "no_proxy does not require specific security considerations."
     },
     "proxy.uri": {
       "description": "Specifies the address of your proxy server.\nFor Example: http://domain\nWARNING: Do not provide credentials in the format\nof http://(username:password@)domain these will be rejected by the server.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Points at the customer's own proxy server; an environment-specific infrastructure reference with no universal 'safe' value, the same reasoning already applied to other environment-specific endpoints on this resource."
+      "rationale": "uri does not require specific security considerations."
     },
     "security_config": {
       "type": "block",
@@ -510,7 +510,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "The number of subdirectories to create under the shared path; numeric capacity sizing, an operational choice with no access-control implication."
+      "rationale": "shared_path_pv_count does not have security impact on the service."
     },
     "storage.lvp_share_config.lvp_config": {
       "type": "block",
