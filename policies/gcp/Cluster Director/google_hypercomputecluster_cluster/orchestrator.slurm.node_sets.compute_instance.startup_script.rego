@@ -5,13 +5,13 @@ import data.terraform.gcp.security.cluster_director.google_hypercomputecluster_c
 
 conditions := [[
     {
-        "situation_description": "Compute-node startup scripts execute commands automatically when instances start and should be restricted to approved content.",
-        "remedies": ["Use only the approved compute-node startup script."],
+        "situation_description": "Compute-node startup scripts can execute arbitrary commands automatically and should not be configured unless separately reviewed and approved.",
+        "remedies": ["Remove the compute instance startup_script."],
     },
     {
-        "condition": "compute instance startup_script must contain approved content",
+        "condition": "compute instance startup_script must not be configured",
         "attribute_path": ["orchestrator", 0, "slurm", 0, "node_sets", 0, "compute_instance", 0, "startup_script"],
-        "values": ["#!/bin/bash\necho compute-node-ready"],
+        "values": [null],
         "policy_type": "whitelist",
     },
 ]]

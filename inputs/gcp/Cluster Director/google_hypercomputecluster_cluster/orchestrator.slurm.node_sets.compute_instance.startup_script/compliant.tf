@@ -38,7 +38,7 @@ resource "google_hypercomputecluster_cluster" "compliant_example_1" {
         static_node_count = 1
 
         compute_instance {
-          startup_script = "#!/bin/bash\necho compute-node-ready"
+          startup_script = null
         }
       }
 
