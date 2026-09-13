@@ -27,46 +27,9 @@ conditions := [
         {
             "condition": "network_url must be configured and formatted correctly",
             "attribute_path": ["consumer_accept_lists", 0, "network_url"],
-            "values": ["*//",  [["https:"]]],
-            "policy_type": "pattern whitelist"
-        },
-        {
-            "condition": "network_url must be configured and formatted correctly",
-            "attribute_path": ["consumer_accept_lists", 0, "network_url"],
-            "values": ["//*",  [["www.googleapis.com"]]],
-            "policy_type": "pattern whitelist"
-        },
-         {
-            "condition": "network_url must be configured and formatted correctly",
-            "attribute_path": ["consumer_accept_lists", 0, "network_url"],
-            "values": ["www.googleapis.com/*",  [["compute"]]],
-            "policy_type": "pattern whitelist"
-        },
-        {
-            "condition": "network_url must be configured and formatted correctly",
-            "attribute_path": ["consumer_accept_lists", 0, "network_url"],
-            "values": ["compute/*",  [["v1"]]],
-            "policy_type": "pattern whitelist"
-        },
-        {
-            "condition": "network_url must be configured and formatted correctly",
-            "attribute_path": ["consumer_accept_lists", 0, "network_url"],
-            "values": ["v1/*",  [["projects"]]],
-            "policy_type": "pattern whitelist"
-        },
-        {
-            "condition": "network_url must be configured and formatted correctly",
-            "attribute_path": ["consumer_accept_lists", 0, "network_url"],
-            "values": ["*/network",  [["global"]]],
-            "policy_type": "pattern whitelist"
-        },
-        {
-            "condition": "network_url must be configured and formatted correctly",
-            "attribute_path": ["consumer_accept_lists", 0, "network_url"],
-            "values": ["global/*/",  [["networks"]]],
+            "values": ["https://www.googleapis.com/compute/v1/projects/*/global/networks/*",  [["projectid", "my-project"],["networkid", "my-network"]]],
             "policy_type": "pattern whitelist"
         }
-
     ]
 ]
 
