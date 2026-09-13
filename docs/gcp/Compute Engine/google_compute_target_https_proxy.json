@@ -6,15 +6,15 @@
       "description": "URLs to certificate manager certificate resources that are used to authenticate connections between users and the load balancer.\nCertificate manager certificates only apply when the load balancing scheme is set to INTERNAL_MANAGED.\nFor EXTERNAL and EXTERNAL_MANAGED, use certificate_map instead.\nsslCertificates and certificateManagerCertificates fields can not be defined together.\nAccepted format is '//certificatemanager.googleapis.com/projects/{project}/locations/{location}/certificates/{resourceName}' or just the self_link 'projects/{project}/locations/{location}/certificates/{resourceName}'",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Certificate manager certificates are used to authenticate connections between users and the load balancer. If an attacker can manipulate these certificates, they might be able to impersonate the load balancer or intercept communications."
+      "security_impact": false,
+      "rationale": "This references a team-managed certificate resource. A generic platform policy cannot structurally validate a valid certificate reference without hardcoding a specific team's project or certificate name, which would not generalise across deployments."
     },
     "certificate_map": {
       "description": "A reference to the CertificateMap resource uri that identifies a certificate map\nassociated with the given target proxy. This field is only supported for EXTERNAL and EXTERNAL_MANAGED load balancing schemes.\nFor INTERNAL_MANAGED, use certificate_manager_certificates instead.\nAccepted format is '//certificatemanager.googleapis.com/projects/{project}/locations/{location}/certificateMaps/{resourceName}'.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This determines which certificates are presented to the clients. If an attacker can manipulate this value, they might be able to present a malicious certificate to clients, leading"
+      "security_impact": false,
+      "rationale": "This references a team-managed certificate map resource. A generic platform policy cannot structurally validate a valid certificate map reference without hardcoding a specific team's project or map name, which would not generalise across deployments."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -69,8 +69,8 @@
       "description": "A URL referring to a networksecurity.ServerTlsPolicy\nresource that describes how the proxy should authenticate inbound\ntraffic. serverTlsPolicy only applies to a global TargetHttpsProxy\nattached to globalForwardingRules with the loadBalancingScheme\nset to INTERNAL_SELF_MANAGED or EXTERNAL or EXTERNAL_MANAGED.\nFor details which ServerTlsPolicy resources are accepted with\nINTERNAL_SELF_MANAGED and which with EXTERNAL, EXTERNAL_MANAGED\nloadBalancingScheme consult ServerTlsPolicy documentation.\nIf left blank, communications are not encrypted.\n\nIf you remove this field from your configuration at the same time as\ndeleting or recreating a referenced ServerTlsPolicy resource, you will\nreceive a resourceInUseByAnotherResource error. Use lifecycle.create_before_destroy\nwithin the ServerTlsPolicy resource to avoid this.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting controls the TLS policy for the proxy, which has direct security implications."
+      "security_impact": false,
+      "rationale": "This references a team-managed TLS policy resource. A generic platform policy cannot structurally validate a valid policy reference without hardcoding a specific team's project or policy name, which would not generalise across deployments."
     },
     "ssl_certificates": {
       "description": "URLs to SslCertificate resources that are used to authenticate connections between users and the load balancer.\nCurrently, you may specify up to 15 SSL certificates. sslCertificates do not apply when the load balancing scheme is set to INTERNAL_SELF_MANAGED.\nsslCertificates and certificateManagerCertificates can not be defined together.",
@@ -83,11 +83,11 @@
       "description": "A reference to the SslPolicy resource that will be associated with\nthe TargetHttpsProxy resource. If not set, the TargetHttpsProxy\nresource will not have any SSL policy configured.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This setting controls the SSL policy for the proxy, which has direct security implications."
+      "security_impact": false,
+      "rationale": "This references a team-managed SSL policy resource. A generic platform policy cannot structurally validate a valid policy reference without hardcoding a specific team's project or policy name, which would not generalise across deployments."
     },
     "tls_early_data": {
-      "description": "Specifies whether TLS 1.3 0-RTT Data (“Early Data”) should be accepted for this service.\nEarly Data allows a TLS resumption handshake to include the initial application payload\n(a HTTP request) alongside the handshake, reducing the effective round trips to “zero”.\nThis applies to TLS 1.3 connections over TCP (HTTP/2) as well as over UDP (QUIC/h3). Possible values: [\"STRICT\", \"PERMISSIVE\", \"UNRESTRICTED\", \"DISABLED\"]",
+      "description": "Specifies whether TLS 1.3 0-RTT Data (\u201cEarly Data\u201d) should be accepted for this service.\nEarly Data allows a TLS resumption handshake to include the initial application payload\n(a HTTP request) alongside the handshake, reducing the effective round trips to \u201czero\u201d.\nThis applies to TLS 1.3 connections over TCP (HTTP/2) as well as over UDP (QUIC/h3). Possible values: [\"STRICT\", \"PERMISSIVE\", \"UNRESTRICTED\", \"DISABLED\"]",
       "required": false,
       "type": "string",
       "security_impact": true,
