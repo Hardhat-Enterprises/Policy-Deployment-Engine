@@ -24,6 +24,15 @@ There are four supporting scripts:
   and sweeping up another resource's files — neither of which fails any test on
   the branch that caused it. Rules are documented in
   `Guide/Policy_writing_tutorial/branch-scope.md`.
+- `check_line_endings.py` — reports tracked files whose **committed blob** holds
+  CRLF. Advisory, not a gate: nothing in the harness depends on line endings any
+  more (`.gitattributes` normalises at check-in and `auto_test.fixture_sha`
+  canonicalises before hashing), but `.gitattributes` cannot retro-fix blobs on a
+  branch cut before it landed, and git does not renormalise on merge — so such a
+  branch can still carry CRLF onto `dev`. Those files then read as modified in
+  every clean checkout, for everyone, until renormalised. Runs report-only on the
+  dev-only `policy_check_ALL` workflow and never on a pull request: a hard
+  whole-tree gate on this would be the exact failure it exists to catch.
 - `policy_lint.py` — deterministic *content*-quality rules over a policy kit's
   declared `conditions`/`variables` (hard-coded literals, trivial messages,
   fixture drift, ...). It answers whether the policy is any good, not just
@@ -129,13 +138,13 @@ python scripts/linters/branch_scope.py --staged           # what you are about t
 python scripts/linters/branch_scope.py --base origin/dev  # the whole branch vs dev (CI)
 ```
 
-**CI (`.github/workflows/branch-scope.yml`):** a `branch_scope` job runs
+**CI (the `Branch scope` job in `.github/workflows/policy_check_PR.yaml`):** it runs
 `branch_scope.py --branch <head ref> --base origin/<base>` on every pull request
-from a `Service/` branch. It is a **separate workflow with no `paths:` filter**
-on purpose: `policy_check_PR.yaml` only runs when `docs/`, `inputs/` or
-`policies/` changed, so a branch whose only change is to `scripts/` or to a
-stray committed binary would never trigger it — and those are exactly the
-changes the scope check exists to catch.
+from a `Service/` branch. It was its own workflow until that one dropped its
+`paths:` filter — the filter was the reason, since a branch whose only change is
+to `scripts/` or to a stray committed binary would not have triggered it, and
+those are exactly the changes this check exists to catch. That workflow now runs
+on every pull request, so the job lives there.
 
 **CI (`.github/workflows/policy_check_PR.yaml`):** a `lint` job runs
 (1) `linter.py --tree all --no-content-checks` as a hard whole-tree structural

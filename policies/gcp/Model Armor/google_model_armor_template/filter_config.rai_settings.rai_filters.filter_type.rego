@@ -1,7 +1,7 @@
-package terraform.gcp.security.model_Armor.google_model_armor_template.filter_config_rai_settings_rai_filters_filter_type
+package terraform.gcp.security.model_armor.google_model_armor_template.filter_config_rai_settings_rai_filters_filter_type
 
 import data.terraform.helpers
-import data.terraform.gcp.security.model_Armor.google_model_armor_template.vars
+import data.terraform.gcp.security.model_armor.google_model_armor_template.vars
 
 
 

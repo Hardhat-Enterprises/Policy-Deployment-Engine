@@ -61,7 +61,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 # fixture_sha / plan_cache_path are the pipeline's own definition of "which
 # cached plan belongs to this fixture". Importing keeps the two in lockstep: a
 # provider bump changes the sha in both places at once.
-from scripts.auto_test.auto_test import plan_cache_path  # noqa: E402
+from scripts.auto_test.auto_test import (  # noqa: E402
+    find_denormalised_plan, plan_cache_path)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HELPERS_DIR = REPO_ROOT / "policies" / "_helpers"
@@ -92,7 +93,17 @@ RULES = {
         "argument under test."),
     "fixture-missing-plan": (
         "No committed plan for this fixture pair — run the test locally and commit "
-        "the <sha>.json the harness writes into the fixture directory."),
+        "the <sha>.json the harness writes into the fixture directory. If the plan "
+        "looks present locally, check line endings: a fixture committed with CRLF "
+        "(or a UTF-8 BOM) is named for a sha no LF checkout computes."),
+    "drift-exemption-invalid": (
+        "An entry in this resource's `drift_exemptions.json` is malformed, names an "
+        "argument the resource does not have, or gives no reason. The file exempts "
+        "nothing until it is fixed."),
+    "drift-exemption-stale": (
+        "An entry in `drift_exemptions.json` exempts a key the fixture does not "
+        "actually differ on, so it is silencing nothing and would hide a real "
+        "difference if one appeared later. Remove it."),
     "fixture-one-sided": (
         "The fixture has no compliant examples at all, or no non-compliant examples "
         "at all, so one half of what the harness checks is never exercised."),
@@ -206,6 +217,183 @@ FIXTURE_IGNORED_KEYS = {
     "name", "labels", "label", "effective_labels", "terraform_labels",
     "effective_annotations",
 }
+
+# --- fixtures whose second difference the provider requires ------------------
+#
+# The drift rule asks that a compliant and a non-compliant example differ only on
+# the argument under test. Sometimes they cannot. Every entry here is the same
+# shape: the argument under test belongs to a set Terraform allows only one of, so
+# showing a compliant and a non-compliant value of it necessarily changes which
+# member of that set is populated. Asking these authors to remove the difference
+# would be asking for a fixture terraform will not accept.
+#
+# This is NOT a way to silence a finding you would rather not fix. It lives in
+# scripts/, which a Service branch cannot edit, so adding one takes a maintainer —
+# and each entry has to say what the mutually exclusive set is. A fixture that
+# stops drifting makes its entry stale, and a test over the real tree fails when
+# that happens, so the list cannot quietly rot.
+#
+# (service folder, resource type, argument) -> ({keys}, why)
+FIXTURE_DRIFT_EXEMPT = {
+    ("App Hub", "google_apphub_application", "scope.type"): (
+        {"location"},
+        "A GLOBAL-scoped application can only exist in the `global` location and a "
+        "REGIONAL one only in a real region, so the location follows the scope type "
+        "under test rather than varying independently of it."),
+    ("Certificate Manager", "google_certificate_manager_certificate",
+     "self_managed.pem_private_key"): (
+        {"managed"},
+        "`managed` and `self_managed` are mutually exclusive. Demonstrating a "
+        "non-compliant self_managed private key means the compliant example cannot "
+        "use self_managed at all, so it uses `managed` instead."),
+    ("Cloud Storage", "google_storage_object_acl", "predefined_acl"): (
+        {"role_entity"},
+        "`predefined_acl` and `role_entity` are mutually exclusive. The compliant "
+        "example cannot set the predefined ACL it is meant not to use, so it grants "
+        "the equivalent access with role_entity."),
+}
+
+
+# --- the provider's write-only convention ------------------------------------
+#
+# A provider that accepts a secret offers it twice: `x` (stored in state) and
+# `x_wo` (write-only, never stored), with `x_wo_version` to trigger a re-send.
+# Only one of `x` and `x_wo` may be set — the registry states it per resource,
+# e.g. "One of `private_key` or `private_key_wo` can only be set".
+#
+# So a fixture testing `x` cannot hold `x` on both sides: the compliant example
+# has to carry the secret as `x_wo` instead, and that is a second difference no
+# author can remove. It is the same shape as every FIXTURE_DRIFT_EXEMPT entry,
+# except the suffix makes it recognisable from the names alone — so it needs no
+# entry, per resource or otherwise, and covers the whole write-only family at
+# once (`google_compute_ssl_certificate`, `google_compute_region_ssl_certificate`
+# and anything the provider adds later).
+WRITE_ONLY_SUFFIX = "_wo"
+WRITE_ONLY_VERSION_SUFFIX = "_wo_version"
+
+
+def write_only_partners(argument_key):
+    """The other spellings of ``argument_key`` in the provider's write-only trio.
+
+    ``private_key`` -> {private_key_wo, private_key_wo_version}, and from either of
+    those back to the whole set. Empty for an argument with no write-only twin —
+    the keys are returned unconditionally, since a name that does not exist on the
+    resource can never be a key the fixture differs on.
+    """
+    base = argument_key
+    for suffix in (WRITE_ONLY_VERSION_SUFFIX, WRITE_ONLY_SUFFIX):
+        if base.endswith(suffix):
+            base = base[: -len(suffix)]
+            break
+    trio = {base, base + WRITE_ONLY_SUFFIX, base + WRITE_ONLY_VERSION_SUFFIX}
+    return trio - {argument_key}
+
+
+# --- per-resource, contributor-editable exemptions ---------------------------
+#
+# FIXTURE_DRIFT_EXEMPT above lives in scripts/, which a Service branch may not
+# edit, so every case needs a maintainer. This file sits inside the resource's own
+# policy folder, which its branch owns, so a contributor can declare their own —
+# and two students on different resources can never conflict.
+#
+# Entries are accepted mechanically here. They are not taken on trust: the portal
+# judges each one during its AI policy review, against the provider's own registry
+# documentation at the version the resource's docs JSON was generated from, and
+# rejects an entry the documentation does not support. Validation below is
+# therefore about the entry being well-formed and still needed, not about whether
+# the claim is true.
+DRIFT_EXEMPTIONS_FILE = "drift_exemptions.json"
+# What a finding about the file itself (rather than one entry) is filed under,
+# in the slot that normally carries the argument name — same idea as "_vars".
+DRIFT_EXEMPTIONS_STEM = "drift_exemptions"
+
+# Appended to every fixture-drift message. Most drift is an attribute that simply
+# moved while the fixture was written, and that is the author's to fix — so this
+# names the escape hatch without inviting it, and points at the evidence that
+# distinguishes the two cases (terraform refusing the fixture outright).
+DRIFT_EXEMPTIONS_DOC = ("Guide/Policy_writing_tutorial/policy-lint.md"
+                        "#when-the-provider-gives-you-no-choice")
+MUTUALLY_EXCLUSIVE_HINT = (
+    "If Terraform refuses to accept both of these settings together (you get a provider "
+    "error setting both), this may be a mutually exclusive pair. Declare it in "
+    f"{DRIFT_EXEMPTIONS_FILE} in this resource's folder (see {DRIFT_EXEMPTIONS_DOC}), "
+    "with the other member(s) under \"keys\" and a short reason. The portal's AI review "
+    "verifies each entry against the official provider documentation for this provider "
+    "version; an entry the documentation does not support will be rejected there, and you "
+    "can escalate with your terraform error output as evidence.")
+
+_drift_exemptions_cache: dict[str, tuple] = {}
+
+
+def load_drift_exemptions(resource_dir):
+    """``(entries, error)`` for a resource's ``drift_exemptions.json``.
+
+    ``entries`` is the parsed top-level object, ``{}`` when the file is absent or
+    unusable; ``error`` is a human-readable reason when it exists but could not be
+    read. A file that cannot be parsed contributes nothing — it never takes the
+    linter down, and it never silently exempts anything either.
+    """
+    resource_dir = Path(resource_dir)
+    key = str(resource_dir.resolve())
+    if key in _drift_exemptions_cache:
+        return _drift_exemptions_cache[key]
+
+    path = resource_dir / DRIFT_EXEMPTIONS_FILE
+    result = ({}, None)
+    if path.is_file():
+        try:
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            result = ({}, f"{DRIFT_EXEMPTIONS_FILE} could not be read: {exc}")
+        else:
+            if isinstance(loaded, dict):
+                result = (loaded, None)
+            else:
+                result = ({}, f"{DRIFT_EXEMPTIONS_FILE} must hold a JSON object keyed by "
+                              f"argument, got {type(loaded).__name__}")
+    _drift_exemptions_cache[key] = result
+    return result
+
+
+def _entry_keys(entry):
+    """``keys`` from a well-formed entry, or None if the entry is not well-formed.
+
+    A ``reason`` is part of being well-formed, not a nicety: an entry without one
+    is a silenced finding rather than a recorded fact, and it must not exempt
+    anything while it stays that way. Validation reports why (see
+    ``_lint_drift_exemptions``); this decides only whether it counts.
+    """
+    if not isinstance(entry, dict):
+        return None
+    keys = entry.get("keys")
+    reason = entry.get("reason")
+    if not isinstance(keys, list) or not keys:
+        return None
+    if not all(isinstance(k, str) and k for k in keys):
+        return None
+    if not isinstance(reason, str) or not reason.strip():
+        return None
+    return frozenset(keys)
+
+
+def _declared_exempt_keys(resource_dir, stem):
+    """The ``keys`` this resource's exemptions file declares for ``stem``."""
+    entries, _ = load_drift_exemptions(resource_dir)
+    return _entry_keys(entries.get(stem)) or frozenset()
+
+
+def drift_exempt_keys(service, resource_type, stem, resource_dir=None):
+    """Keys this fixture may differ on because the provider leaves it no choice.
+
+    The union of the maintainer list above and, when ``resource_dir`` is given, the
+    resource's own ``drift_exemptions.json``. Callers that only want the maintainer
+    list (the tests that keep it from rotting) omit ``resource_dir``.
+    """
+    entry = FIXTURE_DRIFT_EXEMPT.get((service, resource_type, stem))
+    maintained = frozenset(entry[0]) if entry else frozenset()
+    if resource_dir is None:
+        return maintained
+    return maintained | _declared_exempt_keys(resource_dir, stem)
 
 # The policy types `policies/_helpers/helpers.rego` can dispatch, in the order its
 # error message lists them (so the two read identically to a student who hits both).
@@ -863,8 +1051,24 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     if not cache.exists():
         # Reported repo-relative: the finding is read in CI logs and on the portal,
         # where an absolute path of the checkout means nothing.
+        where = cache.relative_to(root).as_posix()
+        # By far the most common cause of a plan that is present locally and absent
+        # here: the fixture was committed (or checked out) with CRLF line endings or
+        # a UTF-8 BOM, so it was named for the pre-normalisation sha. Naming the
+        # remedy is the difference between a rename and every contributor on the
+        # branch re-running terraform for a file whose contents are already correct.
+        denormalised = find_denormalised_plan(input_dir)
+        if denormalised is not None:
+            return [Finding(service, resource_type, stem, "fixture-missing-plan",
+                            f"no committed plan at {where} — but {denormalised.name} is "
+                            "provably the same plan under a pre-normalisation name (these "
+                            "*.tf were planned on a CRLF checkout, or carry a UTF-8 BOM). "
+                            "Re-run auto_test from any checkout and commit the rename it "
+                            "makes — the contents are already correct, so no terraform is "
+                            "needed. On Windows also set `git config core.autocrlf input` "
+                            "and run `git add --renormalize .` so it does not recur")]
         return [Finding(service, resource_type, stem, "fixture-missing-plan",
-                        f"no committed plan at {cache.relative_to(root).as_posix()} — "
+                        f"no committed plan at {where} — "
                         "run auto_test locally and commit the file it writes")]
 
     try:
@@ -881,16 +1085,7 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
                         f"plan {cache.name} is not a Terraform plan "
                         "(no planned_values.root_module.resources list)")]
 
-    compliant, non_compliant = {}, {}
-    for resource in resources:
-        if not isinstance(resource, dict) or resource.get("type") != resource_type:
-            continue
-        match = FIXTURE_LABEL_RE.match(resource.get("name") or "")
-        if not match:
-            continue
-        bucket = compliant if match.group(1) == "compliant" else non_compliant
-        values = resource.get("values")
-        bucket[match.group(2)] = values if isinstance(values, dict) else {}
+    compliant, non_compliant = _sides_from_resources(resources, resource_type)
 
     # --- fixture-one-sided ------------------------------------------------- #
     # The harness does NOT pair examples by number. `validate_policy_output`
@@ -920,8 +1115,27 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
     # Only the argument's *top-level* key is expected to differ; a nested
     # argument (a.b.c) is compared at its block key, since the plan nests it.
     argument_key = stem.split(".")[0]
-    ignored = FIXTURE_IGNORED_KEYS | {argument_key}
+    resource_dir = Path(root) / "policies" / platform / service / resource_type
+    ignored = (FIXTURE_IGNORED_KEYS | {argument_key}
+               | write_only_partners(argument_key)
+               | drift_exempt_keys(service, resource_type, stem, resource_dir))
 
+    drifted = _drifted_keys(compliant, non_compliant, argument_key, identity_key, ignored)
+    if drifted:
+        findings.append(Finding(
+            service, resource_type, stem, "fixture-drift",
+            "compliant.tf and nonCompliant.tf also differ on: " + ", ".join(sorted(drifted))
+            + ". " + MUTUALLY_EXCLUSIVE_HINT))
+    return findings
+
+
+def _drifted_keys(compliant, non_compliant, argument_key, identity_key, ignored):
+    """Keys the two sides differ on, beyond ``ignored`` and the exceptions below.
+
+    Separated out so the exemptions-file validator can ask the same question the
+    rule asks — "does this fixture actually differ on these keys?" — without
+    reproducing the exceptions and drifting out of step with them.
+    """
     drifted = set()
     for good, bad in _drift_comparisons(compliant, non_compliant):
         # What the argument under test is actually set to on each side. A key that
@@ -961,12 +1175,161 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
                     and _is_fixture_label(good_value) and _is_fixture_label(bad_value)):
                 continue
             drifted.add(key)
+    return drifted
 
-    if drifted:
-        findings.append(Finding(
-            service, resource_type, stem, "fixture-drift",
-            "compliant.tf and nonCompliant.tf also differ on: " + ", ".join(sorted(drifted))))
-    return findings
+
+def _documented_arguments(root, platform, service, resource_type):
+    """Argument keys from the resource's generated docs JSON, or None if absent.
+
+    None means "cannot check" — a miniature tree without docs, or a resource whose
+    doc has not been generated yet. Silence beats inventing a finding out of a file
+    that is not there.
+    """
+    doc = Path(root) / "docs" / platform / service / f"{resource_type}.json"
+    try:
+        loaded = json.loads(doc.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    arguments = loaded.get("arguments") if isinstance(loaded, dict) else None
+    return set(arguments) if isinstance(arguments, dict) else None
+
+
+def _lint_drift_exemptions(root, platform, service, resource_type, identity_key=None):
+    """Validate a resource's ``drift_exemptions.json``.
+
+    Every failure is an ordinary finding against the resource, never fatal, and a
+    file that fails validation still contributes nothing to the drift rule — the
+    two are independent, so a typo cannot exempt something by accident.
+
+    What is checked is that the entry is well-formed, names arguments this resource
+    actually has, and is still needed. Whether the claim is *true* — that the
+    provider really does forbid setting both — is judged by the portal's AI review
+    against the provider's own documentation, not here.
+    """
+    resource_dir = Path(root) / "policies" / platform / service / resource_type
+    entries, error = load_drift_exemptions(resource_dir)
+
+    def finding(stem, message):
+        return Finding(service, resource_type, stem, "drift-exemption-invalid", message)
+
+    if error:
+        return [finding(DRIFT_EXEMPTIONS_STEM, error)]
+    if not entries:
+        return []
+
+    out = []
+    documented = _documented_arguments(root, platform, service, resource_type)
+    for stem in sorted(entries):
+        entry = entries[stem]
+        if not isinstance(entry, dict):
+            out.append(finding(stem, f"{DRIFT_EXEMPTIONS_FILE}: '{stem}' must be an object "
+                                     '{"keys": [...], "reason": "..."}, got '
+                                     f"{type(entry).__name__}"))
+            continue
+
+        keys = entry.get("keys")
+        if not isinstance(keys, list) or not keys or not all(
+                isinstance(k, str) and k for k in keys):
+            out.append(finding(stem, f"{DRIFT_EXEMPTIONS_FILE}: '{stem}'.keys must be a "
+                                     "non-empty list of argument names — the set Terraform "
+                                     "allows only one of"))
+
+        reason = entry.get("reason")
+        if not isinstance(reason, str) or not reason.strip():
+            out.append(finding(stem, f"{DRIFT_EXEMPTIONS_FILE}: '{stem}'.reason is empty — "
+                                     "say why the provider forbids setting both, so the "
+                                     "next reader can check it. Until it is filled in, this "
+                                     "entry exempts nothing"))
+
+        # Staleness is only meaningful for an entry that counts; a rejected one is
+        # already reported, and saying it exempts nothing twice helps nobody.
+        if _entry_keys(entry) is None:
+            continue
+
+        # The names must be arguments of *this* resource. A typo here is a silent
+        # exemption of nothing, which reads as a working entry.
+        if documented is not None:
+            unknown = sorted({k for k in [stem, *keys] if k.split(".")[0] not in documented})
+            if unknown:
+                out.append(finding(stem, f"{DRIFT_EXEMPTIONS_FILE}: '{stem}' names "
+                                         f"{', '.join(unknown)}, which "
+                                         f"{'are' if len(unknown) > 1 else 'is'} not "
+                                         f"a documented argument of {resource_type}"))
+
+        out += _stale_exemption_findings(root, platform, service, resource_type,
+                                         stem, sorted(_entry_keys(entry)), identity_key)
+    return out
+
+
+def _stale_exemption_findings(root, platform, service, resource_type, stem, keys,
+                              identity_key):
+    """Flag declared keys the fixture does not actually differ on.
+
+    Same anti-rot principle as the test over the maintainer list: an entry that
+    stops being needed must not sit there quietly exempting a key that could drift
+    again later. Keys already covered elsewhere — the write-only pairing, the
+    maintainer list — count as not drifting, because the entry is doing nothing.
+
+    Silent when the fixture has no readable plan; ``fixture-missing-plan`` is that
+    situation's finding and saying it twice helps nobody.
+    """
+    sides = _fixture_sides(root, platform, service, resource_type, stem)
+    if sides is None:
+        return []
+    compliant, non_compliant = sides
+    if not compliant or not non_compliant:
+        return []
+
+    argument_key = stem.split(".")[0]
+    ignored = (FIXTURE_IGNORED_KEYS | {argument_key}
+               | write_only_partners(argument_key)
+               | drift_exempt_keys(service, resource_type, stem))
+    drifted = _drifted_keys(compliant, non_compliant, argument_key, identity_key, ignored)
+
+    stale = sorted(k for k in keys if k not in drifted)
+    if not stale:
+        return []
+    return [Finding(service, resource_type, stem, "drift-exemption-stale",
+                    f"{DRIFT_EXEMPTIONS_FILE}: '{stem}' exempts "
+                    f"{', '.join(stale)}, which the fixture does not differ on "
+                    "(either it never did, or it was since rewritten, or the pair is "
+                    "already handled without an entry) — remove "
+                    f"{'them' if len(stale) > 1 else 'it'}")]
+
+
+def _fixture_sides(root, platform, service, resource_type, stem):
+    """``(compliant, non_compliant)`` value maps from a fixture's committed plan.
+
+    None when there is no readable plan for it.
+    """
+    input_dir = Path(root) / "inputs" / platform / service / resource_type / stem
+    if not input_dir.is_dir():
+        return None
+    cache = plan_cache_for(input_dir)
+    try:
+        plan = json.loads(cache.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    resources = _plan_resources(plan)
+    if resources is None:
+        return None
+
+    return _sides_from_resources(resources, resource_type)
+
+
+def _sides_from_resources(resources, resource_type):
+    """Split a plan's resources into ``(compliant, non_compliant)`` value maps."""
+    compliant, non_compliant = {}, {}
+    for resource in resources:
+        if not isinstance(resource, dict) or resource.get("type") != resource_type:
+            continue
+        match = FIXTURE_LABEL_RE.match(resource.get("name") or "")
+        if not match:
+            continue
+        bucket = compliant if match.group(1) == "compliant" else non_compliant
+        values = resource.get("values")
+        bucket[match.group(2)] = values if isinstance(values, dict) else {}
+    return compliant, non_compliant
 
 
 # --------------------------------------------------------------------------- #
@@ -1061,6 +1424,7 @@ def clear_caches():
     """Drop every cached OPA evaluation (the caches are process-global)."""
     _eval_cache.clear()
     _friendly_index_cache.clear()
+    _drift_exemptions_cache.clear()
 
 
 def _lint_vars_file(platform, service, resource_type, vars_path, policies_root):
@@ -1124,6 +1488,12 @@ def lint_resource(root, platform, service_folder, resource_type):
         except (PolicyLintError, OSError, UnicodeDecodeError) as exc:
             findings.append(Finding(service_folder, resource_type, "_vars",
                                     "lint-error", str(exc)))
+
+    # Before the per-argument pass: the exemptions file is read by every fixture
+    # rule below, so a malformed one should be reported once, against the file,
+    # rather than implied by whatever the drift rule then does or does not say.
+    findings += _lint_drift_exemptions(root, platform, service_folder, resource_type,
+                                       identity_key)
 
     for rego_path in sorted(resource_dir.glob(f"*{REGO_EXT}")):
         if rego_path.name == VARS_FILE:
