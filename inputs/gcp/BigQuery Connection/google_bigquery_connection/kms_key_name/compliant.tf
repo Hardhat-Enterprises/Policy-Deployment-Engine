@@ -13,5 +13,5 @@ resource "google_bigquery_connection" "compliant_example_1" {
     }
   }
 
-  kms_key_name = "google_kms_crypto_key.crypto_key.id"
+  kms_key_name = "projects/fake-project/locations/australia-southeast1/keyRings/fake-ring/cryptoKeys/fake-key"
 }

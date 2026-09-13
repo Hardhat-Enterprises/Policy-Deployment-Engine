@@ -58,14 +58,47 @@ TARGET_PROVIDER_VERSION = (Path(__file__).resolve().parent / "provider_version.t
 PLAN_FILE_RE = re.compile(r"^[0-9a-f]{64}\.json$")
 
 
+UTF8_BOM = b"\xef\xbb\xbf"
+
+
+def canonical_text_bytes(data: bytes) -> bytes:
+    """A text file's bytes reduced to the form every checkout agrees on.
+
+    CRLF (and a lone CR) collapse to LF and a leading UTF-8 BOM is dropped. Only
+    ever used for hashing — nothing is rewritten on disk.
+
+    This is what makes fixture_sha checkout-independent. Terraform reads CRLF and
+    LF identically, so the two spellings of a fixture plan to the same document;
+    hashing the raw bytes made them two different fixtures anyway. A contributor
+    on Windows defaults (core.autocrlf=true) therefore computed a sha nobody else
+    could reproduce: their plan cache hit locally, and on every LF checkout — CI
+    and the portal included — the expected <sha>.json was a different name, the
+    plan looked absent, and every argument of the resource came back
+    `fixture-missing-plan`. Normalising here fixes that for any checkout, however
+    the contributor's git is configured; .gitattributes then keeps the bytes
+    themselves LF in the repository.
+
+    LF is the canonical form, so the sha of an all-LF tree is unchanged — which is
+    the name dev and CI already carry for all but the handful of fixtures that were
+    committed with CRLF bytes (renamed in the change that introduced this).
+    """
+    if data.startswith(UTF8_BOM):
+        data = data[len(UTF8_BOM):]
+    return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
 def fixture_sha(input_dir: Path) -> str:
-    """Stable hash of a fixture: its *.tf contents + the target provider version."""
+    """Stable hash of a fixture: its *.tf contents + the target provider version.
+
+    The contents are canonicalised (see canonical_text_bytes) so that the same
+    fixture hashes the same on a CRLF checkout and an LF one.
+    """
     h = hashlib.sha256()
     h.update(f"provider={TARGET_PROVIDER_VERSION}\n".encode())
     for tf in sorted(input_dir.glob("*.tf")):
         h.update(tf.name.encode())
         h.update(b"\0")
-        h.update(tf.read_bytes())
+        h.update(canonical_text_bytes(tf.read_bytes()))
         h.update(b"\0")
     return h.hexdigest()
 
@@ -91,6 +124,93 @@ def legacy_plan_path(input_dir: Path, sha: str) -> Path | None:
         return None
     inputs_root = Path(*parts[: i + 1])
     return inputs_root / "plan_cache" / parts[i + 1] / f"{sha}.json"
+
+
+def _sha_over(input_dir: Path, transform) -> str:
+    """fixture_sha's hash, with ``transform`` applied to each *.tf's bytes."""
+    h = hashlib.sha256()
+    h.update(f"provider={TARGET_PROVIDER_VERSION}\n".encode())
+    for tf in sorted(input_dir.glob("*.tf")):
+        h.update(tf.name.encode())
+        h.update(b"\0")
+        h.update(transform(tf.read_bytes()))
+        h.update(b"\0")
+    return h.hexdigest()
+
+
+def _to_crlf(data: bytes) -> bytes:
+    """Every line ending as CRLF — what a core.autocrlf=true checkout writes."""
+    return canonical_text_bytes(data).replace(b"\n", b"\r\n")
+
+
+def alternate_fixture_shas(input_dir: Path) -> list[str]:
+    """Names, other than fixture_sha, that this exact fixture's plan may carry.
+
+    Both are pre-normalisation spellings of the *same* *.tf, which is why either
+    can be renamed onto the canonical name without re-planning:
+
+    * the raw bytes as they sit on disk — the sha a contributor computed while
+      their working tree still held CRLF (or a UTF-8 BOM);
+    * the bytes projected to CRLF — the sha that same contributor computed for a
+      fixture git has since stored as LF. This is the one that matters in CI and
+      on the portal, whose checkouts are LF: the plan committed from a Windows
+      working tree is named for bytes that no longer exist anywhere in the repo,
+      and projecting forward is the only way to recognise it.
+
+    Canonical-equal entries are dropped, so an all-LF fixture returns [].
+    """
+    canonical = fixture_sha(input_dir)
+    out = []
+    for transform in (lambda b: b, _to_crlf):
+        sha = _sha_over(input_dir, transform)
+        if sha != canonical and sha not in out:
+            out.append(sha)
+    return out
+
+
+def find_denormalised_plan(input_dir: Path) -> Path | None:
+    """A committed plan for these *.tf under a pre-normalisation name, if present."""
+    for sha in alternate_fixture_shas(input_dir):
+        candidate = input_dir / f"{sha}.json"
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def adopt_denormalised_plan(input_dir: Path, cache_path: Path) -> bool:
+    """Rename a CRLF-era plan onto its canonical name. True if one was adopted.
+
+    A plan named for one of alternate_fixture_shas is the plan for exactly these
+    *.tf — the same terraform document under a name computed before fixture_sha
+    normalised line endings. Renaming it is strictly better than re-planning: the
+    contents are already right, and re-planning costs the contributor a terraform
+    run and, on a fresh clone, a 121MB provider download. It also means the fix for
+    an affected branch is a rename anyone can produce from any checkout, rather
+    than a re-run each contributor must do on the machine that caused it.
+
+    The narrowness matters. The tempting version of this — "adopt the single
+    <64-hex>.json in the directory if it parses as a plan" — would quietly undo the
+    property the sha naming exists to provide: that a fixture edited without
+    re-running the harness is *caught*, rather than silently tested against the
+    plan of its old config. A stale plan also parses, and is also the only .json in
+    the directory. Keying on the alternate shas keeps that guarantee whole, because
+    the match is cryptographic: only these *.tf, under a different spelling of
+    their line endings, can produce that name. A fixture that was genuinely edited
+    produces none of them.
+
+    Transitional. Once .gitattributes has kept CRLF out of the tree for a release
+    or two, no such file will exist and this can go.
+    """
+    if cache_path.exists():
+        return False
+    denormalised = find_denormalised_plan(input_dir)
+    if denormalised is None:
+        return False
+    try:
+        os.replace(denormalised, cache_path)
+    except OSError:
+        return False
+    return True
 
 
 def adopt_legacy_plan(input_dir: Path, cache_path: Path) -> bool:
@@ -121,7 +241,9 @@ def get_or_build_plan(input_dir: Path, cache_path: Path, verbose: bool = False) 
     """Return the fixture's committed plan, running terraform first if it is absent.
 
     A plan left at the pre-move path is adopted first (see adopt_legacy_plan), so
-    a branch that merges dev does not re-plan every fixture it owns.
+    a branch that merges dev does not re-plan every fixture it owns. A plan named
+    for the pre-normalisation sha is likewise renamed into place rather than
+    rebuilt (see adopt_denormalised_plan).
 
     On the way out, any *other* .json in the fixture dir is deleted: the fixture
     has exactly one valid plan, so a sibling is the leftover of an earlier version
@@ -130,6 +252,7 @@ def get_or_build_plan(input_dir: Path, cache_path: Path, verbose: bool = False) 
     keeps whatever it already had — that plan may be unrebuildable offline.
     """
     adopt_legacy_plan(input_dir, cache_path)
+    adopt_denormalised_plan(input_dir, cache_path)
     if not cache_path.exists() and run_terraform_commands(input_dir, cache_path, verbose) is None:
         return None
     prune_stale_plans(input_dir, keep=cache_path)
@@ -839,6 +962,10 @@ def main():
     if adopted:
         print(f"[*] adopted {adopted} plan(s) from the pre-move inputs/plan_cache/ layout "
               "— commit the moved files")
+    renamed = sum(1 for (i, _), cp in pair_cache.items() if adopt_denormalised_plan(i, cp))
+    if renamed:
+        print(f"[*] renamed {renamed} plan(s) written before line endings were normalised "
+              "— commit the renames (contents are unchanged)")
     misses = sum(1 for cp in pair_cache.values() if not cp.exists())
     if misses:
         print(f"[*] {misses}/{len(pairs)} plan(s) not cached — ensuring terraform provider cache…")
