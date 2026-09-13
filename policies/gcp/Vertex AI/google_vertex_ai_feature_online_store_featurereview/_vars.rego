@@ -1,7 +1,0 @@
-package terraform.gcp.security.vertex_ai.google_vertex_ai_feature_online_store_featurereview.vars
-
-variables := {
-    "friendly_resource_name": "Vertex AI Feature Online Store FeatureReview",
-    "resource_type": "google_vertex_ai_feature_online_store_featurereview",
-    "resource_value_name": "name"
-}
