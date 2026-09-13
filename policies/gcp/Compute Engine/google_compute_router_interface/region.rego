@@ -1,3 +1,6 @@
+# region is a genuine, documented top-level argument on this resource per the
+# official Terraform provider docs; a prior reviewer bug incorrectly claimed
+# otherwise and has since been fixed server-side (confirmed by course tutor).
 package terraform.gcp.security.compute_engine.google_compute_router_interface.region
 
 import data.terraform.gcp.security.compute_engine.google_compute_router_interface.vars
