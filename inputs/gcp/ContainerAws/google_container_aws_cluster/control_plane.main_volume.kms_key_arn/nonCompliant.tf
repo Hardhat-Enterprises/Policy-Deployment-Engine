@@ -1,5 +1,5 @@
 resource "google_container_aws_cluster" "non_compliant_example_1" {
-  name = "nc-container-aws-cluster"
+  name = "non_compliant_example_1"
 
   authorization {
     admin_users {
