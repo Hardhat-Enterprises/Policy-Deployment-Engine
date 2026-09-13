@@ -20,8 +20,8 @@
       "description": "Callback URL used by OAuth 2.0 authorization servers to communicate\nauthorization codes back to developer apps.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This is the OAuth 2.0 redirect URI used by authorization servers to communicate authorization codes back to the app. While security-relevant in OAuth flows (open redirectors can lead to authorization code theft), the specific URL is inherently team-specific. A Rego policy using whitelist or blacklist helpers can only check exact values, not patterns such as requiring an HTTPS prefix. A meaningful constraint would require team-specific URLs, which is not a generic platform policy."
+      "security_impact": true,
+      "rationale": "This is the OAuth 2.0 redirect URI used by authorization servers to communicate authorization codes back to the developer app. Using HTTP instead of HTTPS exposes authorization codes and tokens to interception via man-in-the-middle attacks. A generic platform policy can enforce that callback URLs use HTTPS by validating the URL pattern, preventing credential and token theft without requiring team-specific values."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
