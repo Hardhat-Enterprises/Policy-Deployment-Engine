@@ -84,8 +84,8 @@
       "description": "Name of the zone in which VM instances should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This selects the zone where the instances run and must be consistent with the cluster region and other resources. The appropriate zone is an operational placement choice rather than a generic security policy target."
+      "security_impact": true,
+      "rationale": "Zone placement affects where Flex Start compute resources are hosted and is therefore relevant to data residency requirements. The zone should be restricted to an approved platform whitelist."
     },
     "compute_resources.config.new_on_demand_instances": {
       "type": "block",
@@ -103,8 +103,8 @@
       "description": "Name of the zone in which VM instances should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This selects the zone where on-demand instances run and must match the cluster's regional placement requirements. The exact zone is an operational deployment choice rather than a generic security control."
+      "security_impact": true,
+      "rationale": "Zone placement determines where on-demand compute resources are hosted and is therefore relevant to data residency requirements. The zone should be restricted to an approved platform whitelist."
     },
     "compute_resources.config.new_reserved_instances": {
       "type": "block",
@@ -141,8 +141,8 @@
       "description": "Name of the zone in which VM instances should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This selects the zone where Spot instances run and must match the cluster's regional placement requirements. The exact zone is an operational deployment choice rather than a generic security control."
+      "security_impact": true,
+      "rationale": "Zone placement determines where Spot compute resources are hosted and is therefore relevant to data residency requirements. The zone should be restricted to an approved platform whitelist."
     },
     "network_resources": {
       "type": "block",
@@ -220,15 +220,15 @@
       "description": "Slurm [epilog scripts](https://slurm.schedmd.com/prolog_epilog.html), which\nwill be executed by compute nodes whenever a node finishes running a job.\nValues must not be empty.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Epilog scripts execute commands on compute nodes after jobs finish. Because arbitrary script content can modify the host, access data, or run privileged actions, these scripts directly affect the security posture and should be restricted to approved content."
+      "security_impact": false,
+      "rationale": "Although epilog scripts can execute commands on compute nodes, this field contains free-form script content that cannot be meaningfully constrained by a generic platform-level policy. Validation of arbitrary script logic is outside the scope of this policy framework."
     },
     "orchestrator.slurm.prolog_bash_scripts": {
       "description": "Slurm [prolog scripts](https://slurm.schedmd.com/prolog_epilog.html), which\nwill be executed by compute nodes before a node begins running a new job.\nValues must not be empty.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Prolog scripts execute commands on compute nodes before jobs run. Because arbitrary script content can modify the host, access data, or alter workload execution, these scripts directly affect the security posture and should be restricted to approved content."
+      "security_impact": false,
+      "rationale": "Although prolog scripts can execute commands on compute nodes, this field contains free-form script content that cannot be meaningfully constrained by a generic platform-level policy. Validation of arbitrary script logic is outside the scope of this policy framework."
     },
     "orchestrator.slurm.login_nodes": {
       "type": "block",
@@ -274,15 +274,15 @@
       "description": "[Startup\nscript](https://cloud.google.com/compute/docs/instances/startup-scripts/linux)\nto be run on each login node instance. Max 256KB.\nThe script must complete within the system-defined default timeout of 5\nminutes. For tasks that require more time, consider running them in the\nbackground using methods such as '&' or 'nohup'.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The startup script executes commands automatically on each login node when it starts. Arbitrary script content can modify system configuration, credentials, software, and access controls, so it directly affects the node's security posture."
+      "security_impact": false,
+      "rationale": "Although the startup script can execute commands automatically on login nodes, it contains free-form script content that cannot be meaningfully constrained by a generic platform-level policy. Validation of arbitrary script logic is outside the scope of this policy framework."
     },
     "orchestrator.slurm.login_nodes.zone": {
       "description": "Name of the zone in which login nodes should run, e.g., 'us-central1-a'.\nMust be in the same region as the cluster, and must match the zone of any\nother resources specified in the cluster.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This selects the zone where login nodes run and must be consistent with other cluster resources. The exact zone is an operational placement choice rather than a generic security control."
+      "security_impact": true,
+      "rationale": "The login node zone determines the geographic placement of Slurm login infrastructure and is therefore relevant to data residency requirements. The zone should be restricted to an approved platform whitelist."
     },
     "orchestrator.slurm.login_nodes.boot_disk": {
       "type": "block",
