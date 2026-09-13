@@ -197,8 +197,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the OAuth2 client secret used in the authorization code flow, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the credential the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "auth_config.oauth2_client_credentials": {
       "type": "block",
@@ -221,8 +221,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the OAuth2 client secret used in the client-credentials grant, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the credential the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "auth_config.oauth2_jwt_bearer": {
       "type": "block",
@@ -238,8 +238,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the PKCS#8 private key used to sign JWTs for the jwt-bearer grant, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the signing key the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated key visible."
     },
     "auth_config.oauth2_jwt_bearer.jwt_claims": {
       "type": "block",
@@ -295,8 +295,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the SSH client certificate presented to the target host, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the certificate the connection authenticates with and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated certificate visible."
     },
     "auth_config.ssh_public_key.ssh_client_cert_pass": {
       "type": "block",
@@ -307,8 +307,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the passphrase protecting the SSH client certificate, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the passphrase the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "auth_config.user_password": {
       "type": "block",
@@ -331,8 +331,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the password used for USER_PASSWORD authentication, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the credential the connection authenticates with and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "config_variable": {
       "type": "block",
@@ -395,8 +395,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying a secret-typed config variable passed to the connector, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the value the connector receives with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "destination_config": {
       "type": "block",
@@ -509,8 +509,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying a secret-typed variable in the eventing configuration, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the value the eventing path uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "eventing_config.auth_config": {
       "type": "block",
@@ -592,8 +592,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying a secret-typed variable in the eventing auth configuration, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the value used to authenticate the eventing path with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "eventing_config.auth_config.user_password": {
       "type": "block",
@@ -616,8 +616,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the password used for USER_PASSWORD authentication on the eventing path, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the credential the eventing registration authenticates with and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "eventing_config.registration_destination_config": {
       "type": "block",
@@ -815,8 +815,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying a secret-typed SSL-related variable, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the value the TLS configuration uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "ssl_config.client_certificate": {
       "type": "block",
@@ -827,8 +827,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the client certificate presented during mTLS, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the certificate the connection identifies itself with and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated certificate visible."
     },
     "ssl_config.client_private_key": {
       "type": "block",
@@ -839,8 +839,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the client private key used in mTLS, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the key material backing the connection's identity with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated key visible."
     },
     "ssl_config.client_private_key_pass": {
       "type": "block",
@@ -851,8 +851,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the passphrase protecting the client private key, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the passphrase the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "ssl_config.private_server_certificate": {
       "type": "block",
@@ -863,8 +863,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the private server certificate required when trust_model is PRIVATE, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes which server certificate the connection trusts and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated certificate visible."
     }
   }
 }
