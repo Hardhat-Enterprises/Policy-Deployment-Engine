@@ -6,43 +6,43 @@
       "description": "Absolute time in future when the reservation will be auto-deleted by Compute Engine. Timestamp is represented in RFC3339 text format.\nCannot be used with delete_after_duration.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Schedules an absolute time for automatic deletion of the reservation. This is an operational/cost-management scheduling choice, not a security control \u2014 losing a capacity reservation is an availability/cost concern, not an access or data exposure issue."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy this reservation via IaC (DELETE/ABANDON/PREVENT). Per service-wide guidance, deletion-blocking flags prevent destructive loss of a real capacity/cost commitment \u2014 a policy should enforce the destroy-blocking (PREVENT) value."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-text metadata for human readability. It has no effect on the resource's configuration or behavior."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The reservation's identifier. Naming is a team choice; we don't constrain resource names or references."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which GCP project the reservation belongs to \u2014 a reference/identifier, not a security-configurable property."
     },
     "specific_reservation_required": {
       "description": "When set to true, only VMs that target this reservation by name can\nconsume this reservation. Otherwise, it can be consumed by VMs with\naffinity for any reservation. Defaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether only VMs that explicitly target this reservation by name can consume it, versus any VM with matching reservation affinity. This governs capacity allocation and cost isolation between workloads, not confidentiality, integrity, or exposure of data or access \u2014 a team resource-management choice."
     },
     "zone": {
       "description": "The zone where the reservation is made.",
@@ -60,15 +60,15 @@
       "description": "Number of nanoseconds for the auto-delete duration.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the nanosecond component of the auto-delete duration. Like delete_at_time, this is an operational scheduling choice, not a security control."
     },
     "delete_after_duration.seconds": {
       "description": "Number of seconds for the auto-delete duration.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the second component of the auto-delete duration \u2014 an operational scheduling choice, not a security control."
     },
     "params": {
       "type": "block",
@@ -79,8 +79,8 @@
       "description": "Resource manager tags to be bound to the reservation. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Applies resource manager tags to the reservation for organization and governance purposes. Similar to labels, this is a categorization choice rather than a direct security control."
     },
     "reservation_sharing_policy": {
       "type": "block",
@@ -91,8 +91,8 @@
       "description": "Sharing config for all Google Cloud services. Possible values: [\"ALLOW_ALL\", \"DISALLOW_ALL\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether this reservation's capacity is automatically shared with other Google Cloud managed services (ALLOW_ALL) or restricted from such sharing (DISALLOW_ALL). A generic policy can require the restrictive value to prevent unintended consumption of reserved capacity by services outside the team's direct control \u2014 a structural exposure control, not tied to any specific team or project."
     },
     "share_settings": {
       "type": "block",
@@ -103,8 +103,8 @@
       "description": "Type of sharing for this shared-reservation Possible values: [\"LOCAL\", \"SPECIFIC_PROJECTS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether this is a purely local reservation or one shared with an explicit set of other projects. Both are legitimate architectural choices depending on deployment needs, with no single value that is universally more secure \u2014 actual exposure is governed by which projects appear in project_map, not by this enum."
     },
     "share_settings.project_map": {
       "type": "block",
@@ -115,15 +115,15 @@
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a specific project number to include in the share allowlist. This is a reference to a specific external project; we can't generically constrain which project a team may reference."
     },
     "share_settings.project_map.project_id": {
       "description": "The project id/number, should be same as the key of this project config in the project map.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A project identifier used within the share allowlist. Like other resource identifiers, this is a reference to a specific external project, not a generically constrainable security property."
     },
     "specific_reservation": {
       "type": "block",
@@ -134,15 +134,15 @@
       "description": "The number of resources that are allocated.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies how many resource instances are reserved. This is a capacity-planning choice with no inherently insecure value; sizing depends entirely on the team's workload needs."
     },
     "specific_reservation.source_instance_template": {
       "description": "Specifies the instance template to create the reservation. If you use this field, you must exclude the\ninstanceProperties field.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References an instance template used to define the reservation's properties. We secure the referenced template's own configuration separately; this field is just a pointer to it."
     },
     "specific_reservation.instance_properties": {
       "type": "block",
@@ -153,15 +153,15 @@
       "description": "The name of the machine type to reserve.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the machine type/shape to reserve. This is a functional sizing choice with no universally secure value \u2014 appropriate machine types vary entirely by workload."
     },
     "specific_reservation.instance_properties.min_cpu_platform": {
       "description": "The minimum CPU platform for the reservation. For example,\n'\"Intel Skylake\"'. See\nthe CPU platform availability reference](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform#availablezones)\nfor information on available CPU platforms.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies a minimum CPU platform/generation for compatibility or performance reasons. This is a functional hardware choice, not a security control."
     },
     "specific_reservation.instance_properties.guest_accelerators": {
       "type": "block",
@@ -172,15 +172,15 @@
       "description": "The number of the guest accelerator cards exposed to\nthis instance.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies how many accelerator (GPU/TPU) cards to reserve per instance \u2014 a capacity/performance sizing choice, not a security control."
     },
     "specific_reservation.instance_properties.guest_accelerators.accelerator_type": {
       "description": "The full or partial URL of the accelerator type to\nattach to this instance. For example:\n'projects/my-project/zones/us-central1-c/acceleratorTypes/nvidia-tesla-p100'\n\nIf you are creating an instance template, specify only the accelerator name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which accelerator (GPU) type to attach \u2014 a functional hardware choice with no universally secure value."
     },
     "specific_reservation.instance_properties.local_ssds": {
       "type": "block",
@@ -191,15 +191,15 @@
       "description": "The size of the disk in base-2 GB.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the size of the local SSD to reserve \u2014 a capacity/performance sizing choice with no security implication."
     },
     "specific_reservation.instance_properties.local_ssds.interface": {
       "description": "The disk interface to use for attaching this disk. Default value: \"SCSI\" Possible values: [\"SCSI\", \"NVME\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the disk interface protocol (SCSI vs NVME) for the local SSD \u2014 a performance/compatibility choice with no security implication."
     }
   }
 }

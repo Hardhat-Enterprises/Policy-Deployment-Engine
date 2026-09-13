@@ -6,50 +6,50 @@
       "description": "Client destination port for the 'GCE_VM_IP_PORTMAP' NEG.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is just the client destination port for a portmap NEG. It's a functional networking setting, not a security control, so false."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how the resource gets removed. Allowing ABANDON leaves it orphaned outside Terraform, so this is worth enforcing, so true."
     },
     "fqdn": {
       "description": "Fully qualified domain name of network endpoint.\n\nThis can only be specified when network_endpoint_type of the NEG is INTERNET_FQDN_PORT.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the domain name of the endpoint. It's an address/identifier for the endpoint, not a security control, so false."
     },
     "instance": {
       "description": "The name for a specific VM instance that the IP address belongs to.\nThis is required for network endpoints of type GCE_VM_IP_PORTMAP.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This points to the VM instance the IP belongs to. It's a reference to another resource, not a security control, so false."
     },
     "ip_address": {
       "description": "IPv4 address external endpoint.\n\nThis can only be specified when network_endpoint_type of the NEG is INTERNET_IP_PORT.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the external IP of the endpoint. It's the endpoint's address, not a security value with a safe or unsafe setting to enforce, so false."
     },
     "port": {
       "description": "Port number of network endpoint.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is just the port number of the endpoint. It's a functional networking setting, not a security control, so false."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Project just says where the resource lives, it's not a security control on the resource itself, so false."
     },
     "region": {
       "description": "Region where the containing network endpoint group is located.",
@@ -62,8 +62,8 @@
       "description": "The network endpoint group this endpoint is part of.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This points to the network endpoint group this endpoint belongs to. It's a reference to another resource, not a security control, so false."
     }
   }
 }
