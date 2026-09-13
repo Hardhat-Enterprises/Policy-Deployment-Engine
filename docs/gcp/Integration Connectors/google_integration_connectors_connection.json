@@ -133,8 +133,8 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-         "security_impact": false,
-      "rationale": "Names an external KMS key by its full resource path in the form projects/*/locations/*/keyRings/*/cryptoKeys/*. The key itself is a separate resource, created and managed outside this connection, and this field only points at it. A policy here could only check the shape of a path or require one to be present, neither of which establishes that the key exists, is correctly scoped, or is managed by the organisation — those are properties of the KMS resource, not of this reference. Which key a config variable is encrypted under is a data-layer decision belonging to the team that owns the secret, so the reference is out of scope for a platform-level policy on this resource."
+        "security_impact": true,
+      "rationale": "Supplies the KMS key path in the form projects/*/locations/*/keyRings/*/cryptoKeys/* and is an empty string when the key is Google-managed. A policy cannot validate which key a team should use, but it does not need to: requiring the field to be non-empty is enough to establish that the config variable is encrypted under a customer-managed key rather than a Google-managed one, which puts key rotation and revocation in the organisation's hands. The rule needs no allowlist of projects or key rings and so holds across every team."
      },
     "auth_config.additional_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
@@ -376,8 +376,8 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-        "security_impact": false,
-      "rationale": "Names an external KMS key by its full resource path in the form projects/*/locations/*/keyRings/*/cryptoKeys/*. The key itself is a separate resource, created and managed outside this connection, and this field only points at it. A policy here could only check the shape of a path or require one to be present, neither of which establishes that the key exists, is correctly scoped, or is managed by the organisation — those are properties of the KMS resource, not of this reference. Which key a config variable is encrypted under is a data-layer decision belonging to the team that owns the secret, so the reference is out of scope for a platform-level policy on this resource."
+          "security_impact": true,
+      "rationale": "Supplies the KMS key path in the form projects/*/locations/*/keyRings/*/cryptoKeys/* and is an empty string when the key is Google-managed. A policy cannot validate which key a team should use, but it does not need to: requiring the field to be non-empty is enough to establish that the config variable is encrypted under a customer-managed key rather than a Google-managed one, which puts key rotation and revocation in the organisation's hands. The rule needs no allowlist of projects or key rings and so holds across every team."
      },
     "config_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
@@ -490,8 +490,8 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-         "security_impact": false,
-      "rationale": "Names an external KMS key by its full resource path in the form projects/*/locations/*/keyRings/*/cryptoKeys/*. The key itself is a separate resource, created and managed outside this connection, and this field only points at it. A policy here could only check the shape of a path or require one to be present, neither of which establishes that the key exists, is correctly scoped, or is managed by the organisation — those are properties of the KMS resource, not of this reference. Which key a config variable is encrypted under is a data-layer decision belonging to the team that owns the secret, so the reference is out of scope for a platform-level policy on this resource."
+         "security_impact": true,
+      "rationale": "Supplies the KMS key path in the form projects/*/locations/*/keyRings/*/cryptoKeys/* and is an empty string when the key is Google-managed. A policy cannot validate which key a team should use, but it does not need to: requiring the field to be non-empty is enough to establish that the config variable is encrypted under a customer-managed key rather than a Google-managed one, which puts key rotation and revocation in the organisation's hands. The rule needs no allowlist of projects or key rings and so holds across every team."
      },
     "eventing_config.additional_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
@@ -573,8 +573,8 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-        "security_impact": false,
-      "rationale": "Names an external KMS key by its full resource path in the form projects/*/locations/*/keyRings/*/cryptoKeys/*. The key itself is a separate resource, created and managed outside this connection, and this field only points at it. A policy here could only check the shape of a path or require one to be present, neither of which establishes that the key exists, is correctly scoped, or is managed by the organisation — those are properties of the KMS resource, not of this reference. Which key a config variable is encrypted under is a data-layer decision belonging to the team that owns the secret, so the reference is out of scope for a platform-level policy on this resource."
+         "security_impact": true,
+      "rationale": "Supplies the KMS key path in the form projects/*/locations/*/keyRings/*/cryptoKeys/* and is an empty string when the key is Google-managed. A policy cannot validate which key a team should use, but it does not need to: requiring the field to be non-empty is enough to establish that the config variable is encrypted under a customer-managed key rather than a Google-managed one, which puts key rotation and revocation in the organisation's hands. The rule needs no allowlist of projects or key rings and so holds across every team."
      },
     "eventing_config.auth_config.additional_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
@@ -796,8 +796,9 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-         "security_impact": false,
-      "rationale": "Names an external KMS key by its full resource path in the form projects/*/locations/*/keyRings/*/cryptoKeys/*. The key itself is a separate resource, created and managed outside this connection, and this field only points at it. A policy here could only check the shape of a path or require one to be present, neither of which establishes that the key exists, is correctly scoped, or is managed by the organisation — those are properties of the KMS resource, not of this reference. Which key a config variable is encrypted under is a data-layer decision belonging to the team that owns the secret, so the reference is out of scope for a platform-level policy on this resource." },
+        "security_impact": true,
+      "rationale": "Supplies the KMS key path in the form projects/*/locations/*/keyRings/*/cryptoKeys/* and is an empty string when the key is Google-managed. A policy cannot validate which key a team should use, but it does not need to: requiring the field to be non-empty is enough to establish that the config variable is encrypted under a customer-managed key rather than a Google-managed one, which puts key rotation and revocation in the organisation's hands. The rule needs no allowlist of projects or key rings and so holds across every team."
+     },
     "ssl_config.additional_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
       "required": false,
