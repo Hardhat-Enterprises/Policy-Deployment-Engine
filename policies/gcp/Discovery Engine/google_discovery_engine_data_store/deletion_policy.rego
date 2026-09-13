@@ -8,14 +8,13 @@ conditions := [
         {
             "situation_description": "Data store deletion policy allows the resource to be destroyed, risking accidental or malicious data loss",
             "remedies": [
-                "Set deletion_policy to PREVENT to block Terraform from destroying the data store",
-                "Set deletion_policy to ABANDON to remove from Terraform management without deleting the resource"
+                "Set deletion_policy to PREVENT to block Terraform from destroying the data store"
             ]
         },
         {
-            "condition": "deletion_policy must be set to PREVENT or ABANDON",
+            "condition": "deletion_policy must be set to PREVENT",
             "attribute_path": ["deletion_policy"],
-            "values": ["PREVENT", "ABANDON"],
+            "values": ["PREVENT"],
             "policy_type": "whitelist"
         }
     ]
