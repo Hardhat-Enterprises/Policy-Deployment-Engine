@@ -12,10 +12,16 @@ conditions := [
             ]
         },
         {
-            "condition": "uri scheme must not be insecure",
+            "condition": "uri must use the https scheme",
             "attribute_path": ["uri"],
-            "values": ["*://*", [["http", "ftp", "ssh", "telnet", "smtp"]]],
-            "policy_type": "pattern blacklist"
+            "values": [
+                "*://*",
+                [
+                    ["https"],
+                    ["example.com", "www.example.com", "www.google.com"]
+                ]
+            ],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
