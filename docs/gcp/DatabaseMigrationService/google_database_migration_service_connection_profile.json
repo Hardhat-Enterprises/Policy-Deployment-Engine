@@ -462,7 +462,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Configures Oracle forward SSH connectivity. Forward SSH exposes a network access path, so this field is security-impacting."
+      "rationale": "Selects the hostname used for Oracle forward SSH connectivity. Because forward SSH creates the network path used to reach the database, an unsafe or unintended host can route migration traffic through an untrusted endpoint. This branch treats forward SSH as disallowed in favour of private connectivity."
     },
     "oracle.forward_ssh_connectivity.password": {
       "description": "Input only. SSH password. Only one of 'password' and 'private_key' can be configured.",
@@ -504,7 +504,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Configures private connectivity for Oracle database access. Requiring private connectivity reduces public network exposure."
+      "rationale": "Selects the private connection used for Oracle database access. Requiring a valid private connection keeps migration traffic on a private network path and avoids public or forward-SSH exposure."
     },
     "oracle.ssl": {
       "type": "block",
@@ -630,21 +630,21 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Provides the client certificate used for PostgreSQL SSL authentication. Requiring this field helps enforce certificate-based database authentication."
+      "rationale": "Provides the PostgreSQL client certificate used for mutual TLS authentication. Requiring it ensures certificate-based client authentication material is configured instead of relying only on basic credentials."
     },
     "postgresql.ssl.client_key": {
       "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Provides the private key used for PostgreSQL SSL client authentication. Requiring this field ensures certificate-based authentication material is configured."
+      "rationale": "Provides the private key paired with the PostgreSQL client certificate. Requiring it ensures mutual TLS authentication can be completed with the configured client certificate."
     },
     "postgresql.ssl.type": {
       "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the SSL mode used for PostgreSQL connectivity. Weak or disabled SSL can expose database migration traffic to interception."
+      "rationale": "Controls whether PostgreSQL migration traffic uses SSL. Requiring an SSL-enabled mode prevents plaintext database migration traffic and reduces interception risk."
     }
   }
 }
