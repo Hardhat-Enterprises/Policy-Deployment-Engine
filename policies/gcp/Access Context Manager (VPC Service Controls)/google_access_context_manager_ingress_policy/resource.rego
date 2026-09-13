@@ -9,9 +9,9 @@ conditions := [[
         "remedies": ["Update resource to a valid project resource such as 'projects/<project-number>'."]
     },
     {
-        "condition": "resource is whitelisted",
+        "condition": "resource names a project",
         "attribute_path": ["resource"],
-        "values": ["projects/*"],
+        "values": ["*/", [["projects"]]],
         "policy_type": "pattern whitelist"
     }
 ]]

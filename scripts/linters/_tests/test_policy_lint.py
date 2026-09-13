@@ -2,11 +2,11 @@
 
 Each case under ``fixtures/`` is a miniature repo tree (``docs/``, ``policies/``,
 ``inputs/``). The trees are copied into ``tmp_path`` before every test and the
-committed ``expected_plan.json`` next to a fixture's ``*.tf`` files is installed
-at the sha-named path ``inputs/plan_cache/<platform>/<sha>.json`` that
-``auto_test.plan_cache_path`` derives. Installing it at copy time (instead of
-committing it under that name) keeps the tests correct when the pinned provider
-version changes — the sha is recomputed from the same function the pipeline uses.
+committed ``expected_plan.json`` next to a fixture's ``*.tf`` files is renamed to
+the sha-named ``<sha>.json`` that ``auto_test.plan_cache_path`` derives — the same
+directory, the committed name. Renaming at copy time (instead of committing it
+under that name) keeps the tests correct when the pinned provider version changes:
+the sha is recomputed from the same function the pipeline uses.
 """
 
 import json
@@ -36,17 +36,15 @@ def _clean_caches():
 
 
 def build_tree(tmp_path, case):
-    """Copy fixture ``case`` into tmp_path and install its plan-cache entries."""
+    """Copy fixture ``case`` into tmp_path and install its committed plans."""
     dst = tmp_path / case
     shutil.copytree(FIXTURES / case, dst)
     for template in sorted(dst.rglob("expected_plan.json")):
-        cache = policy_lint.plan_cache_for(dst, template.parent)
-        # Guard rail: a bug in the re-rooting would otherwise have these tests
-        # writing plan-cache entries into the real repo.
+        cache = policy_lint.plan_cache_for(template.parent)
+        # Guard rail: the plan must land inside the copied tree, never in the real
+        # repo — it is derived from a path, and a path bug is silent otherwise.
         assert dst in cache.parents, f"{cache} escaped the fixture tree {dst}"
-        cache.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(template, cache)
-        template.unlink()
+        template.rename(cache)
     return dst
 
 
@@ -351,7 +349,7 @@ def test_fixture_drift_and_missing_plan(tmp_path):
         ("uniform_bucket_level_access", "fixture-missing-plan"),
     }
     missing = [f for f in findings if f.rule == "fixture-missing-plan"][0]
-    assert "no committed plan cache" in missing.message
+    assert "no committed plan at inputs/gcp/Cloud Storage/" in missing.message
     drift = [f for f in findings if f.rule == "fixture-drift"][0]
     # storage_class is the only attribute that differs besides name and the
     # argument under test — it must be the one named.
@@ -374,7 +372,7 @@ def test_fixture_drift_ignores_identity_and_computed_mirrors(tmp_path, resource_
         f"{noise} must not be read as drift"
     # And the plan really does differ on it, so the exemption is doing work.
     plan_dir = root / "inputs" / "gcp" / "Cloud Storage" / resource_type
-    cache = policy_lint.plan_cache_for(root, next(plan_dir.iterdir()))
+    cache = policy_lint.plan_cache_for(next(plan_dir.iterdir()))
     plan = json.loads(cache.read_text())
     values = {r["name"]: r["values"]
               for r in plan["planned_values"]["root_module"]["resources"]}
@@ -382,14 +380,51 @@ def test_fixture_drift_ignores_identity_and_computed_mirrors(tmp_path, resource_
     assert good.get(noise) != bad.get(noise)
 
 
+# --------------------------------------------------------------------------- #
+# Drift: a value that names itself after its fixture is naming, not drift.
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("value,polarity", [
+    ("compliant-example-1", "compliant"),
+    ("compliant_example_1", "compliant"),
+    ("compliant-assistant-1", "compliant"),      # not every id says "example"
+    ("non-compliant-example-1", "non_compliant"),
+    ("non_compliant_example_1", "non_compliant"),
+    ("Compliant-Example-1", "compliant"),        # case is not the signal
+])
+def test_a_value_named_after_its_fixture_is_recognised(value, polarity):
+    # Many GCP id fields reject underscores, so a contributor naming an example has
+    # to write it with hyphens. That is the same act of naming.
+    assert policy_lint._label_polarity(value) == polarity
+
+
+@pytest.mark.parametrize("value", [
+    "my-bucket-1",
+    "Protected assistant",
+    "projects/123456789",
+    "",
+    None,
+    42,
+])
+def test_anything_else_is_not_a_fixture_label(value):
+    assert policy_lint._label_polarity(value) is None
+
+
+def test_the_prefix_alone_does_not_qualify_it():
+    # "compliant" as a bare word, or as part of a longer one, is not a label — the
+    # separator is what makes it a name for this fixture.
+    assert policy_lint._label_polarity("compliant") is None
+    assert policy_lint._label_polarity("complianceteam") is None
+
+
 def test_plan_cache_for_matches_auto_test_on_the_real_repo():
-    # Re-rooting must be a no-op when the tree IS the repo, so the linter reads
-    # exactly the cache entries auto_test writes.
+    # The linter must read exactly the file auto_test writes: same directory as the
+    # fixture, same sha-derived name.
     input_dir = (project_root / "inputs" / "gcp" / "Cloud Storage"
                  / "google_storage_bucket" / "public_access_prevention")
     assert input_dir.is_dir(), "real fixture moved — update this test"
-    assert (policy_lint.plan_cache_for(project_root, input_dir)
-            == auto_test.plan_cache_path(input_dir))
+    cache = policy_lint.plan_cache_for(input_dir)
+    assert cache == auto_test.plan_cache_path(input_dir)
+    assert cache.parent == input_dir, "the committed plan lives beside its fixture"
 
 
 # --------------------------------------------------------------------------- #
@@ -541,12 +576,11 @@ def test_lint_error_is_a_documented_rule():
 
 
 # --------------------------------------------------------------------------- #
-# Fix round 1: the friendly-name index is one OPA call, not one per resource.
+# The friendly-name index needs one string literal per _vars.rego, so it reads
+# them rather than evaluating the platform — and evaluates only what it must.
 # --------------------------------------------------------------------------- #
-def test_friendly_name_index_uses_a_single_opa_call(tmp_path, monkeypatch):
-    root = build_tree(tmp_path, "vars_bad")
-    policy_lint.clear_caches()
-
+def _counting_opa(monkeypatch):
+    """Record every subprocess policy_lint launches, still running each one."""
     real_run = subprocess.run
     calls = []
 
@@ -555,11 +589,60 @@ def test_friendly_name_index_uses_a_single_opa_call(tmp_path, monkeypatch):
         return real_run(cmd, *args, **kwargs)
 
     monkeypatch.setattr(policy_lint.subprocess, "run", counting_run)
+    return calls
+
+
+def test_the_index_costs_no_opa_call_when_every_name_is_a_literal(tmp_path, monkeypatch):
+    root = build_tree(tmp_path, "vars_bad")
+    policy_lint.clear_caches()
+    calls = _counting_opa(monkeypatch)
+
     index = policy_lint._friendly_name_index(root / "policies", "gcp")
 
-    assert len(calls) == 1, f"expected one batched opa eval, got {len(calls)}"
+    assert calls == [], f"expected no opa eval, got {len(calls)}"
     assert sorted(rt for names in index.values() for _, rt in names) == [
         "google_a_thing", "google_b_thing", "google_d_thing", "google_e_thing"]
+
+
+def test_a_name_the_regex_cannot_read_is_evaluated(tmp_path, monkeypatch):
+    # A computed friendly_resource_name must still reach the index — the point of
+    # reading text first is to skip work, never to miss a name.
+    root = build_tree(tmp_path, "vars_bad")
+    vars_path = (root / "policies" / "gcp" / "Compute Service" / "google_a_thing"
+                 / policy_lint.VARS_FILE)
+    text = vars_path.read_text(encoding="utf-8")
+    literal = policy_lint._friendly_name_from_text(vars_path)
+    assert literal, "fixture must declare a literal for this test to remove one"
+    parts = ", ".join(f'"{w}"' for w in literal.split(" "))
+    vars_path.write_text(
+        text.replace(f'"friendly_resource_name": "{literal}"',
+                     f'"friendly_resource_name": concat(" ", [{parts}])'),
+        encoding="utf-8")
+    assert policy_lint._friendly_name_from_text(vars_path) is None
+
+    policy_lint.clear_caches()
+    calls = _counting_opa(monkeypatch)
+    index = policy_lint._friendly_name_index(root / "policies", "gcp")
+
+    assert len(calls) == 1, "the one unreadable file should cost exactly one eval"
+    assert ("Compute Service", "google_a_thing") in index.get(literal.lower(), [])
+
+
+def test_the_two_paths_agree_on_the_real_tree():
+    # The optimisation is only sound while every _vars.rego declares a literal. If
+    # someone writes a computed one, this is where that shows up — and the code
+    # above already handles it, so this is a notice, not a trap.
+    policies = project_root / "policies"
+    policy_lint.clear_caches()
+    index = policy_lint._friendly_name_index(policies, "gcp")
+
+    scraped = {}
+    for vars_path in sorted((policies / "gcp").glob(f"*/*/{policy_lint.VARS_FILE}")):
+        name = policy_lint._friendly_name_from_text(vars_path)
+        assert name is not None, f"{vars_path} needs an opa eval to read its name"
+        scraped.setdefault(name.strip().lower(), []).append(
+            (vars_path.parent.parent.name, vars_path.parent.name))
+    assert index == scraped
 
 
 # --------------------------------------------------------------------------- #
@@ -666,7 +749,7 @@ def test_malformed_plan_cache_is_a_lint_error(tmp_path, payload):
     root = build_tree(tmp_path, "clean")
     input_dir = (root / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket"
                  / "public_access_prevention")
-    policy_lint.plan_cache_for(root, input_dir).write_text(payload)
+    policy_lint.plan_cache_for(input_dir).write_text(payload)
     findings = policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
     assert pairs(findings) == {("public_access_prevention", "lint-error")}
 
@@ -714,7 +797,7 @@ def _bucket_plan(root):
     """(cache_path, plan, resources) for the clean tree's bucket fixture."""
     input_dir = (root / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket"
                  / CLEAN_BUCKET_ARG)
-    cache = policy_lint.plan_cache_for(root, input_dir)
+    cache = policy_lint.plan_cache_for(input_dir)
     plan = json.loads(cache.read_text())
     return cache, plan, plan["planned_values"]["root_module"]["resources"]
 
@@ -826,3 +909,292 @@ def test_mistyped_service_is_not_a_no_policies_dir_marker(tmp_path, capsys):
     err = capsys.readouterr().err
     assert rc == 2
     assert "no-policies-dir" not in err
+
+
+# --------------------------------------------------------------------------- #
+# Drift exemptions: fixtures the provider will not let you write any other way.
+# --------------------------------------------------------------------------- #
+def test_an_exempt_fixture_gets_its_recorded_keys():
+    assert policy_lint.drift_exempt_keys(
+        "Cloud Storage", "google_storage_object_acl", "predefined_acl") == {"role_entity"}
+
+
+def test_everything_else_gets_nothing():
+    assert policy_lint.drift_exempt_keys(
+        "Cloud Storage", "google_storage_bucket", "location") == frozenset()
+    # Right resource, wrong argument — the exemption is per fixture, not per resource.
+    assert policy_lint.drift_exempt_keys(
+        "Cloud Storage", "google_storage_object_acl", "bucket") == frozenset()
+
+
+def test_every_exemption_states_its_mutually_exclusive_set():
+    # An entry without a reason is a silenced finding, not a recorded fact.
+    for key, (keys, why) in policy_lint.FIXTURE_DRIFT_EXEMPT.items():
+        service, resource, stem = key
+        assert all(isinstance(x, str) and x for x in (service, resource, stem))
+        assert keys and all(isinstance(k, str) and k for k in keys)
+        assert isinstance(why, str) and len(why.strip()) > 60, key
+
+
+def test_an_exemption_silences_only_the_keys_it_names(tmp_path, monkeypatch):
+    # The fixtures_bad tree drifts on `storage_class`. Exempting that key clears the
+    # finding; exempting a different one leaves it exactly where it was.
+    root = build_tree(tmp_path, "fixtures_bad")
+    entry = ("Cloud Storage", "google_storage_bucket", "public_access_prevention")
+
+    def drift_findings():
+        policy_lint.clear_caches()
+        return [f for f in policy_lint.lint_resource(
+            root, "gcp", "Cloud Storage", "google_storage_bucket")
+            if f.rule == "fixture-drift"]
+
+    assert drift_findings(), "the fixture must drift before anything is exempted"
+
+    monkeypatch.setitem(policy_lint.FIXTURE_DRIFT_EXEMPT, entry,
+                        ({"something_else"}, "x" * 70))
+    assert drift_findings(), "exempting an unrelated key must change nothing"
+
+    monkeypatch.setitem(policy_lint.FIXTURE_DRIFT_EXEMPT, entry,
+                        ({"storage_class"}, "x" * 70))
+    assert drift_findings() == [], "exempting the drifted key must clear it"
+
+
+@pytest.mark.parametrize("entry", sorted(policy_lint.FIXTURE_DRIFT_EXEMPT))
+def test_every_exemption_is_still_needed(entry, monkeypatch):
+    """Removing an entry must bring its finding back on the real tree.
+
+    This is what stops the list rotting. A fixture that is rewritten so it no longer
+    needs its exemption leaves a stale entry behind, quietly exempting a key that
+    might drift again later — and nothing else would notice.
+    """
+    service, resource, stem = entry
+    exempted = policy_lint.FIXTURE_DRIFT_EXEMPT[entry][0]
+    monkeypatch.setattr(policy_lint, "FIXTURE_DRIFT_EXEMPT",
+                        {k: v for k, v in policy_lint.FIXTURE_DRIFT_EXEMPT.items()
+                         if k != entry})
+    policy_lint.clear_caches()
+    findings = policy_lint.lint_resource(project_root, "gcp", service, resource)
+    drift = [f for f in findings if f.rule == "fixture-drift" and f.policy == stem]
+    assert drift, (f"{entry} no longer drifts without its exemption — the fixture was "
+                   f"fixed, so remove the entry from FIXTURE_DRIFT_EXEMPT")
+    # The message ends with the standing pointer at drift_exemptions.json; the keys
+    # are everything before it.
+    keys_text = drift[0].message.split(policy_lint.MUTUALLY_EXCLUSIVE_HINT)[0]
+    reported = set(keys_text.split(": ", 1)[1].rstrip(". ").split(", "))
+    assert reported <= exempted, (
+        f"{entry} drifts on {reported - exempted}, which its exemption does not "
+        f"cover — either the fixture gained a real second difference, or the entry "
+        f"needs widening with a reason")
+
+
+
+# --------------------------------------------------------------------------- #
+# The provider's write-only convention: `x`, `x_wo`, `x_wo_version` are one
+# setting, and a fixture testing one of them cannot avoid differing on another.
+# --------------------------------------------------------------------------- #
+def test_the_write_only_trio_is_one_setting():
+    assert policy_lint.write_only_partners("private_key") == {
+        "private_key_wo", "private_key_wo_version"}
+    # ...and from either write-only spelling back to the whole set.
+    assert policy_lint.write_only_partners("private_key_wo") == {
+        "private_key", "private_key_wo_version"}
+    assert policy_lint.write_only_partners("private_key_wo_version") == {
+        "private_key", "private_key_wo"}
+
+
+def _fixture_only_tree(tmp_path, stem, compliant_values, non_compliant_values,
+                       service="Compute Engine",
+                       resource_type="google_compute_region_ssl_certificate"):
+    """An inputs/ tree with a committed plan, and nothing else.
+
+    The fixture rules read the plan and the *.tf names only — no policies, no OPA —
+    so this exercises the real drift rule without standing up a whole resource.
+    """
+    input_dir = tmp_path / "inputs" / "gcp" / service / resource_type / stem
+    input_dir.mkdir(parents=True)
+    (input_dir / "compliant.tf").write_text("# fixture\n")
+    (input_dir / "nonCompliant.tf").write_text("# fixture\n")
+
+    def resource(label, values):
+        return {"address": f"{resource_type}.{label}", "mode": "managed",
+                "type": resource_type, "name": label, "values": values}
+
+    plan = {"planned_values": {"root_module": {"resources": [
+        resource("compliant_example_1", compliant_values),
+        resource("non_compliant_example_1", non_compliant_values)]}}}
+    policy_lint.plan_cache_for(input_dir).write_text(json.dumps(plan))
+    return input_dir
+
+
+def _drift(tmp_path, service="Compute Engine",
+           resource_type="google_compute_region_ssl_certificate", stem="private_key"):
+    findings = policy_lint._lint_fixtures(tmp_path, "gcp", service, resource_type, stem)
+    return [f for f in findings if f.rule == "fixture-drift"]
+
+
+def test_a_write_only_partner_is_not_drift(tmp_path):
+    # The real shape: `private_key` and `private_key_wo` are mutually exclusive, so
+    # showing a non-compliant private_key forces the compliant side onto the
+    # write-only spelling. Neither the partner nor its version counter is drift.
+    _fixture_only_tree(
+        tmp_path, "private_key",
+        {"certificate": "cert", "private_key": None,
+         "private_key_wo": "secret", "private_key_wo_version": 1},
+        {"certificate": "cert", "private_key": "leaked-in-state",
+         "private_key_wo": None, "private_key_wo_version": None})
+    assert _drift(tmp_path) == []
+
+
+def test_a_real_second_difference_is_still_drift_beside_a_write_only_pair(tmp_path):
+    # The pairing must not become a blanket exemption for the whole fixture.
+    _fixture_only_tree(
+        tmp_path, "private_key",
+        {"certificate": "cert-a", "private_key": None, "private_key_wo": "secret"},
+        {"certificate": "cert-b", "private_key": "leaked-in-state",
+         "private_key_wo": None})
+    drift = _drift(tmp_path)
+    assert len(drift) == 1
+    assert "certificate" in drift[0].message
+
+
+def test_the_drift_message_points_at_the_exemptions_file(tmp_path):
+    _fixture_only_tree(tmp_path, "private_key",
+                       {"private_key": "a", "storage_class": "STANDARD"},
+                       {"private_key": "b", "storage_class": "NEARLINE"})
+    drift = _drift(tmp_path)
+    assert len(drift) == 1
+    assert policy_lint.DRIFT_EXEMPTIONS_FILE in drift[0].message
+    assert policy_lint.DRIFT_EXEMPTIONS_DOC in drift[0].message
+
+
+# --------------------------------------------------------------------------- #
+# drift_exemptions.json — the per-resource, contributor-editable list.
+# --------------------------------------------------------------------------- #
+def _with_exemptions(root, entries, service="Cloud Storage",
+                     resource_type="google_storage_bucket", raw=None):
+    """Write a drift_exemptions.json into a copied tree's resource folder."""
+    path = (root / "policies" / "gcp" / service / resource_type
+            / policy_lint.DRIFT_EXEMPTIONS_FILE)
+    path.write_text(raw if raw is not None else json.dumps(entries))
+    policy_lint.clear_caches()
+    return path
+
+
+def _document(root, arguments, service="Cloud Storage",
+              resource_type="google_storage_bucket"):
+    """Add argument keys to a copied tree's docs JSON."""
+    doc = root / "docs" / "gcp" / service / f"{resource_type}.json"
+    loaded = json.loads(doc.read_text())
+    for name in arguments:
+        loaded["arguments"][name] = {"description": "Fixture argument.", "required": False,
+                                     "type": "string", "security_impact": False,
+                                     "rationale": "Fixture."}
+    doc.write_text(json.dumps(loaded))
+
+
+def _lint_bad_tree(root):
+    policy_lint.clear_caches()
+    return policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
+
+
+def test_a_declared_exemption_clears_the_drift_it_names(tmp_path):
+    # fixtures_bad drifts on `storage_class`.
+    root = build_tree(tmp_path, "fixtures_bad")
+    _document(root, ["storage_class"])
+    assert [f for f in _lint_bad_tree(root) if f.rule == "fixture-drift"], \
+        "the fixture must drift before anything is exempted"
+
+    _with_exemptions(root, {"public_access_prevention": {
+        "keys": ["storage_class"],
+        "reason": "Terraform allows only one of these to be set."}})
+    findings = _lint_bad_tree(root)
+    assert [f for f in findings if f.rule == "fixture-drift"] == []
+    assert [f for f in findings if f.rule.startswith("drift-exemption")] == []
+
+
+def test_an_exemption_silences_only_the_argument_it_is_filed_under(tmp_path):
+    # Keyed by the argument under test, so an entry for a different fixture in the
+    # same resource must not leak into this one.
+    root = build_tree(tmp_path, "fixtures_bad")
+    _document(root, ["storage_class"])
+    _with_exemptions(root, {"uniform_bucket_level_access": {
+        "keys": ["storage_class"],
+        "reason": "Terraform allows only one of these to be set."}})
+    drift = [f for f in _lint_bad_tree(root) if f.rule == "fixture-drift"]
+    assert [f.policy for f in drift] == ["public_access_prevention"]
+
+
+@pytest.mark.parametrize("entries,raw,why", [
+    (None, "{not json", "malformed JSON"),
+    (None, '["storage_class"]', "top level is not an object"),
+    ({"public_access_prevention": ["storage_class"]}, None, "entry is not an object"),
+    ({"public_access_prevention": {"keys": [], "reason": "x" * 40}}, None, "keys empty"),
+    ({"public_access_prevention": {"keys": ["storage_class"], "reason": "  "}}, None,
+     "reason blank"),
+    ({"public_access_prevention": {"keys": ["storage_class"]}}, None, "reason missing"),
+])
+def test_a_malformed_exemptions_file_is_a_finding_and_exempts_nothing(
+        tmp_path, entries, raw, why):
+    root = build_tree(tmp_path, "fixtures_bad")
+    _document(root, ["storage_class"])
+    _with_exemptions(root, entries, raw=raw)
+    findings = _lint_bad_tree(root)
+
+    assert [f for f in findings if f.rule == "drift-exemption-invalid"], why
+    assert [f for f in findings if f.rule == "fixture-drift"], \
+        f"a file rejected for {why} must not silence the drift it claimed to explain"
+
+
+def test_an_entry_naming_an_undocumented_argument_is_a_finding(tmp_path):
+    # A typo exempts nothing while looking like it works, so it has to be said out
+    # loud. `storage_class` is deliberately left out of this tree's docs.
+    root = build_tree(tmp_path, "fixtures_bad")
+    _with_exemptions(root, {"public_access_prevention": {
+        "keys": ["storage_class"],
+        "reason": "Terraform allows only one of these to be set."}})
+    invalid = [f for f in _lint_bad_tree(root) if f.rule == "drift-exemption-invalid"]
+    assert len(invalid) == 1
+    assert "storage_class" in invalid[0].message
+    assert "not a documented argument" in invalid[0].message
+
+
+def test_an_entry_the_fixture_does_not_need_is_stale(tmp_path):
+    # The anti-rot rule: this fixture does not differ on `location`, so exempting it
+    # silences nothing today and would hide a real difference tomorrow.
+    root = build_tree(tmp_path, "fixtures_bad")
+    _document(root, ["location"])
+    _with_exemptions(root, {"public_access_prevention": {
+        "keys": ["location"],
+        "reason": "Terraform allows only one of these to be set."}})
+    stale = [f for f in _lint_bad_tree(root) if f.rule == "drift-exemption-stale"]
+    assert len(stale) == 1
+    assert "location" in stale[0].message
+
+
+def test_an_entry_duplicating_the_write_only_pairing_is_stale(tmp_path):
+    # Nothing to declare for a `_wo` pair — the linter already handles it, so an
+    # entry for one is redundant and says so.
+    tree = tmp_path / "tree"
+    _fixture_only_tree(
+        tree, "private_key",
+        {"private_key": None, "private_key_wo": "secret"},
+        {"private_key": "leaked-in-state", "private_key_wo": None})
+    resource_dir = (tree / "policies" / "gcp" / "Compute Engine"
+                    / "google_compute_region_ssl_certificate")
+    resource_dir.mkdir(parents=True)
+    (resource_dir / policy_lint.DRIFT_EXEMPTIONS_FILE).write_text(json.dumps(
+        {"private_key": {"keys": ["private_key_wo"],
+                         "reason": "One of private_key or private_key_wo can only be set."}}))
+    policy_lint.clear_caches()
+
+    findings = policy_lint._lint_drift_exemptions(
+        tree, "gcp", "Compute Engine", "google_compute_region_ssl_certificate")
+    assert [f.rule for f in findings] == ["drift-exemption-stale"]
+
+
+def test_no_exemptions_file_is_the_normal_case(tmp_path):
+    root = build_tree(tmp_path, "clean")
+    assert policy_lint.load_drift_exemptions(
+        root / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket") == ({}, None)
+    assert policy_lint.lint_resource(
+        root, "gcp", "Cloud Storage", "google_storage_bucket") == []
