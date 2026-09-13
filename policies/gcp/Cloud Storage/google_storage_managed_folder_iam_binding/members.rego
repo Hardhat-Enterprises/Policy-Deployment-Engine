@@ -14,7 +14,7 @@ conditions := [
 
     {
       "condition": "Public access should be prohibited.",
-      "attribute_path": ["members",0],
+      "attribute_path": ["members"],
       "values": ["allUsers","allAuthenticatedUsers"],
       "policy_type": "blacklist"
     }
@@ -23,5 +23,5 @@ conditions := [
 
 summary := helpers.get_multi_summary(conditions, vars.variables)
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := summary.message
+details := summary.details

@@ -6,29 +6,29 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether 'terraform destroy'/'apply' deletes the resource (DELETE), is blocked (PREVENT), or removes it from Terraform state while leaving it running untouched in GCP (ABANDON). ABANDON creates an orphaned, unmanaged, unmonitored live resource - same 'prevent destructive loss' mechanism as force_delete."
     },
     "force_delete": {
       "description": "By default, you can only delete inactive jobs within Dataproc. Setting this to true, and calling destroy, will ensure that the job is first cancelled before issuing the delete.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Bypasses the normal restriction that only inactive jobs can be deleted, allowing an active job to be force-cancelled and removed. Risks accidental loss of in-progress work."
     },
     "labels": {
       "description": "Optional. The labels to associate with this job.\n\n\t\t\t\t**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\n\t\t\t\tPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Descriptive metadata with no access or security effect."
     },
     "project": {
       "description": "The project in which the cluster can be found and jobs subsequently run against. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies where the job runs. An organisational/location setting, not a security control."
     },
     "region": {
       "description": "The Cloud Dataproc region. This essentially determines which clusters are available for this job to be submitted to. If not specified, defaults to global.",
@@ -41,8 +41,8 @@
       "description": "If set to true, Terraform will wait for the job to reach a terminal state (DONE, ERROR, CANCELLED, ATTEMPT_FAILURE). Otherwise, Terraform will consider the job 'created' once it is in the RUNNING state.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls Terraform's own wait behaviour, not a property of the deployed resource."
     },
     "hadoop_config": {
       "type": "block",
@@ -53,50 +53,50 @@
       "description": "HCFS URIs of archives to be extracted in the working directory of .jar, .tar, .tar.gz, .tgz, and .zip.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional job dependency location. No established precedent in this project for treating source-file locations as a security control."
     },
     "hadoop_config.args": {
       "description": "The arguments to pass to the driver.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional driver input, not a security setting."
     },
     "hadoop_config.file_uris": {
       "description": "HCFS URIs of files to be copied to the working directory of Spark drivers and distributed tasks. Useful for naively parallel tasks.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References files to be copied into the job's working directory from an external HCFS location. While external source URIs carry a theoretical risk of introducing untrusted code or data, a platform-level policy cannot validate arbitrary external URIs without overreaching into infrastructure it doesn't control. Treated as a functional dependency reference, not a policy target."
     },
     "hadoop_config.jar_file_uris": {
       "description": "HCFS URIs of jar files to add to the CLASSPATHs of the Spark driver and tasks.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A pointer to an external artifact (JAR file) location, not a security control. Resource/file references are outside the scope of what a platform-level security policy can meaningfully enforce."
     },
     "hadoop_config.main_class": {
       "description": "The class containing the main method of the driver. Must be in a provided jar or jar that is already on the classpath. Conflicts with main_jar_file_uri",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional driver entry point, not a security control."
     },
     "hadoop_config.main_jar_file_uri": {
       "description": "The HCFS URI of jar file containing the driver jar. Conflicts with main_class",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A pointer to the external artifact (JAR file) containing the job driver, not a security control. External artifact references are outside the scope of platform-level security policy."
     },
     "hadoop_config.properties": {
       "description": "A mapping of property names to values, used to configure Spark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-form map with arbitrary, user-defined keys. Confirmed against this project's own codebase: no policy anywhere in policies/gcp/ targets a properties-style map field (grep -rln '\"properties\"' policies/gcp/ returns zero results), and none of the 6 policy types this engine supports can inspect arbitrary map keys - element_blacklist, the closest mechanism, only checks substring matches on array elements at a fixed attribute_path, and shared.rego resolves attribute_path as a fixed literal walk, not a scan. There is no attribute_path that could target this field's contents, so it cannot be expressed as an enforceable policy in this engine."
     },
     "hadoop_config.logging_config": {
       "type": "block",
@@ -107,8 +107,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package (e.g. DEBUG vs INFO), not whether logging occurs. This is an operational tuning setting, not a binary security control - consistent with 'severity' being ruled non-security elsewhere in this project for the same reason (display/tuning, not enforcement)."
     },
     "hive_config": {
       "type": "block",
@@ -119,43 +119,43 @@
       "description": "Whether to continue executing queries if a query fails. The default value is false. Setting to true can be useful when executing independent parallel queries. Defaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An operational reliability tuning value, not a security control."
     },
     "hive_config.jar_file_uris": {
       "description": "HCFS URIs of jar files to add to the CLASSPATH of the Hive server and Hadoop MapReduce (MR) tasks. Can contain Hive SerDes and UDFs.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An external resource reference/pointer to jar files used by the Hive job, not a security control."
     },
     "hive_config.properties": {
       "description": "A mapping of property names and values, used to configure Hive. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/hive/conf/hive-site.xml, and classes in user code.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Engine configuration/tuning values, not a security control."
     },
     "hive_config.query_file_uri": {
       "description": "HCFS URI of file containing Hive script to execute as the job. Conflicts with query_list",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional job content location, not a security control."
     },
     "hive_config.query_list": {
       "description": "The list of Hive queries or statements to execute as part of the job. Conflicts with query_file_uri",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional job content (the query itself), not a security control."
     },
     "hive_config.script_variables": {
       "description": "Mapping of query variable names to values (equivalent to the Hive command: SET name=\"value\";).",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional query parameter substitutions, not a security control."
     },
     "pig_config": {
       "type": "block",
@@ -166,43 +166,43 @@
       "description": "Whether to continue executing queries if a query fails. The default value is false. Setting to true can be useful when executing independent parallel queries. Defaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An operational reliability tuning value, not a security control."
     },
     "pig_config.jar_file_uris": {
       "description": "HCFS URIs of jar files to add to the CLASSPATH of the Pig Client and Hadoop MapReduce (MR) tasks. Can contain Pig UDFs.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional job dependency location. No established precedent in this project for treating source-file locations as a security control."
     },
     "pig_config.properties": {
       "description": "A mapping of property names to values, used to configure Pig. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/pig/conf/pig.properties, and classes in user code.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Engine configuration/tuning values, not a security control."
     },
     "pig_config.query_file_uri": {
       "description": "HCFS URI of file containing Hive script to execute as the job. Conflicts with query_list",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional job content location, not a security control."
     },
     "pig_config.query_list": {
       "description": "The list of Hive queries or statements to execute as part of the job. Conflicts with query_file_uri",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional job content (the query itself), not a security control."
     },
     "pig_config.script_variables": {
       "description": "Mapping of query variable names to values (equivalent to the Pig command: name=[value]).",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional query parameter substitutions, not a security control."
     },
     "pig_config.logging_config": {
       "type": "block",
@@ -213,8 +213,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     },
     "placement": {
       "type": "block",
@@ -225,8 +225,8 @@
       "description": "The name of the cluster where the job will be submitted",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional routing reference to an existing cluster, not a security setting."
     },
     "presto_config": {
       "type": "block",
@@ -237,43 +237,43 @@
       "description": "Presto client tags to attach to this query.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Descriptive metadata with no access or security effect."
     },
     "presto_config.continue_on_failure": {
       "description": "Whether to continue executing queries if a query fails. Setting to true can be useful when executing independent parallel queries. Defaults to false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An operational reliability tuning value, not a security control."
     },
     "presto_config.output_format": {
       "description": "The format in which query output will be displayed. See the Presto documentation for supported output formats.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls display formatting of query output, not a security control."
     },
     "presto_config.properties": {
       "description": "A mapping of property names to values. Used to set Presto session properties Equivalent to using the --session flag in the Presto CLI.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Engine configuration/tuning values, not a security control."
     },
     "presto_config.query_file_uri": {
       "description": "The HCFS URI of the script that contains SQL queries. Conflicts with query_list",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Points to the external location of the SQL script to execute. Constraining this reference would not improve security, since it is a pointer to another resource/location rather than a configurable security control."
     },
     "presto_config.query_list": {
       "description": "The list of SQL queries or statements to execute as part of the job. Conflicts with query_file_uri",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The literal SQL query text to execute as part of the job. This is functional job content defined by the team, not a security control."
     },
     "presto_config.logging_config": {
       "type": "block",
@@ -284,8 +284,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     },
     "pyspark_config": {
       "type": "block",
@@ -296,50 +296,50 @@
       "description": "Optional. HCFS URIs of archives to be extracted in the working directory of .jar, .tar, .tar.gz, .tgz, and .zip",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to external archive files copied into the job's working directory, not a security control. Resource/file location references are outside the scope of platform-level policy."
     },
     "pyspark_config.args": {
       "description": "Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Command-line arguments passed to the driver program. These are application-level, team-defined functional choices, not a security control."
     },
     "pyspark_config.file_uris": {
       "description": "Optional. HCFS URIs of files to be copied to the working directory of Python drivers and distributed tasks. Useful for naively parallel tasks",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to external files copied into the job's working directory, not a security control. Resource/file location references are outside the scope of platform-level policy."
     },
     "pyspark_config.jar_file_uris": {
       "description": "Optional. HCFS URIs of jar files to add to the CLASSPATHs of the Python driver and tasks",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to external jar file locations added to the job's classpath, not a security control. Resource references are outside the scope of platform-level policy."
     },
     "pyspark_config.main_python_file_uri": {
       "description": "Required. The HCFS URI of the main Python file to use as the driver. Must be a .py file",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The HCFS URI pointing to the main Python driver script. This is a functional pointer to an external resource, not a policy target."
     },
     "pyspark_config.properties": {
       "description": "Optional. A mapping of property names to values, used to configure PySpark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-form map with arbitrary, user-defined keys. Confirmed against this project's own codebase: no policy anywhere in policies/gcp/ targets a properties-style map field (grep -rln '\"properties\"' policies/gcp/ returns zero results), and none of the 6 policy types this engine supports can inspect arbitrary map keys - element_blacklist, the closest mechanism, only checks substring matches on array elements at a fixed attribute_path, and shared.rego resolves attribute_path as a fixed literal walk, not a scan. There is no attribute_path that could target this field's contents, so it cannot be expressed as an enforceable policy in this engine."
     },
     "pyspark_config.python_file_uris": {
       "description": "Optional. HCFS file URIs of Python files to pass to the PySpark framework. Supported file types: .py, .egg, and .zip",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to external Python file locations, consistent with every other *_file_uris field in this resource being treated as an out-of-scope resource reference."
     },
     "pyspark_config.logging_config": {
       "type": "block",
@@ -350,8 +350,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     },
     "reference": {
       "type": "block",
@@ -362,8 +362,8 @@
       "description": "The job ID, which must be unique within the project. The job ID is generated by the server upon job submission or provided by the user as a means to perform retries without creating duplicate jobs",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A functional identifier, not a security control."
     },
     "scheduling": {
       "type": "block",
@@ -374,15 +374,15 @@
       "description": "Maximum number of times per hour a driver may be restarted as a result of driver exiting with non-zero code before job is reported failed.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An operational reliability/retry tuning value, not a security control."
     },
     "scheduling.max_failures_total": {
       "description": "Maximum number of times in total a driver may be restarted as a result of driver exiting with non-zero code before job is reported failed.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An operational reliability/retry tuning value, not a security control."
     },
     "spark_config": {
       "type": "block",
@@ -393,50 +393,50 @@
       "description": "HCFS URIs of archives to be extracted in the working directory of .jar, .tar, .tar.gz, .tgz, and .zip.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to external archive file locations, consistent with every other *_uris field in this resource being treated as an out-of-scope resource reference."
     },
     "spark_config.args": {
       "description": "The arguments to pass to the driver.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Command-line arguments passed to the driver, consistent with the identical pyspark_config.args field being treated as a team functional choice, not a security control."
     },
     "spark_config.file_uris": {
       "description": "HCFS URIs of files to be copied to the working directory of Spark drivers and distributed tasks. Useful for naively parallel tasks.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies URIs of files to be copied to the cluster nodes. Resource references and file paths are not constrained by platform-level policy."
     },
     "spark_config.jar_file_uris": {
       "description": "HCFS URIs of jar files to add to the CLASSPATHs of the Spark driver and tasks.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References external artifact (jar) locations. These are team dependencies, not platform security policy targets."
     },
     "spark_config.main_class": {
       "description": "The class containing the main method of the driver. Must be in a provided jar or jar that is already on the classpath. Conflicts with main_jar_file_uri",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the application entry point class name. This is an architectural/functional choice, not a security control."
     },
     "spark_config.main_jar_file_uri": {
       "description": "The HCFS URI of jar file containing the driver jar. Conflicts with main_class",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the primary application artifact URI. Resource pointers and external references are out of scope for platform-level policy."
     },
     "spark_config.properties": {
       "description": "A mapping of property names to values, used to configure Spark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-form map with arbitrary, user-defined keys. Confirmed against this project's own codebase: no policy anywhere in policies/gcp/ targets a properties-style map field (grep -rln '\"properties\"' policies/gcp/ returns zero results), and none of the 6 policy types this engine supports can inspect arbitrary map keys - element_blacklist, the closest mechanism, only checks substring matches on array elements at a fixed attribute_path, and shared.rego resolves attribute_path as a fixed literal walk, not a scan. There is no attribute_path that could target this field's contents, so it cannot be expressed as an enforceable policy in this engine."
     },
     "spark_config.logging_config": {
       "type": "block",
@@ -447,8 +447,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     },
     "sparksql_config": {
       "type": "block",
@@ -459,36 +459,36 @@
       "description": "HCFS URIs of jar files to be added to the Spark CLASSPATH.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References external artifact (jar) locations. These are team dependencies, not security controls."
     },
     "sparksql_config.properties": {
       "description": "A mapping of property names to values, used to configure Spark SQL's SparkConf. Properties that conflict with values set by the Cloud Dataproc API may be overwritten.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-form map with arbitrary, user-defined keys. Confirmed against this project's own codebase: no policy anywhere in policies/gcp/ targets a properties-style map field (grep -rln '\"properties\"' policies/gcp/ returns zero results), and none of the 6 policy types this engine supports can inspect arbitrary map keys - element_blacklist, the closest mechanism, only checks substring matches on array elements at a fixed attribute_path, and shared.rego resolves attribute_path as a fixed literal walk, not a scan. There is no attribute_path that could target this field's contents, so it cannot be expressed as an enforceable policy in this engine."
     },
     "sparksql_config.query_file_uri": {
       "description": "The HCFS URI of the script that contains SQL queries. Conflicts with query_list",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional job content location, not a security control."
     },
     "sparksql_config.query_list": {
       "description": "The list of SQL queries or statements to execute as part of the job. Conflicts with query_file_uri",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional job content (the query itself), not a security control."
     },
     "sparksql_config.script_variables": {
       "description": "Mapping of query variable names to values (equivalent to the Spark SQL command: SET name=\"value\";).",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Functional query parameter substitutions, not a security control."
     },
     "sparksql_config.logging_config": {
       "type": "block",
@@ -499,8 +499,8 @@
       "description": "Optional. The per-package log levels for the driver. This may include 'root' package name to configure rootLogger. Examples: 'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'.",
       "required": true,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the verbosity/format of driver log output per package, not whether logging occurs. An operational tuning setting, not a binary security control."
     }
   }
 }
