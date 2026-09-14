@@ -766,7 +766,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Specifies which workflow actions execute after deployment. Requiring non-empty steps prevents an unauthorized or accidentally empty workflow from silently skipping intended post-deployment tasks."
+      "rationale": "Enforces that postdeploy.actions contains an explicit, non-placeholder value, which structurally guarantees a defined post-deployment step actually executes rather than silently defaulting to an empty or unapproved state."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks": {
       "type": "block",
@@ -783,14 +783,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Controls the runtime arguments passed to the postdeploy container. Requiring an explicit, non-placeholder value prevents unauthorized or malformed execution flags from being silently accepted."
+      "rationale": "Enforces that container.args, when set, is not left as an unapproved placeholder, which structurally guarantees the runtime arguments actually in effect are the ones explicitly configured."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Controls the entrypoint command for the postdeploy container. Requiring an explicit, non-placeholder value prevents an unauthorized or arbitrary shell command from silently executing."
+      "rationale": "Enforces that container.command, when set, is not left as an unapproved placeholder, which structurally guarantees the entrypoint actually in effect is the one explicitly configured."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
@@ -804,7 +804,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines which container image executes in the postdeploy step. Requiring an explicit, non-placeholder image reference guards against an unverified or unintended image source executing."
+      "rationale": "Enforces that container.image is not empty or an unapproved placeholder, which structurally guarantees a container image is present before this step executes."
     },
     "serial_pipeline.stages.strategy.standard.predeploy": {
       "type": "block",

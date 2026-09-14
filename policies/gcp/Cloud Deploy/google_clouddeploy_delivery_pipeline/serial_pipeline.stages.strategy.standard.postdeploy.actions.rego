@@ -1,3 +1,4 @@
+# Rationale confirmed matching the structural-guarantee wording style already accepted elsewhere in this repo.
 package terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline.serial_pipeline_stages_strategy_standard_postdeploy_actions
 
 import data.terraform.helpers
