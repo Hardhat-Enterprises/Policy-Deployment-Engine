@@ -6,36 +6,36 @@
       "description": "DataScan identifier. Must contain only lowercase letters, numbers and hyphens. Must start with a letter. Must end with a number or a letter.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the scan within its project and location. Naming conventions help administration but do not configure authentication, permissions, encryption, or data exposure."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls protection against Terraform-driven deletion of the scan. Policy should require PREVENT for protected scans to avoid accidental removal of monitoring configuration; DELETE and ABANDON should require an approved lifecycle exception. This protection does not prevent deletion through other interfaces."
     },
     "description": {
       "description": "Description of the scan.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides explanatory metadata about the scan. Its content does not enforce access restrictions or change how data is processed, protected, or published."
     },
     "display_name": {
       "description": "User friendly display name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a readable name for interfaces and administration. Changing the display name does not alter the execution identity, access permissions, or security configuration."
     },
     "labels": {
       "description": "User-defined labels for the scan. A list of key->value pairs.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels support organisation, filtering, and cost attribution. These labels are not IAM tags and do not directly grant permissions or enforce protection of the scanned data."
     },
     "location": {
       "description": "The location where the data scan should reside.",
@@ -48,8 +48,8 @@
       "description": "N/A",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the project that owns the scan and its inherited IAM and organisation-policy context. Policy should restrict the effective project to an approved set, accounting for the provider project when this argument is omitted."
     },
     "data": {
       "type": "block",
@@ -60,15 +60,15 @@
       "description": "The Dataplex entity that represents the data source(e.g. BigQuery table) for Datascan.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the Dataplex entity whose underlying data will be scanned. Policy should allow only approved entity references to keep processing within the authorised data scope; the execution identity's IAM permissions remain necessary."
     },
     "data.resource": {
       "description": "The service-qualified full resource name of the cloud resource for a DataScan job to scan against. The field could be:\nCloud Storage bucket (//storage.googleapis.com/projects/PROJECT_ID/buckets/BUCKET_ID) for DataDiscoveryScan OR BigQuery table of type \"TABLE\" (/bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID) for DataProfileScan/DataQualityScan.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the source bucket or table processed by the scan. Policy should validate the full resource reference against approved source projects and resources, rather than accepting any syntactically valid data source."
     },
     "data_discovery_spec": {
       "type": "block",
@@ -84,29 +84,29 @@
       "description": "The BigQuery connection used to create BigLake tables. Must be in the form 'projects/{projectId}/locations/{locationId}/connections/{connection_id}'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the connection whose credentials provide access to data through published BigLake tables. Policy should restrict the connection to approved full resource names; its service account permissions must be checked separately for least privilege."
     },
     "data_discovery_spec.bigquery_publishing_config.location": {
       "description": "The location of the BigQuery dataset to publish BigLake external or non-BigLake external tables to.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines where the publishing dataset resides. Policy should restrict the effective destination to approved regions or multi-regions for data residency and account for compatibility with the source bucket and scan location."
     },
     "data_discovery_spec.bigquery_publishing_config.project": {
       "description": "The project of the BigQuery dataset to publish BigLake external or non-BigLake external tables to. If not specified, the project of the Cloud Storage bucket will be used. The format is \"projects/{project_id_or_number}\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the project receiving discovered table metadata and its associated access-control context. Policy should restrict the effective publishing project to approved destinations, including the source bucket project used when this value is omitted."
     },
     "data_discovery_spec.bigquery_publishing_config.table_type": {
       "description": "Determines whether to publish discovered tables as BigLake external tables or non-BigLake external tables. Possible values: [\"TABLE_TYPE_UNSPECIFIED\", \"EXTERNAL\", \"BIGLAKE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Changes the data-access model: EXTERNAL uses the querying user's credentials, while BIGLAKE uses the associated connection's credentials. Policy should enforce the approved model for the data source and account for the default EXTERNAL behaviour."
     },
     "data_discovery_spec.storage_config": {
       "type": "block",
@@ -117,15 +117,15 @@
       "description": "Defines the data to exclude during discovery. Provide a list of patterns that identify the data to exclude. For Cloud Storage bucket assets, these patterns are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these patterns are interpreted as patterns to match table names.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Can keep sensitive source paths out of discovery and subsequent table publication. Policy should enforce the approved exclusions for each source where exclusions are required, considering their effect together with include_patterns."
     },
     "data_discovery_spec.storage_config.include_patterns": {
       "description": "Defines the data to include during discovery when only a subset of the data should be considered. Provide a list of patterns that identify the data to include. For Cloud Storage bucket assets, these patterns are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these patterns are interpreted as patterns to match table names.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the source paths eligible for discovery and table publication. Policy should restrict patterns to the approved discovery scope and allow unrestricted selection only for sources approved for whole-source discovery."
     },
     "data_discovery_spec.storage_config.csv_options": {
       "type": "block",
@@ -136,36 +136,36 @@
       "description": "The delimiter that is used to separate values. The default is ',' (comma).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how CSV fields are separated during parsing. The appropriate delimiter depends on the file format and does not configure access control or confidentiality protections."
     },
     "data_discovery_spec.storage_config.csv_options.encoding": {
       "description": "The character encoding of the data. The default is UTF-8.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the character encoding used to read CSV files. Character encoding is a parsing setting, not encryption or a mechanism for controlling access to data."
     },
     "data_discovery_spec.storage_config.csv_options.header_rows": {
       "description": "The number of rows to interpret as header rows that should be skipped when reading data rows.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies how many CSV header rows the parser skips. This is determined by the source file layout and does not provide a security boundary or access restriction."
     },
     "data_discovery_spec.storage_config.csv_options.quote": {
       "description": "The character used to quote column values. Accepts '\"' (double quotation mark) or ''' (single quotation mark). If unspecified, defaults to '\"' (double quotation mark).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines how quoted CSV values are parsed. Choosing a quote character affects format interpretation and does not configure authentication, permissions, or SQL execution."
     },
     "data_discovery_spec.storage_config.csv_options.type_inference_disabled": {
       "description": "Whether to disable the inference of data types for CSV data. If true, all columns are registered as strings.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether discovered CSV columns receive inferred types or string types. It affects schema representation and does not mask values, encrypt data, or enforce column-level access."
     },
     "data_discovery_spec.storage_config.json_options": {
       "type": "block",
@@ -176,15 +176,15 @@
       "description": "The character encoding of the data. The default is UTF-8.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the character encoding for JSON input. It determines how text is decoded and does not encrypt the input or change who can access it."
     },
     "data_discovery_spec.storage_config.json_options.type_inference_disabled": {
       "description": "Whether to disable the inference of data types for JSON data. If true, all columns are registered as their primitive types (strings, number, or boolean).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls type inference when registering JSON fields. Using primitive types changes the discovered schema but does not apply masking, encryption, or access restrictions."
     },
     "data_documentation_spec": {
       "type": "block",
@@ -200,22 +200,22 @@
       "description": "If set, the latest DataScan job result will be published to Dataplex Catalog.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls publication of profile results, which can include common field values, into catalog metadata. Policy should enforce the approved publication setting for the data classification, allowing publication only where the catalog audience is authorised for those results."
     },
     "data_profile_spec.row_filter": {
       "description": "A filter applied to all rows in a single DataScan job. The filter needs to be a valid SQL expression for a WHERE clause in BigQuery standard SQL syntax. Example: col1 >= 0 AND col2 < 10",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains SQL that selects the rows processed for profiling and can help exclude sensitive records. Policy should permit only reviewed filter expressions for restricted scans, with omission allowed when the entire source is approved for profiling; IAM remains the access boundary."
     },
     "data_profile_spec.sampling_percent": {
       "description": "The percentage of the records to be selected from the dataset for DataScan.\nValue can range between 0.0 and 100.0 with up to 3 significant decimal digits.\nSampling is not applied if 'sampling_percent' is not specified, 0 or 100.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Adjusts statistical coverage, runtime, and processing cost. Random sampling does not reliably exclude sensitive records or provide anonymisation, so a sampling percentage is not a confidentiality control."
     },
     "data_profile_spec.exclude_fields": {
       "type": "block",
@@ -226,8 +226,8 @@
       "description": "Expected input is a list of fully qualified names of fields as in the schema.\nOnly top-level field names for nested fields are supported.\nFor instance, if 'x' is of nested field type, listing 'x' is supported but 'x.y.z' is not supported. Here 'y' and 'y.z' are nested fields of 'x'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Excludes columns from profiling, reducing the risk of sensitive values appearing in profile results. Policy should enforce required sensitive-field exclusions for each source and use the supported top-level field names for nested data."
     },
     "data_profile_spec.include_fields": {
       "type": "block",
@@ -238,8 +238,8 @@
       "description": "Expected input is a list of fully qualified names of fields as in the schema.\nOnly top-level field names for nested fields are supported.\nFor instance, if 'x' is of nested field type, listing 'x' is supported but 'x.y.z' is not supported. Here 'y' and 'y.z' are nested fields of 'x'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects columns eligible for profiling and inclusion in result statistics. Policy should restrict the effective selection to approved fields, considering exclusions and the default inclusion of all fields when no selection is specified."
     },
     "data_profile_spec.post_scan_actions": {
       "type": "block",
@@ -255,8 +255,8 @@
       "description": "The BigQuery table to export DataProfileScan results to.\nFormat://bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines where potentially sensitive profiling results are copied. When export is configured, policy should allow only approved destination tables; destination IAM, encryption, and retention protections must be assessed on the BigQuery resources separately."
     },
     "data_quality_spec": {
       "type": "block",
@@ -267,36 +267,36 @@
       "description": "If set, the latest DataScan job result will be published to Dataplex Catalog.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether quality results are copied into catalog metadata, creating another place where dataset and rule information can be viewed. Policy should enforce the approved publication setting for the source's classification and intended catalog audience."
     },
     "data_quality_spec.enable_catalog_based_rules": {
       "description": "If set to true, the scan will retrieve rules defined in Data Catalog for the resource.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Allows catalog-maintained rules, potentially containing SQL, to determine what the scan executes. Policy should enable this mode only for sources approved to use centrally controlled rules; reviewed inline rules remain a valid alternative. Catalog edit permissions require separate review."
     },
     "data_quality_spec.filter": {
       "description": "A filter to selectively run a subset of rules.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects quality rules by their names or attributes. It affects which business validations run, but does not itself change data-access permissions or disable a built-in security control."
     },
     "data_quality_spec.row_filter": {
       "description": "A filter applied to all rows in a single DataScan job. The filter needs to be a valid SQL expression for a WHERE clause in BigQuery standard SQL syntax. Example: col1 >= 0 AND col2 < 10",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Supplies SQL used to select records processed by the quality scan. Policy should restrict configured expressions to reviewed filters and approved references, allowing an omitted filter for approved full-source processing; the filter does not replace row-level access policies."
     },
     "data_quality_spec.sampling_percent": {
       "description": "The percentage of the records to be selected from the dataset for DataScan.\nValue can range between 0.0 and 100.0 with up to 3 significant decimal digits.\nSampling is not applied if 'sampling_percent' is not specified, 0 or 100.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how much data is sampled for quality evaluation, affecting coverage and cost. It does not configure permissions, prevent sensitive-data access, or establish a universal security threshold."
     },
     "data_quality_spec.post_scan_actions": {
       "type": "block",
@@ -312,8 +312,8 @@
       "description": "The BigQuery table to export DataQualityScan results to.\nFormat://bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the destination receiving quality results and associated source and rule metadata. When export is configured, policy should restrict the full table reference to approved destinations, with destination access and retention checked separately."
     },
     "data_quality_spec.post_scan_actions.notification_report": {
       "type": "block",
@@ -339,8 +339,8 @@
       "description": "The email recipients who will receive the DataQualityScan results report.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines who receives emailed scan reports. Policy should validate every recipient against approved addresses or precisely matched domains to prevent disclosure of quality results and dataset information to unintended recipients."
     },
     "data_quality_spec.post_scan_actions.notification_report.score_threshold_trigger": {
       "type": "block",
@@ -351,8 +351,8 @@
       "description": "The score range is in [0,100].",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the quality score that triggers a report. This is an operational alerting threshold based on business expectations; it does not determine recipient authorisation or directly enforce data security."
     },
     "data_quality_spec.rules": {
       "type": "block",
@@ -363,57 +363,57 @@
       "description": "Map of attribute name and value linked to the rule.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides rule metadata that can also be used when filtering which quality rules run. These attributes are not IAM bindings or security tags and do not grant data access."
     },
     "data_quality_spec.rules.column": {
       "description": "The unnested column which this rule is evaluated against.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the source column evaluated by a quality rule. The appropriate column depends on the dataset; this setting does not grant column access or configure column-level restrictions."
     },
     "data_quality_spec.rules.description": {
       "description": "Description of the rule.\nThe maximum length is 1,024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Explains the purpose of a quality rule for readers. The description is not executed and does not control access, encryption, or result publication."
     },
     "data_quality_spec.rules.dimension": {
       "description": "The dimension name a rule belongs to. Custom dimension name is supported with all uppercase letters and maximum length of 30 characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Groups rules and their results under a quality dimension such as completeness or validity. This classification affects reporting and does not establish a security policy or permission boundary."
     },
     "data_quality_spec.rules.ignore_null": {
       "description": "Rows with null values will automatically fail a rule, unless ignoreNull is true. In that case, such null rows are trivially considered passing. Only applicable to ColumnMap rules.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether null values pass supported quality checks. Null acceptance depends on the business meaning of the column and does not inherently change access controls or confidentiality."
     },
     "data_quality_spec.rules.name": {
       "description": "A mutable name for the rule.\nThe name must contain only letters (a-z, A-Z), numbers (0-9), or hyphens (-).\nThe maximum length is 63 characters.\nMust start with a letter.\nMust end with a number or a letter.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a rule for administration, reporting, and rule selection. It does not specify executable SQL, grant permissions, or enable a security protection."
     },
     "data_quality_spec.rules.suspended": {
       "description": "Whether the Rule is active or suspended. Default = false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Pauses an individual quality validation. This changes quality monitoring coverage but does not disable IAM, encryption, audit logging, or another built-in security control; requiring a particular business rule is an application-specific requirement."
     },
     "data_quality_spec.rules.threshold": {
       "description": "The minimum ratio of passing_rows / total_rows required to pass this rule, with a range of [0.0, 1.0]. 0 indicates default value (i.e. 1.0).",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the proportion of records that must pass a quality rule. The acceptable ratio is specific to the data and business use, rather than a general security requirement."
     },
     "data_quality_spec.rules.non_null_expectation": {
       "type": "block",
@@ -429,29 +429,29 @@
       "description": "The maximum column value allowed for a row to pass this validation. At least one of minValue and maxValue need to be provided.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines an upper bound for acceptable business data. It changes the validation result without modifying the underlying data or enforcing access restrictions."
     },
     "data_quality_spec.rules.range_expectation.min_value": {
       "description": "The minimum column value allowed for a row to pass this validation. At least one of minValue and maxValue need to be provided.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines a lower bound for acceptable business data. There is no universal secure minimum across columns, and this setting does not configure a security control."
     },
     "data_quality_spec.rules.range_expectation.strict_max_enabled": {
       "description": "Whether each value needs to be strictly lesser than ('<') the maximum, or if equality is allowed.\nOnly relevant if a maxValue has been defined. Default = false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines whether a value equal to the maximum passes the range check. Inclusive versus exclusive comparison is a business validation choice with no direct access-control effect."
     },
     "data_quality_spec.rules.range_expectation.strict_min_enabled": {
       "description": "Whether each value needs to be strictly greater than ('>') the minimum, or if equality is allowed.\nOnly relevant if a minValue has been defined. Default = false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines whether a value equal to the minimum passes the range check. This changes comparison semantics and does not protect credentials, restrict access, or encrypt data."
     },
     "data_quality_spec.rules.regex_expectation": {
       "type": "block",
@@ -462,8 +462,8 @@
       "description": "A regular expression the column value is expected to match.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Checks whether stored values match an expected business format. It reports quality outcomes and is not an input-sanitisation, access-control, or data-masking mechanism."
     },
     "data_quality_spec.rules.row_condition_expectation": {
       "type": "block",
@@ -474,8 +474,8 @@
       "description": "The SQL expression.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Supplies executable SQL that can include subqueries or routine calls. Policy should allow only reviewed expressions and approved referenced resources to constrain query scope within the execution identity's permissions."
     },
     "data_quality_spec.rules.set_expectation": {
       "type": "block",
@@ -486,8 +486,8 @@
       "description": "Expected values for the column value.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists business values accepted by a quality check. This set validates stored data and does not act as an allowlist for identities, network access, or resource permissions."
     },
     "data_quality_spec.rules.sql_assertion": {
       "type": "block",
@@ -498,8 +498,8 @@
       "description": "The SQL statement.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Provides the SQL query executed for an assertion and can reference data beyond the declared source. Policy should allow only reviewed query statements and approved references, preserving required source filters where applicable; keyword checks alone cannot establish query safety."
     },
     "data_quality_spec.rules.statistic_range_expectation": {
       "type": "block",
@@ -510,36 +510,36 @@
       "description": "The maximum column statistic value allowed for a row to pass this validation.\nAt least one of minValue and maxValue need to be provided.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines an upper limit for a business statistic used in quality evaluation. The suitable value depends on the dataset and does not directly enforce data protection."
     },
     "data_quality_spec.rules.statistic_range_expectation.min_value": {
       "description": "The minimum column statistic value allowed for a row to pass this validation.\nAt least one of minValue and maxValue need to be provided.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines a lower limit for a business statistic used in quality evaluation. It determines whether an aggregate passes validation, without changing access permissions or confidentiality."
     },
     "data_quality_spec.rules.statistic_range_expectation.statistic": {
       "description": "column statistics. Possible values: [\"STATISTIC_UNDEFINED\", \"MEAN\", \"MIN\", \"MAX\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the aggregate metric evaluated by the rule. Choosing a mean, minimum, or maximum is an analytical decision and does not configure resource security."
     },
     "data_quality_spec.rules.statistic_range_expectation.strict_max_enabled": {
       "description": "Whether column statistic needs to be strictly lesser than ('<') the maximum, or if equality is allowed.\nOnly relevant if a maxValue has been defined. Default = false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether an aggregate equal to its maximum bound passes validation. It changes mathematical comparison behaviour rather than an access or protection setting."
     },
     "data_quality_spec.rules.statistic_range_expectation.strict_min_enabled": {
       "description": "Whether column statistic needs to be strictly greater than ('>') the minimum, or if equality is allowed.\nOnly relevant if a minValue has been defined. Default = false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether an aggregate equal to its minimum bound passes validation. This is a quality-rule comparison option with no direct effect on security permissions."
     },
     "data_quality_spec.rules.table_condition_expectation": {
       "type": "block",
@@ -550,8 +550,8 @@
       "description": "The SQL expression.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Provides executable SQL for a table-level check, including possible references to other tables or routines. Policy should restrict it to reviewed expressions and approved references, with execution permissions independently limited through IAM."
     },
     "data_quality_spec.rules.template_reference": {
       "type": "block",
@@ -562,8 +562,8 @@
       "description": "The resource name of the template entry.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects an external catalog template that supplies SQL for execution. Policy should allow only approved full template references, with template contents and editing permissions reviewed separately to prevent unreviewed query changes."
     },
     "data_quality_spec.rules.template_reference.values": {
       "type": "block",
@@ -574,15 +574,15 @@
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a parameter in the selected rule template. The key does not itself contain executable SQL or grant permissions; security validation must evaluate the approved template and each associated parameter value together."
     },
     "data_quality_spec.rules.template_reference.values.value": {
       "description": "The string representation of the parameter value.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Provides text substituted into an executable SQL template. Policy should validate each name-value pair against the approved template's parameter constraints, including permitted resource references, so substitution cannot expand the reviewed query scope."
     },
     "data_quality_spec.rules.uniqueness_expectation": {
       "type": "block",
@@ -608,8 +608,8 @@
       "description": "Service account email.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the service account whose credentials execute the scan. Policy should restrict supplied addresses to approved scan identities; least-privilege IAM grants and impersonation permissions require separate validation, and an approved email alone does not prove minimal privileges."
     },
     "execution_identity.user_credential": {
       "type": "block",
@@ -625,8 +625,8 @@
       "description": "The unnested field (of type Date or Timestamp) that contains values which monotonically increase over time. If not specified, a data scan will run for all data in the table.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the timestamp or date column used to identify incremental data. It affects scan coverage and processing efficiency but does not provide row-level authorisation or a security retention policy."
     },
     "execution_spec.trigger": {
       "type": "block",
@@ -647,8 +647,8 @@
       "description": "Time to live for the DataScan and its results after the one-time run completes. Accepts a string with a unit suffix 's' (e.g., '7200s'). Default is 24 hours. Ranges between 0 and 31536000 seconds (1 year).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls retention of the one-time scan and its results. Policy should enforce approved minimum and maximum retention periods to preserve required evidence without retaining sensitive results unnecessarily, accounting for the default duration and immediate deletion at zero."
     },
     "execution_spec.trigger.schedule": {
       "type": "block",
@@ -659,8 +659,8 @@
       "description": "Cron schedule for running scans periodically. This field is required for Schedule scans.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines when routine data scans run. Frequency affects freshness, resource use, and monitoring coverage, but no universal cron schedule directly enforces access control or data protection."
     }
   }
 }
