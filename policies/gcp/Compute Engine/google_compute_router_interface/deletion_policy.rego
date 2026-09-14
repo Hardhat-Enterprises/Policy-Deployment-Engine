@@ -6,7 +6,7 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Router interface deletion_policy does not prevent accidental deletion.",
+      "situation_description": "Router interface deletion_policy does not structurally guarantee resource availability against accidental deletion.",
       "remedies": [
         "Set deletion_policy to PREVENT to avoid accidental deletion of the interface.",
       ],
