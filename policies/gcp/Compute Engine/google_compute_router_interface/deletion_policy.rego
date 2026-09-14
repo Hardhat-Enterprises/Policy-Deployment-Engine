@@ -6,16 +6,16 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Router interface deletion_policy is not set to allow normal deletion.",
+      "situation_description": "Router interface deletion_policy does not prevent accidental deletion.",
       "remedies": [
-        "Set deletion_policy to DELETE so Terraform can manage and remove the resource normally.",
+        "Set deletion_policy to PREVENT to avoid accidental deletion of the interface.",
       ],
     },
     {
-      "condition": "deletion_policy must be DELETE.",
+      "condition": "deletion_policy must be PREVENT.",
       "attribute_path": ["deletion_policy"],
       "values": [
-        "DELETE",
+        "PREVENT",
       ],
       "policy_type": "whitelist",
     },
