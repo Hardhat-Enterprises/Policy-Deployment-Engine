@@ -1,15 +1,16 @@
 package terraform.gcp.security.bigquery.google_bigquery_connection.kms_key_name
+
 import data.terraform.helpers
 import data.terraform.gcp.security.bigquery.google_bigquery_connection.vars
 
 conditions := [
     [
-        {"situation_description": "kms_key_name is not set, leaving BigQuery Connection data unencrypted at rest", "remedies": ["Set kms_key_name to a valid Cloud KMS key"]},
+                {"situation_description": "kms_key_name is not set, leaving BigQuery Connection data encrypted only with Google-managed keys rather than a customer-managed key", "remedies": ["Set kms_key_name to a Cloud KMS key in the form projects/*/locations/*/keyRings/*/cryptoKeys/*"]},
         {
-            "condition": "Check if kms_key_name is configured",
+            "condition": "Check if kms_key_name is missing or empty",
             "attribute_path": ["kms_key_name"],
-            "values": ["google_kms_crypto_key.crypto_key.id"],
-            "policy_type": "whitelist"
+            "values": [null, ""],
+            "policy_type": "blacklist"
         }
     ]
 ]
