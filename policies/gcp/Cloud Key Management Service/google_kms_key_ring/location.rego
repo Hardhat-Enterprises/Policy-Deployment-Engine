@@ -4,7 +4,7 @@ import data.terraform.gcp.security.google_kms.google_kms_key_ring.vars as vars
 
 conditions :=[
 [
-    {"situation_description" : "location",
+    {"situation_description" : "The key ring is created outside the approved region, so the keys it holds — and therefore the data they protect — sit outside the organisation's data-residency boundary.",
     "remedies":[ "Change location to australia-southeast1"]},
     {
         "condition": "Check if location is not permitted",
@@ -15,5 +15,7 @@ conditions :=[
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

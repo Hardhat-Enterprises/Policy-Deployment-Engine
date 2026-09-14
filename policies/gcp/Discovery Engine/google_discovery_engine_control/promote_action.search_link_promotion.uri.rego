@@ -1,0 +1,27 @@
+package terraform.gcp.security.discovery_engine.google_discovery_engine_control.promote_action_search_link_promotion_uri
+
+import data.terraform.helpers
+import data.terraform.gcp.security.discovery_engine.google_discovery_engine_control.vars
+
+# Restrict promoted links to an approved HTTPS destination.
+
+conditions := [
+  [
+    {
+      "situation_description": "Does the promoted destination URI use HTTPS?",
+      "remedies": ["Use the HTTPS scheme for the promoted destination URI."]
+    },
+    {
+      "condition": "promoted destination URI does not use HTTPS",
+      "attribute_path": ["promote_action", 0, "search_link_promotion", 0, "uri"],
+     "values": ["*://", [["https"]]],
+"policy_type": "pattern whitelist"
+    }
+  ]
+]
+
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+
+details := result.details
