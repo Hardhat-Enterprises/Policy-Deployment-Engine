@@ -2,7 +2,7 @@
 
 resource "google_apikeys_key" "non_compliant_example_1" {
   name         = "non_compliant_example_1"
-  display_name = "Non-compliant server key (public IP range)"
+  display_name = "Compliant server key (restricted IPs)"
   project = "my-gcp-project"
   
   restrictions {
