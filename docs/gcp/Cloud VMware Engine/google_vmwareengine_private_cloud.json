@@ -6,22 +6,22 @@
       "description": "The number of hours to delay this request. You can set this value to an hour between 0 to 8, where setting it to 0 starts the deletion request immediately. If no value is set, a default value is set at the API Level.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls how long a deletion request is delayed. It affects the timing of resource removal but does not itself prevent deletion or change the private cloud's access controls, network exposure, or security configuration."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deleting a private cloud can remove the infrastructure and security controls associated with that environment. A generic policy can require deletion_policy to be set to PREVENT to reduce the risk of accidental or unauthorized destruction."
     },
     "description": {
       "description": "User-provided description for this private cloud.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field only stores descriptive text for the private cloud. It does not change connectivity, access control, resource protection, or security enforcement."
     },
     "location": {
       "description": "The location where the PrivateCloud should reside.",
@@ -34,29 +34,29 @@
       "description": "The ID of the PrivateCloud.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the identifier of the private cloud. Naming the resource does not directly alter its network exposure, access controls, or security behaviour."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the Google Cloud project that owns the resource. The appropriate project is environment-specific, so a generic policy cannot safely require one particular project identifier."
     },
     "send_deletion_delay_hours_if_zero": {
       "description": "While set true, deletion_delay_hours value will be sent in the request even for zero value of the field. This field is only useful for setting 0 value to the deletion_delay_hours field. It can be used both alone and together with deletion_delay_hours.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This only controls whether a zero deletion delay value is explicitly sent to the API. It does not independently prevent deletion or enforce a security control."
     },
     "type": {
       "description": "Initial type of the private cloud. Possible values: [\"STANDARD\", \"TIME_LIMITED\", \"STRETCHED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects whether the private cloud is STANDARD, TIME_LIMITED, or STRETCHED. The appropriate deployment type depends on architectural and availability requirements, and no single type is universally more secure."
     },
     "management_cluster": {
       "type": "block",
@@ -67,8 +67,8 @@
       "description": "The user-provided identifier of the new Cluster. The identifier must meet the following requirements:\n  * Only contains 1-63 alphanumeric characters and hyphens\n  * Begins with an alphabetical character\n  * Ends with a non-hyphen character\n  * Not formatted as a UUID\n  * Complies with RFC 1034 (https://datatracker.ietf.org/doc/html/rfc1034) (section 3.5)",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a user-provided identifier for the management cluster. Its formatting requirements are validated by the provider, but the value does not directly enforce a security control."
     },
     "management_cluster.autoscaling_settings": {
       "type": "block",
@@ -79,22 +79,22 @@
       "description": "The minimum duration between consecutive autoscale operations.\nIt starts once addition or removal of nodes is fully completed.\nMinimum cool down period is 30m.\nCool down period must be in whole minutes (for example, 30m, 31m, 50m).\nMandatory for successful addition of autoscaling settings in cluster.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls the minimum time between autoscaling operations. It primarily affects scaling behaviour and stability rather than access control or security enforcement."
     },
     "management_cluster.autoscaling_settings.max_cluster_node_count": {
       "description": "Maximum number of nodes of any type in a cluster.\nMandatory for successful addition of autoscaling settings in cluster.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This defines the maximum cluster capacity available to autoscaling. The appropriate maximum depends on workload and capacity requirements and does not provide a generic security control."
     },
     "management_cluster.autoscaling_settings.min_cluster_node_count": {
       "description": "Minimum number of nodes of any type in a cluster.\nMandatory for successful addition of autoscaling settings in cluster.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This defines the minimum cluster capacity maintained by autoscaling. The appropriate minimum depends on workload availability and capacity requirements rather than a universal security requirement."
     },
     "management_cluster.autoscaling_settings.autoscaling_policies": {
       "type": "block",
@@ -105,22 +105,22 @@
       "description": "The identifier for this object. Format specified above.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the autoscaling policy. The identifier itself does not change access controls, network exposure, or other security enforcement."
     },
     "management_cluster.autoscaling_settings.autoscaling_policies.node_type_id": {
       "description": "The canonical identifier of the node type to add or remove.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the node type used during autoscaling. The correct node type depends on workload capacity and performance requirements, not a generic security requirement."
     },
     "management_cluster.autoscaling_settings.autoscaling_policies.scale_out_size": {
       "description": "Number of nodes to add to a cluster during a scale-out operation.\nMust be divisible by 2 for stretched clusters.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This determines how many nodes are added during a scale-out event. It affects capacity management rather than security policy enforcement."
     },
     "management_cluster.autoscaling_settings.autoscaling_policies.consumed_memory_thresholds": {
       "type": "block",
@@ -131,15 +131,15 @@
       "description": "The utilization triggering the scale-in operation in percent.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This utilization threshold determines when autoscaling removes capacity based on consumed memory. It affects resource scaling rather than security enforcement."
     },
     "management_cluster.autoscaling_settings.autoscaling_policies.consumed_memory_thresholds.scale_out": {
       "description": "The utilization triggering the scale-out operation in percent.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This utilization threshold determines when autoscaling adds capacity based on consumed memory. It affects resource scaling rather than security enforcement."
     },
     "management_cluster.autoscaling_settings.autoscaling_policies.cpu_thresholds": {
       "type": "block",
@@ -150,15 +150,15 @@
       "description": "The utilization triggering the scale-in operation in percent.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This CPU utilization threshold determines when autoscaling removes capacity. It affects operational scaling behaviour rather than security enforcement."
     },
     "management_cluster.autoscaling_settings.autoscaling_policies.cpu_thresholds.scale_out": {
       "description": "The utilization triggering the scale-out operation in percent.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This CPU utilization threshold determines when autoscaling adds capacity. It affects operational scaling behaviour rather than security enforcement."
     },
     "management_cluster.autoscaling_settings.autoscaling_policies.storage_thresholds": {
       "type": "block",
@@ -169,15 +169,15 @@
       "description": "The utilization triggering the scale-in operation in percent.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This storage utilization threshold determines when autoscaling removes capacity. It controls scaling behaviour rather than a security boundary or access control."
     },
     "management_cluster.autoscaling_settings.autoscaling_policies.storage_thresholds.scale_out": {
       "description": "The utilization triggering the scale-out operation in percent.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This storage utilization threshold determines when autoscaling adds capacity. It controls scaling behaviour rather than a security boundary or access control."
     },
     "management_cluster.node_type_configs": {
       "type": "block",
@@ -188,22 +188,22 @@
       "description": "Customized number of cores available to each node of the type.\nThis number must always be one of 'nodeType.availableCustomCoreCounts'.\nIf zero is provided max value from 'nodeType.availableCustomCoreCounts' will be used.\nThis cannot be changed once the PrivateCloud is created.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls the number of CPU cores available to each node. It is a capacity and licensing configuration and does not directly enforce a security control."
     },
     "management_cluster.node_type_configs.node_count": {
       "description": "The number of nodes of this type in the cluster.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the number of nodes in the cluster. The appropriate value depends on capacity and availability requirements and is not a universal security setting."
     },
     "management_cluster.node_type_configs.node_type_id": {
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the VMware Engine node type used by the cluster. The correct value depends on workload and capacity requirements rather than a generic security requirement."
     },
     "management_cluster.stretched_cluster_config": {
       "type": "block",
@@ -214,15 +214,15 @@
       "description": "Zone that will remain operational when connection between the two zones is lost.\nSpecify the zone in the following format: projects/{project}/locations/{location}.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the zone that remains operational if connectivity between stretched-cluster zones is lost. It primarily controls resilience and availability, and the correct zone is environment-specific."
     },
     "management_cluster.stretched_cluster_config.secondary_location": {
       "description": "Additional zone for a higher level of availability and load balancing.\nSpecify the zone in the following format: projects/{project}/locations/{location}.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects the additional zone used for higher availability and load balancing. The appropriate zone is environment-specific and does not provide a universally enforceable security value."
     },
     "network_config": {
       "type": "block",
@@ -233,15 +233,15 @@
       "description": "Management CIDR used by VMware management appliances.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This defines the network address range used by VMware management appliances. The platform already constrains this value to supported private address space, while the specific CIDR and subnet sizing depend on the team's network design and routing requirements. It is therefore an operational networking choice rather than a generic security policy target."
     },
     "network_config.vmware_engine_network": {
       "description": "The relative resource name of the VMware Engine network attached to the private cloud.\nSpecify the name in the following form: projects/{project}/locations/{location}/vmwareEngineNetworks/{vmwareEngineNetworkId}\nwhere {project} can either be a project number or a project ID.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the VMware Engine network attached to the private cloud. The correct network resource is specific to each project and environment, so a generic policy cannot safely require one particular network identifier."
     }
   }
 }
