@@ -13,7 +13,7 @@ conditions := [
       ],
     },
     {
-      "condition": "deletion_policy must be PREVENT.",
+      "condition": "deletion_policy must be PREVENT or ABANDON.",
       "attribute_path": ["deletion_policy"],
       "values": [
         "PREVENT",
