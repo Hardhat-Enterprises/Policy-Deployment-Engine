@@ -6,22 +6,22 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_network_
 conditions := [
   [
     {
-      "situation_description": "Firewall rules matching on Network Threat Intelligence must reference approved threat lists, not general categorisation lists",
+      "situation_description": "Firewall rules must check source traffic against Google Network Threat Intelligence",
       "remedies": [
-        "Use threat-oriented lists such as iplist-known-malicious-ips or iplist-tor-exit-nodes",
-        "Remove generic catagorisation lists which dont usually indicate malicious traffic",
+        "Set src_threat_intelligences to at least one Google-managed threat intelligence list",
+        "Pick the lists that fit the workload - the platform requires that threat intelligence is consulted, not which feed is chosen",
         "Ensure that when there is a match, the action is set to DENY so matched traffic is blocked."
       ]
     },
     {
-      "condition": "Check that source threat intelligence lists are within the approved set",
+      "condition": "src_threat_intelligences references at least one threat intelligence list",
       "attribute_path": ["rule", 0, "match", 0, "src_threat_intelligences"],
-      "values": ["iplist-known-malicious-ips", "iplist-tor-exit-nodes"],
-      "policy_type": "whitelist"
+      "values": [null, []],
+      "policy_type": "blacklist"
     }
   ]
 ]
-   
+
 result := helpers.get_multi_summary(conditions, vars.variables)
 message := result.message
 details := result.details
