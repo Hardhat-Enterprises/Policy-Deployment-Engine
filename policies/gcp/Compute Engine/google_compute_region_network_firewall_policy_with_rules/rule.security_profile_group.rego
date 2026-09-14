@@ -6,27 +6,26 @@ import data.terraform.gcp.security.compute_engine.google_compute_region_network_
 conditions := [
   [
     {
-      "situation_description": "Firewall rules applying a security profile group must reference a centrally managed, approved group.",
+      "situation_description": "Firewall rules applying a security profile group must reference a centrally managed group by its fully-qualified URL.",
       "remedies": [
-        "Reference a security profile group from the approved central security project",
-        "Never point a security profile group created from the workloads own proejct",
+        "Set security_profile_group to the full networksecurity.googleapis.com URL of a security profile group, not a bare name",
+        "Reference a securityProfileGroups resource - a securityProfiles reference is a different resource and is not accepted here",
         "tls_inspect must be set to true so that encrypted payloads can be inspected."
       ]
     },
     {
-      "condition": "Security profile group must be one of the approved centrally managed groups",
+      "condition": "security_profile_group must be a fully-qualified securityProfileGroups URL",
       "attribute_path": ["rule", 0, "security_profile_group"],
       "values": [
-        "https://networksecurity.googleapis.com/v1/projects/APPROVED_SECURITY_PROJECT/locations/global/securityProfileGroups/standard-threat-prevention",
-        "https://networksecurity.googleapis.com/v1/projects/APPROVED_SECURITY_PROJECT/locations/global/securityProfileGroups/strict-threat-prevention"
+        "https://networksecurity.googleapis.com/v1/projects/[^/]+/locations/[^/]+/*/[^/]+",
+        [["securityProfileGroups"]]
       ],
-      "policy_type": "whitelist"
+      "policy_type": "pattern whitelist"
     }
   ]
 ]
 
-   
+
 result := helpers.get_multi_summary(conditions, vars.variables)
 message := result.message
 details := result.details
-
