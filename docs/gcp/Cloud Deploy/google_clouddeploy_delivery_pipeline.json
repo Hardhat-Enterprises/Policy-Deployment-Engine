@@ -766,7 +766,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Enforces that postdeploy.actions contains an explicit, non-placeholder value, which structurally guarantees a defined post-deployment step actually executes rather than silently defaulting to an empty or unapproved state."
+      "rationale": "Requires postdeploy.actions to be explicitly configured with at least one action. An empty action list would bypass the automated post-deployment verification this field is intended to enforce."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks": {
       "type": "block",
@@ -783,14 +783,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Enforces that container.args, when set, is not left as an unapproved placeholder, which structurally guarantees the runtime arguments actually in effect are the ones explicitly configured."
+      "rationale": "Requires container.args, when set, to be an explicit, non-placeholder value, preventing unvalidated input or arbitrary execution flags from being silently accepted (injection-prevention archetype)."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Enforces that container.command, when set, is not left as an unapproved placeholder, which structurally guarantees the entrypoint actually in effect is the one explicitly configured."
+      "rationale": "Requires container.command, when set, to be an explicit, approved entrypoint. An unconstrained container command can execute arbitrary code under the deployment pipeline's own identity, bypassing intended controls."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
@@ -804,7 +804,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Enforces that container.image is not empty or an unapproved placeholder, which structurally guarantees a container image is present before this step executes."
+      "rationale": "Requires container.image to be an explicit, non-placeholder value. An empty string or generic placeholder would otherwise be silently accepted by the API, allowing an unintended or unverified image to execute."
     },
     "serial_pipeline.stages.strategy.standard.predeploy": {
       "type": "block",
