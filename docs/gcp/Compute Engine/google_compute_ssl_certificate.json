@@ -6,8 +6,8 @@
       "description": "The certificate in PEM format.\nThe certificate chain must be no greater than 5 certs long.\nThe chain must include at least one intermediate cert.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This specifies the certificate to be used for SSL termination. The certificate is sensitive information and should be protected."
+      "security_impact": false,
+      "rationale": "This is the public PEM certificate content, which is inherently presented to every connecting client and is not secret information (unlike the associated private key). A generic platform policy also cannot structurally validate arbitrary certificate content without hardcoding a specific team's certificate, which would not generalise across deployments."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
