@@ -765,8 +765,8 @@
       "description": "Optional. A sequence of skaffold custom actions to invoke during execution of the postdeploy job.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Postdeploy action names reference team-defined workflow steps \u2014 an operational pipeline configuration choice, not a platform-level security control that can be generically enforced."
+      "security_impact": true,
+      "rationale": "Specifies which workflow actions execute after deployment. Requiring non-empty steps prevents an unauthorized or accidentally empty workflow from silently skipping intended post-deployment tasks."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks": {
       "type": "block",
@@ -782,15 +782,15 @@
       "description": "Optional. Args is the container arguments to use. This overrides the default arguments defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Container runtime arguments are team-specific operational configuration, not a platform-level security control. A generic platform policy cannot meaningfully constrain arbitrary command-line arguments without breaking legitimate team workloads."
+      "security_impact": true,
+      "rationale": "Controls the runtime arguments passed to the postdeploy container. Requiring an explicit, non-placeholder value prevents unauthorized or malformed execution flags from being silently accepted."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
-      "security_impact": false,
-      "rationale": "Command entrypoint overrides are team-specific operational configuration, not a platform-level security control. Restricting arbitrary command overrides across teams is out of scope for a generic platform policy."
+      "security_impact": true,
+      "rationale": "Controls the entrypoint command for the postdeploy container. Requiring an explicit, non-placeholder value prevents an unauthorized or arbitrary shell command from silently executing."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
@@ -803,8 +803,8 @@
       "description": "Required. Image is the container image to use.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Container image references are team-managed functional inputs, not enforceable platform-level security controls. A generic platform policy cannot meaningfully constrain team-specific image references or registries without hardcoding values that would not generalise across deployments."
+      "security_impact": true,
+      "rationale": "Determines which container image executes in the postdeploy step. Requiring an explicit, non-placeholder image reference guards against an unverified or unintended image source executing."
     },
     "serial_pipeline.stages.strategy.standard.predeploy": {
       "type": "block",
