@@ -8,7 +8,7 @@ resource "google_integration_connectors_connection" "non_compliant_example_1" {
     user_password {
       username = "user@example.com"
       password {
-        secret_version = "projects/test-project/secrets/conn-pw/versions/latest"
+        secret_version = "projects/test-project/secrets/conn-pw/versions/5"
       }
     }
   }
