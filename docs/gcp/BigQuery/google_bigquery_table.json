@@ -91,7 +91,7 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "When enabled this requires every query to include a partition filter so BigQuery can eliminate partitions before scanning data. That scopes how much data is read per query which helps cost and performance but does not control access encryption or exposure"
+      "rationale": "Require true so every query must include a partition filter. That blocks accidental or malicious full-table scans and limits how much table data can be read or exposed in a single query."
     },
     "resource_tags": {
       "description": "The tags attached to this table. Tag keys are globally unique. Tag key is expected to be in the namespaced format, for example \"123456789012/environment\" where 123456789012 is the ID of the parent organization or project resource for this tag key. Tag value is expected to be the short name, for example \"Production\".",
@@ -541,7 +541,7 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "When enabled this requires queries against hive partitioned external data to include a partition filter so BigQuery can prune partitions before scanning files in external storage. It limits bytes scanned for cost and performance and is not an access or encryption control"
+      "rationale": "Require true on hive-partitioned external tables so queries must filter partitions. That bounds which external files are scanned per query and reduces unintended bulk exposure of the full dataset."
     },
     "external_data_configuration.hive_partitioning_options.source_uri_prefix": {
       "description": "When hive partition detection is requested, a common for all source uris must be required. The prefix must end immediately before the partition key encoding begins.",
