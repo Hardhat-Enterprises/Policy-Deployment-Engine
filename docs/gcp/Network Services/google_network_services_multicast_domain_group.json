@@ -13,15 +13,15 @@
       "description": "An optional text description of the multicast domain group.",
       "required": false,
       "type": "string",
-     "security_impact": false,
-   "rationale": "Free-text field with no functional effect on resource behavior or access control. Policy should discourage embedding sensitive data (e.g. credentials, internal hostnames, or PII) in the description, but the field itself carries no inherent security impact."
+      "security_impact": false,
+      "rationale": "Free-text field with no functional effect on resource behavior or access control. Policy should discourage embedding sensitive data (e.g. credentials, internal hostnames, or PII) in the description, but the field itself carries no inherent security impact."
     },
     "labels": {
       "description": "Labels as key-value pairs.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-       "security_impact": true,
-      "rationale": "Labels support governance controls like environment classification, cost tracking, and label-based compliance automation. Policy should require a baseline set of mandatory keys (e.g. environment, owner)."
+      "security_impact": false,
+      "rationale": "Labels are descriptive metadata used for organization and tracking, not security controls."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -30,19 +30,19 @@
       "security_impact": true,
       "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
     },
-  "multicast_domain_group_id": {
+    "multicast_domain_group_id": {
       "description": "A unique name for the multicast domain group.\nThe name is restricted to letters, numbers, and hyphen, with the first\ncharacter a letter, and the last a letter or a number. The name must not\nexceed 48 characters.",
       "required": true,
       "type": "string",
       "security_impact": false,
       "rationale": "Resource identifier only; naming has no functional security impact beyond optional org naming conventions."
     },
-   "project": {
+    "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines which GCP project the resource is created in; an unpinned or incorrect project can place resources outside intended security boundaries or monitoring scope."
+      "security_impact": false,
+      "rationale": "Identifies the GCP project the resource belongs to. Resource identifiers and references to other resources are not policy targets."
     }
   }
 }
