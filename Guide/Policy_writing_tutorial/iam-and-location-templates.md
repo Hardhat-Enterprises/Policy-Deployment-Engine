@@ -130,7 +130,7 @@ Complete every item before raising a PR:
 - [ ] Condition 3 — `attribute_path` confirmed (same as condition 2)
 - [ ] Valid roles confirmed from resource documentation — pattern whitelist values updated
 - [ ] `_iam_policy` values updated to full JSON string patterns matching your resource's valid roles
-- [ ] `python3 scripts/auto_test/auto_test.py` run for the resource — policy produces expected pass/fail output
+- [ ] `python3 scripts/check_resource.py` passes for the resource — docs complete, every true arg covered, policy produces the expected pass/fail output
 
 <div align="center">
 

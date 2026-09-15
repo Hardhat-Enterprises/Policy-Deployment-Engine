@@ -16,7 +16,7 @@ conditions := [
            {
                 
                 "condition": "Google Cloud Endpoints consumers IAM members must not include public principals.",
-                "attribute_path": ["members", 0],
+                "attribute_path": ["members"],
                 "values": ["allUsers", "allAuthenticatedUsers"],
                 "policy_type": "blacklist"
 
