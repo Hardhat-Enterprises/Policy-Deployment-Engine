@@ -1,11 +1,7 @@
-# Describe your resource type here.
-# Label the resource(s) under test non_compliant_example_1, non_compliant_example_2, ...
-# (sequential, in order; always suffixed with _1 even when there is only one).
-#
-# Only the tested resource type may appear in this file — no dependency resources.
-# We run `terraform plan` only, so point at fake addresses/values instead of
-# creating real dependencies.
-
 resource "google_compute_router_nat" "non_compliant_example_1" {
     name = "non-compliant-example-1"
+    source_subnetwork_ip_ranges_to_nat  = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+    router = google_compute_router.router.name
+    region = google_compute_router.router.region
+    nat_ip_allocate_option = "NONE"
 }
