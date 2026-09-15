@@ -6,32 +6,14 @@ import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orche
 conditions := [
     [
         {
-            "situation_description": "Only approved secure remote locations are allowed for files retrieved by the VM",
-            "remedies": ["Use an approved HTTPS remote URI for the file"]
+            "situation_description": "Only secure remote file locations are allowed to help prevent files from being retrieved over insecure connections",
+            "remedies": ["Use an HTTPS remote URI for the file"]
         },
         {
-            "condition": "Check if the remote URI uses the approved HTTPS location",
-            "attribute_path": [
-                "orchestrated_resource",
-                0,
-                "os_policy_assignment_v1_payload",
-                0,
-                "os_policies",
-                0,
-                "resource_groups",
-                0,
-                "resources",
-                0,
-                "file",
-                0,
-                "file",
-                0,
-                "remote",
-                0,
-                "uri"
-            ],
-            "values": ["https://example.com/test-file"],
-            "policy_type": "whitelist"
+            "condition": "Check if the remote URI uses HTTPS",
+            "attribute_path": ["orchestrated_resource",0,"os_policy_assignment_v1_payload",0,"os_policies",0,"resource_groups",0,"resources",0,"file",0,"file",0,"remote",0,"uri"],
+            "values": ["*://*", [["https"]]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]

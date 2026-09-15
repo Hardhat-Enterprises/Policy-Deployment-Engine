@@ -20,14 +20,8 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "non_complia
                             desired_state = "INSTALLED"
 
                             rpm {
-                                pull_deps = false
-
                                 source {
                                     allow_insecure = true
-
-                                    remote {
-                                        uri = "https://example.com/package.rpm"
-                                    }
                                 }
                             }
                         }
@@ -38,7 +32,7 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "non_complia
             instance_filter {
                 inclusion_labels {
                     labels = {
-                        environment = "unapproved"
+                        environment = "test"
                     }
                 }
 

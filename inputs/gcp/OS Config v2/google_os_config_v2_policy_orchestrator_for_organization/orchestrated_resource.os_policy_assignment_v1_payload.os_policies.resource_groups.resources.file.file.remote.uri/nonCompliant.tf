@@ -33,7 +33,7 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "non_complia
             instance_filter {
                 inclusion_labels {
                     labels = {
-                        environment = "unapproved"
+                        environment = "test"
                     }
                 }
 

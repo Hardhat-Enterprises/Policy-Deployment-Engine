@@ -3,7 +3,7 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "compliant_e
     organization_id = "121623553414"
     state = "STOPPED"
     action = "UPSERT"
-    deletion_policy = "DELETE"
+    deletion_policy = "PREVENT"
 
     orchestrated_resource {
         id = "test-orchestrated-resource"

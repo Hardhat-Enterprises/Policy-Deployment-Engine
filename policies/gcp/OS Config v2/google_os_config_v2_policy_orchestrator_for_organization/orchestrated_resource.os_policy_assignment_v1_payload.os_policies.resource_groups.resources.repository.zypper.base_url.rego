@@ -6,11 +6,11 @@ import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orche
 conditions := [
     [
         {
-            "situation_description": "Zypper repository base URLs must use a secure HTTPS source.",
-            "remedies": ["Use an approved HTTPS repository URL."]
+            "situation_description": "Zypper repository base URLs must use HTTPS to protect repository content from insecure transport",
+            "remedies": ["Use an HTTPS URL for the Zypper repository"]
         },
         {
-            "condition": "Zypper repository base_url must use HTTPS.",
+            "condition": "Check that the Zypper repository base URL uses HTTPS",
             "attribute_path": [
                 "orchestrated_resource",
                 0,
@@ -28,10 +28,8 @@ conditions := [
                 0,
                 "base_url"
             ],
-            "values": [
-                "https://packages.example.com/zypper"
-            ],
-            "policy_type": "whitelist"
+            "values": ["*://*", [["https"]]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]

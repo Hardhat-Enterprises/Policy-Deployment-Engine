@@ -6,14 +6,14 @@ import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orche
 conditions := [
     [
         {
-            "situation_description": "RETAIN deletion policy is not allowed because it can prevent required resource deletion and leave managed resources exposed or unmanaged",
-            "remedies": ["Use DELETE as the deletion policy unless resource retention is explicitly approved"]
+            "situation_description": "PREVENT deletion policy is required to protect the resource from unintended deletion",
+            "remedies": ["Use PREVENT as the deletion policy"]
         },
         {
-            "condition": "Check if the deletion policy is RETAIN",
+            "condition": "Check if the deletion policy is PREVENT",
             "attribute_path": ["deletion_policy"],
-            "values": ["RETAIN"],
-            "policy_type": "blacklist"
+            "values": ["PREVENT"],
+            "policy_type": "whitelist"
         }
     ],
 ]

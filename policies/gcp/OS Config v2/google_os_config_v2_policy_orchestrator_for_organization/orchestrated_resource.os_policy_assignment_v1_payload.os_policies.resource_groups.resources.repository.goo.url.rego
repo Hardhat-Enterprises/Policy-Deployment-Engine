@@ -5,13 +5,31 @@ import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orche
 
 conditions := [
     [
-        {"situation_description" : "Goo repository URLs must use an approved secure HTTPS source.",
-        "remedies" : ["Use an approved HTTPS repository URL."]},
         {
-            "condition": "Goo repository URL must be the approved HTTPS repository.",
-            "attribute_path" : ["orchestrated_resource",0,"os_policy_assignment_v1_payload",0,"os_policies",0,"resource_groups",0,"resources",0,"repository",0,"goo",0,"url"],
-            "values" : ["https://packages.example.com/repository"],
-            "policy_type" : "whitelist"
+            "situation_description": "Goo repository URLs must use HTTPS to protect repository content from insecure transport",
+            "remedies": ["Use an HTTPS URL for the Goo repository"]
+        },
+        {
+            "condition": "Check that the Goo repository URL uses HTTPS",
+            "attribute_path": [
+                "orchestrated_resource",
+                0,
+                "os_policy_assignment_v1_payload",
+                0,
+                "os_policies",
+                0,
+                "resource_groups",
+                0,
+                "resources",
+                0,
+                "repository",
+                0,
+                "goo",
+                0,
+                "url"
+            ],
+            "values": ["*://*", [["https"]]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]

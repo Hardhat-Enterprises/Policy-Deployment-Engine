@@ -6,11 +6,11 @@ import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orche
 conditions := [
     [
         {
-            "situation_description": "Overly permissive file modes must not allow unauthorized modification or execution",
-            "remedies": ["Use a file permission mode that does not allow unrestricted access such as 777"]
+            "situation_description": "File permissions must not allow group or other users to write to or execute the file",
+            "remedies": ["Use file permissions that restrict group and other users to read-only or no access"]
         },
         {
-            "condition": "Check that the file permission mode is not 777",
+            "condition": "Check that group and other permission digits do not allow write or execute access",
             "attribute_path": [
                 "orchestrated_resource",
                 0,
@@ -26,8 +26,8 @@ conditions := [
                 0,
                 "permissions"
             ],
-            "values": ["777"],
-            "policy_type": "blacklist"
+            "values": ["***", [[], ["2", "3", "5", "6", "7"], ["2", "3", "5", "6", "7"]]],
+            "policy_type": "pattern blacklist"
         }
     ]
 ]
