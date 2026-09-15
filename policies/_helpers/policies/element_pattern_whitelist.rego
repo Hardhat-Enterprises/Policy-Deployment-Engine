@@ -4,7 +4,14 @@ package terraform.helpers.policies.element_pattern_whitelist
 #
 # Detects array attributes where any element does NOT match a required
 # wildcard resource-path shape, e.g. projects/*/locations/*/apps/*/guardrails/*.
-# Each '*' matches one or more non-'/' characters (a single path segment).
+# Each '*' matches one or more non-'/' characters (a single path segment), and
+# every other character is matched literally (regex metacharacters such as '.'
+# and '(' are escaped before building the regex).
+#
+# values is exactly [pattern] — a single shape string, nothing else. Only the
+# array attribute is examined: a missing attribute, a non-list value, or an
+# empty list produces no violations (there is nothing to check, or nothing to
+# fail the shape).
 #
 # Example:
 #   pattern: "projects/*/locations/*/apps/*/guardrails/*"
@@ -18,7 +25,9 @@ import data.terraform.helpers.shared
 #   tf_variables - Resource metadata (resource_type, friendly_resource_name,
 #                  resource_value_name)
 #   attribute_path - Path to the array attribute
-#   values_formatted - [pattern] where pattern is the required wildcard shape
+#   values_formatted - [pattern]; pattern is the required wildcard shape. The
+#                      list holds exactly one element, so values_formatted[1]
+#                      is never read.
 #
 # Returns:
 #   Set of violation objects with {name, message}
@@ -31,6 +40,7 @@ get_violations(tf_variables, attribute_path, values_formatted) = results if {
     }
 }
 
+# Builds the {name, message} violation object for one non-compliant resource.
 _build_violation(tf_variables, attribute_path, pattern, resource) = violation if {
     attribute_path_string := shared.format_attribute_path(attribute_path)
     array_value := shared.get_attribute_value(resource, attribute_path)
@@ -51,15 +61,22 @@ _build_violation(tf_variables, attribute_path, pattern, resource) = violation if
     }
 }
 
-# An element matches when it fits the wildcard shape: '*' becomes one or more
-# non-'/' characters, so a '*' can never span path segments.
+# An element matches when it fits the wildcard shape. '*' is the only special
+# character and becomes one or more non-'/' characters, so a '*' never spans a
+# path segment ('/'). Every other character is matched literally: regex
+# metacharacters such as '.' and '(' are escaped before building the regex.
 _matches(pattern, value) if {
-    p := regex.replace(pattern, "\\*", "[^/]+")
+    parts := split(pattern, "*")
+    escaped := [_escape(part) | part := parts[_]]
+    p := concat("[^/]+", escaped)
     regex.match(sprintf("^%s$", [p]), value)
 }
 
-# get_resources() filters Terraform resources that have at least one array
-# element failing the required shape.
+# Escapes regex metacharacters in a pattern segment so the rest matches literally.
+_escape(segment) := regex.replace(segment, "([.+?()\\[\\]{}\\^$|\\\\])", "\\$1")
+
+# _get_resources() filters Terraform resources of the target type that have at
+# least one array element failing the required shape.
 _get_resources(resource_type, attribute_path, pattern) = resources if {
     resources := {
         resource |
@@ -74,6 +91,7 @@ _get_resources(resource_type, attribute_path, pattern) = resources if {
     }
 }
 
+# Formats the human-readable violation message.
 _format_message(friendly_resource_name, resource_value_name, attribute_path_string, bad, pattern) = msg if {
     msg := sprintf("%s '%s' has '%s' with elements not matching the required shape '%s': %v",
         [friendly_resource_name, resource_value_name, attribute_path_string, pattern, bad])

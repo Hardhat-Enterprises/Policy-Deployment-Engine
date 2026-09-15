@@ -125,6 +125,34 @@ test_get_resources_wrong_shape if {
 	r.name == "wrong-shape-agent"
 }
 
+# Test 4b: '*' matches one segment and never spans a '/', so an extra segment
+# (projects/p/extra/guardrails/g) does not match 'projects/*/guardrails/*'.
+test_get_resources_star_does_not_span_slash if {
+	mock_input := {
+		"planned_values": {
+			"root_module": {
+				"resources": [
+					{
+						"type": "google_ces_agent",
+						"name": "extra-segment-agent",
+						"values": {"guardrails": ["projects/p/extra/guardrails/g"]},
+					},
+				],
+			},
+		},
+	}
+
+	resources := element_pattern_whitelist._get_resources(
+		"google_ces_agent",
+		["guardrails"],
+		"projects/*/guardrails/*",
+	) with input as mock_input
+
+	count(resources) == 1
+	some r in resources
+	r.name == "extra-segment-agent"
+}
+
 # Test 5: An empty list has no elements to fail, so it is not flagged
 test_get_resources_empty_list if {
 	mock_input := {

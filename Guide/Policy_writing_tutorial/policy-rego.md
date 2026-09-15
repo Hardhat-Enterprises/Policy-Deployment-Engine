@@ -109,7 +109,9 @@ else is not a policy type: the engine cannot dispatch it, so it stops and report
 `POLICY ERROR: unknown policy_type ...` and your test goes red. `policy_lint`'s
 [`unknown-policy-type`](policy-lint.md#unknown-policy-type) rule catches it before you get that far.
 
-There is no `element whitelist`, and you do not need one — see the Whitelist note below.
+There is no *exact-match* `element whitelist`, and you do not need one — plain `whitelist`
+already covers that (see the Whitelist note below). For *pattern*-based list whitelisting,
+use `element pattern whitelist`.
 
 ---
 
@@ -120,8 +122,10 @@ Whitelist allows only specific values and blocks everything else.
 > **Whitelist already handles lists.** When the attribute is an array, the helper requires
 > *every* element to be in your `values` set (it is a subset test), so
 > `"attribute_path": ["allowed_ips"]` under a `whitelist` is a complete check — you do not need,
-> and will not find, an `element whitelist`. `element blacklist` exists as a separate type only
-> because *forbidding* a list needs substring matching, which the plain `blacklist` does not do.
+> and will not find, an *exact-match* `element whitelist`. `element blacklist` exists as a separate
+> type only because *forbidding* a list needs substring matching, which the plain `blacklist` does
+> not do. For *pattern*-based list validation (every element must match a shape), use
+> `element pattern whitelist`.
 
 ```rego
 
