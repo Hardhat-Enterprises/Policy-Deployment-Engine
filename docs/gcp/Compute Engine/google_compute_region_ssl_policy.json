@@ -6,57 +6,57 @@
       "description": "A list of features enabled when the selected profile is CUSTOM. The\nmethod returns the set of features that can be specified in this\nlist. This field must be empty if the profile is not CUSTOM.\n\nSee the [official documentation](https://cloud.google.com/compute/docs/load-balancing/ssl-policies#profilefeaturesupport)\nfor which ciphers are available to use. **Note**: this argument\n*must* be present when using the 'CUSTOM' profile. This argument\n*must not* be present when using any other profile.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This list selects the TLS 1.2-and-earlier cipher suites enabled when the CUSTOM profile is used. Known CBC, 3DES, and static-RSA suites weaken encryption or forward secrecy, so a generic policy can block those cipher elements while still allowing teams to choose approved modern suites."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This controls whether the resource can be destroyed. Flags that block deletion are always worth enforcing, because an accidental or malicious delete causes destructive loss, so the policy should stop unsafe values like ABANDON that drop the resource. So true."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Just a free text description. It doesn't affect how the resource works or its security, so false."
     },
     "min_tls_version": {
       "description": "The minimum version of SSL protocol that can be used by the clients\nto establish a connection with the load balancer. When set to\n'TLS_1_3', the profile field must be set to 'RESTRICTED'. Default value: \"TLS_1_0\" Possible values: [\"TLS_1_0\", \"TLS_1_1\", \"TLS_1_2\", \"TLS_1_3\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This sets the lowest TLS version clients can use. Old versions like TLS 1.0 and 1.1 are open to downgrade attacks, so the policy should require a modern floor of at least TLS 1.2, ideally TLS 1.3. That's a clear security control, so true."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The name is just an identifier for the resource, not something you put a security rule on, so this is false."
     },
     "post_quantum_key_exchange": {
       "description": "One of 'DEFAULT', 'ENABLED', or 'DEFERRED'. Controls whether the load balancer negotiates\nX25519MLKEM768 key exchange when clients advertise support for it.\nWhen set to 'DEFAULT', or if no SSL Policy is attached to\nthe target proxy, the load balancer disallows X25519MLKEM768 key\nexchange before October 2026, and allows it afterward. When set to\n'ENABLED', the load balancer allows X25519MLKEM768 key\nexchange. When set to 'DEFERRED', the load balancer\ndisallows X25519MLKEM768 key exchange until October 2027, and allows\nit afterward. Possible values: [\"DEFAULT\", \"ENABLED\", \"DEFERRED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls whether post-quantum key exchange is negotiated. It's a newer, optional crypto feature with a sensible default rather than a baseline setting to enforce right now, so false."
     },
     "profile": {
       "description": "Profile specifies the set of SSL features that can be used by the\nload balancer when negotiating SSL with clients. If using 'CUSTOM',\nthe set of SSL features to enable must be specified in the\n'customFeatures' field.\n\nSee the [official documentation](https://cloud.google.com/compute/docs/load-balancing/ssl-policies#profilefeaturesupport)\nfor information on what cipher suites each profile provides. If\n'CUSTOM' is used, the 'custom_features' attribute **must be set**.\nIf set to 'FIPS_202205', 'minTlsVersion' must also be set to\n'TLS_1_2'. Default value: \"COMPATIBLE\" Possible values: [\"COMPATIBLE\", \"MODERN\", \"RESTRICTED\", \"CUSTOM\", \"FIPS_202205\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This picks the SSL profile, which decides the cipher suites allowed. COMPATIBLE allows weaker ciphers, so the policy should require a strong profile like MODERN or RESTRICTED and forbid COMPATIBLE. That directly affects TLS strength, so true."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Project just says where the resource lives, it's not a security control on the resource itself, so false."
     },
     "region": {
       "description": "The region where the regional SSL policy resides.",

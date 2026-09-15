@@ -92,11 +92,35 @@ The attribute path would be:
 
 ### Different ways to write your policy
 
+The engine dispatches on `policy_type`, and it knows **exactly six** values:
+
+| `policy_type` | Use it when |
+|---|---|
+| `blacklist` | The attribute must not be one of these values |
+| `whitelist` | The attribute must be one of these values (arrays: **every** element must be) |
+| `range` | A number must be above / below / between bounds |
+| `pattern blacklist` | A wildcard-extracted part of the value must not be one of these |
+| `pattern whitelist` | A wildcard-extracted part of the value must be one of these |
+| `element blacklist` | No element of an array may **contain** one of these substrings |
+
+Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
+else is not a policy type: the engine cannot dispatch it, so it stops and reports
+`POLICY ERROR: unknown policy_type ...` and your test goes red. `policy_lint`'s
+[`unknown-policy-type`](policy-lint.md#unknown-policy-type) rule catches it before you get that far.
+
+There is no `element whitelist`, and you do not need one — see the Whitelist note below.
+
 ---
 
 ### Whitelist
 
 Whitelist allows only specific values and blocks everything else.
+
+> **Whitelist already handles lists.** When the attribute is an array, the helper requires
+> *every* element to be in your `values` set (it is a subset test), so
+> `"attribute_path": ["allowed_ips"]` under a `whitelist` is a complete check — you do not need,
+> and will not find, an `element whitelist`. `element blacklist` exists as a separate type only
+> because *forbidding* a list needs substring matching, which the plain `blacklist` does not do.
 
 ```rego
 
@@ -199,7 +223,17 @@ Ensures a value falls within a specific range.
 
 ### Pattern Whitelist
 
-Allows only values that match a defined pattern.
+Allows only values that match a defined pattern. `values` is **two** entries: a target string
+whose `*` wildcards mark the parts you care about, then a list of allowed values *per wildcard
+position* (first list for the first `*`, and so on). It is a wildcard match, not a regex — a
+regex in `values[0]` will not do what you expect.
+
+> **A value that does not match the target is never flagged.** The helper extracts the wildcard
+> parts out of the value first; if the value does not fit the target shape at all, there is
+> nothing to extract and the resource passes. So `"project/*/gcp/*"` says "*if* it looks like
+> this, the parts must be allowed" — it does **not** say "it must look like this". If the shape
+> itself is the control, check the shape with a `whitelist` (or a `pattern blacklist` on the
+> bad shape) as a second condition.
 ```rego
     [
       {
@@ -239,6 +273,12 @@ Blocks values that match a defined pattern.
 
 Blocks **array** attributes whose elements contain any blacklisted **substring** (simple
 `contains` matching, not regex). `values` is a flat array of forbidden substrings.
+
+> **It matches substrings, so it catches more than the exact value.** Blacklisting `"*"` also
+> flags `"https://example.com/*"` and `"*.googleapis.com"`, because both *contain* a `*`. That
+> is usually what you want for a wildcard check — but it means a short substring like `"dev"`
+> will also flag `"developer-portal"`. Pick substrings that cannot appear innocently, or anchor
+> them with a separator (`"dev-"`, `"-sandbox"`).
 ```rego
     [
       {

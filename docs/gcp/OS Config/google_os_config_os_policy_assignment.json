@@ -6,15 +6,15 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls destroy/abandon behaviour. Blacklist ABANDON: abandoning removes the assignment from Terraform management while it keeps enforcing OS state on targeted VMs, creating configuration enforcement that drifts outside IaC governance and change control."
     },
     "description": {
       "description": "OS policy assignment description. Length of the description is limited to 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Freeform description; metadata with no effect on behaviour or exposure."
     },
     "location": {
       "description": "The location for the resource",
@@ -27,22 +27,22 @@
       "description": "Resource name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource name; identifier only, no security effect."
     },
     "project": {
       "description": "The project for the resource",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Target project selector; access is governed by IAM, not by this field."
     },
     "skip_await_rollout": {
       "description": "Set to true to skip awaiting rollout during resource creation and update.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether Terraform waits for the rollout to finish; operational timing, no security posture effect."
     },
     "instance_filter": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "Target all VMs in the project. If true, no other criteria is permitted.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Targets all VMs versus a filtered set; the intended VM-selection mechanism, not a security control."
     },
     "instance_filter.exclusion_labels": {
       "type": "block",
@@ -65,8 +65,8 @@
       "description": "Labels are identified by key/value pairs in this map. A VM should contain all the key/value pairs specified in this map to be selected.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Label set used to exclude VMs from targeting; selection metadata, no security effect."
     },
     "instance_filter.inclusion_labels": {
       "type": "block",
@@ -77,8 +77,8 @@
       "description": "Labels are identified by key/value pairs in this map. A VM should contain all the key/value pairs specified in this map to be selected.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Label set used to include VMs in targeting; selection metadata, no security effect."
     },
     "instance_filter.inventories": {
       "type": "block",
@@ -89,15 +89,15 @@
       "description": "The OS short name",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "OS-based targeting criterion; selects which VMs the assignment applies to."
     },
     "instance_filter.inventories.os_version": {
       "description": "The OS version Prefix matches are supported if asterisk(*) is provided as the last character. For example, to match all versions with a major version of '7', specify the following value for this field '7.*' An empty string matches all OS versions.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "OS-version targeting criterion; selection only."
     },
     "os_policies": {
       "type": "block",
@@ -108,29 +108,29 @@
       "description": "This flag determines the OS policy compliance status when none of the resource groups within the policy are applicable for a VM. Set this value to 'true' if the policy needs to be reported as compliant even if the policy has nothing to validate or enforce.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines whether a VM with no matching resource group is treated as compliant; match-evaluation semantics, not a security baseline."
     },
     "os_policies.description": {
       "description": "Policy description. Length of the description is limited to 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Freeform description of the OS policy; metadata."
     },
     "os_policies.id": {
       "description": "The id of the OS policy with the following restrictions:\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.\n* Must be unique within the assignment.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier for the OS policy; label only."
     },
     "os_policies.mode": {
       "description": "Policy mode Possible values: [\"MODE_UNSPECIFIED\", \"VALIDATION\", \"ENFORCEMENT\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects VALIDATION (report only) versus ENFORCEMENT (apply desired state); an operational rollout choice, and neither value is inherently a security violation."
     },
     "os_policies.resource_groups": {
       "type": "block",
@@ -146,15 +146,15 @@
       "description": "The OS short name",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "OS filter selecting when this resource group applies; selection criterion."
     },
     "os_policies.resource_groups.inventory_filters.os_version": {
       "description": "The OS version\nPrefix matches are supported if asterisk(*) is provided as the last character. For example, to match all versions with a major version of '7', specify the following value for this field '7.*'\nAn empty string matches all OS versions.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "OS-version filter for the resource group; selection only."
     },
     "os_policies.resource_groups.resources": {
       "type": "block",
@@ -165,8 +165,8 @@
       "description": "The id of the resource with the following restrictions:\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.\n* Must be unique within the OS policy.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier for the configuration resource; label only."
     },
     "os_policies.resource_groups.resources.exec": {
       "type": "block",
@@ -182,29 +182,29 @@
       "description": "Optional arguments to pass to the source during execution.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Arguments passed to the enforce script; content-dependent input with no discrete baseline to enforce."
     },
     "os_policies.resource_groups.resources.exec.enforce.interpreter": {
       "description": "The script interpreter to use. Possible values: [\"INTERPRETER_UNSPECIFIED\", \"NONE\", \"SHELL\", \"POWERSHELL\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Script interpreter (NONE/SHELL/POWERSHELL) for the enforce step; execution mechanism, not a security baseline — no value is inherently a violation."
     },
     "os_policies.resource_groups.resources.exec.enforce.output_file_path": {
       "description": "Only recorded for enforce Exec. Path to an output file (that is created by this Exec) whose content will be recorded in OSPolicyResourceCompliance after a successful run. Absence or failure to read this file will result in this ExecResource being non-compliant. Output file size is limited to 100K bytes.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Path where the enforce step writes captured output; a filesystem path with no exposure control."
     },
     "os_policies.resource_groups.resources.exec.enforce.script": {
       "description": "An inline script. The size of the script is limited to 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-form inline script content executed on the VM; its value could be anything, so a value-blacklist cannot meaningfully constrain it and it is not a discrete platform-policy target. (Where a script is fetched from is governed by the exec file-source policies.)"
     },
     "os_policies.resource_groups.resources.exec.enforce.file": {
       "type": "block",
@@ -215,15 +215,15 @@
       "description": "Defaults to false. When false, files are subject to validations based on the file type: Remote: A checksum must be specified. Cloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When true, disables integrity validation of the fetched enforce-step script file (a remote SHA256 checksum or a Cloud Storage generation number is no longer required), so a tampered or substituted artifact could be installed or executed on the VM. Blacklist true to require integrity verification."
     },
     "os_policies.resource_groups.resources.exec.enforce.file.local_path": {
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.exec.enforce.file.gcs": {
       "type": "block",
@@ -234,22 +234,22 @@
       "description": "Bucket of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.exec.enforce.file.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied Cloud Storage generation must be a real object version, not the 0 sentinel (blacklist 0). Combined with the allow_insecure policy — allow_insecure=false makes a generation mandatory for Cloud Storage sources per the provider — this pins fetches to an immutable object version. Sound: absent (remote/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.exec.enforce.file.gcs.object": {
       "description": "Name of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.exec.enforce.file.remote": {
       "type": "block",
@@ -260,15 +260,15 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied remote SHA256 checksum must not be blank (blacklist empty string). Combined with the allow_insecure policy — allow_insecure=false makes a checksum mandatory for remote sources per the provider — this guarantees a real, non-empty integrity digest for remote fetches. Sound: absent (Cloud Storage/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.exec.enforce.file.remote.uri": {
       "description": "URI from which to fetch the object. It should contain both the protocol and path following the format '{protocol}://{location}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: the agent fetches remote content from this URI, so it must use HTTPS to prevent in-transit tampering or interception. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// or other plaintext scheme is flagged. When the source is Cloud Storage or local instead of remote the field is absent and the check correctly does not apply."
     },
     "os_policies.resource_groups.resources.exec.validate": {
       "type": "block",
@@ -279,29 +279,29 @@
       "description": "Optional arguments to pass to the source during execution.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Arguments passed to the validate script; content-dependent input with no discrete baseline to enforce."
     },
     "os_policies.resource_groups.resources.exec.validate.interpreter": {
       "description": "The script interpreter to use. Possible values: [\"INTERPRETER_UNSPECIFIED\", \"NONE\", \"SHELL\", \"POWERSHELL\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Script interpreter (NONE/SHELL/POWERSHELL) for the validate step; execution mechanism, not a security baseline — no value is inherently a violation."
     },
     "os_policies.resource_groups.resources.exec.validate.output_file_path": {
       "description": "Only recorded for enforce Exec. Path to an output file (that is created by this Exec) whose content will be recorded in OSPolicyResourceCompliance after a successful run. Absence or failure to read this file will result in this ExecResource being non-compliant. Output file size is limited to 100K bytes.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Path where the validate step writes captured output; a filesystem path with no exposure control."
     },
     "os_policies.resource_groups.resources.exec.validate.script": {
       "description": "An inline script. The size of the script is limited to 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-form inline script content executed on the VM; its value could be anything, so a value-blacklist cannot meaningfully constrain it and it is not a discrete platform-policy target. (Where a script is fetched from is governed by the exec file-source policies.)"
     },
     "os_policies.resource_groups.resources.exec.validate.file": {
       "type": "block",
@@ -312,15 +312,15 @@
       "description": "Defaults to false. When false, files are subject to validations based on the file type:\nRemote: A checksum must be specified. Cloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When true, disables integrity validation of the fetched validate-step script file (a remote SHA256 checksum or a Cloud Storage generation number is no longer required), so a tampered or substituted artifact could be installed or executed on the VM. Blacklist true to require integrity verification."
     },
     "os_policies.resource_groups.resources.exec.validate.file.local_path": {
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.exec.validate.file.gcs": {
       "type": "block",
@@ -331,22 +331,22 @@
       "description": "Bucket of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.exec.validate.file.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied Cloud Storage generation must be a real object version, not the 0 sentinel (blacklist 0). Combined with the allow_insecure policy — allow_insecure=false makes a generation mandatory for Cloud Storage sources per the provider — this pins fetches to an immutable object version. Sound: absent (remote/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.exec.validate.file.gcs.object": {
       "description": "Name of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.exec.validate.file.remote": {
       "type": "block",
@@ -357,15 +357,15 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied remote SHA256 checksum must not be blank (blacklist empty string). Combined with the allow_insecure policy — allow_insecure=false makes a checksum mandatory for remote sources per the provider — this guarantees a real, non-empty integrity digest for remote fetches. Sound: absent (Cloud Storage/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.exec.validate.file.remote.uri": {
       "description": "URI from which to fetch the object. It should contain both the protocol and path following the format '{protocol}://{location}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: the agent fetches remote content from this URI, so it must use HTTPS to prevent in-transit tampering or interception. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// or other plaintext scheme is flagged. When the source is Cloud Storage or local instead of remote the field is absent and the check correctly does not apply."
     },
     "os_policies.resource_groups.resources.file": {
       "type": "block",
@@ -376,22 +376,22 @@
       "description": "A a file with this content. The size of the content is limited to 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Arbitrary inline file content; a generic platform policy cannot meaningfully validate free-form strings, so this is not a policy target."
     },
     "os_policies.resource_groups.resources.file.path": {
       "description": "The absolute path of the file within the VM.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The destination path for the managed file — a location/reference string, not a security configuration toggle or access control."
     },
     "os_policies.resource_groups.resources.file.state": {
       "description": "Desired state of the file. Possible values: [\"DESIRED_STATE_UNSPECIFIED\", \"PRESENT\", \"ABSENT\", \"CONTENTS_MATCH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Security-configuration enforcement: the desired state determines whether a managed security file is actually enforced. A whitelist of PRESENT and CONTENTS_MATCH ensures the file is created/verified rather than left in the no-op UNSPECIFIED state. (ABSENT is also flagged; if legitimate removals are required, add ABSENT to the approved set.)"
     },
     "os_policies.resource_groups.resources.file.file": {
       "type": "block",
@@ -402,15 +402,15 @@
       "description": "Defaults to false. When false, files are subject to validations based on the file type: Remote: A checksum must be specified. Cloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When true, disables integrity validation of the fetched managed file's source (a remote SHA256 checksum or a Cloud Storage generation number is no longer required), so a tampered or substituted artifact could be installed or executed on the VM. Blacklist true to require integrity verification."
     },
     "os_policies.resource_groups.resources.file.file.local_path": {
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.file.file.gcs": {
       "type": "block",
@@ -421,22 +421,22 @@
       "description": "Bucket of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.file.file.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied Cloud Storage generation must be a real object version, not the 0 sentinel (blacklist 0). Combined with the allow_insecure policy — allow_insecure=false makes a generation mandatory for Cloud Storage sources per the provider — this pins fetches to an immutable object version. Sound: absent (remote/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.file.file.gcs.object": {
       "description": "Name of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.file.file.remote": {
       "type": "block",
@@ -447,15 +447,15 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied remote SHA256 checksum must not be blank (blacklist empty string). Combined with the allow_insecure policy — allow_insecure=false makes a checksum mandatory for remote sources per the provider — this guarantees a real, non-empty integrity digest for remote fetches. Sound: absent (Cloud Storage/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.file.file.remote.uri": {
       "description": "URI from which to fetch the object. It should contain both the protocol and path following the format '{protocol}://{location}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: the agent fetches remote content from this URI, so it must use HTTPS to prevent in-transit tampering or interception. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// or other plaintext scheme is flagged. When the source is Cloud Storage or local instead of remote the field is absent and the check correctly does not apply."
     },
     "os_policies.resource_groups.resources.pkg": {
       "type": "block",
@@ -466,8 +466,8 @@
       "description": "The desired state the agent should maintain for this package. Possible values: [\"DESIRED_STATE_UNSPECIFIED\", \"INSTALLED\", \"REMOVED\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Desired package state (INSTALLED/REMOVED); functional intent, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.apt": {
       "type": "block",
@@ -478,8 +478,8 @@
       "description": "Package name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "APT package name; identifies the package, no security effect."
     },
     "os_policies.resource_groups.resources.pkg.deb": {
       "type": "block",
@@ -490,8 +490,8 @@
       "description": "Whether dependencies should also be installed. - install when false: 'dpkg -i package' - install when true: 'apt-get update && apt-get -y install package.deb'",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether dependencies are also installed — an operational package-installation choice, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.deb.source": {
       "type": "block",
@@ -502,15 +502,15 @@
       "description": "Defaults to false. When false, files are subject to validations based on the file type:\nRemote: A checksum must be specified. Cloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When true, disables integrity validation of the fetched .deb package source (a remote SHA256 checksum or a Cloud Storage generation number is no longer required), so a tampered or substituted artifact could be installed or executed on the VM. Blacklist true to require integrity verification."
     },
     "os_policies.resource_groups.resources.pkg.deb.source.local_path": {
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.deb.source.gcs": {
       "type": "block",
@@ -521,22 +521,22 @@
       "description": "Bucket of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.deb.source.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied Cloud Storage generation must be a real object version, not the 0 sentinel (blacklist 0). Combined with the allow_insecure policy — allow_insecure=false makes a generation mandatory for Cloud Storage sources per the provider — this pins fetches to an immutable object version. Sound: absent (remote/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.pkg.deb.source.gcs.object": {
       "description": "Name of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.deb.source.remote": {
       "type": "block",
@@ -547,15 +547,15 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied remote SHA256 checksum must not be blank (blacklist empty string). Combined with the allow_insecure policy — allow_insecure=false makes a checksum mandatory for remote sources per the provider — this guarantees a real, non-empty integrity digest for remote fetches. Sound: absent (Cloud Storage/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.pkg.deb.source.remote.uri": {
       "description": "URI from which to fetch the object. It should contain both the protocol and path following the format '{protocol}://{location}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: the agent fetches remote content from this URI, so it must use HTTPS to prevent in-transit tampering or interception. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// or other plaintext scheme is flagged. When the source is Cloud Storage or local instead of remote the field is absent and the check correctly does not apply."
     },
     "os_policies.resource_groups.resources.pkg.googet": {
       "type": "block",
@@ -566,8 +566,8 @@
       "description": "Package name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "GooGet package name; identifier only."
     },
     "os_policies.resource_groups.resources.pkg.msi": {
       "type": "block",
@@ -578,8 +578,8 @@
       "description": "Additional properties to use during installation. This should be in the format of Property=Setting. Appended to the defaults of 'ACTION=INSTALL REBOOT=ReallySuppress'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Properties passed to the MSI installer; content-dependent input with no discrete baseline."
     },
     "os_policies.resource_groups.resources.pkg.msi.source": {
       "type": "block",
@@ -590,15 +590,15 @@
       "description": "Defaults to false. When false, files are subject to validations based on the file type:\nRemote: A checksum must be specified. Cloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When true, disables integrity validation of the fetched .msi package source (a remote SHA256 checksum or a Cloud Storage generation number is no longer required), so a tampered or substituted artifact could be installed or executed on the VM. Blacklist true to require integrity verification."
     },
     "os_policies.resource_groups.resources.pkg.msi.source.local_path": {
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.msi.source.gcs": {
       "type": "block",
@@ -609,22 +609,22 @@
       "description": "Bucket of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.msi.source.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied Cloud Storage generation must be a real object version, not the 0 sentinel (blacklist 0). Combined with the allow_insecure policy — allow_insecure=false makes a generation mandatory for Cloud Storage sources per the provider — this pins fetches to an immutable object version. Sound: absent (remote/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.pkg.msi.source.gcs.object": {
       "description": "Name of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.msi.source.remote": {
       "type": "block",
@@ -635,15 +635,15 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied remote SHA256 checksum must not be blank (blacklist empty string). Combined with the allow_insecure policy — allow_insecure=false makes a checksum mandatory for remote sources per the provider — this guarantees a real, non-empty integrity digest for remote fetches. Sound: absent (Cloud Storage/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.pkg.msi.source.remote.uri": {
       "description": "URI from which to fetch the object. It should contain both the protocol and path following the format '{protocol}://{location}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: the agent fetches remote content from this URI, so it must use HTTPS to prevent in-transit tampering or interception. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// or other plaintext scheme is flagged. When the source is Cloud Storage or local instead of remote the field is absent and the check correctly does not apply."
     },
     "os_policies.resource_groups.resources.pkg.rpm": {
       "type": "block",
@@ -654,8 +654,8 @@
       "description": "Whether dependencies should also be installed. - install when false: 'rpm --upgrade --replacepkgs package.rpm' - install when true: 'yum -y install package.rpm' or 'zypper -y install package.rpm'",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether dependencies are also installed — an operational package-installation choice, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source": {
       "type": "block",
@@ -666,15 +666,15 @@
       "description": "Defaults to false. When false, files are subject to validations based on the file type:\nRemote: A checksum must be specified. Cloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When true, disables integrity validation of the fetched .rpm package source (a remote SHA256 checksum or a Cloud Storage generation number is no longer required), so a tampered or substituted artifact could be installed or executed on the VM. Blacklist true to require integrity verification."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source.local_path": {
       "description": "A local path within the VM to use.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A path reference to a file already on the VM — a file/path location, not a security control."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source.gcs": {
       "type": "block",
@@ -685,22 +685,22 @@
       "description": "Bucket of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names an external Cloud Storage bucket — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source.gcs.generation": {
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied Cloud Storage generation must be a real object version, not the 0 sentinel (blacklist 0). Combined with the allow_insecure policy — allow_insecure=false makes a generation mandatory for Cloud Storage sources per the provider — this pins fetches to an immutable object version. Sound: absent (remote/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source.gcs.object": {
       "description": "Name of the Cloud Storage object.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a specific Cloud Storage object — a reference to another resource, which the platform does not constrain."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source.remote": {
       "type": "block",
@@ -711,15 +711,15 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Integrity control: a supplied remote SHA256 checksum must not be blank (blacklist empty string). Combined with the allow_insecure policy — allow_insecure=false makes a checksum mandatory for remote sources per the provider — this guarantees a real, non-empty integrity digest for remote fetches. Sound: absent (Cloud Storage/local sources) is not flagged."
     },
     "os_policies.resource_groups.resources.pkg.rpm.source.remote.uri": {
       "description": "URI from which to fetch the object. It should contain both the protocol and path following the format '{protocol}://{location}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: the agent fetches remote content from this URI, so it must use HTTPS to prevent in-transit tampering or interception. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// or other plaintext scheme is flagged. When the source is Cloud Storage or local instead of remote the field is absent and the check correctly does not apply."
     },
     "os_policies.resource_groups.resources.pkg.yum": {
       "type": "block",
@@ -730,8 +730,8 @@
       "description": "Package name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "YUM package name; identifier only."
     },
     "os_policies.resource_groups.resources.pkg.zypper": {
       "type": "block",
@@ -742,8 +742,8 @@
       "description": "Package name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Zypper package name; identifier only."
     },
     "os_policies.resource_groups.resources.repository": {
       "type": "block",
@@ -759,36 +759,36 @@
       "description": "Type of archive files in this repository. Possible values: [\"ARCHIVE_TYPE_UNSPECIFIED\", \"DEB\", \"DEB_SRC\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "APT archive type (DEB/DEB_SRC); functional repository setting."
     },
     "os_policies.resource_groups.resources.repository.apt.components": {
       "description": "List of components for this repository. Must contain at least one item.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which sections of the repository (e.g. main, contrib) are pulled — functional repository configuration that does not affect trust or transport, so not a platform-policy target."
     },
     "os_policies.resource_groups.resources.repository.apt.distribution": {
       "description": "Distribution of this repository.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The repository distribution codename (e.g. stable, bookworm); it selects the release line, not trust or transport, so constraining it yields no security gain."
     },
     "os_policies.resource_groups.resources.repository.apt.gpg_key": {
       "description": "URI of the key file for this repository. The agent maintains a keyring at '/etc/apt/trusted.gpg.d/osconfig_agent_managed.gpg'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Signature-verification control: if an APT repository signing key is configured it must not be blank (blacklist empty string), so package signatures can be verified. Sound: absent is not flagged."
     },
     "os_policies.resource_groups.resources.repository.apt.uri": {
       "description": "URI for this repository.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: this repository location URL must use HTTPS so packages are retrieved over an authenticated, tamper-resistant channel. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// endpoint is flagged."
     },
     "os_policies.resource_groups.resources.repository.goo": {
       "type": "block",
@@ -799,15 +799,15 @@
       "description": "The name of the repository.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "GooGet repository name; identifier only."
     },
     "os_policies.resource_groups.resources.repository.goo.url": {
       "description": "The url of the repository.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: this repository location URL must use HTTPS so packages are retrieved over an authenticated, tamper-resistant channel. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// endpoint is flagged."
     },
     "os_policies.resource_groups.resources.repository.yum": {
       "type": "block",
@@ -818,29 +818,29 @@
       "description": "The location of the repository directory.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: this repository location URL must use HTTPS so packages are retrieved over an authenticated, tamper-resistant channel. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// endpoint is flagged."
     },
     "os_policies.resource_groups.resources.repository.yum.display_name": {
       "description": "The display name of the repository.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable YUM repository name; metadata."
     },
     "os_policies.resource_groups.resources.repository.yum.gpg_keys": {
       "description": "URIs of GPG keys.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Signature-verification control: if repository signing keys are configured the list must not be empty (blacklist empty list), so package signatures can be verified. Sound: absent is not flagged."
     },
     "os_policies.resource_groups.resources.repository.yum.id": {
       "description": "A one word, unique name for this repository. This is the 'repo id' in the yum config file and also the 'display_name' if 'display_name' is omitted. This id is also used as the unique identifier when checking for resource conflicts.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "YUM repository ID; identifier only."
     },
     "os_policies.resource_groups.resources.repository.zypper": {
       "type": "block",
@@ -851,29 +851,29 @@
       "description": "The location of the repository directory.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Secure-transport control: this repository location URL must use HTTPS so packages are retrieved over an authenticated, tamper-resistant channel. Enforced by a whitelist on the URL scheme (pattern whitelist \"*://\" allowing \"https\"); an http:// endpoint is flagged."
     },
     "os_policies.resource_groups.resources.repository.zypper.display_name": {
       "description": "The display name of the repository.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable Zypper repository name; metadata."
     },
     "os_policies.resource_groups.resources.repository.zypper.gpg_keys": {
       "description": "URIs of GPG keys.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Signature-verification control: if repository signing keys are configured the list must not be empty (blacklist empty list), so package signatures can be verified. Sound: absent is not flagged."
     },
     "os_policies.resource_groups.resources.repository.zypper.id": {
       "description": "A one word, unique name for this repository. This is the 'repo id' in the zypper config file and also the 'display_name' if 'display_name' is omitted. This id is also used as the unique identifier when checking for GuestPolicy conflicts.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Zypper repository ID; identifier only."
     },
     "rollout": {
       "type": "block",
@@ -884,8 +884,8 @@
       "description": "This determines the minimum duration of time to wait after the configuration changes are applied through the current rollout. A VM continues to count towards the 'disruption_budget' at least until this duration of time has passed after configuration changes are applied.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Minimum wait between rollout steps; rollout pacing, an availability/operational control."
     },
     "rollout.disruption_budget": {
       "type": "block",
@@ -896,15 +896,15 @@
       "description": "Specifies a fixed value.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Fixed number of VMs disrupted per rollout step; availability tuning, not security."
     },
     "rollout.disruption_budget.percent": {
       "description": "Specifies the relative value defined as a percentage, which will be multiplied by a reference value.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Caps how many VMs are updated at once during a rollout — an operational availability/resiliency concern, not a security control."
     }
   }
 }

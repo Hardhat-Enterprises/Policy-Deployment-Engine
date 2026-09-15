@@ -11,7 +11,8 @@ conditions := [
     {
       "condition": "checks that vpc connector resides in approved Australian regions",
       "attribute_path": ["vpc_connector"],
-      "values": ["projects/my-project/locations/*/connectors/my-connector",[["australia-southeast1", "australia-southeast2"]]],
+      "values": ["projects/*/locations/*/connectors/*",
+                 [["my-project"], ["australia-southeast1", "australia-southeast2"], ["my-connector"]]],
       "policy_type": "pattern whitelist"
     }
     ],
