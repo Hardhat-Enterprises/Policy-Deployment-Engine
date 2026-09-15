@@ -19,8 +19,30 @@ env:
   TERRAFORM_VERSION: "1.15.7"
   OPA_VERSION: "v1.17.1"
 
+# Two independent jobs, deliberately.
+#
+# They used to be one, with the whole-tree lint first. When that lint failed, the
+# Terraform+OPA step never ran, policy_results.json was never written, and the
+# policy-results upload — `if: always()` — had nothing to upload. dev was in
+# exactly that state for the whole #720 -> #750 window, and the PDE Portal's
+# dev-branch rollup consumes that artifact newest-wins without comparing it to the
+# commit being scanned, so for two days it paired a fresh head sha with the last
+# pre-#720 verdicts and said nothing.
+#
+# Splitting is better than `continue-on-error` on the lint step: the run still goes
+# red honestly when the lint is red, rather than a step marked "soft" hiding it and
+# a later step re-raising it. The two jobs share nothing, so neither can stop the
+# other reporting.
+#
+# NOT applied to policy_check_PR. Its structural lint stays a hard gate: the portal
+# bot polls `PR checks` and refuses to merge a raised pull request while it is red,
+# so softening it there would reopen the hole that let nine red pull requests reach
+# dev. See scripts/_tests/test_workflow_contracts.py, which asserts both halves.
 jobs:
-  policy_check:
+  # Whole-tree lint. Fails red when the tree is broken — this is the alarm that
+  # surfaced #720 -> #750 — and blocks nothing else, because nothing else is in
+  # this job. Python only: no terraform, no OPA, no provider mirror.
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -30,8 +52,39 @@ jobs:
         with:
           python-version: '3.x'
 
+      # Report-only, and deliberately BEFORE the lint gate so it is still reported
+      # on a run the lint then fails. `.gitattributes` normalises new content at
+      # check-in, but it does not retro-fix blobs already committed on a branch cut
+      # before it landed, and git does not renormalise on merge — so such a branch
+      # can still carry CRLF onto dev. Nothing breaks when it does (fixture_sha
+      # canonicalises before hashing), but the files then read as modified in every
+      # clean checkout, which is how #750's two errors ended up attributed to
+      # whoever happened to be committing.
+      #
+      # continue-on-error on purpose: a hard whole-tree gate on this would be the
+      # very failure it exists to catch — one CRLF file anywhere on dev would turn
+      # every contributor's pull request red at once. dev-only, advisory, visible.
+      - name: Line endings (report only)
+        continue-on-error: true
+        run: python3 scripts/linters/check_line_endings.py
+
       - name: Lint (whole tree, structural + content)
         run: python3 scripts/linters/linter.py --tree all --platform gcp
+
+  # The verdicts the portal reads. Runs whatever the lint job does, and always
+  # uploads, so a repo-wide lint regression can never again cost the repo its
+  # policy results. The contract the portal matches on is the artifact name
+  # `policy-results`, its member `policy_results.json`, and that it comes from a
+  # run on dev — none of which may change without telling them.
+  policy_results:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
@@ -51,7 +104,8 @@ jobs:
       # gcp resource — a repo-wide companion to the structural lint above, not a gate:
       # continue-on-error so a repo-wide content regression never reddens this job.
       # `--json gcp` is the whole-platform sweep (~11s; needs only OPA, no terraform
-      # plan), so it must run after "Install OPA" above and needs nothing else set up.
+      # plan), so it lives in this job — the one that installs OPA — rather than
+      # beside the structural lint it reads as a companion to.
       - name: Policy lint (whole tree, report only)
         continue-on-error: true
         run: |
