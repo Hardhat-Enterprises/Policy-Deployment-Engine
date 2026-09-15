@@ -92,7 +92,7 @@ The attribute path would be:
 
 ### Different ways to write your policy
 
-The engine dispatches on `policy_type`, and it knows **exactly six** values:
+The engine dispatches on `policy_type`, and it knows **exactly seven** values:
 
 | `policy_type` | Use it when |
 |---|---|
@@ -102,13 +102,16 @@ The engine dispatches on `policy_type`, and it knows **exactly six** values:
 | `pattern blacklist` | A wildcard-extracted part of the value must not be one of these |
 | `pattern whitelist` | A wildcard-extracted part of the value must be one of these |
 | `element blacklist` | No element of an array may **contain** one of these substrings |
+| `element pattern whitelist` | Every element of an array must match a wildcard shape |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
 `POLICY ERROR: unknown policy_type ...` and your test goes red. `policy_lint`'s
 [`unknown-policy-type`](policy-lint.md#unknown-policy-type) rule catches it before you get that far.
 
-There is no `element whitelist`, and you do not need one — see the Whitelist note below.
+There is no *exact-match* `element whitelist`, and you do not need one — plain `whitelist`
+already covers that (see the Whitelist note below). For *pattern*-based list whitelisting,
+use `element pattern whitelist`.
 
 ---
 
@@ -119,8 +122,10 @@ Whitelist allows only specific values and blocks everything else.
 > **Whitelist already handles lists.** When the attribute is an array, the helper requires
 > *every* element to be in your `values` set (it is a subset test), so
 > `"attribute_path": ["allowed_ips"]` under a `whitelist` is a complete check — you do not need,
-> and will not find, an `element whitelist`. `element blacklist` exists as a separate type only
-> because *forbidding* a list needs substring matching, which the plain `blacklist` does not do.
+> and will not find, an *exact-match* `element whitelist`. `element blacklist` exists as a separate
+> type only because *forbidding* a list needs substring matching, which the plain `blacklist` does
+> not do. For *pattern*-based list validation (every element must match a shape), use
+> `element pattern whitelist`.
 
 ```rego
 
@@ -290,6 +295,27 @@ Blocks **array** attributes whose elements contain any blacklisted **substring**
         "attribute_path": ["resource_names"],
         "values": ["attacker-project", "test-project", "dev-", "-sandbox"],
         "policy_type": "element blacklist"
+      }
+    ]
+```
+
+### Element Pattern Whitelist
+
+Allows only **array** attributes whose **every** element matches a required wildcard
+shape. `values` is a single pattern string; each `*` matches one path segment (one or
+more non-`/` characters), so a `*` never spans a separator. This is the positive
+(allowlist) counterpart to `element blacklist` for lists of resource paths.
+```rego
+    [
+      {
+        "situation_description": "Guardrails must be explicit platform resource paths",
+        "remedies": ["Reference a concrete guardrail resource path"]
+      },
+      {
+        "condition": "Guardrails must match the platform path shape",
+        "attribute_path": ["guardrails"],
+        "values": ["projects/*/locations/*/apps/*/guardrails/*"],
+        "policy_type": "element pattern whitelist"
       }
     ]
 ```
