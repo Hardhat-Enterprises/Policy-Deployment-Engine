@@ -8,6 +8,7 @@ import shutil
 import hashlib
 import tempfile
 import time
+import uuid
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
@@ -25,40 +26,47 @@ CLI_CONFIG_FILE = CACHE_ROOT / "cli.tfrc"
 MIRROR_DIR = CACHE_ROOT / "mirror"
 CACHE_SETUP_SCRIPT = Path(__file__).resolve().parent / "cache_setup.sh"
 
-# --- Committed plan-JSON cache --------------------------------------------
-# `terraform plan` (provider schema load) is ~90% of per-policy time, but the
-# fixtures are static, so a fixture's plan JSON only changes when its *.tf or the
-# provider version changes. So the plan is committed, as `<sha>.json` INSIDE the
-# fixture directory next to the *.tf files it was planned from. On a run, a cache
-# hit feeds OPA directly and skips terraform entirely; a miss runs terraform once
-# and writes the file. The target provider version is read from
-# provider_version.txt (the single source of truth shared with cache_setup.sh),
-# so a provider bump invalidates every cached plan.
-#
-# The sha is the whole validity check: the file is a hit only because its NAME is
-# the hash of the *.tf beside it, so an edited fixture cannot silently be tested
-# against the plan of its old config. Keeping the plan in the fixture dir (rather
-# than a central inputs/plan_cache/) is what makes staleness a local question —
-# any sibling *.json that is not `<current sha>.json` is stale by construction, so
-# prune_stale_plans() below is correct on a single-fixture run and needs no
-# whole-platform sweep to identify orphans.
-#
-# The file is a pure `terraform show -json` document: nothing wraps it, so OPA,
-# jq and the linters all read it as the plan it is.
-#
-# fixture_sha() and plan_cache_path() are the ONLY definition of "which plan
-# belongs to this fixture". The linters and the portal import them rather than
-# re-deriving a path or a hash, which is why a provider bump — or this move out
-# of inputs/plan_cache/ — changed the answer everywhere at once. Do not inline
-# either of them anywhere; import them.
+# Committed plans live beside their fixtures. Every consumer uses the same
+# effective-file resolver and hash, including migrations and temporary test trees.
 TARGET_PROVIDER_VERSION = (Path(__file__).resolve().parent / "provider_version.txt").read_text().strip()
-
-# Committed plan files are named <64 hex chars>.json. Terraform only ever parses
-# *.tf / *.tf.json, so a hex-stemmed .json in the fixture dir is inert to it.
+POLICIES_ROOT = REPO_ROOT / "policies"
+PLATFORM_CONFIG_NAME = "config.tf"
+FIXTURE_TF_FILES = ("compliant.tf", "nonCompliant.tf")
+POLICY_FILE = "policy.rego"
+VARS_FILE = "_vars.rego"
 PLAN_FILE_RE = re.compile(r"^[0-9a-f]{64}\.json$")
-
-
 UTF8_BOM = b"\xef\xbb\xbf"
+
+
+def policy_root(policy_dir: Path, repo_root: Path | None = None) -> Path:
+    """Resolve the owning policies root; an explicit root never falls back elsewhere."""
+    directory = Path(policy_dir).resolve()
+    candidates = [Path(repo_root).resolve() / "policies"] if repo_root is not None else [
+        p for p in directory.parents if p.name == "policies"]
+    for root in candidates:
+        try:
+            parts = directory.relative_to(root).parts
+        except ValueError:
+            continue
+        if len(parts) == 4 and parts[0] in {"gcp", "aws", "azure"}:
+            return root
+    raise ValueError(f"Not an argument directory under policies/<platform>/<service>/<resource>: {directory}")
+
+
+def platform_of(policy_dir: Path, repo_root: Path | None = None) -> str:
+    return Path(policy_dir).resolve().relative_to(policy_root(policy_dir, repo_root)).parts[0]
+
+
+def fixture_files(policy_dir: Path, repo_root: Path | None = None) -> dict[str, Path]:
+    """Terraform's effective *.tf files; local config replaces the shared default."""
+    directory = Path(policy_dir).resolve()
+    root = policy_root(directory, repo_root)
+    files = {p.name: p for p in directory.glob("*.tf") if p.is_file()}
+    config = files.get(PLATFORM_CONFIG_NAME, root / platform_of(directory, repo_root) / PLATFORM_CONFIG_NAME)
+    if not config.is_file():
+        raise FileNotFoundError(f"Missing effective config.tf for {directory}: {config}")
+    files[PLATFORM_CONFIG_NAME] = config
+    return files
 
 
 def canonical_text_bytes(data: bytes) -> bytes:
@@ -87,55 +95,28 @@ def canonical_text_bytes(data: bytes) -> bytes:
     return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
 
 
-def fixture_sha(input_dir: Path) -> str:
-    """Stable hash of a fixture: its *.tf contents + the target provider version.
-
-    The contents are canonicalised (see canonical_text_bytes) so that the same
-    fixture hashes the same on a CRLF checkout and an LF one.
-    """
+def sha_for_files(files: dict[str, Path], transform=canonical_text_bytes) -> str:
+    """Hash named effective files. Also used by the read-only legacy migration adapter."""
     h = hashlib.sha256()
     h.update(f"provider={TARGET_PROVIDER_VERSION}\n".encode())
-    for tf in sorted(input_dir.glob("*.tf")):
-        h.update(tf.name.encode())
+    for name in sorted(files):
+        h.update(name.encode())
         h.update(b"\0")
-        h.update(canonical_text_bytes(tf.read_bytes()))
+        h.update(transform(files[name].read_bytes()))
         h.update(b"\0")
     return h.hexdigest()
 
 
-def plan_cache_path(input_dir: Path) -> Path:
-    """<input_dir>/<sha>.json — the committed plan for this fixture, beside its *.tf."""
-    return input_dir / f"{fixture_sha(input_dir)}.json"
+def fixture_sha(policy_dir: Path, repo_root: Path | None = None) -> str:
+    return sha_for_files(fixture_files(policy_dir, repo_root))
 
 
-def legacy_plan_path(input_dir: Path, sha: str) -> Path | None:
-    """Where this fixture's plan lived before plans moved into the fixture dirs.
-
-    ``<inputs>/plan_cache/<platform>/<sha>.json``, resolved from the fixture's own
-    ancestry rather than from REPO_ROOT so a tree under _tests/ resolves inside
-    itself. None when ``input_dir`` is not under an ``inputs/<platform>/`` path.
-    """
-    parts = input_dir.resolve().parts
-    try:
-        i = len(parts) - 1 - parts[::-1].index("inputs")
-    except ValueError:
-        return None
-    if i + 1 >= len(parts):
-        return None
-    inputs_root = Path(*parts[: i + 1])
-    return inputs_root / "plan_cache" / parts[i + 1] / f"{sha}.json"
+def plan_cache_path(policy_dir: Path, repo_root: Path | None = None) -> Path:
+    return Path(policy_dir) / f"{fixture_sha(policy_dir, repo_root)}.json"
 
 
-def _sha_over(input_dir: Path, transform) -> str:
-    """fixture_sha's hash, with ``transform`` applied to each *.tf's bytes."""
-    h = hashlib.sha256()
-    h.update(f"provider={TARGET_PROVIDER_VERSION}\n".encode())
-    for tf in sorted(input_dir.glob("*.tf")):
-        h.update(tf.name.encode())
-        h.update(b"\0")
-        h.update(transform(tf.read_bytes()))
-        h.update(b"\0")
-    return h.hexdigest()
+def _sha_over(policy_dir: Path, transform) -> str:
+    return sha_for_files(fixture_files(policy_dir), transform)
 
 
 def _to_crlf(data: bytes) -> bytes:
@@ -177,6 +158,14 @@ def find_denormalised_plan(input_dir: Path) -> Path | None:
     return None
 
 
+def is_committed_plan(path: Path) -> bool:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        return isinstance(value, dict) and isinstance(value.get("planned_values"), dict)
+    except (OSError, ValueError):
+        return False
+
+
 def adopt_denormalised_plan(input_dir: Path, cache_path: Path) -> bool:
     """Rename a CRLF-era plan onto its canonical name. True if one was adopted.
 
@@ -204,7 +193,7 @@ def adopt_denormalised_plan(input_dir: Path, cache_path: Path) -> bool:
     if cache_path.exists():
         return False
     denormalised = find_denormalised_plan(input_dir)
-    if denormalised is None:
+    if denormalised is None or not is_committed_plan(denormalised):
         return False
     try:
         os.replace(denormalised, cache_path)
@@ -213,50 +202,37 @@ def adopt_denormalised_plan(input_dir: Path, cache_path: Path) -> bool:
     return True
 
 
-def adopt_legacy_plan(input_dir: Path, cache_path: Path) -> bool:
-    """Move a pre-move plan into the fixture dir. True if one was adopted.
-
-    Every Service branch that ever committed a plan carries its own
-    inputs/plan_cache/ entries through a merge of dev — they are additions git has
-    no reason to drop — so after merging they hold a legacy file the harness would
-    ignore and the linters would flag twice over (legacy-plan-cache from
-    branch_scope, fixture-missing-plan from policy_lint). The contents are still
-    exactly the plan for these *.tf, since the sha is the same hash it always was,
-    so the next local run moves it into place instead of re-planning the fixture
-    and leaving the contributor a manual `git rm` to work out.
-    """
-    if cache_path.exists():
-        return False
-    legacy = legacy_plan_path(input_dir, cache_path.stem)
-    if legacy is None or not legacy.is_file():
-        return False
-    try:
-        os.replace(legacy, cache_path)
-    except OSError:
-        return False
-    return True
+# Fixtures own distinct plan files. Lock by destination (rather than only hash),
+# and use unique temp names so duplicate invocations cannot collide on a write.
+_plan_locks: dict[str, Lock] = {}
+_plan_locks_guard = Lock()
 
 
-def get_or_build_plan(input_dir: Path, cache_path: Path, verbose: bool = False) -> Path | None:
-    """Return the fixture's committed plan, running terraform first if it is absent.
-
-    A plan left at the pre-move path is adopted first (see adopt_legacy_plan), so
-    a branch that merges dev does not re-plan every fixture it owns. A plan named
-    for the pre-normalisation sha is likewise renamed into place rather than
-    rebuilt (see adopt_denormalised_plan).
-
-    On the way out, any *other* .json in the fixture dir is deleted: the fixture
-    has exactly one valid plan, so a sibling is the leftover of an earlier version
-    of these *.tf (or a stray plan.json from an older harness). Pruning only ever
-    happens once ``cache_path`` is known-good, so a fixture whose terraform failed
-    keeps whatever it already had — that plan may be unrebuildable offline.
-    """
-    adopt_legacy_plan(input_dir, cache_path)
-    adopt_denormalised_plan(input_dir, cache_path)
-    if not cache_path.exists() and run_terraform_commands(input_dir, cache_path, verbose) is None:
-        return None
-    prune_stale_plans(input_dir, keep=cache_path)
-    return cache_path
+def get_or_build_plan(policy_dir: Path, cache_path: Path, verbose: bool = False) -> Path | None:
+    key = str(cache_path.resolve())
+    with _plan_locks_guard:
+        lock = _plan_locks.setdefault(key, Lock())
+    with lock:
+        adopt_denormalised_plan(policy_dir, cache_path)
+        if not is_committed_plan(cache_path):
+            plan_json = run_terraform_commands(policy_dir, verbose)
+            if plan_json is None:
+                return None
+            # Reject incomplete output before publishing or deleting the previous plan.
+            try:
+                document = json.loads(plan_json)
+                if not isinstance(document, dict) or not isinstance(document.get("planned_values"), dict):
+                    return None
+            except (TypeError, json.JSONDecodeError):
+                return None
+            tmp = cache_path.with_name(f"{cache_path.name}.{uuid.uuid4().hex}.tmp")
+            try:
+                tmp.write_text(plan_json, encoding="utf-8")
+                os.replace(tmp, cache_path)
+            finally:
+                tmp.unlink(missing_ok=True)
+        prune_stale_plans(policy_dir, keep=cache_path)
+        return cache_path
 
 
 def prune_stale_plans(input_dir: Path, keep: Path) -> int:
@@ -484,7 +460,7 @@ def get_all_resource_types(plan_json_path: Path) -> list[str]:
 
 
 def parse_rego_metadata(policy_file: Path):
-    """Parse the <argument>.rego policy file to extract
+    """Parse the policy.rego file to extract
     (package_path, vars_import_data_path). Returns (pkg_path, vars_import) or
     (None, None). The vars import still targets the ``...vars`` package (the file
     is _vars.rego but the package name is unchanged).
@@ -579,74 +555,82 @@ def get_policy_messages(data_paths, plan_path: Path, message_query: str) -> list
     return normalize_messages(val)
 
 
-def run_terraform_commands(input_dir: Path, out_path: Path, verbose: bool = False) -> Path | None:
-    """Plan ``input_dir`` and write the plan JSON to ``out_path``. None on failure."""
+def run_terraform_commands(policy_dir: Path, verbose: bool = False) -> str | None:
+    """Plan one fixture in a throwaway workspace; return the plan JSON text, or None.
+
+    Terraform runs in a short-lived temp directory, never in the repo tree. Two reasons:
+
+    1. Required by the layout. The provider stub lives once at policies/<platform>/config.tf,
+       not beside the fixtures, so the .tf files terraform needs are only ever co-located
+       in a workspace we assemble.
+    2. Windows MAX_PATH. Argument dirs run to ~230 characters, and `terraform init` then
+       wants to create .terraform/providers/registry.terraform.io/hashicorp/google/<ver>/
+       <platform>/terraform-provider-google_<ver>_x5.exe under them — roughly another 120,
+       which blows past the 260-character limit. A %TEMP%-rooted workspace stays well
+       inside it. (Override TMPDIR/TEMP if a runner's temp root is itself very deep.)
+
+    As a bonus nothing is left to clean up in the repo: no .terraform, no lock file, no
+    stray plan.json in a policy directory.
+    """
     env = os.environ.copy()
 
-    # Fake credentials live in a temp file OUTSIDE the repo tree, so an interrupted
-    # run never leaves a stray file in a fixture dir (and concurrent workers can't
-    # collide on it).
-    creds_fd, creds_name = tempfile.mkstemp(suffix=".json", prefix="fake-creds-")
-    with os.fdopen(creds_fd, "w") as fh:
-        fh.write('{"type": "service_account", "project_id": "fake-project"}')
+    # Fake credentials live in the workspace too, so an interrupted run leaves nothing
+    # behind anywhere and concurrent workers can't collide on it.
+    work = Path(tempfile.mkdtemp(prefix="pde-tf-"))
+    creds = work / "fake-creds.json"
+    creds.write_text('{"type": "service_account", "project_id": "fake-project"}', encoding="utf-8")
 
     env.update({
-        'GOOGLE_APPLICATION_CREDENTIALS': creds_name,
+        'GOOGLE_APPLICATION_CREDENTIALS': str(creds),
         'GOOGLE_PROJECT': 'fake-project',
         'GOOGLE_REGION': 'us-central1',
-        # Project-local, offline provider source (see module header). No global
-        # writes, no per-dir re-download. TF_DATA_DIR is intentionally left at its
-        # per-directory default so each fixture's .terraform is isolated
-        # (concurrency-safe) and symlinks into the shared mirror (tiny footprint);
-        # cleanup_workspace removes it after each pair. The provider comes from a
+        # Project-local, offline provider source (see module header). No global writes,
+        # no per-dir re-download. TF_DATA_DIR is left at its per-directory default so each
+        # workspace's .terraform is isolated (concurrency-safe) and symlinks into the
+        # shared mirror; the whole workspace is deleted below. The provider comes from a
         # filesystem mirror (not TF_PLUGIN_CACHE_DIR), so no plugin-cache env is set.
         'TF_CLI_CONFIG_FILE': str(CLI_CONFIG_FILE),
     })
 
-    # Written via a temp file in the same dir, then os.replace'd: an interrupted
-    # run must never leave a truncated <sha>.json that the next run reads as a
-    # valid hit. One worker owns a fixture dir at a time, so pid is unique enough.
-    tmp = out_path.with_suffix(f".{os.getpid()}.tmp")
     commands = [
         ["terraform", "init", "-backend=false"],
         ["terraform", "plan", "-refresh=false", "-lock=false", "-input=false", "-out=plan"],
     ]
 
     try:
+        for name, src in fixture_files(policy_dir).items():
+            shutil.copyfile(src, work / name)
+
         for cmd in commands:
             result = subprocess.run(
-                cmd, cwd=input_dir, capture_output=True, text=True, env=env)
+                cmd, cwd=work, capture_output=True, text=True, env=env)
             if result.returncode != 0:
                 if verbose:
-                    print(f"❌ Command failed: {' '.join(cmd)}")
-                    print("--- stdout ---")
-                    print(result.stdout)
-                    print("--- stderr ---")
-                    print(result.stderr)
+                    thread_safe_print(f"Command failed: {' '.join(cmd)} (in {policy_dir})")
+                    thread_safe_print("--- stdout ---")
+                    thread_safe_print(result.stdout)
+                    thread_safe_print("--- stderr ---")
+                    thread_safe_print(result.stderr)
                 return None
 
-        # `terraform show -json` writes the plan JSON to stdout; redirect it
-        # straight to the file (no shell, no needless `| cat`).
-        with open(tmp, "w", encoding="utf-8") as fh:
-            result = subprocess.run(
-                ["terraform", "show", "-json", "plan"],
-                cwd=input_dir, stdout=fh, stderr=subprocess.PIPE, text=True, env=env)
+        # `terraform show -json` writes the plan JSON to stdout; capture it directly
+        # (no shell, no intermediate file — the caller writes it to the cache).
+        result = subprocess.run(
+            ["terraform", "show", "-json", "plan"],
+            cwd=work, capture_output=True, text=True, env=env)
         if result.returncode != 0:
             if verbose:
-                print("❌ Command failed: terraform show -json plan")
-                print("--- stderr ---")
-                print(result.stderr)
+                thread_safe_print("Command failed: terraform show -json plan")
+                thread_safe_print("--- stderr ---")
+                thread_safe_print(result.stderr)
             return None
-        os.replace(tmp, out_path)
+        return result.stdout
+    except OSError as e:
+        if verbose:
+            thread_safe_print(f"Workspace error for {policy_dir}: {e}")
+        return None
     finally:
-        try:
-            os.unlink(creds_name)
-        except OSError:
-            pass
-        if tmp.exists():
-            tmp.unlink(missing_ok=True)
-
-    return out_path
+        shutil.rmtree(work, ignore_errors=True)
 
 
 def get_policy_metadata(policy_file: Path, service: str, resource: str, attribute: str) -> tuple[str, str]:
@@ -758,27 +742,30 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     return make_success(attribute, service, resource)
 
 
-def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Path,
+def run_policy_check_pair(policy_dir: Path, policy_file: Path, policies_root: Path,
                           cache_path: Path, verbose: bool = False):
     # Extract data about services and filesystem paths
-    abs_input_dir = input_dir.resolve()
-    service, resource, attribute = extract_path_parts(input_dir)
-    # Cache hit -> use the committed <sha>.json; miss -> run terraform and write it.
-    plan_path = get_or_build_plan(abs_input_dir, cache_path, verbose)
-    cleanup_workspace(abs_input_dir, verbose)
+    abs_policy_dir = policy_dir.resolve()
+    service, resource, attribute = extract_path_parts(policy_dir)
+    # Cache hit -> use the committed plan.json; miss -> run terraform and cache it.
+    plan_path = get_or_build_plan(abs_policy_dir, cache_path, verbose)
 
     if plan_path is None:
-        res = make_failure(attribute, "Terraform failed to compile!", service, resource)
-        return res
+        return make_failure(attribute, "Terraform failed to compile!", service, resource)
 
     # plan_path is the fixture's committed <sha>.json — never delete it here.
     message_query, vars_query = get_policy_metadata(
         policy_file, service, resource, attribute)
 
-    # Scope OPA's --data to just the shared helpers + this resource's policy dir
-    # (the .rego + _vars.rego). Loading the whole policies/ tree on every eval
-    # re-compiles ~1000 policies per call and dominates runtime; this is ~20x faster.
-    data_paths = [(policies_root / "_helpers").resolve(), policy_file.parent.resolve()]
+    # Scope OPA's --data to just the shared helpers + this policy + its resource's
+    # _vars.rego. Loading the whole policies/ tree on every eval re-compiles ~1000
+    # policies per call and dominates runtime; this is ~20x faster. The files are named
+    # explicitly rather than passing the argument dir, because _vars.rego lives one
+    # level up (at the resource) and would otherwise be missed.
+    data_paths = [(policies_root / "_helpers").resolve(), policy_file.resolve()]
+    vars_file = policy_file.parent.parent / VARS_FILE
+    if vars_file.is_file():
+        data_paths.append(vars_file.resolve())
 
     # One eval fetches the whole `variables` object (resource_type + value_name).
     variables = opa_eval_value(data_paths, plan_path, vars_query)
@@ -810,80 +797,55 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
     return validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource,
                                   resource_value_name)
 
-def cleanup_workspace(workdir: Path, verbose: bool = False):
-    # Remove transient terraform artifacts from the input dir. NOT the plan JSON:
-    # the harness no longer writes a `plan.json` at all — `terraform show -json`
-    # goes straight to the committed `<sha>.json`, which lives here permanently.
-    # `plan` is the binary plan file, and the lock is regenerated offline from the
-    # mirror on each init.
-    for fname in ["plan", ".terraform.lock.hcl"]:
-        f = workdir / fname
-        try:
-            f.unlink()
-        except FileNotFoundError:
-            pass
 
-    # remove .terraform directory recursively
-    for tfdir in workdir.rglob(".terraform"):
-        if tfdir.is_dir():
-            try:
-                shutil.rmtree(tfdir)
-            except OSError as e:
-                if verbose:
-                    thread_safe_print(f"⚠️  could not remove {tfdir}: {e}")
+def discover_policies(policies_search_root: Path):
+    """Find every policy directory under the given root.
 
-def find_matching_pairs(inputs_root: Path, policies_search_root: Path):
+    A policy is one self-contained directory:
+        policies/<platform>/<service>/<resource>/<argument>/
+            policy.rego, compliant.tf, nonCompliant.tf
+
+    Returns (pairs, malformed):
+      pairs     — [(policy_dir, policy_file)] for complete policies.
+      malformed — [(policy_dir, reason)] for a directory that is only half a policy: a
+                  policy.rego with fixtures missing, or fixtures with no policy.rego.
+                  Both are hard failures — such a policy can never be tested.
     """
-    Pair each input argument directory with its policy file.
-
-    Input fixtures live in leaf dirs ``inputs/gcp/<svc>/<resource>/<argument>/``;
-    the matching policy is the FILE ``policies/gcp/<svc>/<resource>/<argument>.rego``
-    (the per-argument layout — not the old ``<argument>/policy.rego`` directory).
-
-    Args:
-        inputs_root: Root directory for Terraform input files
-        policies_search_root: The user-provided policies root (for path matching)
-    """
-    def is_leaf_terraform_dir(directory: Path) -> bool:
-        # A single rglob pass: there must be a .tf directly in this dir and none in
-        # any descendant dir.
-        has_direct = False
-        for tf in directory.rglob("*.tf"):
-            if tf.parent == directory:
-                has_direct = True
-            else:
-                return False
-        return has_direct
-
-    input_dirs = [p for p in inputs_root.rglob('*') if p.is_dir() and is_leaf_terraform_dir(p)]
     pairs = []
-    unmatched_inputs = []          # (input_dir, expected_policy_file)
-    matched_policy_files = set()
+    malformed = []
+    seen = set()
 
-    for input_dir in input_dirs:
-        relative = input_dir.relative_to(inputs_root)
-        # <argument> may contain dots (a nested docs key); append .rego to the
-        # whole name rather than using with_suffix, which would clobber it.
-        policy_file = policies_search_root / relative.parent / f"{relative.name}.rego"
-        if policy_file.is_file():
-            pairs.append((input_dir, policy_file))
-            matched_policy_files.add(policy_file.resolve())
+    for policy_file in sorted(policies_search_root.rglob(POLICY_FILE)):
+        policy_dir = policy_file.parent
+        seen.add(policy_dir.resolve())
+        missing = [f for f in FIXTURE_TF_FILES if not (policy_dir / f).is_file()]
+        if missing:
+            malformed.append((policy_dir, f"missing fixture file(s): {', '.join(missing)}"))
         else:
-            unmatched_inputs.append((input_dir, policy_file))
+            pairs.append((policy_dir, policy_file))
 
-    # Orphan policies: every <argument>.rego in scope (excluding the per-resource
-    # _vars.rego and the shared _helpers) that no input fixture drives.
-    orphan_policies = []           # (policy_file, expected_input_dir)
-    for pf in policies_search_root.rglob("*.rego"):
-        if pf.name == "_vars.rego" or "_helpers" in pf.parts:
+    # The inverse: a directory carrying fixtures but no policy.rego. Skip the shared
+    # helpers and the per-platform config.tf, which are not policy directories.
+    for tf in sorted(policies_search_root.rglob("*.tf")):
+        policy_dir = tf.parent
+        if policy_dir.resolve() in seen or "_helpers" in policy_dir.parts:
             continue
-        if pf.resolve() in matched_policy_files:
-            continue
-        rel = pf.relative_to(policies_search_root)
-        expected_input = inputs_root / rel.parent / pf.stem
-        orphan_policies.append((pf, expected_input))
+        if tf.name == PLATFORM_CONFIG_NAME:
+            continue                       # policies/<platform>/config.tf
+        seen.add(policy_dir.resolve())
+        malformed.append((policy_dir, f"terraform fixtures with no {POLICY_FILE}"))
 
-    return pairs, unmatched_inputs, orphan_policies
+    for rego in sorted(policies_search_root.rglob("*.rego")):
+        if rego.name not in {POLICY_FILE, VARS_FILE} and "_helpers" not in rego.parts:
+            malformed.append((rego.parent / rego.stem, f"legacy policy file {rego}; run the layout migration"))
+    for directory, _ in pairs[:]:
+        try:
+            fixture_files(directory)
+        except (OSError, ValueError) as exc:
+            pairs.remove((directory, directory / POLICY_FILE))
+            malformed.append((directory, str(exc)))
+
+    return pairs, malformed
 
 
 def write_report(results: list, path: str) -> None:
@@ -900,29 +862,62 @@ def write_report(results: list, path: str) -> None:
         fh.write("\n")
 
 
+def verify_plan_cache(pairs, verbose: bool = False) -> int:
+    """Read-only: require each fixture's expected, parseable plan and no stale plans."""
+    errors = []
+    for directory, _ in pairs:
+        try:
+            expected = plan_cache_path(directory)
+            if not expected.is_file():
+                errors.append(f"{directory}: missing committed plan {expected.name}")
+            else:
+                plan = json.loads(expected.read_text(encoding="utf-8"))
+                if not isinstance(plan, dict) or not isinstance(plan.get("planned_values"), dict):
+                    errors.append(f"{expected}: not a Terraform plan")
+            for sibling in directory.glob("*.json"):
+                if sibling != expected:
+                    errors.append(f"{sibling}: unexpected or stale plan; expected {expected.name}")
+        except (OSError, ValueError) as exc:
+            errors.append(f"{directory}: {exc}")
+    for error in errors:
+        print(f"[FAIL] {error}")
+    print(f"[{ 'FAIL' if errors else 'OK' }] checked {len(pairs)} fixture-local plans")
+    return 1 if errors else 0
+
+
 def main():
+    # The progress line and summary use emoji. On Windows, piping stdout switches
+    # Python from the console's UTF-8 to the locale codepage (cp1252), which cannot
+    # encode them — so `auto_test.py | tee log` died with UnicodeEncodeError. Ask for
+    # UTF-8 explicitly; harmless where it is already the default.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")
+        except (AttributeError, OSError):
+            pass
+
     parser = argparse.ArgumentParser(
-        description="Run Terraform + OPA policy checks for matched input/policy pairs.",
-        epilog="Examples:\n"
-               "  auto_test.py                                   # whole repo\n"
-               "  auto_test.py gcp                               # whole platform\n"
-               "  auto_test.py 'gcp/Cloud Storage'               # whole service\n"
-               "  auto_test.py 'gcp/Cloud Storage/google_storage_bucket'   # one resource",
+        description="Run Terraform + OPA policy checks over the policies tree.",
+        epilog="Examples:"
+               "\n  auto_test.py                                   # whole repo"
+               "\n  auto_test.py gcp                               # whole platform"
+               "\n  auto_test.py 'gcp/Cloud Storage'               # whole service"
+               "\n  auto_test.py 'gcp/Cloud Storage/google_storage_bucket'   # one resource",
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
         "target", nargs="?", default=None,
         help="What to test, as <platform>[/<service>[/<resource>]] — e.g. 'gcp', "
              "'gcp/AlloyDB', 'gcp/AlloyDB/google_alloydb_backup'. Quote service names "
-             "that contain spaces. Omit to test the whole repo. Derives both the inputs/ "
-             "and policies/ roots; cannot be combined with --inputs/--policies.")
-    parser.add_argument("--inputs", default=None,
-                        help="Explicit inputs root (advanced; a positional target overrides it). "
-                             "Default: the whole repo (inputs/), or inputs/<target>.")
+             "that contain spaces. Omit to test the whole repo. Cannot be combined "
+             "with --policies.")
     parser.add_argument("--policies", default=None,
                         help="Explicit policies root (advanced; a positional target overrides it). "
                              "Default: the whole repo (policies/), or policies/<target>.")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("--workers", type=int, default=4, help="Number of parallel workers (default: 4)")
+    parser.add_argument("--verify-plan-cache", action="store_true",
+                        help="Read-only: check every fixture has a committed plan, then exit. "
+                             "Runs no terraform and no OPA, and writes nothing.")
     parser.add_argument("--report", default=None, metavar="PATH",
                         help="Write the full results list to PATH as a JSON array of "
                              "{service, resource, policy, passed} objects (failure entries keep "
@@ -931,42 +926,35 @@ def main():
     args = parser.parse_args()
     start_time = time.monotonic()
 
-    if args.target and (args.inputs or args.policies):
-        parser.error("pass either a positional target or --inputs/--policies, not both.")
+    if args.target and args.policies:
+        parser.error("pass either a positional target or --policies, not both.")
 
-    # A positional target derives both roots from the mirrored trees; otherwise fall
-    # back to the explicit flags, defaulting to the whole repo.
     if args.target:
-        inputs_root = Path("inputs") / args.target
         policies_search_root = Path("policies") / args.target
     else:
-        inputs_root = Path(args.inputs) if args.inputs else Path("inputs")
         policies_search_root = Path(args.policies) if args.policies else Path("policies")
     policies_base_root = normalize_policies_root(policies_search_root)
 
-    pairs, unmatched_inputs, orphan_policies = find_matching_pairs(
-        inputs_root, policies_search_root)
-    if not pairs and not unmatched_inputs and not orphan_policies:
-        print(" No input/policy pairs or mismatches found.")
+    pairs, malformed = discover_policies(policies_search_root)
+    if not pairs and not malformed:
+        print(f" No policies found under {policies_search_root}.")
         sys.exit(1)
 
-    # Resolve each pair's plan path up front; only stand up the terraform provider
-    # cache if at least one plan is missing (a fully-cached run needs no
-    # terraform/provider at all). Stale siblings are pruned per fixture as each
-    # pair runs — see get_or_build_plan — so there is no whole-tree prune step.
-    pair_cache = {(i, p): plan_cache_path(i) for i, p in pairs}
-    # Adopt any pre-move plans before counting misses, so a branch that has just
-    # merged dev neither re-plans its fixtures nor stands up a provider mirror it
-    # turns out not to need.
-    adopted = sum(1 for (i, _), cp in pair_cache.items() if adopt_legacy_plan(i, cp))
-    if adopted:
-        print(f"[*] adopted {adopted} plan(s) from the pre-move inputs/plan_cache/ layout "
-              "— commit the moved files")
-    renamed = sum(1 for (i, _), cp in pair_cache.items() if adopt_denormalised_plan(i, cp))
-    if renamed:
-        print(f"[*] renamed {renamed} plan(s) written before line endings were normalised "
-              "— commit the renames (contents are unchanged)")
-    misses = sum(1 for cp in pair_cache.values() if not cp.exists())
+    if args.verify_plan_cache:
+        if malformed:
+            print(f"[FAIL] {len(malformed)} malformed policy director(ies) — fix these first:")
+            for policy_dir, reason in sorted(malformed):
+                print(f"  {policy_dir}: {reason}")
+            sys.exit(1)
+        sys.exit(verify_plan_cache(pairs, args.verbose))
+
+    # Resolve each policy's plan-cache path up front; only stand up the terraform
+    # provider cache if at least one plan is missing (a fully-cached run needs no
+    # terraform/provider at all).
+    pair_cache = {(d, p): plan_cache_path(d) for d, p in pairs}
+    for (directory, _), cache in pair_cache.items():
+        adopt_denormalised_plan(directory, cache)
+    misses = sum(1 for cp in pair_cache.values() if not is_committed_plan(cp))
     if misses:
         print(f"[*] {misses}/{len(pairs)} plan(s) not cached — ensuring terraform provider cache…")
         ensure_cache_ready()
@@ -975,38 +963,33 @@ def main():
 
     results = []
 
-    # A mismatched input/policy is a hard failure (the pair can never be tested).
-    for input_dir, policy_file in unmatched_inputs:
-        service, resource, attribute = extract_path_parts(input_dir)
-        results.append(make_failure(
-            attribute, f"No matching policy file (expected {policy_file})", service, resource))
-    for policy_file, expected_input in orphan_policies:
-        service, resource, attribute = policy_file.parts[-3], policy_file.parts[-2], policy_file.stem
-        results.append(make_failure(
-            attribute, f"No matching input fixture (expected {expected_input}/)", service, resource))
+    # A half-built policy is a hard failure (it can never be tested).
+    for policy_dir, reason in malformed:
+        service, resource, attribute = extract_path_parts(policy_dir)
+        results.append(make_failure(attribute, reason, service, resource))
 
     # Process pairs in parallel
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
         # Submit all tasks
         future_to_pair = {
-            executor.submit(run_policy_check_pair, input_dir, policy_file, policies_base_root,
-                            pair_cache[(input_dir, policy_file)], args.verbose): (input_dir, policy_file)
-            for input_dir, policy_file in pairs
+            executor.submit(run_policy_check_pair, policy_dir, policy_file, policies_base_root,
+                            pair_cache[(policy_dir, policy_file)], args.verbose): (policy_dir, policy_file)
+            for policy_dir, policy_file in pairs
         }
 
         # Collect results as they complete
         total = len(future_to_pair)
         done = passed = 0
         for future in as_completed(future_to_pair):
-            input_dir, policy_file = future_to_pair[future]
+            policy_dir, policy_file = future_to_pair[future]
             try:
                 result = future.result()
                 results.append(result)
                 if result.get("passed"):
                     passed += 1
             except Exception as exc:
-                thread_safe_print(f"Error processing {input_dir}: {exc}")
-                service, resource, attribute = extract_path_parts(input_dir)
+                thread_safe_print(f"Error processing {policy_dir}: {exc}")
+                service, resource, attribute = extract_path_parts(policy_dir)
                 results.append(make_failure(attribute, f"Exception: {exc}", service, resource))
             done += 1
             if not args.verbose:

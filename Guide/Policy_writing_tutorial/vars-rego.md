@@ -4,7 +4,7 @@
 Ensure your `_vars.rego` file is located in:
 
 `policies/gcp/<Service>/<resource type>/` — directly in the resource folder, alongside the
-`<attribute>.rego` policy files. Only one `_vars.rego` file is required per resource type.
+`<attribute>/` folders. Only one `_vars.rego` file is required per resource type.
 
 ![policy-structure](images/policy-vars-file-structure.PNG)
 

@@ -62,7 +62,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 # cached plan belongs to this fixture". Importing keeps the two in lockstep: a
 # provider bump changes the sha in both places at once.
 from scripts.auto_test.auto_test import (  # noqa: E402
-    find_denormalised_plan, plan_cache_path)
+    find_denormalised_plan, plan_cache_path, sha_for_files)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HELPERS_DIR = REPO_ROOT / "policies" / "_helpers"
@@ -481,7 +481,7 @@ def _opa_reason(proc):
 
 def _run_opa(query, *data_dirs):
     """``opa eval --format json`` over ``data_dirs``; returns the query value."""
-    cmd = ["opa", "eval", "--format", "json"]
+    cmd = ["opa", "eval", "--format", "json", "--ignore", "*.json"]
     for d in data_dirs:
         cmd += ["-d", str(d)]
     cmd.append(query)
@@ -499,19 +499,20 @@ def _run_opa(query, *data_dirs):
 
 
 def _eval_dir(directory, helpers_dir):
-    """Whole-``data.terraform`` value for one policy directory, cached.
-
-    One OPA invocation per resource-type directory covers every policy file in
-    it; a per-file query is only used if this batch evaluation fails.
-    """
-    key = (str(Path(directory).resolve()), str(Path(helpers_dir).resolve()))
+    """Evaluate only Rego sources, never fixture JSON documents."""
+    directory = Path(directory)
+    key = (str(directory.resolve()), str(Path(helpers_dir).resolve()))
     if key not in _eval_cache:
+        sources = sorted(directory.rglob("*.rego"))
+        parent_vars = directory.parent / VARS_FILE
+        if parent_vars.is_file():
+            sources.append(parent_vars)
         try:
-            _eval_cache[key] = _run_opa("data.terraform", helpers_dir, directory) or {}
+            _eval_cache[key] = _run_opa("data.terraform", helpers_dir, *sources) or {}
         except OpaUnavailableError:
-            raise                                         # environment, not content
+            raise
         except PolicyLintError:
-            _eval_cache[key] = None                       # force the per-file path
+            _eval_cache[key] = None
     return _eval_cache[key]
 
 
@@ -542,7 +543,11 @@ def _rule_value(rego_path, helpers_dir, rule_name):
     # Batch evaluation failed or the rule is undefined in it — ask again with just
     # this one file, so a genuine OPA error surfaces (rather than becoming a silent
     # empty list) and an unparseable *sibling* cannot poison a healthy policy.
-    return _run_opa(f"data.{package}.{rule_name}", helpers_dir, Path(rego_path))
+    sources = [Path(rego_path)]
+    vars_path = Path(rego_path).parent.parent / VARS_FILE if Path(rego_path).name == "policy.rego" else Path(rego_path).parent / VARS_FILE
+    if vars_path.is_file() and vars_path != Path(rego_path):
+        sources.append(vars_path)
+    return _run_opa(f"data.{package}.{rule_name}", helpers_dir, *sources)
 
 
 def load_conditions(rego_path, policies_root, helpers_dir=None):
@@ -585,16 +590,31 @@ def _resolve_helpers(policies_root, helpers_dir=None):
 # --------------------------------------------------------------------------- #
 # Plan cache
 # --------------------------------------------------------------------------- #
-def plan_cache_for(input_dir):
+def plan_cache_for(input_dir, *, legacy=False):
     """``<input_dir>/<sha>.json`` — the committed plan, beside the fixture's *.tf.
 
     Straight through to ``auto_test.plan_cache_path`` (the pipeline's own
     definition of which plan belongs to a fixture), so a provider bump changes
     the expected filename here and in the harness at the same time. No root
-    rebasing is needed any more: the plan lives inside the directory it is for,
-    so a fixture tree under ``_tests/`` resolves inside itself for free.
+    rebasing is needed: the plan lives inside the directory it is for, so a
+    fixture tree under ``_tests/`` resolves inside itself for free.
+
+    ``legacy=True`` is for a pre-cutover tree, where the fixture sits under
+    ``inputs/`` and carries its own ``config.tf`` rather than sharing the
+    platform one. The plan is in the same place, but its sha is taken over the
+    directory's own *.tf alone — asking auto_test would fail, because that
+    resolves a policies/<platform>/<service>/<resource>/<argument> root which a
+    legacy path does not have.
+
+    This exists for exactly one caller: run_precommit_linter lints a baseline
+    worktree checked out from the base commit to subtract pre-existing findings,
+    and on a branch that spans the cutover that baseline is the old layout.
     """
-    return plan_cache_path(Path(input_dir))
+    directory = Path(input_dir)
+    if not legacy:
+        return plan_cache_path(directory)
+    sha = sha_for_files({p.name: p for p in directory.glob("*.tf")})
+    return directory / f"{sha}.json"
 
 
 # --------------------------------------------------------------------------- #
@@ -834,8 +854,8 @@ def _repeated_helper_calls(text):
 # Rules over one policy file
 # --------------------------------------------------------------------------- #
 def _lint_policy_file(root, platform, service, resource_type, rego_path, policies_root,
-                      identity_key=None):
-    stem = rego_path.stem
+                      identity_key=None, *, legacy_layout=False):
+    stem = rego_path.stem if legacy_layout else rego_path.parent.name
     text = rego_path.read_text(encoding="utf-8")
     out = []
 
@@ -885,7 +905,7 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
         # file never silences the rest of the run.
         add("lint-error", str(exc))
         return out + _lint_fixtures(root, platform, service, resource_type, stem,
-                                    identity_key)
+                                    identity_key, legacy_layout=legacy_layout)
 
     seen = set()
 
@@ -967,7 +987,7 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
             f"no condition reads '{stem}' (attribute paths: "
             f"{', '.join(sorted(set(p for p in joined_paths if p))) or 'none'})")
 
-    out.extend(_lint_fixtures(root, platform, service, resource_type, stem, identity_key))
+    out.extend(_lint_fixtures(root, platform, service, resource_type, stem, identity_key, legacy_layout=legacy_layout))
     return out
 
 
@@ -1040,14 +1060,14 @@ def _drift_comparisons(compliant, non_compliant):
     return pairs
 
 
-def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=None):
-    input_dir = Path(root) / "inputs" / platform / service / resource_type / stem
+def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=None, *, legacy_layout=False):
+    input_dir = Path(root) / ("inputs" if legacy_layout else "policies") / platform / service / resource_type / stem
     # A missing input directory is linter.py's finding (an orphan policy), not
     # ours — we only speak about fixtures that exist.
     if not input_dir.is_dir() or not any(input_dir.glob("*.tf")):
         return []
 
-    cache = plan_cache_for(input_dir)
+    cache = plan_cache_for(input_dir, legacy=legacy_layout)
     if not cache.exists():
         # Reported repo-relative: the finding is read in CI logs and on the portal,
         # where an absolute path of the checkout means nothing.
@@ -1057,7 +1077,11 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
         # a UTF-8 BOM, so it was named for the pre-normalisation sha. Naming the
         # remedy is the difference between a rename and every contributor on the
         # branch re-running terraform for a file whose contents are already correct.
-        denormalised = find_denormalised_plan(input_dir)
+        # Not on a legacy tree: the alternate-sha hint resolves the shared
+        # platform config.tf, which a pre-cutover fixture does not have. The
+        # hint is a cutover convenience anyway — the baseline pass only needs
+        # to know which findings already existed.
+        denormalised = None if legacy_layout else find_denormalised_plan(input_dir)
         if denormalised is not None:
             return [Finding(service, resource_type, stem, "fixture-missing-plan",
                             f"no committed plan at {where} — but {denormalised.name} is "
@@ -1194,7 +1218,8 @@ def _documented_arguments(root, platform, service, resource_type):
     return set(arguments) if isinstance(arguments, dict) else None
 
 
-def _lint_drift_exemptions(root, platform, service, resource_type, identity_key=None):
+def _lint_drift_exemptions(root, platform, service, resource_type, identity_key=None,
+                           *, legacy_layout=False):
     """Validate a resource's ``drift_exemptions.json``.
 
     Every failure is an ordinary finding against the resource, never fatal, and a
@@ -1257,12 +1282,13 @@ def _lint_drift_exemptions(root, platform, service, resource_type, identity_key=
                                          f"a documented argument of {resource_type}"))
 
         out += _stale_exemption_findings(root, platform, service, resource_type,
-                                         stem, sorted(_entry_keys(entry)), identity_key)
+                                         stem, sorted(_entry_keys(entry)), identity_key,
+                                         legacy_layout=legacy_layout)
     return out
 
 
 def _stale_exemption_findings(root, platform, service, resource_type, stem, keys,
-                              identity_key):
+                              identity_key, *, legacy_layout=False):
     """Flag declared keys the fixture does not actually differ on.
 
     Same anti-rot principle as the test over the maintainer list: an entry that
@@ -1273,7 +1299,8 @@ def _stale_exemption_findings(root, platform, service, resource_type, stem, keys
     Silent when the fixture has no readable plan; ``fixture-missing-plan`` is that
     situation's finding and saying it twice helps nobody.
     """
-    sides = _fixture_sides(root, platform, service, resource_type, stem)
+    sides = _fixture_sides(root, platform, service, resource_type, stem,
+                           legacy_layout=legacy_layout)
     if sides is None:
         return []
     compliant, non_compliant = sides
@@ -1297,15 +1324,17 @@ def _stale_exemption_findings(root, platform, service, resource_type, stem, keys
                     f"{'them' if len(stale) > 1 else 'it'}")]
 
 
-def _fixture_sides(root, platform, service, resource_type, stem):
+def _fixture_sides(root, platform, service, resource_type, stem, *, legacy_layout=False):
     """``(compliant, non_compliant)`` value maps from a fixture's committed plan.
 
-    None when there is no readable plan for it.
+    None when there is no readable plan for it. Layout-aware like _lint_fixtures:
+    the fixture sits under inputs/ before the cutover and beside its policy.rego
+    under policies/ after it.
     """
-    input_dir = Path(root) / "inputs" / platform / service / resource_type / stem
+    input_dir = Path(root) / ("inputs" if legacy_layout else "policies") / platform / service / resource_type / stem
     if not input_dir.is_dir():
         return None
-    cache = plan_cache_for(input_dir)
+    cache = plan_cache_for(input_dir, legacy=legacy_layout)
     try:
         plan = json.loads(cache.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
@@ -1464,7 +1493,7 @@ def _lint_vars_file(platform, service, resource_type, vars_path, policies_root):
 # --------------------------------------------------------------------------- #
 # Entry points
 # --------------------------------------------------------------------------- #
-def lint_resource(root, platform, service_folder, resource_type):
+def _lint_resource(root, platform, service_folder, resource_type, *, legacy_layout=False):
     """Every finding for one ``policies/<platform>/<service>/<resource_type>/``."""
     root = Path(root)
     policies_root = root / "policies"
@@ -1493,20 +1522,38 @@ def lint_resource(root, platform, service_folder, resource_type):
     # rule below, so a malformed one should be reported once, against the file,
     # rather than implied by whatever the drift rule then does or does not say.
     findings += _lint_drift_exemptions(root, platform, service_folder, resource_type,
-                                       identity_key)
+                                       identity_key, legacy_layout=legacy_layout)
 
-    for rego_path in sorted(resource_dir.glob(f"*{REGO_EXT}")):
+    pattern = f"*{REGO_EXT}" if legacy_layout else "*/policy.rego"
+    if not legacy_layout:
+        for old in sorted(resource_dir.glob("*.rego")):
+            if old.name != VARS_FILE:
+                findings.append(Finding(service_folder, resource_type, old.stem,
+                                        "lint-error", f"legacy policy file {old.name}; run the layout migration"))
+    for rego_path in sorted(resource_dir.glob(pattern)):
         if rego_path.name == VARS_FILE:
             continue
         try:
             findings += _lint_policy_file(root, platform, service_folder, resource_type,
-                                          rego_path, policies_root, identity_key)
+                                          rego_path, policies_root, identity_key, legacy_layout=legacy_layout)
         except OpaUnavailableError:
             raise
         except (PolicyLintError, OSError, UnicodeDecodeError) as exc:
-            findings.append(Finding(service_folder, resource_type, rego_path.stem,
+            findings.append(Finding(service_folder, resource_type, rego_path.stem if legacy_layout else rego_path.parent.name,
                                     "lint-error", str(exc)))
     return findings
+
+
+def lint_resource(root, platform, service_folder, resource_type):
+    """Normal commands require the new nested layout."""
+    return _lint_resource(root, platform, service_folder, resource_type)
+
+
+def lint_resource_baseline(root, platform, service_folder, resource_type):
+    """Read either layout only when comparing inherited findings against a base."""
+    directory = Path(root) / "policies" / platform / service_folder / resource_type
+    legacy = any(p.name != VARS_FILE for p in directory.glob("*.rego"))
+    return _lint_resource(root, platform, service_folder, resource_type, legacy_layout=legacy)
 
 
 def _expand_target(root, target):

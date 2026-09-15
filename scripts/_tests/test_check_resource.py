@@ -125,19 +125,21 @@ def test_the_base_doc_is_read_from_git():
 # True-arg coverage
 # --------------------------------------------------------------------------- #
 def _resource_tree(tmp_path, *, policy=None, fixture=None):
-    """A repo-shaped tree, optionally with a policy file and/or a fixture dir."""
+    base = tmp_path / "policies/gcp/Cloud Storage/google_storage_bucket"
     if policy:
-        p = tmp_path / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket"
-        p.mkdir(parents=True, exist_ok=True)
-        (p / policy).write_text("package x\n")
+        path = base / policy
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("package x\n")
     if fixture:
-        f = tmp_path / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket" / fixture
-        f.mkdir(parents=True, exist_ok=True)
+        directory = base / fixture
+        directory.mkdir(parents=True, exist_ok=True)
+        for name in ("compliant.tf", "nonCompliant.tf"):
+            (directory / name).write_text("# test fixture\n")
     return tmp_path
 
 
 def test_a_covered_true_argument_passes(tmp_path, monkeypatch):
-    _resource_tree(tmp_path, policy="location.rego", fixture="location")
+    _resource_tree(tmp_path, policy="location/policy.rego", fixture="location")
     monkeypatch.chdir(tmp_path)
     doc = _doc(location={"security_impact": True, "rationale": "r"})
     assert cr.check_true_arg_coverage(doc, "gcp", "Cloud Storage", "google_storage_bucket") == []
@@ -147,9 +149,9 @@ def test_a_true_argument_missing_both_reports_both(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     doc = _doc(location={"security_impact": True, "rationale": "r"})
     findings = cr.check_true_arg_coverage(doc, "gcp", "Cloud Storage", "google_storage_bucket")
-    assert len(findings) == 2
-    assert any("missing policy" in f for f in findings)
-    assert any("missing input fixture" in f for f in findings)
+    assert len(findings) == 3
+    for name in ("policy.rego", "compliant.tf", "nonCompliant.tf"):
+        assert any(name in f for f in findings)
 
 
 def test_a_false_argument_needs_no_policy_or_fixture(tmp_path, monkeypatch):
@@ -162,24 +164,27 @@ def test_a_false_argument_needs_no_policy_or_fixture(tmp_path, monkeypatch):
 # --if-cached: is every plan committed?
 # --------------------------------------------------------------------------- #
 def _fixture_dir(tmp_path, argument="location"):
-    d = (tmp_path / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket" / argument)
+    d = (tmp_path / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket" / argument)
     d.mkdir(parents=True)
     (d / "compliant.tf").write_text('resource "google_storage_bucket" "a" {}\n')
+    (d / "nonCompliant.tf").write_text("# other fixture\n")
+    (d / "policy.rego").write_text("package test\n")
+    (tmp_path / "policies/gcp/config.tf").write_text("# shared config\n")
     return d
 
 
 def test_a_fixture_without_its_plan_is_uncached(tmp_path, monkeypatch):
     _fixture_dir(tmp_path)
     monkeypatch.setattr(cr, "REPO", tmp_path)
-    missing = cr.uncached_fixtures(Path("inputs/gcp/Cloud Storage/google_storage_bucket"))
+    missing = cr.uncached_fixtures(Path("policies/gcp/Cloud Storage/google_storage_bucket"))
     assert [d.name for d in missing] == ["location"]
 
 
 def test_a_fixture_with_its_plan_is_cached(tmp_path, monkeypatch):
     d = _fixture_dir(tmp_path)
-    cr.plan_cache_path(d).write_text("{}")
+    cr.plan_cache_path(d).write_text('{"planned_values": {}}')
     monkeypatch.setattr(cr, "REPO", tmp_path)
-    assert cr.uncached_fixtures(Path("inputs/gcp/Cloud Storage/google_storage_bucket")) == []
+    assert cr.uncached_fixtures(Path("policies/gcp/Cloud Storage/google_storage_bucket")) == []
 
 
 def test_a_stale_plan_does_not_count_as_cached(tmp_path, monkeypatch):
@@ -188,12 +193,12 @@ def test_a_stale_plan_does_not_count_as_cached(tmp_path, monkeypatch):
     d = _fixture_dir(tmp_path)
     (d / f"{'a' * 64}.json").write_text("{}")
     monkeypatch.setattr(cr, "REPO", tmp_path)
-    assert len(cr.uncached_fixtures(Path("inputs/gcp/Cloud Storage/google_storage_bucket"))) == 1
+    assert len(cr.uncached_fixtures(Path("policies/gcp/Cloud Storage/google_storage_bucket"))) == 1
 
 
 def test_a_missing_directory_is_not_an_error(tmp_path, monkeypatch):
     monkeypatch.setattr(cr, "REPO", tmp_path)
-    assert cr.uncached_fixtures(Path("inputs/gcp/nope/nope")) == []
+    assert cr.uncached_fixtures(Path("policies/gcp/nope/nope")) == []
 
 
 # --------------------------------------------------------------------------- #
@@ -204,8 +209,8 @@ ARGS = ("gcp", "Cloud Storage", "google_storage_bucket")
 
 @pytest.mark.parametrize("path", [
     "docs/gcp/Cloud Storage/google_storage_bucket.json",
-    "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
-    "policies/gcp/Cloud Storage/google_storage_bucket/location.rego",
+    "policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
+    "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego",
     "policies/gcp/Cloud Storage/google_storage_bucket/_vars.rego",
 ])
 def test_the_resources_own_files_are_recognised(path):
@@ -214,7 +219,7 @@ def test_the_resources_own_files_are_recognised(path):
 
 @pytest.mark.parametrize("path", [
     "docs/gcp/Cloud Storage/google_storage_bucket_iam_binding.json",   # neighbouring resource
-    "inputs/gcp/Compute Engine/google_compute_image/family/compliant.tf",
+    "policies/gcp/Compute Engine/google_compute_image/family/compliant.tf",
     "policies/_helpers/helpers.rego",
     "README.md",
     "scripts/auto_test/auto_test.py",
@@ -226,14 +231,14 @@ def test_everything_else_is_not_this_resource(path):
 def test_a_service_folder_with_spaces_survives_the_prefix_match():
     # Folder names carry spaces and brackets; the match is a plain string compare
     # on repo-relative paths, so nothing needs escaping — but it is worth pinning.
-    path = "inputs/gcp/Cloud Run (v2 API)/google_cloud_run_v2_service/ingress/compliant.tf"
+    path = "policies/gcp/Cloud Run (v2 API)/google_cloud_run_v2_service/ingress/compliant.tf"
     assert cr.touches_resource([path], "gcp", "Cloud Run (v2 API)",
                                "google_cloud_run_v2_service") == [path]
 
 
 @pytest.mark.parametrize("path,reads", [
-    ("inputs/gcp/S/r/a/compliant.tf", True),
-    ("policies/gcp/S/r/a.rego", True),
+    ("policies/gcp/S/r/a/compliant.tf", True),
+    ("policies/gcp/S/r/a/policy.rego", True),
     ("docs/gcp/S/r.json", False),
 ])
 def test_only_tf_and_rego_feed_the_opa_test(path, reads):
@@ -301,6 +306,7 @@ def test_a_service_branch_with_no_doc_fails(capsys):
     assert "resource doc not found" in capsys.readouterr().out
 
 
+@pytest.mark.repository_data
 def test_the_real_repo_passes_its_own_gate(capsys):
     # An end-to-end check against a resource that is green on dev, so a regression
     # in the wiring (paths, slug resolution, auto_test invocation) fails here rather

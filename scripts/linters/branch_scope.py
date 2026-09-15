@@ -68,9 +68,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _service_slug import slug_to_folder  # noqa: E402
 
 RULES = {
+    "legacy-layout": "GCP fixtures now live beside policy.rego under policies/.",
     "out-of-scope-file": (
         "The file is not part of this branch's resource type. A Service/ branch may "
-        "change only its own docs JSON, inputs/ fixtures and policies/ files."),
+        "change only its own docs JSON and its own policies/ directory."),
     "deleted-file": (
         "The branch deletes a file. Nothing on a resource branch needs a deletion — "
         "not even inside your own folder; rename by adding the new file. The one "
@@ -120,6 +121,7 @@ SERVICE_PREFIX = "Service/"
 
 # Where to send a contributor for each rule.
 REMEDIES = {
+    "legacy-layout": "Merge origin/{base} after cutover and use the nested policies/ layout; do not resurrect inputs/gcp/.",
     "out-of-scope-file": (
         "Restore it with `git checkout origin/{base} -- '{path}'`, then commit again. "
         "If it is a file you created by accident (an editor scratch file, a downloaded "
@@ -341,7 +343,7 @@ def path_in_scope(path, platform, folder, resource_type):
     if len(parts) < 4:
         return False
     tree, got_platform, got_folder = parts[0], parts[1], parts[2]
-    if tree not in ("docs", "inputs", "policies"):
+    if tree not in ("docs", "policies"):
         return False
     if not _segments_match(got_platform, platform):
         return False
@@ -363,9 +365,13 @@ def classify(status, path, platform, folder, resource_type):
     that tells them what to do: a branch working from the pre-move layout is told
     that once, not once per resurrected cache file.
     """
-    if path.startswith(LEGACY_PLAN_CACHE_PREFIX):
+    if path.startswith((LEGACY_PLAN_CACHE_PREFIX, "plan_cache/")):
         # Deleting the old tree is exactly right; bringing it back is the mistake.
         return None if status == "D" else "legacy-plan-cache"
+    if path.startswith("inputs/gcp/"):
+        return "legacy-layout"
+    if re.fullmatch(r"policies/[^/]+/config\.tf", path):
+        return "shared-harness-edit"
     if status == "D":
         # A fixture's *.tf edit changes its sha, and the harness prunes the plan of
         # the previous version as it writes the new one. That deletion is the
@@ -384,7 +390,6 @@ def classify(status, path, platform, folder, resource_type):
 def check(entries, platform, folder, resource_type, base="dev"):
     """``[Finding, ...]`` for a branch's changed entries, sorted by rule then path."""
     scope_hint = (f"docs/{platform}/{folder}/{resource_type}.json, "
-                  f"inputs/{platform}/{folder}/{resource_type}/ and "
                   f"policies/{platform}/{folder}/{resource_type}/")
     findings = []
     for status, path in entries:
@@ -643,7 +648,6 @@ def main(argv=None):
     elif findings:
         print(f"[FAIL] {branch} changes files outside its own resource type.")
         print(f"       This branch owns: docs/{platform}/{folder}/{resource_type}.json, "
-              f"inputs/{platform}/{folder}/{resource_type}/, "
               f"policies/{platform}/{folder}/{resource_type}/")
         _report(findings, args.max_per_rule, base=args.base, staged=args.staged)
     else:

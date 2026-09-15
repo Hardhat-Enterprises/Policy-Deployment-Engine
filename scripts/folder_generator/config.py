@@ -18,9 +18,10 @@ CLOUD_CONFIGS = {
 STATE_FILE = os.path.join(CACHE_DIR, "user_state.json")
 
 TEMPLATE_BASE_DIR = os.path.join(PROJECT_ROOT, "templates")
-INPUT_BASE_DIR = os.path.join(PROJECT_ROOT, "inputs")
 POLICY_BASE_DIR = os.path.join(PROJECT_ROOT, "policies")
 
-TEMPLATE_FILES_TF = ["compliant.tf", "config.tf", "nonCompliant.tf"]
+# A policy is one self-contained directory: the .tf fixtures sit beside policy.rego.
+# config.tf is NOT here — there is one shared copy at policies/<platform>/config.tf.
+TEMPLATE_FILES_TF = ["compliant.tf", "nonCompliant.tf"]
 TEMPLATE_POLICY = "policy.rego"
 TEMPLATE_VARS = "_vars.rego"
