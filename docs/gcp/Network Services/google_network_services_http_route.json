@@ -20,29 +20,29 @@
       "description": "Gateways defines a list of gateways this HttpRoute is attached to, as one of the routing rules to route the requests served by the gateway.\nEach gateway reference should match the pattern: projects/*/locations/global/gateways/<gateway_name>",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Controls which Gateway resources this route is attached to; attaching to an unapproved or overly permissive gateway can expose routing to unintended external traffic."
+      "security_impact": false,
+      "rationale": "References other Gateway resources by name. Resource references are out of scope for a generic security policy target."
     },
     "hostnames": {
       "description": "Set of hosts that should match against the HTTP host header to select a HttpRoute to process the request.",
       "required": true,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Determines which HTTP Host headers this route matches. An overly broad or wildcard hostname can cause traffic to be routed unexpectedly, a common source of misrouting and security exposure."
+      "security_impact": false,
+      "rationale": "Hostnames define functional routing domains, which are architectural configuration choices rather than security policy targets."
     },
     "labels": {
       "description": "Set of label tags associated with the HttpRoute resource.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Labels support governance controls like environment classification, cost tracking, and label-based compliance automation. Policy should require a baseline set of mandatory keys (e.g. environment, owner)."
+      "security_impact": false,
+      "rationale": "Labels are descriptive metadata used for organization and tracking, not security controls."
     },
     "meshes": {
       "description": "Meshes defines a list of meshes this HttpRoute is attached to, as one of the routing rules to route the requests served by the mesh.\nEach mesh reference should match the pattern: projects/*/locations/global/meshes/<mesh_name>.\nThe attached Mesh should be of a type SIDECAR.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Controls which service mesh resources this route is attached to; an unapproved or overly permissive mesh binding can expose internal service traffic incorrectly."
+      "security_impact": false,
+      "rationale": "References other Mesh resources by name. Resource references are out of scope for a generic security policy target."
     },
     "name": {
       "description": "Name of the HttpRoute resource.",
@@ -55,8 +55,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines which GCP project the resource is created in; an unpinned or incorrect project can place resources outside intended security boundaries or monitoring scope."
+      "security_impact": false,
+      "rationale": "Identifies the GCP project the resource belongs to. Resource identifiers and references to other resources are not policy targets."
     },
     "rules": {
       "type": "block",
@@ -145,8 +145,8 @@
       "description": "The URL of a BackendService to route traffic to.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the backend service traffic is routed to. A misconfigured or attacker-influenced value can redirect traffic to an unintended or malicious backend; policy should whitelist approved BackendService references."
+      "security_impact": false,
+      "rationale": "References another BackendService resource by name. Pointers and identifiers to other resources are out of scope for a generic, multi-tenant policy target."
     },
     "rules.action.destinations.weight": {
       "description": "Specifies the proportion of requests forwarded to the backend referenced by the serviceName field. This is computed as: weight/Sum(weights in this destination list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports.\nIf only one serviceName is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend.\nIf weights are specified for any one service name, they need to be specified for all of them.\nIf weights are unspecified for all services, then, traffic is distributed in equal proportions to all of them.",
@@ -176,8 +176,8 @@
       "description": "The percentage of traffic which will be aborted.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Setting the abort percentage to 100 causes all matched traffic to fail, functioning as a complete self-inflicted denial of service if applied in production; values should be scoped and time-bound to controlled testing."
+      "security_impact": false,
+      "rationale": "Controls the percentage of traffic aborted for fault-injection testing. An operational availability and testing setting rather than a security control."
     },
     "rules.action.fault_injection_policy.delay": {
       "type": "block",
@@ -207,8 +207,8 @@
       "description": "The host that will be used in the redirect response instead of the one that was supplied in the request.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "An attacker-influenced or misconfigured redirect host enables an open-redirect, sending legitimate users to a malicious external site; policy should whitelist approved redirect-target hosts."
+      "security_impact": false,
+      "rationale": "Specifies an external redirect destination host. This is an application-level reference rather than a platform-level security control."
     },
     "rules.action.redirect.https_redirect": {
       "description": "If set to true, the URL scheme in the redirected request is set to https.",
@@ -261,8 +261,8 @@
       "description": "Add the headers with given map where key is the name of the header, value is the value of the header.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Allowing arbitrary header injection (e.g. spoofing trust headers like Authorization, X-Forwarded-For, or Cookie) is security-relevant, but the current policy engine has no mechanism to check for forbidden keys within a map(string) field - only fixed, known keys (as used in labels.rego) or list/scalar membership are supported. Flagging for reviewer: this needs new shared-helper logic to enforce, out of scope for a single-field policy."
+      "security_impact": false,
+      "rationale": "Arbitrary key-value map used to implement application-level header logic. Its contents are determined by team-specific routing needs, not platform security requirements, so it is out of scope as a policy target."
     },
     "rules.action.request_header_modifier.remove": {
       "description": "Remove headers (matching by header names) specified in the list.",
@@ -275,8 +275,8 @@
       "description": "Completely overwrite/replace the headers with given map where key is the name of the header, value is the value of the header.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "FLAGGED - NOT YET BUILDABLE: like request_header_modifier.add, this is a map(string) field where keys are arbitrary header names. Overwriting headers on the upstream request carries the same trust-header spoofing risk (e.g. faking Authorization/X-Forwarded-For), but the policy engine has no mechanism to check for forbidden keys within a map(string) - only fixed known keys (as in labels.rego) or list/scalar membership are supported. Needs new shared-helper logic; out of scope for a single-field policy."
+      "security_impact": false,
+      "rationale": "Arbitrary key-value map used to implement application-level header logic. Its contents are determined by team-specific routing needs, not platform security requirements, so it is out of scope as a policy target."
     },
     "rules.action.request_mirror_policy": {
       "type": "block",
@@ -292,8 +292,8 @@
       "description": "The URL of a BackendService to route traffic to.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Mirrored request traffic, which may contain sensitive data, is sent to this backend. Routing mirror traffic to an unintended or insecure service leaks that data; policy should whitelist approved mirror-destination services."
+      "security_impact": false,
+      "rationale": "References another BackendService resource by name for mirrored traffic. Pointers and identifiers to other resources are out of scope for a generic, multi-tenant policy target."
     },
     "rules.action.request_mirror_policy.destination.weight": {
       "description": "Specifies the proportion of requests forwarded to the backend referenced by the serviceName field. This is computed as: weight/Sum(weights in this destination list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports.\nIf only one serviceName is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend.\nIf weights are specified for any one service name, they need to be specified for all of them.\nIf weights are unspecified for all services, then, traffic is distributed in equal proportions to all of them.",
@@ -311,22 +311,22 @@
       "description": "Add the headers with given map where key is the name of the header, value is the value of the header.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "FLAGGED - NOT YET BUILDABLE: map(string) field where keys are arbitrary header names. Injecting response headers can add misleading security headers or leak internal metadata to clients, but the policy engine cannot check for forbidden keys within a map(string) field - only fixed known keys or list/scalar membership are supported. Needs new shared-helper logic; out of scope for a single-field policy."
+      "security_impact": false,
+      "rationale": "Arbitrary key-value map used to implement application-level response header logic. Its contents are determined by team-specific requirements, not platform security policy, so it is out of scope as a policy target."
     },
     "rules.action.response_header_modifier.remove": {
       "description": "Remove headers (matching by header names) specified in the list.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Removing browser-security response headers (e.g. Content-Security-Policy, Strict-Transport-Security, X-Frame-Options, X-Content-Type-Options) before they reach the client strips real defenses against XSS, clickjacking, and downgrade attacks."
+      "security_impact": false,
+      "rationale": "Removes specified response headers as part of application-level response handling. This is application routing logic rather than a platform infrastructure control."
     },
     "rules.action.response_header_modifier.set": {
       "description": "Completely overwrite/replace the headers with given map where key is the name of the header, value is the value of the header.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "FLAGGED - NOT YET BUILDABLE: map(string) field where keys are arbitrary header names. Overwriting response headers can strip or replace legitimate security-relevant headers with weaker values, but the policy engine cannot check for forbidden keys within a map(string) field - only fixed known keys or list/scalar membership are supported. Needs new shared-helper logic; out of scope for a single-field policy."
+      "security_impact": false,
+      "rationale": "Arbitrary key-value map used to overwrite response headers. Header modification maps of this kind are application-level operational choices outside platform policy scope."
     },
     "rules.action.retry_policy": {
       "type": "block",
@@ -337,8 +337,8 @@
       "description": "Specifies the allowed number of retries.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "An excessive retry count can amplify load against a struggling backend during outages (a self-inflicted retry-storm/DoS pattern). Policy should cap num_retries to a safe upper bound."
+      "security_impact": false,
+      "rationale": "Controls the number of retry attempts. An operational resilience and availability setting rather than a security posture control."
     },
     "rules.action.retry_policy.per_try_timeout": {
       "description": "Specifies a non-zero timeout per retry attempt. A duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
@@ -363,15 +363,15 @@
       "description": "Prior to forwarding the request to the selected destination, the requests host header is replaced by this value.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Rewriting the Host header sent to the backend can enable host-header-confusion or SSRF-adjacent misconfigurations if set to an untrusted or overly permissive value, so its use should be reviewed and constrained."
+      "security_impact": false,
+      "rationale": "Rewrites the Host header before forwarding to the backend. This is an application routing choice that cannot be generically validated without knowledge of team-specific backend infrastructure."
     },
     "rules.action.url_rewrite.path_prefix_rewrite": {
       "description": "Prior to forwarding the request to the selected destination, the matching portion of the requests path is replaced by this value.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Rewriting the request path before forwarding to the backend can be misused to bypass path-based access controls or route requests to unintended internal endpoints if set to an untrusted or overly permissive value."
+      "security_impact": false,
+      "rationale": "Rewrites the matched path prefix before forwarding to the backend. This is core application routing logic rather than a security policy target."
     },
     "rules.matches": {
       "type": "block",
@@ -389,8 +389,8 @@
       "description": "Specifies if prefixMatch and fullPathMatch matches are case sensitive. The default value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Enabling case-insensitive path matching can allow requests to bypass rules that rely on exact-case path segments (e.g. a rule targeting '/Admin' could be matched by '/admin'), weakening path-based access controls."
+      "security_impact": false,
+      "rationale": "Controls case sensitivity for path matching. This is an architectural routing requirement determined by each team, not a security policy target."
     },
     "rules.matches.prefix_match": {
       "description": "The HTTP request path value must begin with specified prefixMatch. prefixMatch must begin with a /.",
@@ -403,8 +403,8 @@
       "description": "The HTTP request path value must satisfy the regular expression specified by regexMatch after removing any query parameters and anchor supplied with the original URL. For regular expression grammar, please see https://github.com/google/re2/wiki/Syntax",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "A loosely-anchored or overly broad path regex can unintentionally match unauthorized paths, exposing unintended routes; policy should require fully-anchored, reviewed regex patterns."
+      "security_impact": false,
+      "rationale": "Free-form regular expression used for path matching. Application routing logic of this kind cannot be generically evaluated by a platform-level policy."
     },
     "rules.matches.headers": {
       "type": "block",
@@ -509,8 +509,8 @@
       "description": "The value of the query parameter must match the regular expression specified by regexMatch.For regular expression grammar, please see https://github.com/google/re2/wiki/Syntax",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "A loosely-anchored query-parameter regex can unintentionally match unauthorized values, same bypass risk as other regex matches; policy should require fully-anchored, reviewed regex patterns."
+      "security_impact": false,
+      "rationale": "Free-form regular expression used for query-parameter matching. This is an application-specific routing rule outside the scope of a generic platform policy."
     }
   }
 }
