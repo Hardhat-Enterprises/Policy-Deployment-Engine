@@ -305,8 +305,8 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Requires a non-empty SHA-256 checksum for remote execution files so that payloads cannot be fetched and executed without integrity verification, reducing the risk of compromised or tampered files going undetected."
+      "security_impact": false,
+      "rationale": "The SHA-256 checksum verifies the integrity of a specific remote validation file, but the security control is the allow_insecure setting: keeping allow_insecure false prevents checksum validation from being bypassed."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
@@ -706,8 +706,8 @@
       "description": "Whether dependencies should also be installed.\n- install when false: 'rpm --upgrade --replacepkgs package.rpm'\n- install when true: 'yum -y install package.rpm' or\n'zypper -y install package.rpm'",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether RPM package dependencies are automatically retrieved, which can expand the software supply chain and introduce unreviewed packages or dependencies."
+      "security_impact": false,
+      "rationale": "Controls the RPM installation mechanism by determining whether package dependencies are automatically resolved and retrieved; neither setting is inherently insecure, so constraining this functional choice does not provide a distinct security benefit."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source": {
       "type": "block",
@@ -859,7 +859,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the repository URL used to retrieve packages, helping ensure packages are obtained from an approved and trusted source."
+      "rationale": "Controls where packages are fetched from, and the policy requires the HTTPS scheme by forbidding HTTP repository URLs regardless of which repository is specified."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.yum": {
       "type": "block",
