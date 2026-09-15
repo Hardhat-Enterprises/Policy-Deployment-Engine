@@ -111,8 +111,8 @@
       "description": "Tags to attach to the instance.",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "Network tags determine which firewall rules apply to an instance, since GCP firewall rules are commonly scoped by target tag rather than instance name. Incorrect or missing tags can cause instances to inherit unintended firewall exposure or miss protective rules that should apply."
+      "security_impact": true,
+      "rationale": "Network tags determine which firewall rules apply to an instance, since GCP firewall rules are commonly scoped by target tag rather than instance name. Policy should require tags to be drawn from an approved set, since incorrect or missing tags directly change which firewall rules match the instance and therefore its network exposure."
     },
     "advanced_machine_features": {
       "type": "block",
@@ -171,7 +171,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Selects the confidential computing technology (SEV/SEV_SNP/TDX), which determines the strength of the memory-encryption guarantee."
+      "rationale": "Selects the confidential computing technology (SEV/SEV_SNP/TDX), which determines the strength of the memory-encryption guarantee. Policy should require a modern tier (e.g. SEV_SNP or TDX) rather than leaving the value unconstrained."
     },
     "confidential_instance_config.enable_confidential_compute": {
       "description": "Defines whether the instance should have confidential compute enabled. Field will be deprecated in a future release.",
@@ -280,8 +280,8 @@
       "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Disk-level Resource Manager tags can drive tag-based IAM/firewall conditions; incorrect tags can unintentionally widen or narrow enforced policy scope."
+      "security_impact": false,
+      "rationale": "Resource Manager tag keys/values referenced here are team-managed taxonomy identifiers rather than a direct security control; references to other resources are out of scope for a generic policy target."
     },
     "disk.resource_policies": {
       "description": "A list (short name or id) of resource policies to attach to this disk. Currently a max of 1 resource policy is supported.",
@@ -295,21 +295,21 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Specifying an existing disk as the source lets the template attach pre-provisioned storage that may already contain data, configuration, or embedded credentials; using an unreviewed or untrusted existing disk can bypass the hardening and patching applied to approved base images, so the source disk's provenance should be reviewed."
+      "rationale": "References an existing disk resource by name. Pointers to other resources are out of scope for a generic platform security policy target."
     },
     "disk.source_image": {
       "description": "The image from which to initialize this disk. This can be one of: the image's self_link, projects/{project}/global/images/{image}, projects/{project}/global/images/family/{family}, global/images/{image}, global/images/family/{family}, family/{family}, {project}/{family}, {project}/{image}, {family}, or {image}. ~> Note: Either source or source_image is required when creating a new instance except for when creating a local SSD.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Determines which base OS image the disk boots from. Using an unapproved, outdated, or public/community image instead of an organization-approved hardened image can introduce unpatched vulnerabilities or untrusted software into the instance from creation."
+      "security_impact": true,
+      "rationale": "Determines which base OS image the disk boots from. Using an unapproved, outdated, or public/community image instead of an organization-approved hardened image can introduce unpatched vulnerabilities or untrusted software into the instance from creation; policy should require images to come from an approved project/family whitelist."
     },
     "disk.source_snapshot": {
       "description": "The source snapshot to create this disk. When creating\na new instance, one of initializeParams.sourceSnapshot,\ninitializeParams.sourceImage, or disks.source is\nrequired except for local SSD.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Creating a disk from a snapshot carries forward the exact data and configuration state captured at snapshot time; restoring from an unreviewed or stale snapshot can reintroduce previously remediated vulnerabilities or expose data that should have been purged, so the snapshot origin and freshness should be reviewed."
+      "rationale": "References a specific snapshot resource. Snapshots are team-managed data references, not a structural policy target for a generic platform policy."
     },
     "disk.storage_pool": {
       "description": "The self_link or ID of the Storage Pool to create this disk in.",
@@ -367,15 +367,15 @@
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in RFC 4648 base64 to either encrypt or decrypt this resource. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Raw CSEK key material; exposure in config/state would compromise the encryption guarantee."
+      "security_impact": false,
+      "rationale": "Raw customer-supplied key material passed directly in configuration. This is an ephemeral, team-provided secret value rather than a tunable security setting, and cannot be meaningfully constrained by a structural platform policy."
     },
     "disk.source_image_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit customer-supplied encryption key to either encrypt or decrypt this resource. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "RSA-wrapped CSEK key material; exposure in config/state would compromise the encryption guarantee."
+      "security_impact": false,
+      "rationale": "An RSA-wrapped, opaque encrypted key blob supplied by the team. As an opaque secret artifact rather than a configurable security toggle, it is not a useful structural policy target."
     },
     "disk.source_snapshot_encryption_key": {
       "type": "block",
@@ -386,8 +386,8 @@
       "description": "The self link of the encryption key that is stored in\nGoogle Cloud KMS. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the KMS-stored key used to decrypt the source snapshot."
+      "security_impact": false,
+      "rationale": "References a specific KMS key by self link. Pointing at a hardcoded key resource is a team-specific reference and is out of scope for a generic, multi-tenant policy target."
     },
     "disk.source_snapshot_encryption_key.kms_key_service_account": {
       "description": "The service account being used for the encryption\nrequest for the given KMS key. If absent, the Compute\nEngine default service account is used.",
@@ -400,15 +400,15 @@
       "description": "Specifies a 256-bit customer-supplied encryption key, encoded in RFC 4648 base64 to either encrypt or decrypt this resource. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Raw CSEK key material; exposure in config/state would compromise the encryption guarantee."
+      "security_impact": false,
+      "rationale": "Raw customer-supplied key material passed directly in configuration. This is an ephemeral, team-provided secret value rather than a tunable security setting, and cannot be meaningfully constrained by a structural platform policy."
     },
     "disk.source_snapshot_encryption_key.rsa_encrypted_key": {
       "description": "Specifies an RFC 4648 base64 encoded, RSA-wrapped 2048-bit customer-supplied encryption key to either encrypt or decrypt this resource. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "RSA-wrapped CSEK key material; exposure in config/state would compromise the encryption guarantee."
+      "security_impact": false,
+      "rationale": "An RSA-wrapped, opaque encrypted key blob supplied by the team. As an opaque secret artifact rather than a configurable security toggle, it is not a useful structural policy target."
     },
     "guest_accelerator": {
       "type": "block",
@@ -446,14 +446,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Determines which VPC network the interface attaches to. Attaching an instance to the wrong or an overly permissive network can expose it to unintended peer traffic or bypass network-level segmentation controls."
+      "rationale": "References the VPC network to attach this interface to. This is a network reference and team-specific architecture choice; references to other resources are out of scope for a generic platform policy target."
     },
     "network_interface.network_attachment": {
       "description": "The URL of the network attachment that this interface should connect to in the following format: projects/{projectNumber}/regions/{region_name}/networkAttachments/{network_attachment_name}.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Connects the interface via a Network Connectivity Center attachment rather than a direct VPC network/subnetwork; an incorrect or unauthorized attachment can expose the instance to traffic from an unintended external network."
+      "rationale": "References a Network Connectivity Center attachment resource by URL. This is a pointer to another resource, not a direct security configuration, and is out of scope for a generic platform policy target."
     },
     "network_interface.network_ip": {
       "description": "The private IP address to assign to the instance. If empty, the address will be automatically assigned.",
@@ -480,15 +480,15 @@
       "description": "The stack type for this network interface to identify whether the IPv6 feature is enabled or not. If not specified, IPV4_ONLY will be used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines whether IPv6 is enabled on the interface (IPV4_IPV6/IPV6_ONLY); enabling IPv6 unnecessarily widens the network exposure surface."
+      "security_impact": false,
+      "rationale": "Selects whether IPv4-only or dual-stack IPv6 is used on the interface. This is an architectural and functional networking choice determined by team requirements, not a security baseline control on its own; actual exposure is governed by firewall rules."
     },
     "network_interface.subnetwork": {
       "description": "The name of the subnetwork to attach this interface to. The subnetwork must exist in the same region this instance will be created in. Either network or subnetwork must be provided.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Determines which subnetwork the interface attaches to, which governs the instance's IP range, regional placement, and applicable firewall/routing rules; attaching to the wrong subnetwork can place the instance outside its intended network segmentation boundary."
+      "rationale": "References the subnetwork to attach this interface to. This is a network reference and team architectural decision; references to other resources are out of scope for a generic platform policy target."
     },
     "network_interface.subnetwork_project": {
       "description": "The ID of the project in which the subnetwork belongs. If it is not provided, the provider project is used.",
@@ -627,8 +627,8 @@
       "description": "Defines the maintenance behavior for this instance.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Must be TERMINATE (not MIGRATE) for most Confidential VM configurations; an incorrect value can silently break confidential-compute guarantees or fail instance creation."
+      "security_impact": false,
+      "rationale": "Selects host maintenance behavior (MIGRATE/TERMINATE). This is an architectural hosting preference tied to specific workload configurations (e.g. Confidential VM or sole-tenant requirements) rather than a general-purpose security baseline control."
     },
     "scheduling.preemptible": {
       "description": "Allows instance to be preempted. This defaults to false.",
