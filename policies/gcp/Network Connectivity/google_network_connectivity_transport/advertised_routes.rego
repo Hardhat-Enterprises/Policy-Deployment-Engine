@@ -5,17 +5,17 @@ import data.terraform.helpers
 
 conditions := [[
 	{
-		"situation_description": "The Network Connectivity Transport advertises an unapproved route range",
+		"situation_description": "The Network Connectivity Transport advertises an unrestricted default route",
 		"remedies": [
-			"Restrict advertised routes to approved IP CIDR ranges",
-			"Do not advertise overly broad routes such as 0.0.0.0/0 unless explicitly approved",
+			"Replace unrestricted default routes with appropriately scoped IP prefixes",
+			"Do not advertise 0.0.0.0/0 or ::/0 unless the policy is explicitly customized",
 		],
 	},
 	{
-		"condition": "Advertised routes must contain only approved IP ranges",
+		"condition": "Advertised routes must not contain unrestricted IPv4 or IPv6 default routes",
 		"attribute_path": ["advertised_routes"],
-		"values": ["10.0.0.0/8"],
-		"policy_type": "whitelist",
+		"values": ["0.0.0.0/0", "::/0"],
+		"policy_type": "blacklist",
 	},
 ]]
 

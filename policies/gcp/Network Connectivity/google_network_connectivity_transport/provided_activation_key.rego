@@ -5,11 +5,8 @@ import data.terraform.helpers
 
 conditions := [[
 	{
-		"situation_description": "The Network Connectivity Transport contains a directly provided activation key",
-		"remedies": [
-			"Remove the plaintext activation key from the Terraform resource",
-			"Supply sensitive connection material through an approved secret-management process",
-		],
+		"situation_description": "The Network Connectivity Transport has provided_activation_key set directly",
+		"remedies": ["Remove provided_activation_key from the Terraform resource configuration"],
 	},
 	{
 		"condition": "The Transport must not contain a directly configured activation key",

@@ -7,7 +7,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Controls which IP prefixes are advertised to the remote provider. Overly broad or unauthorized route advertisements can expose unintended internal networks, so advertised prefixes should be restricted to approved ranges."
+      "rationale": "Controls which IP prefixes are advertised to the remote provider. Unrestricted default routes such as 0.0.0.0/0 or ::/0 can expose unintended network paths, so a generic platform policy should prohibit these overly broad prefixes."
     },
     "bandwidth": {
       "description": "Bandwidth of the Transport. This must be one of the supported bandwidths for the remote profile.",
@@ -70,9 +70,9 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Contains sensitive connection material used to establish the remote transport. Policy should prevent plaintext or hardcoded secret exposure and require approved secret-handling practices."
+      "rationale": "Contains sensitive activation-key material. To prevent secrets from being stored directly in Terraform configuration or state, provided_activation_key must never be set directly on the resource."
     },
-    "region": {
+      "region": {
       "description": "The region of this resource. This is required to construct the resource name, but is not sent to the API since the region is already contained in the parent field.",
       "required": true,
       "type": "string",
