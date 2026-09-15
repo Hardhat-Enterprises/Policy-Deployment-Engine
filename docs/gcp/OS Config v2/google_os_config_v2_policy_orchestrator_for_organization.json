@@ -260,8 +260,8 @@
       "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls file validation behaviour but is a file-transfer setting rather than a direct policy scope or access control."
+      "security_impact": true,
+      "rationale": "Controls whether remote files used for execution must pass integrity validation, helping prevent unverified files from being executed on VMs."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.local_path": {
       "description": "A local path within the VM to use.",
@@ -305,15 +305,15 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Verifies the integrity of a remote file but does not directly configure security policy behaviour."
+      "security_impact": true,
+      "rationale": "Ensures remote files used for execution can be verified for integrity before use."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Specifies the remote file location and does not directly control security policy scope or enforcement."
+      "security_impact": true,
+      "rationale": "Controls the remote location of files used for execution and can affect the security of the code retrieved by the VM."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate": {
       "type": "block",
@@ -357,8 +357,8 @@
       "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls whether insecure file transfers are allowed and does not directly control security policy configuration."
+      "security_impact": true,
+      "rationale": "Controls whether files used for validation must pass integrity checks, helping prevent unverified files from being executed on VMs."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.local_path": {
       "description": "A local path within the VM to use.",
@@ -402,15 +402,15 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Specifies the SHA256 checksum of the remote file and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Verifies the integrity of remote files used during validation, helping prevent tampered files from being processed by the VM."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Specifies the URI from which to fetch the remote file and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls the remote location of files used during validation and can affect the security of the code retrieved by the VM."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file": {
       "type": "block",
@@ -435,8 +435,8 @@
       "description": "Consists of three octal digits which represent, in\norder, the permissions of the owner, group, and other users for the\nfile (similarly to the numeric mode used in the linux chmod\nutility). Each digit represents a three bit number with the 4 bit\ncorresponding to the read permissions, the 2 bit corresponds to the\nwrite bit, and the one bit corresponds to the execute permission.\nDefault behavior is 755.\n\nBelow are some examples of permissions and their associated values:\nread, write, and execute: 7\nread and execute: 5\nread and write: 6\nread only: 4",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Specifies the file permissions and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls file permissions on managed VMs, helping prevent unauthorized access or modification of deployed files."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.state": {
       "description": "Required. Desired state of the file.\nPossible values:\nDESIRED_STATE_UNSPECIFIED\nPRESENT\nABSENT\nCONTENTS_MATCH",
@@ -454,8 +454,8 @@
       "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Controls whether insecure file transfers are allowed and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls whether files used by the resource can bypass integrity validation, helping prevent unverified files from being processed on managed VMs."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.local_path": {
       "description": "A local path within the VM to use.",
@@ -506,8 +506,8 @@
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Specifies the URI from which to fetch the remote file and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls the remote location of files retrieved by the VM, helping prevent code or content from being obtained from untrusted sources."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg": {
       "type": "block",
@@ -554,8 +554,8 @@
       "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Specifies whether to allow insecure file transfers and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls whether Debian packages can be retrieved without source integrity validation, helping prevent unverified packages from being installed on managed VMs."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.local_path": {
       "description": "A local path within the VM to use.",
@@ -642,8 +642,8 @@
       "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Specifies whether to allow insecure file transfers and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls whether MSI packages can be retrieved without source integrity validation, helping prevent unverified packages from being installed on managed VMs."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.local_path": {
       "description": "A local path within the VM to use.",
@@ -706,8 +706,8 @@
       "description": "Whether dependencies should also be installed.\n- install when false: 'rpm --upgrade --replacepkgs package.rpm'\n- install when true: 'yum -y install package.rpm' or\n'zypper -y install package.rpm'",
       "required": false,
       "type": "bool",
-      "security_impact":  false,
-      "rationale": "Specifies whether to pull dependencies during package installation and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls whether RPM package dependencies are automatically retrieved, which can expand the software supply chain and introduce unreviewed packages or dependencies."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source": {
       "type": "block",
@@ -718,8 +718,8 @@
       "description": "Defaults to false. When false, files are subject to validations\nbased on the file type:\n\nRemote: A checksum must be specified.\nCloud Storage: An object generation number must be specified.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Specifies whether to allow insecure file transfers and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls whether RPM packages can be retrieved without source integrity validation, helping prevent unverified packages from being installed on managed VMs."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.local_path": {
       "description": "A local path within the VM to use.",
@@ -858,8 +858,8 @@
       "description": "Required. The url of the repository.",
       "required": true,
       "type": "string",
-      "security_impact":  false,
-      "rationale": "Specifies the repository location used by the policy resource."
+      "security_impact": true,
+      "rationale": "Controls the repository URL used to retrieve packages, helping ensure packages are obtained from an approved and trusted source."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.yum": {
       "type": "block",
@@ -903,8 +903,8 @@
       "description": "Required. The location of the repository directory.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Specifies the base URL of the Zypper repository and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls the repository URL used to retrieve packages, helping ensure packages are obtained from an approved and trusted source."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.zypper.display_name": {
       "description": "The display name of the repository.",
@@ -917,8 +917,8 @@
       "description": "URIs of GPG keys.",
       "required": false,
       "type": "list(string)",
-      "security_impact":  false,
-      "rationale": "Specifies the URIs of GPG keys for the Zypper repository and does not directly control security policy behaviour."
+      "security_impact": true,
+      "rationale": "Controls the GPG keys used to verify packages from the Zypper repository, helping prevent packages signed by untrusted keys from being accepted."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.repository.zypper.id": {
       "description": "Required. A one word, unique name for this repository. This is the 'repo\nid' in the zypper config file and also the 'display_name' if\n'display_name' is omitted. This id is also used as the unique\nidentifier when checking for GuestPolicy conflicts.",
