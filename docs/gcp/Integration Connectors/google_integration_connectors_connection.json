@@ -426,9 +426,9 @@
       "description": "The port is the target port number that is accepted by the destination.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Sets the port the connection opens on the target endpoint. The provider's own advanced example configures port 80, which is the default HTTP port and carries traffic in cleartext, so credentials and payloads crossing that connection are exposed on the network path. The equivalent risk applies to the other well-known cleartext ports. A generic policy can blacklist the ports whose protocols are unencrypted by definition (80, 21, 23, 110, 143) without knowing which endpoint a team connects to, while leaving every other port available for the encrypted equivalents."
-    },
+          "security_impact": false,
+      "rationale": "Sets the port the connection opens on the target endpoint. A port number is a functional address rather than a transport-security control: TLS can be negotiated on any port and plaintext can be served on 443, so excluding conventionally unencrypted ports would not establish that a connection is encrypted, only that it avoids a convention. Whether this connection's traffic is protected is determined by ssl_config.use_ssl and ssl_config.trust_model on this same resource, which are the enforceable targets. The port itself follows whatever the upstream service listens on and is a team integration choice."
+     },
     "destination_config.destination.service_attachment": {
       "description": "PSC service attachments. Format: projects/*/regions/*/serviceAttachments/*",
       "required": false,
