@@ -6,120 +6,120 @@
       "description": "Whether the VLAN attachment is enabled or disabled.  When using\nPARTNER type this will Pre-Activate the interconnect attachment",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational activation setting. Enabling or disabling the attachment is not generically more secure and forcing it off would primarily prevent connectivity."
     },
     "bandwidth": {
       "description": "Provisioned bandwidth capacity for the interconnect attachment.\nFor attachments of type DEDICATED, the user can set the bandwidth.\nFor attachments of type PARTNER, the Google Partner that is operating the interconnect must set the bandwidth.\nOutput only for PARTNER type, mutable for PARTNER_PROVIDER and DEDICATED,\nDefaults to BPS_10G Possible values: [\"BPS_50M\", \"BPS_100M\", \"BPS_200M\", \"BPS_300M\", \"BPS_400M\", \"BPS_500M\", \"BPS_1G\", \"BPS_2G\", \"BPS_5G\", \"BPS_10G\", \"BPS_20G\", \"BPS_50G\", \"BPS_100G\", \"BPS_400G\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Capacity and performance setting; the available bandwidth value does not directly enable or weaken a generic security control."
     },
     "candidate_cloud_router_ip_address": {
       "description": "Single IPv4 address + prefix length to be configured on the cloud router interface for this\ninterconnect attachment. Example: 203.0.113.1/29",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Network-address configuration specific to the deployment topology. A generic policy would require environment-specific IP values."
     },
     "candidate_cloud_router_ipv6_address": {
       "description": "Single IPv6 address + prefix length to be configured on the cloud router interface for this\ninterconnect attachment. Example: 2001:db8::1/125",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Network-address configuration specific to the deployment topology. A generic policy would require environment-specific IPv6 values."
     },
     "candidate_customer_router_ip_address": {
       "description": "Single IPv4 address + prefix length to be configured on the customer router interface for this\ninterconnect attachment. Example: 203.0.113.2/29",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Network-address configuration specific to the deployment topology. A generic policy would require environment-specific IP values."
     },
     "candidate_customer_router_ipv6_address": {
       "description": "Single IPv6 address + prefix length to be configured on the customer router interface for this\ninterconnect attachment. Example: 2001:db8::2/125",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Network-address configuration specific to the deployment topology. A generic policy would require environment-specific IPv6 values."
     },
     "candidate_subnets": {
       "description": "Up to 16 candidate prefixes that can be used to restrict the allocation\nof cloudRouterIpAddress and customerRouterIpAddress for this attachment.\nAll prefixes must be within link-local address space (169.254.0.0/16)\nand must be /29 or shorter (/28, /27, etc). Google will attempt to select\nan unused /29 from the supplied candidate prefix(es). The request will\nfail if all possible /29s are in use on Google's edge. If not supplied,\nGoogle will randomly select an unused /29 from all of link-local space.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls link-local address allocation for router interfaces, but does not generically control public exposure, encryption, authentication, logging, or destructive loss."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the resource. A security-focused policy should require 'PREVENT' to reduce the risk of accidental or unauthorized removal of critical network connectivity and service disruption."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Cosmetic and descriptive metadata with no generic security-control effect."
     },
     "edge_availability_domain": {
       "description": "Desired availability domain for the attachment. Only available for type\nPARTNER, at creation time. For improved reliability, customers should\nconfigure a pair of attachments with one per availability domain. The\nselected availability domain will be provided to the Partner via the\npairing key so that the provisioned circuit will lie in the specified\ndomain. If not specified, the value will default to AVAILABILITY_DOMAIN_ANY.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Availability and redundancy setting. It can improve reliability, but it is not a generic security control under the supplied archetypes."
     },
     "encryption": {
       "description": "Indicates the user-supplied encryption option of this interconnect\nattachment. Can only be specified at attachment creation for PARTNER or\nDEDICATED attachments.\n* NONE - This is the default value, which means that the VLAN attachment\ncarries unencrypted traffic. VMs are able to send traffic to, or receive\ntraffic from, such a VLAN attachment.\n* IPSEC - The VLAN attachment carries only encrypted traffic that is\nencrypted by an IPsec device, such as an HA VPN gateway or third-party\nIPsec VPN. VMs cannot directly send traffic to, or receive traffic from,\nsuch a VLAN attachment. To use HA VPN over Cloud Interconnect, the VLAN\nattachment must be created with this option. Default value: \"NONE\" Possible values: [\"NONE\", \"IPSEC\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Directly controls whether traffic on the VLAN attachment is encrypted. Because the default 'NONE' permits unencrypted traffic, a generic policy can require 'IPSEC'."
     },
     "interconnect": {
       "description": "URL of the underlying Interconnect object that this attachment's\ntraffic will traverse through. Required if type is DEDICATED, must not\nbe set if type is PARTNER.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Reference to an existing Interconnect resource. Generic policy should not constrain which named or identified resource is referenced."
     },
     "ipsec_internal_addresses": {
       "description": "URL of addresses that have been reserved for the interconnect attachment,\nUsed only for interconnect attachment that has the encryption option as\nIPSEC.\nThe addresses must be RFC 1918 IP address ranges. When creating HA VPN\ngateway over the interconnect attachment, if the attachment is configured\nto use an RFC 1918 IP address, then the VPN gateway's IP address will be\nallocated from the IP address range specified here.\nFor example, if the HA VPN gateway's interface 0 is paired to this\ninterconnect attachment, then an RFC 1918 IP address for the VPN gateway\ninterface 0 will be allocated from the IP address specified for this\ninterconnect attachment.\nIf this field is not specified for interconnect attachment that has\nencryption option as IPSEC, later on when creating HA VPN gateway on this\ninterconnect attachment, the HA VPN gateway's IP address will be\nallocated from regional external IP address pool.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "When encryption is 'IPSEC', omitting this argument can cause HA VPN gateway addresses to be allocated from the regional external IP pool. A conditional policy can require a non-empty list of RFC 1918 address references without prescribing specific resources."
     },
     "labels": {
       "description": "Labels for this resource. These can only be added or modified by the setLabels\nmethod. Each label key/value pair must comply with RFC1035. Label values may be empty.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource metadata; labels do not directly enable or weaken a generic security control."
     },
     "mtu": {
       "description": "Maximum Transmission Unit (MTU), in bytes, of packets passing through this interconnect attachment.\nValid values are 1440, 1460, 1500, and 8896. If not specified, the value will default to 1440.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Packet-size and network-performance setting. The supported MTU values do not represent a generic security-feature choice."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is created. The\nname must be 1-63 characters long, and comply with RFC1035. Specifically, the\nname must be 1-63 characters long and match the regular expression\n'[a-z]([-a-z0-9]*[a-z0-9])?' which means the first character must be a\nlowercase letter, and all following characters must be a dash, lowercase\nletter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource identifier. Generic policy should not constrain resource naming."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Reference to the project containing the resource. Enforcing a specific project would require environment-specific identifiers."
     },
     "region": {
       "description": "Region where the regional interconnect attachment resides.",
@@ -132,36 +132,36 @@
       "description": "URL of the cloud router to be used for dynamic routing. This router must be in\nthe same region as this InterconnectAttachment. The InterconnectAttachment will\nautomatically connect the Interconnect to the network & region within which the\nCloud Router is configured.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Reference to an existing Cloud Router. Security properties should be enforced on the router's own configurable controls rather than on this resource pointer."
     },
     "stack_type": {
       "description": "The stack type for this interconnect attachment to identify whether the IPv6\nfeature is enabled or not. If not specified, IPV4_ONLY will be used.\nThis field can be both set at interconnect attachments creation and update\ninterconnect attachment operations. Possible values: [\"IPV4_IPV6\", \"IPV4_ONLY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects IPv4-only or dual-stack networking. IPv6 is not inherently insecure; exposure and filtering are governed by separate routing and firewall controls."
     },
     "subnet_length": {
       "description": "Length of the IPv4 subnet mask. Allowed values: 29 (default), 30. The default value is 29,\nexcept for Cross-Cloud Interconnect connections that use an InterconnectRemoteLocation with a\nconstraints.subnetLengthRange.min equal to 30. For example, connections that use an Azure\nremote location fall into this category. In these cases, the default value is 30, and\nrequesting 29 returns an error. Where both 29 and 30 are allowed, 29 is preferred, because it\ngives Google Cloud Support more debugging visibility.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls link-local subnet sizing and support visibility. It is an operational network choice rather than a generic security control."
     },
     "type": {
       "description": "The type of InterconnectAttachment you wish to create. Defaults to\nDEDICATED. Possible values: [\"DEDICATED\", \"PARTNER\", \"PARTNER_PROVIDER\", \"L2_DEDICATED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the attachment architecture. No allowed attachment type is universally the secure choice without deployment-specific context."
     },
     "vlan_tag8021q": {
       "description": "The IEEE 802.1Q VLAN tag for this attachment, in the range 2-4094. When\nusing PARTNER type this will be managed upstream.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Deployment-specific VLAN identifier. A generic constraint would require topology-specific values and would not itself provide a security guarantee."
     },
     "l2_forwarding": {
       "type": "block",
@@ -172,22 +172,22 @@
       "description": "The default appliance IP address.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Deployment-specific appliance IP address. A meaningful policy would require knowledge of the organisation's network topology."
     },
     "l2_forwarding.network": {
       "description": "URL of the network to which this attachment belongs.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Reference to an existing network. Generic policy should not constrain which specific network identifier is referenced."
     },
     "l2_forwarding.tunnel_endpoint_ip_address": {
       "description": "The tunnel endpoint IP address.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Deployment-specific tunnel endpoint address. A meaningful policy would require environment-specific topology information."
     },
     "l2_forwarding.appliance_mappings": {
       "type": "block",
@@ -198,22 +198,22 @@
       "description": "The appliance IP address.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Deployment-specific appliance IP address. A generic policy cannot safely prescribe the correct value."
     },
     "l2_forwarding.appliance_mappings.name": {
       "description": "The name of this appliance mapping rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier for an appliance mapping rule; naming has no generic security impact."
     },
     "l2_forwarding.appliance_mappings.vlan_id": {
       "description": "The VLAN tag.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Deployment-specific VLAN mapping value. It cannot be generically constrained without knowing the network topology."
     },
     "l2_forwarding.appliance_mappings.inner_vlan_to_appliance_mappings": {
       "type": "block",
@@ -224,15 +224,15 @@
       "description": "The inner appliance IP address.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Deployment-specific inner appliance address. A generic policy would require environment-specific topology information."
     },
     "l2_forwarding.appliance_mappings.inner_vlan_to_appliance_mappings.inner_vlan_tags": {
       "description": "List of inner VLAN tags.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Deployment-specific VLAN mapping values. They do not independently enable a generic security feature."
     },
     "l2_forwarding.geneve_header": {
       "type": "block",
@@ -243,8 +243,8 @@
       "description": "VNI is a 24-bit unique virtual network identifier.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Virtual network identifier used for overlay segmentation. The correct value is deployment-specific, and constraining it generically would not guarantee security."
     },
     "params": {
       "type": "block",
@@ -255,8 +255,8 @@
       "description": "Resource manager tags to be bound to the interconnect attachment. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References Resource Manager tag keys and values. Generic policy should not prescribe specific organisation-dependent tag identifiers."
     }
   }
 }

@@ -1,0 +1,21 @@
+package terraform.gcp.security.compute_engine.google_compute_vpn_tunnel.deletion_policy
+import data.terraform.helpers
+import data.terraform.gcp.security.compute_engine.google_compute_vpn_tunnel.vars
+conditions := [
+    [
+    {
+      "situation_description": "The VPN tunnel can be destroyed by Terraform, risking loss of encrypted connectivity to the peer network.",
+      "remedies": ["Set deletion_policy to PREVENT so the tunnel cannot be deleted by a Terraform apply."]
+    },
+    {
+      "condition": "deletion_policy is not set to PREVENT",
+      "attribute_path": ["deletion_policy"],
+      "values": ["PREVENT"],
+      "policy_type": "whitelist"
+    }
+  ]
+]
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

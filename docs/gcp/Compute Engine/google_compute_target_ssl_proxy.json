@@ -6,64 +6,64 @@
       "description": "A reference to the BackendService resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This just points to the backend service the proxy sends traffic to. It's a reference to another resource, not a security control on the proxy itself, so false."
     },
     "certificate_map": {
       "description": "A reference to the CertificateMap resource uri that identifies a certificate map\nassociated with the given target proxy. This field can only be set for global target proxies.\nAccepted format is '//certificatemanager.googleapis.com/projects/{project}/locations/{location}/certificateMaps/{resourceName}'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This points to a certificate map for the proxy. It's a reference to another resource, not a security control on the proxy itself, so false."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "ABANDON can leave the target SSL proxy active after Terraform stops managing it. This could leave TLS settings, certificates, or backend routing outside normal security updates. PREVENT can also stop accidental or malicious deletion of this secure entry point. Because the setting affects TLS management and service availability, it has a security impact."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Just a free text description. It doesn't affect how the resource works or its security, so false."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The name is just an identifier for the resource, not something you put a security rule on, so this is false."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Project just says where the resource lives, it's not a security control on the resource itself, so false."
     },
     "proxy_header": {
       "description": "Specifies the type of proxy header to append before sending data to\nthe backend. Default value: \"NONE\" Possible values: [\"NONE\", \"PROXY_V1\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets whether a proxy header is added before data goes to the backend (NONE or PROXY_V1). It's a functional setting, not a security control, so false."
     },
     "ssl_certificates": {
       "description": "A list of SslCertificate resources that are used to authenticate\nconnections between users and the load balancer. At least one\nSSL certificate must be specified.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the list of SSL certificates the proxy uses. They're references to cert resources, and the provider already makes you set at least one, so there's nothing extra to enforce here, so false."
     },
     "ssl_policy": {
       "description": "A reference to the SslPolicy resource that will be associated with\nthe TargetSslProxy resource. If not set, the TargetSslProxy\nresource will not have any SSL policy configured.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This sets the SSL policy for the proxy, which controls the TLS versions and ciphers it allows. If it's not set the proxy falls back to Google's default which allows weaker TLS, so enforcing an SSL policy here has a real security impact, so true."
     }
   }
 }

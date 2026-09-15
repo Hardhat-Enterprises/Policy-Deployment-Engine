@@ -6,57 +6,57 @@
       "description": "Represents kinds of entities.\n* AUTO_EXPANSION_MODE_UNSPECIFIED: Auto expansion disabled for the entity.\n* AUTO_EXPANSION_MODE_DEFAULT: Allows an agent to recognize values that have not been explicitly listed in the entity. Possible values: [\"AUTO_EXPANSION_MODE_DEFAULT\", \"AUTO_EXPANSION_MODE_UNSPECIFIED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether the agent may recognise entity values that were not explicitly listed. The appropriate setting depends on the entity vocabulary, training data and acceptable matching behaviour, so neither supported mode is a universally secure configuration."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform may delete the entity type, abandon it from Terraform management, or prevent its destruction. A policy should require PREVENT to reduce the risk of accidental or unauthorised deletion disrupting entity extraction and dependent conversation logic."
     },
     "display_name": {
       "description": "The human-readable name of the entity type, unique within the agent.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the human-readable name used to identify the entity type. It does not control access, logging, encryption, data exposure or entity matching, so it is not a generic security policy target."
     },
     "enable_fuzzy_extraction": {
       "description": "Enables fuzzy entity extraction during classification.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables more tolerant entity matching, including matching words in different orders. Its usefulness and acceptable false-match rate depend on the entity and conversation design, so forcing either state would be a functional decision rather than a generic security control."
     },
     "kind": {
       "description": "Indicates whether the entity type can be automatically expanded.\n* KIND_MAP: Map entity types allow mapping of a group of synonyms to a canonical value.\n* KIND_LIST: List entity types contain a set of entries that do not map to canonical values. However, list entity types can contain references to other entity types (with or without aliases).\n* KIND_REGEXP: Regexp entity types allow to specify regular expressions in entries values. Possible values: [\"KIND_MAP\", \"KIND_LIST\", \"KIND_REGEXP\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the entity uses map, list or regular-expression behaviour. All supported kinds are legitimate designs, and security depends on the team-specific entries and matching rules rather than the kind alone."
     },
     "language_code": {
       "description": "The language of the following fields in entityType:\nEntityType.entities.value\nEntityType.entities.synonyms\nEntityType.excluded_phrases.value\nIf not specified, the agent's default language is used. Many languages are supported. Note: languages must be enabled in the agent before they can be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the language used for entity values, synonyms and excluded phrases. This is localisation and agent-behaviour configuration whose correct value depends on the languages enabled for the agent."
     },
     "parent": {
       "description": "The agent to create a entity type for.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Dialogflow CX agent that owns the entity type. It is a team-specific resource reference, and constraining it would require pinning a particular project, location or agent rather than enforcing a generic security property."
     },
     "redact": {
       "description": "Indicates whether parameters of the entity type should be redacted in log. If redaction is enabled, page parameters and intent parameters referring to the entity type will be replaced by parameter name when logging.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether extracted entity parameter values are replaced by the parameter name in logs. A policy should require redaction to reduce the risk of personal, account or other sensitive values being exposed through conversation logs."
     },
     "entities": {
       "type": "block",
@@ -67,15 +67,15 @@
       "description": "A collection of value synonyms. For example, if the entity type is vegetable, and value is scallions, a synonym could be green onions.\nFor KIND_LIST entity types: This collection must contain exactly one synonym equal to value.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines application-specific terms that should resolve to an entity value. The correct synonyms depend on the agent's vocabulary and conversation requirements, so a generic platform policy cannot determine a secure list."
     },
     "entities.value": {
       "description": "The primary value associated with this entity entry. For example, if the entity type is vegetable, the value could be scallions.\nFor KIND_MAP entity types: A canonical value to be used in place of synonyms.\nFor KIND_LIST entity types: A string that can contain references to other entity types (with or without aliases).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the application-specific canonical value, list entry or entity reference used during extraction. Its correct contents depend on the agent's domain and cannot be meaningfully constrained by a generic security policy."
     },
     "excluded_phrases": {
       "type": "block",
@@ -86,8 +86,8 @@
       "description": "The word or phrase to be excluded.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines an application-specific phrase that should not be matched as the entity. The required exclusions depend on the vocabulary and expected user input, so there is no universal secure value to enforce."
     }
   }
 }

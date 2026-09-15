@@ -9,13 +9,15 @@ conditions := [
         {
             "condition": "Automation uses dedicated service account",
             "attribute_path": ["service_account"],
-            "values": ["dedicated-automation-sa@my-project.iam.gserviceaccount.com"],
-            "policy_type": "whitelist"
+            "values": ["*@*", [["dedicated-automation-sa"], ["my-project.iam.gserviceaccount.com"]]],
+            "policy_type": "pattern whitelist"
         }
     ]
 ]
 
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := result.message
+
+details := result.details
