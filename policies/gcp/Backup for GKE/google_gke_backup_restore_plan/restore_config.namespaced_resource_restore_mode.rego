@@ -6,15 +6,15 @@ import data.terraform.gcp.security.backup_for_gke.google_gke_backup_restore_plan
 conditions := [
   [
     {
-      "situation_description": "Namespaced resource restore mode must fail on conflicts to prevent existing resources from being overwritten.",
+      "situation_description": "Namespaced resource restore mode must not overwrite or alter existing resources when conflicts occur.",
       "remedies": [
-        "Set restore_config.namespaced_resource_restore_mode to FAIL_ON_CONFLICT."
+        "Set restore_config.namespaced_resource_restore_mode to FAIL_ON_CONFLICT or MERGE_SKIP_ON_CONFLICT."
       ]
     },
     {
-      "condition": "Namespaced resource restore mode must be FAIL_ON_CONFLICT.",
+      "condition": "Namespaced resource restore mode must avoid overwriting existing resources.",
       "attribute_path": ["restore_config", 0, "namespaced_resource_restore_mode"],
-      "values": ["FAIL_ON_CONFLICT"],
+      "values": ["FAIL_ON_CONFLICT", "MERGE_SKIP_ON_CONFLICT"],
       "policy_type": "whitelist"
     }
   ]
