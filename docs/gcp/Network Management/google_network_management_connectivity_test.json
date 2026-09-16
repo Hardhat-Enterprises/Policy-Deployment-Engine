@@ -6,64 +6,64 @@
       "description": "Whether the analysis should skip firewall checking. Default value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This connectivity test's entire purpose is to analyse network reachability. Skipping firewall checks could cause the test to report a path as reachable when a real firewall would actually block it, masking the true security posture from the very tool meant to reveal it."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deletion-blocking flags follow the prevent-destructive-loss archetype: enforcing PREVENT protects against accidental or malicious destruction of the resource, so this is treated as security-relevant."
     },
     "description": {
       "description": "The user-supplied description of the Connectivity Test.\nMaximum of 512 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-text label with no functional effect on access, exposure, or data protection."
     },
     "labels": {
       "description": "Resource labels to represent user-provided metadata.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Metadata for organisation and identification; it does not itself change security behaviour."
     },
     "name": {
       "description": "Unique name for the connectivity test.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the resource; it does not itself change security behaviour."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project determines resource ownership/location, similar to other identifier fields; it is not itself a security control."
     },
     "protocol": {
       "description": "IP Protocol of the test. When not provided, \"TCP\" is assumed.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A configuration-type selector for the test protocol (TCP/UDP); it is not itself a security control."
     },
     "related_projects": {
       "description": "Other projects that may be relevant for reachability analysis.\nThis is applicable to scenarios where a test can cross project\nboundaries.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A list of references to other GCP projects for cross-project analysis scope; these are identifiers, not security controls."
     },
     "round_trip": {
       "description": "Whether run analysis for the return path from destination to source.\nDefault value is false.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A testing-behaviour toggle controlling which direction the analysis runs; it does not affect access, exposure, or data protection."
     },
     "destination": {
       "type": "block",
@@ -74,92 +74,92 @@
       "description": "A Cloud SQL instance URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Cloud SQL instance). Per the project's core rule, resource references are not themselves security controls — the instance's own security is enforced at its own resource policies."
     },
     "destination.forwarding_rule": {
       "description": "Forwarding rule URI. Forwarding rules are frontends for load balancers,\nPSC endpoints, and Protocol Forwarding.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the forwarding rule). Per the project's core rule, resource references are not themselves security controls."
     },
     "destination.fqdn": {
       "description": "A DNS endpoint of Google Kubernetes Engine cluster control plane.\nRequires gke_master_cluster to be set, can't be used simultaneoulsly with\nip_address or network. Applicable only to destination endpoint.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This represents an external destination the test targets. Consistent with the project's established approach to external endpoint targets, platform policy cannot meaningfully validate arbitrary external destinations, so this is treated as a reference rather than a security control."
     },
     "destination.gke_master_cluster": {
       "description": "A cluster URI for Google Kubernetes Engine cluster control plane.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the GKE cluster). Per the project's core rule, resource references are not themselves security controls."
     },
     "destination.gke_pod": {
       "description": "A [GKE Pod](https://cloud.google.com/kubernetes-engine/docs/concepts/pod) URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the GKE pod). Per the project's core rule, resource references are not themselves security controls."
     },
     "destination.instance": {
       "description": "A Compute Engine instance URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Compute Engine instance). Per the project's core rule, resource references are not themselves security controls."
     },
     "destination.ip_address": {
       "description": "The IP address of the endpoint, which can be an external or internal IP.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This represents a destination address the test targets, either an internal GCP resource or an external destination. Consistent with the project's established approach to endpoint targets, this is treated as a reference rather than a security control."
     },
     "destination.network": {
       "description": "A VPC network URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the VPC network). Per the project's core rule, resource references are not themselves security controls."
     },
     "destination.network_type": {
       "description": "For source endpoints, type of the network where the endpoint is located. Not relevant for destination endpoints. Possible values: [\"GCP_NETWORK\", \"NON_GCP_NETWORK\", \"INTERNET\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A configuration-type selector identifying the kind of network involved; it is not itself a security control."
     },
     "destination.port": {
       "description": "The IP protocol port of the endpoint. Only applicable when protocol is\nTCP or UDP.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A routing parameter that pairs with the target address; it does not itself represent a security decision independent of which destination is being targeted."
     },
     "destination.project_id": {
       "description": "Project ID where the endpoint is located.\nThe project ID can be derived from the URI if you provide a endpoint or\nnetwork URI.\nThe following are two cases where you may need to provide the project ID:\n1. Only the IP address is specified, and the IP address is within a Google\nCloud project.\n2. When you are using Shared VPC and the IP address that you provide is\nfrom the service project. In this case, the network that the IP address\nresides in is defined in the host project.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project determines resource ownership/location, similar to other identifier fields; it is not itself a security control."
     },
     "destination.redis_cluster": {
       "description": "A Redis Cluster URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Redis cluster). Per the project's core rule, resource references are not themselves security controls."
     },
     "destination.redis_instance": {
       "description": "A Redis Instance URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Redis instance). Per the project's core rule, resource references are not themselves security controls."
     },
     "source": {
       "type": "block",
@@ -170,57 +170,57 @@
       "description": "A Cloud SQL instance URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Cloud SQL instance). Per the project's core rule, resource references are not themselves security controls."
     },
     "source.gke_master_cluster": {
       "description": "A cluster URI for Google Kubernetes Engine cluster control plane.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the GKE cluster). Per the project's core rule, resource references are not themselves security controls."
     },
     "source.instance": {
       "description": "A Compute Engine instance URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Compute Engine instance). Per the project's core rule, resource references are not themselves security controls."
     },
     "source.ip_address": {
       "description": "The IP address of the endpoint, which can be an external or internal IP.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This represents a source address the test originates from, either an internal GCP resource or an external origin. Consistent with the project's established approach to endpoint targets, this is treated as a reference rather than a security control."
     },
     "source.network": {
       "description": "A VPC network URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the VPC network). Per the project's core rule, resource references are not themselves security controls."
     },
     "source.network_type": {
       "description": "Type of the network where the endpoint is located. Possible values: [\"GCP_NETWORK\", \"NON_GCP_NETWORK\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A configuration-type selector identifying the kind of network involved; it is not itself a security control."
     },
     "source.port": {
       "description": "The IP protocol port of the endpoint. Only applicable when protocol is\nTCP or UDP.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A routing parameter that pairs with the source address; it does not itself represent a security decision independent of which source is being tested."
     },
     "source.project_id": {
       "description": "Project ID where the endpoint is located.\nThe project ID can be derived from the URI if you provide a endpoint or\nnetwork URI.\nThe following are two cases where you may need to provide the project ID:\n1. Only the IP address is specified, and the IP address is within a Google\nCloud project.\n2. When you are using Shared VPC and the IP address that you provide is\nfrom the service project. In this case, the network that the IP address\nresides in is defined in the host project.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project determines resource ownership/location, similar to other identifier fields; it is not itself a security control."
     },
     "source.app_engine_version": {
       "type": "block",
@@ -231,8 +231,8 @@
       "description": "An App Engine service version name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the App Engine version). Per the project's core rule, resource references are not themselves security controls."
     },
     "source.cloud_function": {
       "type": "block",
@@ -243,8 +243,8 @@
       "description": "A Cloud Function name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Cloud Function). Per the project's core rule, resource references are not themselves security controls."
     },
     "source.cloud_run_revision": {
       "type": "block",
@@ -255,8 +255,8 @@
       "description": "A Cloud Run revision URI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference/pointer to another GCP-managed resource (the Cloud Run revision). Per the project's core rule, resource references are not themselves security controls."
     }
   }
 }
