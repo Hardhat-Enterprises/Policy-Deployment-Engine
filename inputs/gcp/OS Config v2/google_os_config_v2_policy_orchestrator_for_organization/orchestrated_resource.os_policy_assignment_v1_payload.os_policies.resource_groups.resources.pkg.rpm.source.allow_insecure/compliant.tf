@@ -20,14 +20,8 @@ resource "google_os_config_v2_policy_orchestrator_for_organization" "compliant_e
                             desired_state = "INSTALLED"
 
                             rpm {
-                                pull_deps = false
-
                                 source {
                                     allow_insecure = false
-
-                                    remote {
-                                        uri = "https://example.com/package.rpm"
-                                    }
                                 }
                             }
                         }
