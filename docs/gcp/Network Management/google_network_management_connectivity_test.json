@@ -89,7 +89,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "This represents an external destination the test targets. Consistent with the project's established approach to external endpoint targets, platform policy cannot meaningfully validate arbitrary external destinations, so this is treated as a reference rather than a security control."
+      "rationale": "A reference/pointer to a specific GCP-managed resource (the GKE cluster control plane), expressed in DNS form and tied to gke_master_cluster. Per the project's core rule, resource references are not themselves security controls."
     },
     "destination.gke_master_cluster": {
       "description": "A cluster URI for Google Kubernetes Engine cluster control plane.",
@@ -138,7 +138,7 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "A routing parameter that pairs with the target address; it does not itself represent a security decision independent of which destination is being targeted."
+      "rationale": "A port number does not indicate whether traffic is encrypted — TLS can run on any port, and plaintext can run on 443 — so constraining the port choice does not itself secure anything. It is a routing parameter, not a security control."
     },
     "destination.project_id": {
       "description": "Project ID where the endpoint is located.\nThe project ID can be derived from the URI if you provide a endpoint or\nnetwork URI.\nThe following are two cases where you may need to provide the project ID:\n1. Only the IP address is specified, and the IP address is within a Google\nCloud project.\n2. When you are using Shared VPC and the IP address that you provide is\nfrom the service project. In this case, the network that the IP address\nresides in is defined in the host project.",
