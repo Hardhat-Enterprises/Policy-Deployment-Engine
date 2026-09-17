@@ -4,7 +4,7 @@ resource "google_compute_router_nat" "non_compliant_example_1" {
     router = "test-router"
     region = "australia-southeast1"
     log_config { 
-        enable = false 
-        filter = "ALL"
+        enable = true 
+        filter = "ERRORS_ONLY"
     }
 }
