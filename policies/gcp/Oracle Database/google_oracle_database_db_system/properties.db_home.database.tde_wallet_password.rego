@@ -1,4 +1,4 @@
-package terraform.gcp.security.oracle_database.google_oracle_database_db_system.tde_wallet_password
+package terraform.gcp.security.oracle_database.google_oracle_database_db_system.properties_db_home_database_tde_wallet_password
 
 import data.terraform.helpers
 import data.terraform.gcp.security.oracle_database.google_oracle_database_db_system.vars

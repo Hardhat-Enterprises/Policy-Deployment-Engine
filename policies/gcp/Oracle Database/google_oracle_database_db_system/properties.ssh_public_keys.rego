@@ -1,4 +1,4 @@
-package terraform.gcp.security.oracle_database.google_oracle_database_db_system.ssh_public_keys
+package terraform.gcp.security.oracle_database.google_oracle_database_db_system.properties_ssh_public_keys
 
 import data.terraform.helpers
 import data.terraform.gcp.security.oracle_database.google_oracle_database_db_system.vars
@@ -12,8 +12,8 @@ conditions := [
             ]
         },
         {
-            "condition": "At least one SSH public key must be configured for the Oracle Database DB System.",
-            "attribute_path": ["properties", "ssh_public_keys"],
+            "condition": "The SSH public keys list must not be empty.",
+            "attribute_path": ["properties", 0, "ssh_public_keys"],
             "values": [[]],
             "policy_type": "blacklist"
         }

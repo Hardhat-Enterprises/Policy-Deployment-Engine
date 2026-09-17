@@ -1,5 +1,4 @@
-package terraform.gcp.security.oracle_database.google_oracle_database_db_system.is_diagnostics_events_enabled
-
+package terraform.gcp.security.oracle_database.google_oracle_database_db_system.properties_data_collection_options_is_diagnostics_events_enabled
 import data.terraform.helpers
 import data.terraform.gcp.security.oracle_database.google_oracle_database_db_system.vars
 

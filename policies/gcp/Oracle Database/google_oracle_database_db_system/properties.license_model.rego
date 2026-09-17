@@ -1,5 +1,4 @@
-package terraform.gcp.security.oracle_database.google_oracle_database_db_system.license_model
-
+package terraform.gcp.security.oracle_database.google_oracle_database_db_system.properties_license_model
 import data.terraform.helpers
 import data.terraform.gcp.security.oracle_database.google_oracle_database_db_system.vars
 
@@ -13,7 +12,7 @@ conditions := [
         },
         {
             "condition": "The license model must be explicitly set to an approved value.",
-            "attribute_path": ["properties", "license_model"],
+            "attribute_path": ["properties", 0, "license_model"],
             "values": ["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"],
             "policy_type": "whitelist"
         }

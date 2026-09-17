@@ -1,5 +1,4 @@
-package terraform.gcp.security.oracle_database.google_oracle_database_db_system.is_unified_auditing_enabled
-
+package terraform.gcp.security.oracle_database.google_oracle_database_db_system.properties_db_home_is_unified_auditing_enabled
 import data.terraform.helpers
 import data.terraform.gcp.security.oracle_database.google_oracle_database_db_system.vars
 

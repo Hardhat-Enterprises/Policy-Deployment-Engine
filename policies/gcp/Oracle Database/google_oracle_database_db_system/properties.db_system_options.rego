@@ -1,5 +1,4 @@
-package terraform.gcp.security.oracle_database.google_oracle_database_db_system.db_system_options
-
+package terraform.gcp.security.oracle_database.google_oracle_database_db_system.properties_db_system_options
 import data.terraform.helpers
 import data.terraform.gcp.security.oracle_database.google_oracle_database_db_system.vars
 
