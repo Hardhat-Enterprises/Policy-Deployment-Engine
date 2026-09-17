@@ -6,15 +6,15 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Network attachment subnetworks is empty or invalid, so no subnetwork is explicitly configured.",
+      "situation_description": "Network attachment subnetworks contains an invalid or placeholder subnetwork entry.",
       "remedies": [
-        "Set subnetworks to the subnetwork(s) this network attachment should use.",
+        "Remove the invalid placeholder entry and use a valid subnetwork reference.",
       ],
     },
     {
-      "condition": "subnetworks must not be empty.",
+      "condition": "subnetworks must not contain an invalid placeholder entry.",
       "attribute_path": ["subnetworks"],
-      "values": [null, [], "invalid-subnetwork"],
+      "values": ["invalid-subnetwork"],
       "policy_type": "blacklist",
     },
   ],

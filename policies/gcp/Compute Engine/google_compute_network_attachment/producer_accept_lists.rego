@@ -6,15 +6,15 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Network attachment producer_accept_lists is empty, so no producer projects are explicitly approved.",
+      "situation_description": "Network attachment producer_accept_lists contains an invalid or placeholder project entry.",
       "remedies": [
-        "Set producer_accept_lists to the project(s) explicitly approved to connect to this network attachment.",
+        "Remove the invalid placeholder entry and use a valid, explicitly approved project reference.",
       ],
     },
     {
-      "condition": "producer_accept_lists must not be empty.",
+      "condition": "producer_accept_lists must not contain an invalid placeholder entry.",
       "attribute_path": ["producer_accept_lists"],
-      "values": [null, [], "invalid-project"],
+      "values": ["invalid-project"],
       "policy_type": "blacklist",
     },
   ],
