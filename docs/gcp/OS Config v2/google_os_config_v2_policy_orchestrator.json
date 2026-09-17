@@ -573,8 +573,8 @@
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "An optional generation number pinning the deb package fetch to a specific version of the Cloud Storage object. Unlike a remote source, a Cloud Storage object sits inside the organisation's own bucket, where who may overwrite it is governed by IAM on that bucket rather than by this field, so the version the fetch resolves to is controlled at the storage layer. Pinning is a release-management practice for the owning team rather than a platform security requirement here."
+      "security_impact": true,
+      "rationale": "An optional generation number pinning the deb package fetch to one specific version of the Cloud Storage object. Left unset the reference floats to whatever version is live at install time, so a later overwrite of the object silently changes which package is installed with root privileges across the fleet, with no configuration change. Requiring an explicit pinned generation forbids that mutable reference, matching the treatment of the identical field on the rpm and exec.enforce.file sources."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.gcs.object": {
       "description": "Required. Name of the Cloud Storage object.",
