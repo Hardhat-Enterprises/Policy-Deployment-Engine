@@ -4,13 +4,13 @@ import data.terraform.gcp.security.compute_engine.google_compute_router_nat.vars
 
 conditions := [
     [
-    {"situation_description" : "A self documenting message about the conditions within",
-    "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
+    {"situation_description" : "NAT IPs are allocated manually rather than automatically assigned from an approved pool, risking NAT IP misconfigurations",
+    "remedies":[ "Set nat_ip_allocate_option to AUTO_ONLY to enable automatic NAT IP allocation"]},
     {
-        "condition": "A message about what the condition does",
-        "attribute_path" : [nat_ip_allocate_option], 
-        "values" : [], # Values to compare against
-        "policy_type" : "" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "condition": "nat_ip_allocate_option must be set to AUTO_ONLY",
+        "attribute_path" : ["nat_ip_allocate_option"], 
+        "values" : ["AUTO_ONLY"], 
+        "policy_type" : "whitelist" 
     }
     ]
 ]

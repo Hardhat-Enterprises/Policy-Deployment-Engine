@@ -4,13 +4,13 @@ import data.terraform.gcp.security.compute_engine.google_compute_router_nat.vars
 
 conditions := [
     [
-    {"situation_description" : "A self documenting message about the conditions within",
-    "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
+    {"situation_description" : "NAT logging is disabled, leaving error events uncaptured for investigation",
+    "remedies":[ "Set log_config_enable to true to enable NAT logging"]},
     {
-        "condition": "A message about what the condition does",
-        "attribute_path" : [log_config_enable],
-        "values" : [], # Values to compare against
-        "policy_type" : "" # Policy type eg. 'whitelist', 'blacklist', 'range', 'pattern whitelist', 'pattern blacklist'
+        "condition": "log_config_enable must be set to true",
+        "attribute_path" : ["log_config", 0, "enable"],
+        "values" : [true],
+        "policy_type" : "whitelist"
     }
     ]
 ]

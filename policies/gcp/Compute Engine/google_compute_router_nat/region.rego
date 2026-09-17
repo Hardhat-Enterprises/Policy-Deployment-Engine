@@ -4,12 +4,12 @@ import data.terraform.gcp.security.compute_engine.google_compute_router_nat.vars
 
 conditions := [
     [
-    {"situation_description" : "A self documenting message about the conditions within",
-    "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
+    {"situation_description" : "Router NAT is configured to a region outside of the allowed Australian regions",
+    "remedies":[ "Set region to the allowed Australian regions of australia-southeast1 or australia-southeast2"]},
     {
-        "condition": "A message about what the condition does",
-        "attribute_path" : [region], 
-        "values" : [australia-southeast1, australia-southeast2], 
+        "condition": "Region must be set to an allowed Australian region",
+        "attribute_path" : ["region"], 
+        "values" : ["australia-southeast1", "australia-southeast2"], 
         "policy_type" : "whitelist" 
     }
     ]

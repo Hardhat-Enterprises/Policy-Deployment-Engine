@@ -4,12 +4,12 @@ import data.terraform.gcp.security.compute_engine.google_compute_router_nat.vars
 
 conditions := [
     [
-    {"situation_description" : "A self documenting message about the conditions within",
-    "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
+    {"situation_description" : "Router NAT can be destroyed by Terraform, risking loss of NAT routing to the internet and external networks.",
+    "remedies":[ "Set deletion_policy to PREVENT."]},
     {
-        "condition": "A message about what the condition does",
-        "attribute_path" : [deletion_policy], 
-        "values" : ["PREVENT"], # Values to compare against
+        "condition": "deletion_policy must be set to PREVENT",
+        "attribute_path" : ["deletion_policy"], 
+        "values" : ["PREVENT"],
         "policy_type" : "whitelist" 
     }
     ]

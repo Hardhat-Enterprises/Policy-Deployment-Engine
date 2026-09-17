@@ -1,7 +1,7 @@
 resource "google_compute_router_nat" "non_compliant_example_1" {
     name = "non-compliant-example-1"
     source_subnetwork_ip_ranges_to_nat  = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-    router = google_compute_router.router.name
-    region = google_compute_router.router.region
-    enable_endpoint_independent_mapping = "true"
+    router = "test-router"
+    region = "australia-southeast1"
+    enable_endpoint_independent_mapping = true
 }

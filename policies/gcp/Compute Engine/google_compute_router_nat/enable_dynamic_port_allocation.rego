@@ -4,12 +4,12 @@ import data.terraform.gcp.security.compute_engine.google_compute_router_nat.vars
 
 conditions := [
     [
-    {"situation_description" : "A self documenting message about the conditions within",
-    "remedies":[ "Something that fixes the issues in this situation","You can have multiple items in the array"]},
+    {"situation_description" : "NAT is using static port allocation rather than dynamic allocation, risking port exhaustion",
+    "remedies":[ "Set enable_dynamic_port_allocation to true to enable NAT dynamic port allocation"]},
     {
-        "condition": "A message about what the condition does",
-        "attribute_path" : [enable_dynamic_port_allocation],
-        "values" : ["true"], 
+        "condition": "enable_dynamic_port_allocation must be set to true",
+        "attribute_path" : ["enable_dynamic_port_allocation"],
+        "values" : [true], 
         "policy_type" : "whitelist" 
     }
     ]
