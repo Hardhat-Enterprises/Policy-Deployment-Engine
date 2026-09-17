@@ -10,7 +10,7 @@ resource "google_clouddeploy_delivery_pipeline" "non_compliant_example_1" {
           postdeploy {
             tasks {
               container {
-                image = "invalid-image"
+                image = "us-docker.pkg.dev/my-project/my-repo/my-image:latest"
               }
             }
           }

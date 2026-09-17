@@ -8,7 +8,7 @@ resource "google_clouddeploy_delivery_pipeline" "non_compliant_example_1" {
       strategy {
         standard {
           postdeploy {
-            actions = ["invalid-action"]
+            actions = []
           }
         }
       }

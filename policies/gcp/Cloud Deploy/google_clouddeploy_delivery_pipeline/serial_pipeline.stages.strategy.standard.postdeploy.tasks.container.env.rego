@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "container.env must not be empty",
             "attribute_path": ["serial_pipeline", 0, "stages", 0, "strategy", 0, "standard", 0, "postdeploy", 0, "tasks", 0, "container", 0, "env"],
-            "values": [null, {}, {"ENV_NAME": "invalid"}],
+            "values": [null, {}],
             "policy_type": "blacklist"
         }
     ]
