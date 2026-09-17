@@ -11,7 +11,7 @@ resource "google_clouddeploy_delivery_pipeline" "non_compliant_example_1" {
             tasks {
               container {
                 image = "us-docker.pkg.dev/my-project/my-repo/my-image:latest"
-                args  = ["invalid-arg"]
+                args  = ["--password=secret123"]
               }
             }
           }

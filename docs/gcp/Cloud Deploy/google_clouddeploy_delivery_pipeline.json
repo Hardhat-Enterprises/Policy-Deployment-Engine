@@ -783,14 +783,14 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "This policy does not validate or restrict application-specific argument content, which remains the team's own configuration choice. It only rejects the literal placeholder value \"invalid-arg\", a platform-level integrity check independent of which arguments a team configures."
+      "rationale": "A genuine risk is passing sensitive credentials directly as plaintext command-line arguments: process arguments are visible to any process on the same host (e.g. via ps or /proc), unlike environment variables or mounted secrets. The policy forbids arguments containing the literal substring \"password=\", a concrete, real pattern for an inline plaintext credential."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.command": {
       "description": "Optional. Command is the container entrypoint to use. This overrides the default entrypoint defined in the container image.",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "This policy does not validate or approve the application-specific entrypoint command, which remains the team's own architectural choice. It only rejects the literal placeholder value \"invalid-command\", a platform-level integrity check independent of which command a team configures."
+      "rationale": "A genuine risk is overriding the entrypoint to invoke a generic shell interpreter (e.g. /bin/sh) directly, which allows arbitrary command execution instead of a fixed, vetted binary. The policy forbids a command entry containing the literal substring \"/bin/sh\", a concrete, real shell-execution risk."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.env": {
       "description": "Optional. Environment variables that are set in the container.",
