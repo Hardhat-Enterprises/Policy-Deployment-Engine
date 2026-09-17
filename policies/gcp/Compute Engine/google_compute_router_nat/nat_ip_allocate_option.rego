@@ -4,12 +4,12 @@ import data.terraform.gcp.security.compute_engine.google_compute_router_nat.vars
 
 conditions := [
     [
-    {"situation_description" : "NAT IPs are allocated manually rather than automatically assigned from an approved pool, risking NAT IP misconfigurations",
-    "remedies":[ "Set nat_ip_allocate_option to AUTO_ONLY to enable automatic NAT IP allocation"]},
+    {"situation_description" : "NAT IPs are allocated automatically rather than manually assigned from an approved pool, risking NAT IP misconfigurations",
+    "remedies":[ "Set nat_ip_allocate_option to MANUAL_ONLY to enable manual NAT IP allocation"]},
     {
-        "condition": "nat_ip_allocate_option must be set to AUTO_ONLY",
+        "condition": "nat_ip_allocate_option must be set to MANUAL_ONLY",
         "attribute_path" : ["nat_ip_allocate_option"], 
-        "values" : ["AUTO_ONLY"], 
+        "values" : ["MANUAL_ONLY"], 
         "policy_type" : "whitelist" 
     }
     ]
