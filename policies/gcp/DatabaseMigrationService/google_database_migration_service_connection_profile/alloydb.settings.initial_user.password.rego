@@ -7,18 +7,24 @@ resource_value_name := vars.variables.resource_value_name
 
 conditions := []
 
-violating_resources contains name if {
+violating_resources contains resource.values[resource_value_name] if {
     resource := input.planned_values.root_module.resources[_]
     resource.type == resource_type
-    name := resource.values[resource_value_name]
-    v := resource.values.alloydb[0].settings[0].initial_user[0].password
-    v != "secure-password"
+
+    alloydb := resource.values.alloydb
+    count(alloydb) > 0
+
+    settings := alloydb[0].settings
+    initial_user := object.get(settings[0], "initial_user", [{}])[0]
+    password := object.get(initial_user, "password", "")
+
+    regex.match(`(?i)^(|password|changeme|default|weak-password)$`, password)
 }
 
 message := [
-    "Situation 1: AlloyDB initial user password is not set to the approved secure value.",
-    sprintf("Non-Compliant Resources: %s", [concat(", ", violating_resources)]),
-    "Potential Remedies: Set alloydb.settings.initial_user.password to the approved secure value.",
+    "Situation 1: AlloyDB initial-user passwords must not be blank or obvious defaults.",
+    sprintf("Non-Compliant Resources: %s", [concat(", ", [name | name := violating_resources[_]])]),
+    "Potential Remedies: Use a non-default secret managed through an approved secret-management process.",
 ] if {
     count(violating_resources) > 0
 }

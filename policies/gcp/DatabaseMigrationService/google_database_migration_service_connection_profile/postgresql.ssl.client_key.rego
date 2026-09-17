@@ -7,18 +7,23 @@ resource_value_name := vars.variables.resource_value_name
 
 conditions := []
 
-violating_resources contains name if {
+violating_resources contains resource.values[resource_value_name] if {
     resource := input.planned_values.root_module.resources[_]
     resource.type == resource_type
-    name := resource.values[resource_value_name]
-    ssl := resource.values.postgresql[0].ssl[0]
-    object.get(ssl, "client_key", null) == null
+
+    postgresql := resource.values.postgresql
+    count(postgresql) > 0
+
+    ssl := object.get(postgresql[0], "ssl", [{}])[0]
+    value := object.get(ssl, "client_key", "")
+
+    not regex.match(`^-----BEGIN (RSA |EC )?PRIVATE KEY-----[\s\S]+-----END (RSA |EC )?PRIVATE KEY-----\s*$`, value)
 }
 
 message := [
-    "Situation 1: postgresql.ssl.client_key is not configured.",
-    sprintf("Non-Compliant Resources: %s", [concat(", ", violating_resources)]),
-    "Potential Remedies: Set postgresql.ssl.client_key to support SSL verification or client certificate authentication.",
+    "Situation 1: PostgreSQL SSL client keys must be PEM formatted.",
+    sprintf("Non-Compliant Resources: %s", [concat(", ", [name | name := violating_resources[_]])]),
+    "Potential Remedies: Provide a PEM private key bounded by matching BEGIN and END PRIVATE KEY markers.",
 ] if {
     count(violating_resources) > 0
 }

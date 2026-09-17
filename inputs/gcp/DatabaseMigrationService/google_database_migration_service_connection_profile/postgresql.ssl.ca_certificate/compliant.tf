@@ -13,7 +13,11 @@ resource "google_database_migration_service_connection_profile" "compliant_examp
     }
 
     ssl {
-      ca_certificate = "secure-value"
+      ca_certificate = <<-PEM
+-----BEGIN CERTIFICATE-----
+dGVzdC1jYS1jZXJ0aWZpY2F0ZQ==
+-----END CERTIFICATE-----
+PEM
     }
   }
 }

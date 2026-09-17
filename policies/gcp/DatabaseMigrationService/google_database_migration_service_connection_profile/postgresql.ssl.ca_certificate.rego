@@ -7,18 +7,23 @@ resource_value_name := vars.variables.resource_value_name
 
 conditions := []
 
-violating_resources contains name if {
+violating_resources contains resource.values[resource_value_name] if {
     resource := input.planned_values.root_module.resources[_]
     resource.type == resource_type
-    name := resource.values[resource_value_name]
-    ssl := resource.values.postgresql[0].ssl[0]
-    object.get(ssl, "ca_certificate", null) == null
+
+    postgresql := resource.values.postgresql
+    count(postgresql) > 0
+
+    ssl := object.get(postgresql[0], "ssl", [{}])[0]
+    value := object.get(ssl, "ca_certificate", "")
+
+    not regex.match(`^-----BEGIN CERTIFICATE-----[\s\S]+-----END CERTIFICATE-----\s*$`, value)
 }
 
 message := [
-    "Situation 1: postgresql.ssl.ca_certificate is not configured.",
-    sprintf("Non-Compliant Resources: %s", [concat(", ", violating_resources)]),
-    "Potential Remedies: Set postgresql.ssl.ca_certificate to support SSL verification or client certificate authentication.",
+    "Situation 1: PostgreSQL SSL CA certificates must be PEM formatted.",
+    sprintf("Non-Compliant Resources: %s", [concat(", ", [name | name := violating_resources[_]])]),
+    "Potential Remedies: Provide a PEM certificate bounded by BEGIN CERTIFICATE and END CERTIFICATE.",
 ] if {
     count(violating_resources) > 0
 }

@@ -17,17 +17,19 @@ resource "google_database_migration_service_connection_profile" "non_compliant_e
         ip_config {
           enable_ipv4 = true
           require_ssl = true
+          private_network = "projects/myProject/global/networks/default"
           authorized_networks {
-            value = "203.0.113.5/32"
-            label = "corp-office"
+            value = "0.0.0.0/0"
+            label = "internet-wide-test"
           }
         }
         auto_storage_increase = true
         data_disk_type        = "PD_HDD"
         data_disk_size_gb     = "11"
-        zone                  = "us-central1-b"
-        source_id             = "projects/gcp-project/locations/us-central1/connectionProfiles/my-fromprofileid"
+        zone                  = "australia-southeast2-a"
+        source_id             = "projects/gcp-project/locations/australia-southeast2/connectionProfiles/my-fromprofileid"
         root_password         = "testpasscloudsql"
+        cmek_key_name         = "abcd"
       }
-    }
+  }
 }

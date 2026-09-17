@@ -12,6 +12,8 @@ resource "google_database_migration_service_connection_profile" "non_compliant_e
       private_connection = "URI"
     }
 
-    ssl {}
+    ssl {
+      ca_certificate = "not-a-pem-certificate"
+    }
   }
 }
