@@ -23,7 +23,6 @@ resource "google_os_config_v2_policy_orchestrator" "non_compliant_example_1" {
                                     gcs {
                                         bucket = "example-bucket"
                                         object = "pkg.rpm"
-                                        generation = ""
                                     }
                                 }
                             }

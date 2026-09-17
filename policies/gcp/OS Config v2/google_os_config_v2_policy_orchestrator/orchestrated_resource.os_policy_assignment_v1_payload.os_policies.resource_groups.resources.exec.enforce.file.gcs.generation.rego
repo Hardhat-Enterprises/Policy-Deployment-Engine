@@ -10,7 +10,7 @@ conditions := [
     {
         "condition": "Check that a generation number is pinned for the enforce stage object",
         "attribute_path" : ["orchestrated_resource",0,"os_policy_assignment_v1_payload",0,"os_policies",0,"resource_groups",0,"resources",0,"exec",0,"enforce",0,"file",0,"gcs",0,"generation"],
-        "values" : [""],
+        "values" : [null, ""],
         "policy_type" : "blacklist"
     }
     ]

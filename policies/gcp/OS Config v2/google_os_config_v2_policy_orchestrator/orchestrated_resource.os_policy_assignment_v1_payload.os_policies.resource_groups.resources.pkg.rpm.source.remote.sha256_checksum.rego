@@ -10,7 +10,7 @@ conditions := [
     {
         "condition": "Check that a checksum is supplied for the remote rpm package",
         "attribute_path" : ["orchestrated_resource",0,"os_policy_assignment_v1_payload",0,"os_policies",0,"resource_groups",0,"resources",0,"pkg",0,"rpm",0,"source",0,"remote",0,"sha256_checksum"],
-        "values" : [""],
+        "values" : [null, ""],
         "policy_type" : "blacklist"
     }
     ]

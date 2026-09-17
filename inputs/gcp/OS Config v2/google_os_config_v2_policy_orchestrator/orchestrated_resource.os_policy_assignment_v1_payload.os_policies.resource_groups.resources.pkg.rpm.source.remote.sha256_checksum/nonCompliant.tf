@@ -22,7 +22,6 @@ resource "google_os_config_v2_policy_orchestrator" "non_compliant_example_1" {
                                 source {
                                     remote {
                                         uri = "https://example.com/pkg.rpm"
-                                        sha256_checksum = ""
                                     }
                                 }
                             }

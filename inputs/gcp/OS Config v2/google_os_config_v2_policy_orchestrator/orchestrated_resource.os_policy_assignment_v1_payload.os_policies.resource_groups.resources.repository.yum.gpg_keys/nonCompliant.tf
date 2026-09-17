@@ -20,7 +20,6 @@ resource "google_os_config_v2_policy_orchestrator" "non_compliant_example_1" {
                             yum {
                                 id = "test-yum"
                                 base_url = "https://repo.example.com/yum"
-                                gpg_keys = ["http://repo.example.com/key.gpg"]
                             }
                         }
                     }

@@ -22,7 +22,6 @@ resource "google_os_config_v2_policy_orchestrator" "non_compliant_example_1" {
                                 uri = "https://repo.example.com/apt"
                                 distribution = "stable"
                                 components = ["main"]
-                                gpg_key = "http://repo.example.com/key.gpg"
                             }
                         }
                     }

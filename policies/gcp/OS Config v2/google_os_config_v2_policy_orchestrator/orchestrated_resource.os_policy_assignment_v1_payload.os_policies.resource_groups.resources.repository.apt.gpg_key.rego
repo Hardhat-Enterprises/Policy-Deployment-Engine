@@ -5,13 +5,13 @@ import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orche
 
 conditions := [
     [
-    {"situation_description" : "The GPG key for the APT repository is fetched over plain HTTP, so the key used to verify package signatures could itself be substituted in transit",
-    "remedies" : ["Use an HTTPS URI for the repository GPG key"]},
+    {"situation_description" : "The APT repository is added without a GPG key, so packages from it are installed without any signature verification",
+    "remedies" : ["Supply the URI of the repository's GPG key so package signatures are verified"]},
     {
-        "condition": "Check that the APT repository GPG key is fetched over HTTPS",
+        "condition": "Check that a GPG key is supplied for the APT repository",
         "attribute_path" : ["orchestrated_resource",0,"os_policy_assignment_v1_payload",0,"os_policies",0,"resource_groups",0,"resources",0,"repository",0,"apt",0,"gpg_key"],
-        "values" : ["*://*", [["https"]]],
-        "policy_type" : "pattern whitelist"
+        "values" : [null, ""],
+        "policy_type" : "blacklist"
     }
     ]
 ]

@@ -5,13 +5,13 @@ import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orche
 
 conditions := [
     [
-    {"situation_description" : "A GPG key for the Zypper repository is fetched over plain HTTP, so the key used to verify package signatures could itself be substituted in transit",
-    "remedies" : ["Use HTTPS URIs for the repository's GPG keys"]},
+    {"situation_description" : "The Zypper repository is added without any GPG keys, so packages from it are installed without any signature verification",
+    "remedies" : ["Supply at least one GPG key URI so package signatures are verified"]},
     {
-        "condition": "Check that no GPG key URI uses plain HTTP",
+        "condition": "Check that at least one GPG key is supplied for the Zypper repository",
         "attribute_path" : ["orchestrated_resource",0,"os_policy_assignment_v1_payload",0,"os_policies",0,"resource_groups",0,"resources",0,"repository",0,"zypper",0,"gpg_keys"],
-        "values" : ["http://"],
-        "policy_type" : "element blacklist"
+        "values" : [null, ""],
+        "policy_type" : "blacklist"
     }
     ]
 ]
