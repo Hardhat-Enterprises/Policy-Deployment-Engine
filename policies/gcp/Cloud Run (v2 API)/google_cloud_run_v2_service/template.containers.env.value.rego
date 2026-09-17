@@ -10,7 +10,7 @@ conditions := [
         },
         {
             "condition": "Plaintext env values must not be set",
-            "attribute_path": ["template",0,"containers",0,"env",0,"value"],
+            "attribute_path": ["template",0,"containers",0,"env","value"],
             "values": [null,""],
             "policy_type": "whitelist"
         }
