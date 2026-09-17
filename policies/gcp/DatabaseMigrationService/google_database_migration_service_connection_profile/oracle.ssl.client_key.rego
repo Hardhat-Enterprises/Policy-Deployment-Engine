@@ -5,6 +5,8 @@ import data.terraform.gcp.security.database_migration_service.google_database_mi
 resource_type := vars.variables.resource_type
 resource_value_name := vars.variables.resource_value_name
 
+conditions := []
+
 violating_resources contains name if {
     resource := input.planned_values.root_module.resources[_]
     resource.type == resource_type
