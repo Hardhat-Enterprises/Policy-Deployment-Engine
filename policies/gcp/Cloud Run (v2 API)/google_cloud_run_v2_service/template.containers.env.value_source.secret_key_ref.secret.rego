@@ -11,7 +11,7 @@ conditions := [
         {
             "condition": "Require secret from secret_key_ref in value_source for env variables",
             "attribute_path": ["template",0,"containers",0,"env",0,"value_source",0,"secret_key_ref",0,"secret"],
-            "values": [null],
+            "values": ["",null],
             "policy_type": "blacklist"
         }
     ],

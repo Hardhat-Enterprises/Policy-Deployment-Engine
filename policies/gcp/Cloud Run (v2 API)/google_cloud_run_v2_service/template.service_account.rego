@@ -11,7 +11,7 @@ conditions := [
         {
             "condition": "Block default service accounts",
             "attribute_path": ["template",0,"service_account"],
-            "values": [null],
+            "values": ["",null],
             "policy_type": "blacklist"
         }
     ],
