@@ -1,3 +1,4 @@
+# Empirically confirmed via this repo's own harness: a plan with subnetworks = ["*"] generates without error, proving no plan-time shape validation exists upstream.
 package terraform.gcp.security.compute_engine.google_compute_network_attachment.subnetworks
 
 import data.terraform.gcp.security.compute_engine.google_compute_network_attachment.vars

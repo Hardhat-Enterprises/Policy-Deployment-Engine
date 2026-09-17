@@ -63,7 +63,7 @@
       "required": true,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "This list controls which subnets can receive producer endpoint traffic through this network attachment. A wildcard-like entry (e.g. \"*\") would allow unintended, unscoped subnets to receive traffic, analogous to an overly broad access-control entry. The policy forbids a literal wildcard entry, without pinning any specific real subnetwork name."
+      "rationale": "This field is required and typed as a list of subnet URL strings, but the provider performs no client-side shape validation at plan time: a plan containing subnetworks = [\"*\"] generates successfully with no error, confirmed by this repository's own test harness. A wildcard or malformed entry therefore reaches a real deployment plan unchecked, and enforcing this at plan time is exactly the substantively enforceable, schema-permitted-but-insecure state a platform policy should catch before it reaches production."
     }
   }
 }
