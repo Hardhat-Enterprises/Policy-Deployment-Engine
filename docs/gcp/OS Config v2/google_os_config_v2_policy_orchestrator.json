@@ -574,7 +574,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "The generation number pinning the deb package fetch to one version of the Cloud Storage object. The shared File source validation already requires a generation number unless the source's own allow_insecure flag is turned on, so forbidding the unset value here re-encodes a rule the API enforces rather than a genuinely accepted insecure state. A policy should target allow_insecure instead."
+      "rationale": "An optional generation number pinning the deb package fetch to a specific version of the Cloud Storage object. Unlike a remote source, a Cloud Storage object sits inside the organisation's own bucket, where who may overwrite it is governed by IAM on that bucket rather than by this field, so the version the fetch resolves to is controlled at the storage layer. Pinning is a release-management practice for the owning team rather than a platform security requirement here."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.gcs.object": {
       "description": "Required. Name of the Cloud Storage object.",
@@ -737,8 +737,8 @@
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The generation number pinning the RPM fetch to one version of the Cloud Storage object. The shared File source validation already requires a generation number unless the source's own allow_insecure flag is turned on, so forbidding the unset value here re-encodes a rule the API enforces. A policy should target allow_insecure instead."
+      "security_impact": true,
+      "rationale": "An optional generation number pinning the RPM fetch to one specific version of the Cloud Storage object. Left unset the reference floats to whatever version is live at install time, so the package installed on the fleet can change silently without any configuration change. Requiring an explicit pinned generation forbids that mutable reference and is a valid policy target in its own right."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.gcs.object": {
       "description": "Required. Name of the Cloud Storage object.",
@@ -756,8 +756,8 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "The SHA256 checksum verified before a remote RPM is installed. The same File source validation already requires a checksum on a remote file unless allow_insecure is explicitly set, so this is an integrity control the API enforces already rather than one a policy needs to add. The real control point is allow_insecure."
+      "security_impact": true,
+      "rationale": "The SHA256 checksum the agent verifies a remote RPM against before installing it. Nothing in the package source schema gates this the way a paired allow-insecure flag would, so the checksum can simply be omitted and the VM will install whatever the remote server returns, with root privileges. Requiring an explicit checksum closes a real integrity gap on a root-installed artifact rather than restating an existing platform rule."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
