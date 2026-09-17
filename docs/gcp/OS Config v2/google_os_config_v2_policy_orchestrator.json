@@ -161,7 +161,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Limits a resource group to VMs running a particular operating system. Which operating systems appear here depends on a team's own estate, so no single value could be required across the organisation."
+      "rationale": "The unique identifier given to an OS policy within the assignment, restricted by GCP to lowercase letters, numbers and hyphens and required to be unique. It exists so individual policies can be referenced and distinguished, and takes no part in selecting VMs or deciding what is applied to them, so constraining it would enforce a naming convention rather than a security outcome."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.mode": {
       "description": "Required. Policy mode\nPossible values:\nMODE_UNSPECIFIED\nVALIDATION\nENFORCEMENT",
@@ -227,8 +227,8 @@
       "description": "Required. The script interpreter to use.\nPossible values:\nINTERPRETER_UNSPECIFIED\nNONE\nSHELL\nPOWERSHELL",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects which interpreter runs the script on the VM. Whether a team needs SHELL or POWERSHELL depends on the operating systems they run and the script they have written, and no option is unsafe in itself, so this is a platform choice rather than a security control."
+      "security_impact": true,
+      "rationale": "Selects the interpreter that runs the enforce-stage script on the VM. The accepted values include the sentinel INTERPRETER_UNSPECIFIED alongside the real choices NONE, SHELL and POWERSHELL, and leaving the field at that sentinel means no interpreter has been deliberately chosen for code that will execute on the fleet. A policy should forbid the unspecified sentinel while leaving the explicit choice between NONE, SHELL and POWERSHELL to the team."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.output_file_path": {
       "description": "Only recorded for enforce Exec.\nPath to an output file (that is created by this Exec) whose\ncontent will be recorded in OSPolicyResourceCompliance after a\nsuccessful run. Absence or failure to read this file will result in\nthis ExecResource being non-compliant. Output file size is limited to\n500K bytes.",
@@ -280,7 +280,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Pins the fetch to one specific version of the Cloud Storage object. Without it the VM runs whatever is currently at that object name, so anyone who can overwrite the object changes what executes on the fleet. The provider requires this unless allow_insecure is set, so a policy should require it to be present."
+      "rationale": "An optional generation number pinning the enforce-stage fetch to one specific version of the Cloud Storage object. Left unset, the reference floats to whatever object currently lives at that name, so the script the VM executes can change silently without any configuration change. A policy should require a pinned generation so the fetched object cannot mutate underneath the fleet."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.gcs.object": {
       "description": "Required. Name of the Cloud Storage object.",
@@ -298,8 +298,8 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The checksum the agent verifies a downloaded file against before running it. Without it the VM executes whatever the remote server returns, so a compromised or swapped file would run unnoticed. A policy should require a checksum to be present on every remote script source."
+      "security_impact": false,
+      "rationale": "The SHA256 checksum the agent verifies a remote enforce-stage file against before running it. The companion allow_insecure field's description shows the platform already refuses a remote source without a checksum unless allow_insecure is explicitly set to true, so requiring a checksum here only re-states a validity rule the API already enforces. The real control point is allow_insecure, which is where a policy belongs."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.enforce.file.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
@@ -324,8 +324,8 @@
       "description": "Required. The script interpreter to use.\nPossible values:\nINTERPRETER_UNSPECIFIED\nNONE\nSHELL\nPOWERSHELL",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects which interpreter runs the validate-stage script. The right choice depends on the operating system and the script itself, and no option is unsafe in isolation, so this is a platform decision rather than a security control."
+      "security_impact": true,
+      "rationale": "Selects the interpreter that runs the validate-stage script on the VM. As with the enforce stage, the enum exposes the sentinel INTERPRETER_UNSPECIFIED beside the real interpreters, so the field can be left without a deliberate choice for code that still executes on the machine. A policy should forbid the sentinel and require an explicit interpreter, leaving which one to the team."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.output_file_path": {
       "description": "Only recorded for enforce Exec.\nPath to an output file (that is created by this Exec) whose\ncontent will be recorded in OSPolicyResourceCompliance after a\nsuccessful run. Absence or failure to read this file will result in\nthis ExecResource being non-compliant. Output file size is limited to\n500K bytes.",
@@ -376,8 +376,8 @@
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Pins the validate-stage fetch to one specific version of the Cloud Storage object. Without it the agent runs whatever currently sits at that object name, so anyone able to overwrite the object controls what executes. A policy should require the generation number to be set."
+      "security_impact": false,
+      "rationale": "The generation number pinning a validate-stage Cloud Storage fetch to one version of the object. The companion allow_insecure field's description shows the platform already requires a generation number unless allow_insecure is explicitly set to true, so mandating it here re-encodes a rule the API enforces rather than closing a genuinely accepted insecure state. A policy should target allow_insecure instead."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.gcs.object": {
       "description": "Required. Name of the Cloud Storage object.",
@@ -395,8 +395,8 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The checksum the agent verifies the validate-stage file against before running it. Without it the VM executes whatever the remote server returns, so a substituted file would run undetected. A policy should require a checksum on every remote source."
+      "security_impact": false,
+      "rationale": "The SHA256 checksum the agent verifies a remote validate-stage file against before running it. The companion allow_insecure field's description shows the platform already refuses a remote source without a checksum unless allow_insecure is explicitly set to true, so requiring a checksum here only re-states a rule the API already enforces. The real control point is allow_insecure."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.exec.validate.file.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
@@ -435,8 +435,8 @@
       "description": "Required. Desired state of the file.\nPossible values:\nDESIRED_STATE_UNSPECIFIED\nPRESENT\nABSENT\nCONTENTS_MATCH",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Says whether the file should exist, be absent, or have matching contents. Which of these a team needs depends entirely on what they are managing, and none of the options is unsafe in itself."
+      "security_impact": true,
+      "rationale": "Says what state the managed file should be kept in. Alongside PRESENT, ABSENT and CONTENTS_MATCH the enum accepts the sentinel DESIRED_STATE_UNSPECIFIED, which leaves the intended state undeclared so the resource enforces nothing definite. A policy should forbid the sentinel while leaving the choice between the three real states to the team."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file": {
       "type": "block",
@@ -473,8 +473,8 @@
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "string",
-       "security_impact": true,
-      "rationale": "Pins the fetch to one specific version of the object. Without it the agent takes whatever currently sits at that object name, so anyone able to overwrite the object changes what lands on the fleet. A policy should require it to be set."
+       "security_impact": false,
+      "rationale": "The generation number pinning a Cloud Storage fetch to one version of the object for a managed file. The companion allow_insecure field's description shows the platform already requires a generation number unless allow_insecure is explicitly set to true, so mandating it here re-encodes a rule the API enforces. A policy should target allow_insecure instead."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.gcs.object": {
       "description": "Required. Name of the Cloud Storage object.",
@@ -492,8 +492,8 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The checksum verified before the downloaded file is written to the VM. Without it a tampered file would be installed without detection, so a policy should require a checksum on every remote file source."
+      "security_impact": false,
+      "rationale": "The SHA256 checksum verified before a downloaded file is written to the VM. The companion allow_insecure field's description shows the platform already rejects a remote source without a checksum unless allow_insecure is explicitly set to true, so requiring one here is a validity check the API already performs rather than an independent security policy. The real control point is allow_insecure."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.file.file.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
@@ -511,8 +511,8 @@
       "description": "Required. The desired state the agent should maintain for this package.\nPossible values:\nDESIRED_STATE_UNSPECIFIED\nINSTALLED\nREMOVED",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Says whether the package should be installed or removed. Both are ordinary administrative intentions and which one is correct depends on the package, so neither value is unsafe in itself."
+      "security_impact": true,
+      "rationale": "Says whether the agent should keep the package installed or removed. The enum also accepts the sentinel DESIRED_STATE_UNSPECIFIED, which leaves the intended state undeclared so the agent maintains nothing definite for that package. A policy should forbid the sentinel regardless of which explicit state a team chooses."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.apt": {
       "type": "block",
@@ -573,8 +573,8 @@
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Pins the package fetch to one specific version of the object. Without it whoever can overwrite the object controls which package gets installed with root privileges across the fleet, so a policy should require the generation number to be set."
+      "security_impact": false,
+      "rationale": "The generation number pinning the deb package fetch to one version of the Cloud Storage object. The shared File source validation already requires a generation number unless the source's own allow_insecure flag is turned on, so forbidding the unset value here re-encodes a rule the API enforces rather than a genuinely accepted insecure state. A policy should target allow_insecure instead."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.gcs.object": {
       "description": "Required. Name of the Cloud Storage object.",
@@ -592,8 +592,8 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The checksum verified before the deb package is installed. Without it the VM installs whatever the server returns, with root privileges, so a policy should require a checksum on every remote package source."
+      "security_impact": false,
+      "rationale": "The SHA256 checksum verified before a remote deb package is installed. The same File source validation already requires a checksum on a remote file unless allow_insecure is explicitly set, so this is an integrity control the API enforces already rather than one a policy needs to add. The real control point is allow_insecure."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.deb.source.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
@@ -661,8 +661,8 @@
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Pins the MSI fetch to one specific version of the object. Without it anyone able to overwrite the object controls which installer runs on the fleet, so a policy should require the generation number."
+      "security_impact": false,
+      "rationale": "The generation number pinning the MSI fetch to one version of the Cloud Storage object. The parallel allow_insecure field documents that when insecure fetches are disallowed, which is the default, the API already requires a generation number to be specified, so mandating it here is a linter on a value the platform already forces. The real control is keeping allow_insecure false."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.gcs.object": {
       "description": "Required. Name of the Cloud Storage object.",
@@ -680,8 +680,8 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The checksum verified before the MSI is executed. Without it the VM runs whatever installer the server returns, so a policy should require a checksum on every remote MSI source."
+      "security_impact": false,
+      "rationale": "The SHA256 checksum verified before a remote MSI is executed. The companion allow_insecure field's description shows the API already refuses a remote source without a checksum unless allow_insecure is explicitly set, so requiring one here re-states a rule the platform already enforces. The real control point is allow_insecure."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.msi.source.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
@@ -737,8 +737,8 @@
       "description": "Generation number of the Cloud Storage object.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Pins the RPM fetch to one specific version of the object. Without it whoever can overwrite the object decides which package is installed with root privileges, so a policy should require the generation number."
+      "security_impact": false,
+      "rationale": "The generation number pinning the RPM fetch to one version of the Cloud Storage object. The shared File source validation already requires a generation number unless the source's own allow_insecure flag is turned on, so forbidding the unset value here re-encodes a rule the API enforces. A policy should target allow_insecure instead."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.gcs.object": {
       "description": "Required. Name of the Cloud Storage object.",
@@ -756,8 +756,8 @@
       "description": "SHA256 checksum of the remote file.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "The checksum verified before the RPM is installed. Without it the VM installs whatever the server returns, with root privileges, so a policy should require a checksum on every remote package source."
+      "security_impact": false,
+      "rationale": "The SHA256 checksum verified before a remote RPM is installed. The same File source validation already requires a checksum on a remote file unless allow_insecure is explicitly set, so this is an integrity control the API enforces already rather than one a policy needs to add. The real control point is allow_insecure."
     },
     "orchestrated_resource.os_policy_assignment_v1_payload.os_policies.resource_groups.resources.pkg.rpm.source.remote.uri": {
       "description": "Required. URI from which to fetch the object. It should contain both the\nprotocol and path following the format '{protocol}://{location}'.",
