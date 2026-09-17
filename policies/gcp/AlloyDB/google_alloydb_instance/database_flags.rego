@@ -1,4 +1,4 @@
-package terraform.gcp.security.alloydb.google_alloydb_instance.database_flags
+package terraform.gcp.security.google_alloydb_instance.database_flags
 
 import data.terraform.helpers
 import data.terraform.gcp.security.alloydb.google_alloydb_instance.vars
@@ -6,26 +6,20 @@ import data.terraform.gcp.security.alloydb.google_alloydb_instance.vars
 conditions := [
     [
         {
-            "situation_description": "AlloyDB IAM authentication should be enabled.",
-
+            "situation_description": "The AlloyDB instance should not use database flags that reduce appropriate security logging or expose excessive database-engine diagnostic information.",
             "remedies": [
-                "Set alloydb.iam_authentication to on.",
-                "Do not disable AlloyDB IAM authentication."
+                "Review database_flags and remove insecure or unnecessarily verbose database-engine settings.",
+                "Use approved secure database flag values based on the organisation's database security baseline."
             ]
         },
-
         {
-            "condition": "The alloydb.iam_authentication database flag must be set to on.",
-
+            "condition": "The database_flags attribute must not contain insecure database flag values.",
             "attribute_path": ["database_flags"],
-
             "values": [
-                {
-                    "alloydb.iam_authentication": "on"
-                }
+                "DEBUG",
+                "TRACE"
             ],
-
-            "policy_type": "whitelist"
+            "policy_type": "element blacklist"
         }
     ]
 ]
@@ -33,5 +27,4 @@ conditions := [
 result := helpers.get_multi_summary(conditions, vars.variables)
 
 message := result.message
-
 details := result.details
