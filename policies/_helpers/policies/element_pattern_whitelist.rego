@@ -8,10 +8,9 @@ package terraform.helpers.policies.element_pattern_whitelist
 # every other character is matched literally (regex metacharacters such as '.'
 # and '(' are escaped before building the regex).
 #
-# values is exactly [pattern] — a single shape string, nothing else. Only the
-# array attribute is examined: a missing attribute, a non-list value, or an
-# empty list produces no violations (there is nothing to check, or nothing to
-# fail the shape).
+# values is a list of wildcard shapes; an element is compliant if it matches
+# any one of them (OR). A string value is checked as a one-item list. A missing
+# attribute or an empty list produces no violations (nothing to check).
 #
 # Example:
 #   pattern: "projects/*/locations/*/apps/*/guardrails/*"
@@ -19,34 +18,33 @@ package terraform.helpers.policies.element_pattern_whitelist
 
 import data.terraform.helpers.shared
 
-# Identifies resources with array elements that fail the required shape.
+# Identifies resources whose elements fail every one of the required shapes.
 #
 # Parameters:
 #   tf_variables - Resource metadata (resource_type, friendly_resource_name,
 #                  resource_value_name)
 #   attribute_path - Path to the array attribute
-#   values_formatted - [pattern]; pattern is the required wildcard shape. The
-#                      list holds exactly one element, so values_formatted[1]
-#                      is never read.
+#   values_formatted - list of wildcard shapes; an element passes if it matches
+#                      any one of them
 #
 # Returns:
 #   Set of violation objects with {name, message}
 get_violations(tf_variables, attribute_path, values_formatted) = results if {
-    pattern := values_formatted[0]
-    nc_resources := _get_resources(tf_variables.resource_type, attribute_path, pattern)
+    patterns := values_formatted
+    nc_resources := _get_resources(tf_variables.resource_type, attribute_path, patterns)
     results := {
-        _build_violation(tf_variables, attribute_path, pattern, resource) |
+        _build_violation(tf_variables, attribute_path, patterns, resource) |
         some resource in nc_resources
     }
 }
 
 # Builds the {name, message} violation object for one non-compliant resource.
-_build_violation(tf_variables, attribute_path, pattern, resource) = violation if {
+_build_violation(tf_variables, attribute_path, patterns, resource) = violation if {
     attribute_path_string := shared.format_attribute_path(attribute_path)
-    array_value := shared.get_attribute_value(resource, attribute_path)
+    array_value := _as_list(shared.get_attribute_value(resource, attribute_path))
     bad := [element |
         element := array_value[_]
-        not _matches(pattern, element)
+        not _matches_any(patterns, element)
     ]
 
     violation := {
@@ -56,7 +54,7 @@ _build_violation(tf_variables, attribute_path, pattern, resource) = violation if
             shared.get_resource_attribute(resource, tf_variables.resource_value_name),
             attribute_path_string,
             bad,
-            pattern,
+            patterns,
         ),
     }
 }
@@ -72,27 +70,43 @@ _matches(pattern, value) if {
     regex.match(sprintf("^%s$", [p]), value)
 }
 
+# An element is compliant if it matches any one of the required shapes.
+_matches_any(patterns, value) if {
+    some pattern in patterns
+    _matches(pattern, value)
+}
+
 # Escapes regex metacharacters in a pattern segment so the rest matches literally.
 _escape(segment) := regex.replace(segment, "([.+?()\\[\\]{}\\^$|\\\\])", "\\$1")
 
+# Normalises the attribute value to a list: a string is checked as a one-item
+# list; anything that is neither a list nor a string (e.g. a missing attribute)
+# is left undefined so the resource is skipped rather than flagged.
+_as_list(value) := value if {
+    is_array(value)
+}
+
+_as_list(value) := [value] if {
+    is_string(value)
+}
+
 # _get_resources() filters Terraform resources of the target type that have at
-# least one array element failing the required shape.
-_get_resources(resource_type, attribute_path, pattern) = resources if {
+# least one element failing every one of the required shapes.
+_get_resources(resource_type, attribute_path, patterns) = resources if {
     resources := {
         resource |
         resource := input.planned_values.root_module.resources[_]
         resource.type == resource_type
-        array_value := shared.get_attribute_value(resource, attribute_path)
-        is_array(array_value)
+        array_value := _as_list(shared.get_attribute_value(resource, attribute_path))
         count([1 |
             element := array_value[_]
-            not _matches(pattern, element)
+            not _matches_any(patterns, element)
         ]) > 0
     }
 }
 
 # Formats the human-readable violation message.
-_format_message(friendly_resource_name, resource_value_name, attribute_path_string, bad, pattern) = msg if {
-    msg := sprintf("%s '%s' has '%s' with elements not matching the required shape '%s': %v",
-        [friendly_resource_name, resource_value_name, attribute_path_string, pattern, bad])
+_format_message(friendly_resource_name, resource_value_name, attribute_path_string, bad, patterns) = msg if {
+    msg := sprintf("%s '%s' has '%s' with elements not matching any required shape %v: %v",
+        [friendly_resource_name, resource_value_name, attribute_path_string, patterns, bad])
 }

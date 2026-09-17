@@ -13,7 +13,7 @@ import data.terraform.helpers.shared_test
 import rego.v1
 
 # ==============================================================================
-# UNIT TESTS (6): Test _get_resources and get_violations with simple mocks
+# UNIT TESTS (11): Test _get_resources and get_violations with simple mocks
 # ==============================================================================
 
 # Test 1: A single non-matching element (bare name) flags the resource
@@ -35,7 +35,7 @@ test_get_resources_single_bad_element if {
 	resources := element_pattern_whitelist._get_resources(
 		"google_ces_agent",
 		["guardrails"],
-		"projects/*/locations/*/apps/*/guardrails/*",
+		["projects/*/locations/*/apps/*/guardrails/*"],
 	) with input as mock_input
 
 	count(resources) == 1
@@ -62,7 +62,7 @@ test_get_resources_compliant_full_path if {
 	resources := element_pattern_whitelist._get_resources(
 		"google_ces_agent",
 		["guardrails"],
-		"projects/*/locations/*/apps/*/guardrails/*",
+		["projects/*/locations/*/apps/*/guardrails/*"],
 	) with input as mock_input
 
 	count(resources) == 0
@@ -90,7 +90,7 @@ test_get_resources_mixed_elements if {
 	resources := element_pattern_whitelist._get_resources(
 		"google_ces_agent",
 		["guardrails"],
-		"projects/*/locations/*/apps/*/guardrails/*",
+		["projects/*/locations/*/apps/*/guardrails/*"],
 	) with input as mock_input
 
 	count(resources) == 1
@@ -117,7 +117,7 @@ test_get_resources_wrong_shape if {
 	resources := element_pattern_whitelist._get_resources(
 		"google_ces_agent",
 		["guardrails"],
-		"projects/*/locations/*/apps/*/guardrails/*",
+		["projects/*/locations/*/apps/*/guardrails/*"],
 	) with input as mock_input
 
 	count(resources) == 1
@@ -145,7 +145,7 @@ test_get_resources_star_does_not_span_slash if {
 	resources := element_pattern_whitelist._get_resources(
 		"google_ces_agent",
 		["guardrails"],
-		"projects/*/guardrails/*",
+		["projects/*/guardrails/*"],
 	) with input as mock_input
 
 	count(resources) == 1
@@ -172,7 +172,7 @@ test_get_resources_empty_list if {
 	resources := element_pattern_whitelist._get_resources(
 		"google_ces_agent",
 		["guardrails"],
-		"projects/*/locations/*/apps/*/guardrails/*",
+		["projects/*/locations/*/apps/*/guardrails/*"],
 	) with input as mock_input
 
 	count(resources) == 0
@@ -197,10 +197,121 @@ test_get_resources_ignores_other_type if {
 	resources := element_pattern_whitelist._get_resources(
 		"google_ces_agent",
 		["guardrails"],
-		"projects/*/locations/*/apps/*/guardrails/*",
+		["projects/*/locations/*/apps/*/guardrails/*"],
 	) with input as mock_input
 
 	count(resources) == 0
+}
+
+# Test 6b: A '.' in the pattern is literal, not a regex "any character"
+test_get_resources_dot_is_literal if {
+	mock_input := {
+		"planned_values": {
+			"root_module": {
+				"resources": [
+					{
+						"type": "google_ces_agent",
+						"name": "dot-agent",
+						"values": {"guardrails": ["projects/fooXjson"]},
+					},
+				],
+			},
+		},
+	}
+
+	resources := element_pattern_whitelist._get_resources(
+		"google_ces_agent",
+		["guardrails"],
+		["projects/*.json"],
+	) with input as mock_input
+
+	count(resources) == 1
+	some r in resources
+	r.name == "dot-agent"
+}
+
+# Test 6c: '(', '[' and '$' in the pattern are literal
+test_get_resources_metachars_literal if {
+	mock_input := {
+		"planned_values": {
+			"root_module": {
+				"resources": [
+					{
+						"type": "google_ces_agent",
+						"name": "meta-agent",
+						"values": {"guardrails": ["projects/p(x)[y]$z"]},
+					},
+				],
+			},
+		},
+	}
+
+	resources := element_pattern_whitelist._get_resources(
+		"google_ces_agent",
+		["guardrails"],
+		["projects/*(x)[y]$z"],
+	) with input as mock_input
+
+	count(resources) == 0
+}
+
+# Test 6d: An element is compliant if it matches any one of the listed patterns
+test_get_resources_multiple_patterns_any if {
+	mock_input := {
+		"planned_values": {
+			"root_module": {
+				"resources": [
+					{
+						"type": "google_ces_agent",
+						"name": "second-pattern-agent",
+						"values": {"guardrails": ["gs://my-bucket"]},
+					},
+					{
+						"type": "google_ces_agent",
+						"name": "neither-pattern-agent",
+						"values": {"guardrails": ["bare-name"]},
+					},
+				],
+			},
+		},
+	}
+
+	resources := element_pattern_whitelist._get_resources(
+		"google_ces_agent",
+		["guardrails"],
+		["projects/*/guardrails/*", "gs://*"],
+	) with input as mock_input
+
+	count(resources) == 1
+	some r in resources
+	r.name == "neither-pattern-agent"
+}
+
+# Test 6e: A string value is checked as a one-item list
+test_get_resources_string_checked_as_list if {
+	mock_input := {
+		"planned_values": {
+			"root_module": {
+				"resources": [
+					{
+						"type": "google_ces_agent",
+						"name": "string-agent",
+						"values": {"guardrails": "approved-guardrail"},
+					},
+				],
+			},
+		},
+	}
+
+	resources := element_pattern_whitelist._get_resources(
+		"google_ces_agent",
+		["guardrails"],
+		["projects/*/locations/*/apps/*/guardrails/*"],
+	) with input as mock_input
+
+	count(resources) == 1
+	some r in resources
+	r.name == "string-agent"
 }
 
 # ==============================================================================
