@@ -48,6 +48,7 @@ All branches must follow one of these patterns:
     `Cloud Run (v2 API)` → `cloud_run_v2_api`. It maps back to exactly one folder.
   - `<resource_type>`: a documented resource (a `docs/<platform>/<folder>/<resource>.json`)
 - `feature/<feature_name>` - For general features and any non-resource maintenance/cleanup work (e.g., `feature/add-logging`)
+- `Task/<topic_slug>` - Instructor-assigned tasks. The portal creates the branch for you; do not rename it.
 
 This `Service/...` branch is what scopes the per-resource CI gate to the resource you're
 working on (doc completeness, policy/input coverage, and the OPA test).
@@ -71,6 +72,13 @@ pre-commit install
 This will enforce:
 - ✅ **Linter** - Validates the `docs/`, `inputs/`, and `policies/` trees against the docs taxonomy
 - ✅ **Branch Naming Convention** - Ensures your branch name follows the required format
+- ✅ **Branch Scope** - A `Service/...` branch only changes its own resource's files
+- ✅ **Resource gate** - Doc completeness for your resource (`check_resource.py --skip-coverage`)
+
+The hooks **do not** check argument coverage (a policy and a fixture for every
+`security_impact: true` argument) or run the OPA test. You write the docs first and the
+policies after, so coverage gaps are normal while you work. The pull request enforces
+coverage, and so does the full `python3 scripts/check_resource.py` run.
 
 ### ⚠️ What Happens During Commit
 
@@ -91,12 +99,21 @@ When you commit, the pre-commit hooks will run automatically:
    - Verifies your current branch follows the naming convention
    - If invalid, the commit is **blocked**
 
+3. **Branch Scope Check** (`scripts/linters/branch_scope.py --staged`)
+   - On a `Service/...` branch, blocks staged changes to another resource's files
+
+4. **Resource Gate** (`scripts/check_resource.py --gate-only --skip-coverage`)
+   - Doc completeness: every argument has a real `security_impact` and a rationale
+   - Skips argument coverage and the OPA test. Those tell you whether the resource is
+     *finished*, so the PR checks them. A doc committed before its policies exist is fine
+
 **Example error message:**
 ```
 [FAIL] Invalid branch name
 
 Allowed branch names:
   - feature/<name>
+  - Task/<topic_slug>  (instructor-assigned task branches)
   - Service/<platform>/<service_slug>/<resource_type>
       e.g. Service/gcp/cloud_run_v2_api/google_cloud_run_v2_service
   - (protected: dev)
@@ -239,7 +256,8 @@ The *lint* and *policy_check* jobs run the same script you run locally
 already covered the rest), so a green local run means a green CI run.
 
 A PR is blocked when a lint error lands on a file it changed, or (for `Service/` PRs) when the
-per-resource gate fails. Terraform and OPA versions are pinned in the workflows for
+per-resource gate fails. That includes coverage gaps. CI never passes `--skip-coverage`; only the
+pre-commit hook does, so docs-first commits go through and an unfinished resource still can't merge. Terraform and OPA versions are pinned in the workflows for
 reproducibility (the provider version is pinned via `scripts/auto_test/provider_version.txt`).
 
 
