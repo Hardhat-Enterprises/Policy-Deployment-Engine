@@ -1,5 +1,4 @@
-package terraform.gcp.security.oracle_database.google_oracle_database_db_system.backup_destination_details
-
+package terraform.gcp.security.oracle_database.google_oracle_database_db_system.properties_db_home_database_properties_db_backup_config_backup_destination_details
 import data.terraform.helpers
 import data.terraform.gcp.security.oracle_database.google_oracle_database_db_system.vars
 

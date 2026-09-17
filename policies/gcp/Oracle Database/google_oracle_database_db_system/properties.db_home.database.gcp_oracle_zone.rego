@@ -1,5 +1,4 @@
-package terraform.gcp.security.oracle_database.google_oracle_database_db_system.database_gcp_oracle_zone
-
+package terraform.gcp.security.oracle_database.google_oracle_database_db_system.properties_db_home_database_gcp_oracle_zone
 import data.terraform.helpers
 import data.terraform.gcp.security.oracle_database.google_oracle_database_db_system.vars
 
