@@ -1,4 +1,4 @@
-package terraform.gcp.security.compute_engine.google_compute_router_nat.log_config.enable 
+package terraform.gcp.security.compute_engine.google_compute_router_nat.log_config_enable 
 import data.terraform.helpers
 import data.terraform.gcp.security.compute_engine.google_compute_router_nat.vars
 
