@@ -6,15 +6,15 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Network attachment producer_accept_lists contains an invalid or placeholder project entry.",
+      "situation_description": "Network attachment producer_accept_lists contains a wildcard-like entry, exposing the attachment to any consumer project.",
       "remedies": [
-        "Remove the invalid placeholder entry and use a valid, explicitly approved project reference.",
+        "Remove the wildcard entry and list only the specific, explicitly approved consumer project(s).",
       ],
     },
     {
-      "condition": "producer_accept_lists must not contain an invalid placeholder entry.",
+      "condition": "producer_accept_lists must not contain a wildcard entry.",
       "attribute_path": ["producer_accept_lists"],
-      "values": ["invalid-project"],
+      "values": ["*"],
       "policy_type": "blacklist",
     },
   ],

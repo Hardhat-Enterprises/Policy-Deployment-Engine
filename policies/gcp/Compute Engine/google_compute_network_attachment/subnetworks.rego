@@ -6,15 +6,15 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "Network attachment subnetworks contains an invalid or placeholder subnetwork entry.",
+      "situation_description": "Network attachment subnetworks contains a wildcard-like entry, allowing unscoped subnets to receive producer traffic.",
       "remedies": [
-        "Remove the invalid placeholder entry and use a valid subnetwork reference.",
+        "Remove the wildcard entry and list only the specific, explicit subnetwork(s).",
       ],
     },
     {
-      "condition": "subnetworks must not contain an invalid placeholder entry.",
+      "condition": "subnetworks must not contain a wildcard entry.",
       "attribute_path": ["subnetworks"],
-      "values": ["invalid-subnetwork"],
+      "values": ["*"],
       "policy_type": "blacklist",
     },
   ],
