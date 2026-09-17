@@ -17,7 +17,8 @@ tells you which one failed:
   4. Doc completeness      every leaf argument in docs/<platform>/<folder>/<resource>.json
                            has a REAL boolean ``security_impact`` (the "true/false"
                            placeholder the linter tolerates tree-wide is rejected
-                           here) and a non-empty ``rationale``
+                           here) and a non-empty ``rationale``, and no argument in
+                           the base branch's copy of the doc is missing from it
   5. True-arg coverage     every argument with ``security_impact: true`` has both a
                            policy ``policies/.../<resource>/<arg>.rego`` and a fixture
                            ``inputs/.../<resource>/<arg>/``
@@ -48,6 +49,14 @@ Options
 ``--changed-only``   skip steps whose inputs this commit does not touch, judged from
                      the staged files. Also for the pre-commit hook: it runs on every
                      commit, and most commits change nothing this gate reads.
+``--skip-coverage``  skip true-arg coverage, and with it the OPA test. Coverage asks
+                     "is this resource finished?", which is a question for the pull
+                     request, not for every commit: docs are written and approved
+                     before any policy exists, so a commit hook that checked it would
+                     block that work outright. The OPA test goes too, because without
+                     coverage it would fail confusingly on the missing policies and
+                     fixtures. Doc completeness still runs. Used by the pre-commit
+                     hook; CI and the full run never pass it.
 
 Exits 0 when everything passed (or was legitimately skipped), 1 on any failure.
 """
@@ -186,9 +195,10 @@ def base_ref():
     is right for a pre-commit hook and wrong here, so say so rather than silently
     checking less than the name of this script promises.
     """
-    r = subprocess.run(["git", "rev-parse", "--verify", "--quiet", "origin/dev"],
+    ref = f"origin/{os.getenv('GITHUB_BASE_REF') or 'dev'}"
+    r = subprocess.run(["git", "rev-parse", "--verify", "--quiet", ref],
                        cwd=REPO, capture_output=True, text=True)
-    return "origin/dev" if r.returncode == 0 else None
+    return ref if r.returncode == 0 else None
 
 
 def step_branch_name(report, branch):
@@ -258,6 +268,38 @@ def check_doc_completeness(doc):
     return errors
 
 
+def check_no_lost_args(doc, base_doc):
+    """Arguments in the base branch's copy of the doc that this branch's lacks.
+
+    ``check_doc_completeness`` can only judge what is inside ``arguments``, so a
+    leaf deleted cleanly from it passes by construction. ``base_doc`` is None when
+    there is no base to compare with.
+    """
+    if base_doc is None:
+        return []
+    mine = set(doc.get("arguments", {}))
+    lost = [k for k in base_doc.get("arguments", {}) if k not in mine]
+    if not lost:
+        return []
+    return [f"{len(lost)} argument(s) in the base branch's doc are missing from this "
+            "branch's `arguments`: " + ", ".join(lost)]
+
+
+def load_base_doc(base, rel_path):
+    """The base branch's version of a doc, or None when it has none (a new doc, no
+    base ref locally, or a base copy that is not valid JSON)."""
+    if base is None:
+        return None
+    r = subprocess.run(["git", "show", f"{base}:{rel_path}"],
+                       cwd=REPO, capture_output=True, text=True, encoding="utf-8")
+    if r.returncode != 0:
+        return None
+    try:
+        return json.loads(r.stdout)
+    except json.JSONDecodeError:
+        return None
+
+
 def check_true_arg_coverage(doc, platform, folder, resource):
     errors = []
     for name, entry in leaf_args(doc):
@@ -300,6 +342,10 @@ def step_opa(report, platform, folder, resource, if_cached):
         show(result)
 
 
+COVERAGE_SKIPPED = ("not a commit-time check — checked on the PR and by the full "
+                    "`python scripts/check_resource.py` run")
+
+
 # --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
@@ -317,6 +363,9 @@ def main(argv=None):
                              "than running terraform to build one.")
     parser.add_argument("--changed-only", action="store_true",
                         help="Skip steps whose inputs the staged files do not touch.")
+    parser.add_argument("--skip-coverage", action="store_true",
+                        help="Skip true-arg coverage and the OPA test (checked on the PR "
+                             "and by the full run). For the pre-commit hook.")
     args = parser.parse_args(argv)
 
     branch = args.branch or os.getenv("GITHUB_HEAD_REF") or current_branch()
@@ -364,7 +413,7 @@ def main(argv=None):
                                          f"{resource}'s docs, fixtures or policies")
             return report.summarise(resource)
         if not touches_opa_inputs(mine):
-            # Docs-only edit: coverage and completeness can move, the plan cannot.
+            # Docs-only edit: completeness (and coverage) can move, the plan cannot.
             args.if_cached = True
             staged_opa = False
         else:
@@ -374,17 +423,33 @@ def main(argv=None):
 
     doc = json.loads(doc_path.read_text(encoding="utf-8"))
 
-    doc_errors = check_doc_completeness(doc)
+    base = base_ref()
+    base_version = load_base_doc(base, f"{DOCS}/{platform}/{folder}/{resource}.json")
+    doc_errors = check_no_lost_args(doc, base_version) + check_doc_completeness(doc)
     if doc_errors:
-        report.fail("Doc completeness", f"{len(doc_errors)} argument(s) incomplete")
+        report.fail("Doc completeness", f"{len(doc_errors)} finding(s)")
         for e in doc_errors:
             print(f"      - {e}")
     else:
-        report.ok("Doc completeness", "every argument has a real security_impact and a rationale")
+        compared = (f"nothing lost against {base}" if base_version is not None
+                    else "no base doc to compare with — run `git fetch origin`"
+                    if base is None else f"new doc, not on {base}")
+        report.ok("Doc completeness", "every argument has a real security_impact and a "
+                                      f"rationale; {compared}")
+
+    if args.skip_coverage:
+        # Not a commit-time question: docs land before policies, so gaps are normal
+        # here. The pull request and the full run are where "finished" is enforced.
+        report.skip("True-arg coverage", COVERAGE_SKIPPED)
+        report.skip("OPA test", "skipped with coverage: until every policy and fixture "
+                                "exists it would only fail on files not written yet")
+        return report.summarise(resource)
 
     cover_errors = check_true_arg_coverage(doc, platform, folder, resource)
     if cover_errors:
-        report.fail("True-arg coverage", f"{len(cover_errors)} gap(s)")
+        report.fail("True-arg coverage",
+                    f"{len(cover_errors)} gap(s) — expected until the policies and "
+                    "fixtures are written; they block merging the PR, not your commits")
         for e in cover_errors:
             print(f"      - {e}")
     else:
