@@ -17,7 +17,9 @@ There are four supporting scripts:
 - `../check_resource.py` — not a linter itself: the single entry point that runs
   all of these plus the per-resource gate (doc completeness, argument coverage,
   OPA test), in the order CI runs them. It is what contributors are told to run
-  and what CI's `policy_check` job calls with `--gate-only`.
+  and what CI's `policy_check` job calls with `--gate-only`. The pre-commit hook
+  adds `--skip-coverage`: coverage and the OPA test are PR-time checks, since
+  docs are written and approved before any policy exists.
 - `branch_scope.py` — enforces that a `Service/<platform>/<service_slug>/<resource_type>`
   branch changes **only** that resource's files (`docs/` JSON, `inputs/`,
   `policies/`). It catches the two silent mistakes — editing the shared harness
@@ -137,6 +139,12 @@ python scripts/linters/run_precommit_linter.py --all      # whole tree, fail on 
 python scripts/linters/branch_scope.py --staged           # what you are about to commit
 python scripts/linters/branch_scope.py --base origin/dev  # the whole branch vs dev (CI)
 ```
+
+The `resource-gate` hook runs `check_resource.py --gate-only --if-cached
+--changed-only --skip-coverage`, which means doc completeness only. It never checks
+true-arg coverage, which answers "is this resource finished?" and would otherwise
+block every commit made while the docs exist but the policies don't. The PR and
+the full `check_resource.py` run still fail on coverage gaps.
 
 **CI (the `Branch scope` job in `.github/workflows/policy_check_PR.yaml`):** it runs
 `branch_scope.py --branch <head ref> --base origin/<base>` on every pull request
