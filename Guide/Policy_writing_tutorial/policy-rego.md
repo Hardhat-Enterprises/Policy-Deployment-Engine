@@ -92,7 +92,7 @@ The attribute path would be:
 
 ### Different ways to write your policy
 
-The engine dispatches on `policy_type`, and it knows **exactly six** values:
+The engine dispatches on `policy_type`, and it knows **exactly seven** values:
 
 | `policy_type` | Use it when |
 |---|---|
@@ -102,6 +102,7 @@ The engine dispatches on `policy_type`, and it knows **exactly six** values:
 | `pattern blacklist` | A wildcard-extracted part of the value must not be one of these |
 | `pattern whitelist` | A wildcard-extracted part of the value must be one of these |
 | `element blacklist` | No element of an array may **contain** one of these substrings |
+| `map key blacklist` | No map key may match a prohibited name, ignoring capitalisation, with a non-empty value |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
@@ -293,6 +294,39 @@ Blocks **array** attributes whose elements contain any blacklisted **substring**
       }
     ]
 ```
+
+### Map Key Blacklist
+
+Checks the **names inside a map**, rather than list elements or the map's values.
+`values` is a flat list of prohibited names. Matching ignores capitalisation but
+requires the whole name: `Authorization` matches `AUTHORIZATION`, not
+`X-Authorization-Mode`.
+
+A matching key is flagged only when its value is neither `null` nor an empty
+string. Whitespace-only values are still non-empty. Missing, empty or non-map
+attributes are ignored; this helper does not require the map to exist or validate
+its shape. It checks known values in root-module resources, like the other helpers.
+
+```rego
+    [
+      {
+        "situation_description": "The webhook contains sensitive inline request headers",
+        "remedies": ["Move credentials to secret_versions_for_request_headers."]
+      },
+      {
+        "condition": "Reject sensitive header names with non-empty inline values",
+        "attribute_path": ["generic_web_service", 0, "request_headers"],
+        "values": ["authorization", "proxy-authorization", "api-key", "x-api-key", "x-auth-token"],
+        "policy_type": "map key blacklist"
+      }
+    ]
+```
+
+For the Service Directory webhook, use
+`["service_directory", 0, "generic_web_service", 0, "request_headers"]` instead.
+Violation messages name the matching keys without printing their values.
+See the [helper documentation](../../policies/_helpers/README.md#7-map-key-blacklist)
+for a complete conditions example and the test command.
 
 <div align="center">
 

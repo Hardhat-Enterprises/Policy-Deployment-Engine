@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 6 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist
+- Support for 7 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist
 - OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -29,6 +29,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [4. Pattern Blacklist](#4-pattern-blacklist)
   - [5. Pattern Whitelist](#5-pattern-whitelist)
   - [6. Element Blacklist](#6-element-blacklist)
+  - [7. Map Key Blacklist](#7-map-key-blacklist)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
@@ -87,7 +88,8 @@ policies/_helpers/
     ├── range.rego
     ├── pattern_blacklist.rego
     ├── pattern_whitelist.rego
-    └── element_blacklist.rego
+    ├── element_blacklist.rego
+    └── map_key_blacklist.rego
 ```
 
 ### Component Responsibilities
@@ -254,6 +256,51 @@ get_violations(tf_variables, attribute_path, values) = results
 ```
 
 ---
+
+### 7. Map Key Blacklist
+
+**Module:** `policies/map_key_blacklist.rego`
+
+Use this type to reject specified map keys with populated values. Keys are compared
+by exact name ignoring capitalisation: `Authorization` and `AUTHORIZATION` match,
+but `X-Authorization-Mode` does not. Null and empty-string values are ignored;
+whitespace-only strings are populated values and are flagged. A missing, empty,
+or non-object map produces no violations. This helper does not validate map shape
+or require the map to exist.
+
+This is useful for detecting sensitive inline HTTP headers. Messages contain the
+matching key names, never the map values. The prohibited names are supplied by
+each policy, not hard-coded into the helper.
+
+```rego
+conditions := [[
+    {
+        "situation_description": "The webhook contains sensitive inline request headers",
+        "remedies": ["Move credentials to secret_versions_for_request_headers."],
+    },
+    {
+        "condition": "Reject sensitive header names with populated values",
+        "attribute_path": ["generic_web_service", 0, "request_headers"],
+        "values": ["authorization", "proxy-authorization", "api-key", "x-api-key", "x-auth-token"],
+        "policy_type": "map key blacklist",
+    },
+]]
+
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
+```
+
+For Service Directory, the attribute path is
+`["service_directory", 0, "generic_web_service", 0, "request_headers"]`.
+Like the existing helpers, this checks resources under `planned_values.root_module.resources`.
+It evaluates known plan values; it cannot prove that unknown values are safe.
+
+Run the focused and integration tests from the repository root:
+
+```shell
+opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_blacklist_integration_test.rego policies/_helpers -v
+```
 
 ## Usage Guide
 
