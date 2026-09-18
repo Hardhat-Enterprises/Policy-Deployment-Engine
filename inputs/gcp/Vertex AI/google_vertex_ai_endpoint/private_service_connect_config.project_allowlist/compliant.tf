@@ -4,6 +4,6 @@ resource "google_vertex_ai_endpoint" "compliant_example_1" {
   location     = "us-central1"
   private_service_connect_config {
     enable_private_service_connect = true
-    project_allowlist              = ["approved-project-id"]
+    project_allowlist              = ["my-valid-project-id"]
   }
 }

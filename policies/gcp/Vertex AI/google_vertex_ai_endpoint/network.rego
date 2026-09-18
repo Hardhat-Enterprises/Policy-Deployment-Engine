@@ -6,13 +6,13 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.vars
 conditions := [
     [
         {
-            "situation_description": "Ensure Vertex AI Endpoint does not use the default VPC network.",
-            "remedies": ["Set the `network` attribute to a custom VPC network."]
+            "situation_description": "Ensure Vertex AI Endpoint mandates a valid private network peering configuration.",
+            "remedies": ["Set the `network` attribute to a valid VPC network path."]
         },
         {
-            "condition": "network is set to default",
+            "condition": "network is missing or set to default",
             "attribute_path": ["network"],
-            "values": ["default"],
+            "values": [null, "", "default"],
             "policy_type": "blacklist"
         }
     ]

@@ -6,13 +6,13 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.vars
 conditions := [
     [
         {
-            "situation_description": "Ensure the endpoint uses Customer-Managed Encryption Keys (CMEK).",
-            "remedies": ["Configure the `encryption_spec.kms_key_name` attribute."]
+            "situation_description": "Ensure the endpoint explicitly declares an encryption_spec KMS key.",
+            "remedies": ["Provide a `kms_key_name`."]
         },
         {
-            "condition": "encryption_spec.kms_key_name is empty",
+            "condition": "kms_key_name is missing or empty",
             "attribute_path": ["encryption_spec", 0, "kms_key_name"],
-            "values": [""],
+            "values": [null, ""],
             "policy_type": "blacklist"
         }
     ]
