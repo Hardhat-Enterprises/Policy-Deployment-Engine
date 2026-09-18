@@ -63,8 +63,8 @@
       "description": "The type of the connected data store.\nSee [DataStoreType](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/DataStoreConnection#datastoretype) for valid values.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the functional type of the connected data store and does not itself configure a generic platform-level security control."
+      "security_impact": true,
+      "rationale": "The DataStoreType enum includes DATA_STORE_TYPE_UNSPECIFIED, which represents an unspecified configuration rather than an explicit data store type. A generic policy can forbid the unspecified sentinel and require an explicit supported data store type."
     },
     "tool.data_store_spec.data_store_connections.document_processing_mode": {
       "description": "The document processing mode for the data store connection. Should only be set for PUBLIC_WEB and UNSTRUCTURED data stores. If not set it is considered as DOCUMENTS, as this is the legacy mode.\nSee [DocumentProcessingMode](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/DataStoreConnection#documentprocessingmode) for valid values.",
@@ -124,7 +124,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Contains an API credential directly in the Terraform configuration and state. A generic security policy can prevent direct credential storage and require a Secret Manager-backed alternative to reduce secret exposure."
+      "rationale": "Contains an API credential directly in Terraform configuration and state. A generic security policy can prevent direct credential storage and require a Secret Manager-backed alternative to reduce secret exposure."
     },
     "tool.open_api_spec.authentication.api_key_config.key_name": {
       "description": "The parameter name or the header name of the API key.\nE.g., If the API request is \"https://example.com/act?X-Api-Key=\", \"X-Api-Key\" would be the parameter name.",
@@ -137,8 +137,8 @@
       "description": "Key location in the request.\nSee [RequestLocation](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.tools#requestlocation) for valid values.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects where the API key is placed in a request. This is an API integration requirement rather than a generic platform-level security control."
+      "security_impact": true,
+      "rationale": "Controls where the API key is transmitted in the HTTP request. Query-string placement can expose credentials through URLs, logs, browser history, and referrer data, while header placement avoids placing the key in the URL. A generic policy can forbid QUERY_STRING and require HEADER."
     },
     "tool.open_api_spec.authentication.api_key_config.secret_version_for_api_key": {
       "description": "Optional. The name of the SecretManager secret version resource storing the API key.\nIf this field is set, the apiKey field will be ignored.\nFormat: projects/{project}/secrets/{secret}/versions/{version}",
@@ -189,29 +189,29 @@
       "description": "OAuth grant types.\nSee [OauthGrantType](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.tools#oauthgranttype) for valid values",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the OAuth grant flow required by the external provider. It is an authentication architecture choice whose appropriate value depends on the integration rather than a generic platform security policy."
+      "security_impact": true,
+      "rationale": "The OAuth grant type enum includes OAUTH_GRANT_TYPE_UNSPECIFIED in addition to explicit grant types. A generic policy can forbid the unspecified sentinel and require an explicit supported grant type."
     },
     "tool.open_api_spec.authentication.oauth_config.scopes": {
       "description": "Optional. The OAuth scopes to grant.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Controls the permissions requested from the OAuth provider. Restricting scopes to an approved least-privilege set can reduce unnecessary access granted to the tool."
+      "security_impact": false,
+      "rationale": "OAuth scopes are defined by the external API being integrated, so an appropriate least-privilege scope set depends on that provider and workload. A generic platform policy cannot safely define a universal allowed or forbidden scope list."
     },
     "tool.open_api_spec.authentication.oauth_config.secret_version_for_client_secret": {
       "description": "Optional. The name of the SecretManager secret version resource storing the client secret.\nIf this field is set, the clientSecret field will be ignored.\nFormat: projects/{project}/secrets/{secret}/versions/{version}",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References a Secret Manager secret version containing the OAuth client secret. It identifies an external secret resource rather than storing or configuring the credential value directly."
+      "security_impact": true,
+      "rationale": "References a Secret Manager secret version used for the OAuth client secret. A generic policy can require an explicitly pinned numeric secret version and forbid floating aliases such as latest so deployments do not silently change when a new secret version is published."
     },
     "tool.open_api_spec.authentication.oauth_config.token_endpoint": {
       "description": "The token endpoint in the OAuth provider to exchange for an access token.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Specifies the OAuth provider endpoint used for token exchange. The correct endpoint is integration-specific and does not provide a suitable generic platform-level security policy target."
+      "security_impact": true,
+      "rationale": "Specifies the OAuth endpoint used to exchange credentials for an access token. A generic security policy can require an HTTPS endpoint and reject plaintext HTTP URLs without constraining the provider-specific hostname."
     },
     "tool.open_api_spec.authentication.service_agent_auth_config": {
       "type": "block",
@@ -251,8 +251,8 @@
       "description": "The allowed custom CA certificates (in DER format) for HTTPS verification. This overrides the default SSL trust store.\nIf this is empty or unspecified, Dialogflow will use Google's default trust store to verify certificates.\nN.B. Make sure the HTTPS server certificates are signed with \"subject alt name\".\nFor instance a certificate can be self-signed using the following command:\n'''\n  openssl x509 -req -days 200 -in example.com.csr \\\n    -signkey example.com.key \\\n    -out example.com.crt \\\n    -extfile <(printf \"\\nsubjectAltName='DNS:www.example.com'\")\n'''\nA base64-encoded string.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Configures a custom CA certificate used for HTTPS certificate verification and overrides the default SSL trust store. Incorrect trust configuration could allow connections to certificates trusted by an unintended CA, so the value is security-relevant."
+      "security_impact": false,
+      "rationale": "Contains team-specific custom CA certificate material and is already required when a ca_certs block is configured. A generic platform policy cannot meaningfully validate or approve arbitrary organisation-specific certificate content, so presence checking would duplicate schema validation rather than provide a generic security control."
     },
     "tool.open_api_spec.tls_config.ca_certs.display_name": {
       "description": "The name of the allowed custom CA certificates. This can be used to disambiguate the custom CA certificates.",
