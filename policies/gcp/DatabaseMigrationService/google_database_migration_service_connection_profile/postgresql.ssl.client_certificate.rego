@@ -8,10 +8,6 @@ resource_value_name := vars.variables.resource_value_name
 conditions := []
 
 invalid_client_certificate(value) if {
-    value == null
-}
-
-invalid_client_certificate(value) if {
     value == ""
 }
 
@@ -34,9 +30,9 @@ violating_resources contains resource.values[resource_value_name] if {
 }
 
 message := [
-    "Situation 1: PostgreSQL mutual TLS client certificates must be non-empty and PEM formatted.",
+    "Situation 1: PostgreSQL client certificates, when configured, must be non-empty and PEM formatted.",
     sprintf("Non-Compliant Resources: %s", [concat(", ", [name | name := violating_resources[_]])]),
-    "Potential Remedies: Configure ssl.client_certificate with a valid PEM certificate when using mutual TLS.",
+    "Potential Remedies: Omit client_certificate when mutual TLS is not used, or provide a valid PEM certificate.",
 ] if {
     count(violating_resources) > 0
 }
