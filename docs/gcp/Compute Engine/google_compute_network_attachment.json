@@ -62,8 +62,8 @@
       "description": "An array of URLs where each entry is the URL of a subnet provided by the service consumer to use for endpoints in the producers that connect to this network attachment.",
       "required": true,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This field names the subnets producer endpoints connect through, controlling which subnets can receive producer traffic. A real, API-accepted but security-relevant risk is referencing the auto-created \"default\" subnetwork: it is a genuine, valid subnet self-link, but is typically broader-access and shared across unrelated resources rather than purpose-built for this attachment. The policy forbids the literal subnetwork name \"default\" while leaving the project/region prefix unconstrained."
+      "security_impact": false,
+      "rationale": "This field is a list of subnet references. A platform policy cannot meaningfully constrain which subnets are named, or their properties, from this field alone \u2014 that exposure/reachability characteristic lives on the referenced google_compute_subnetwork resource itself, not on this field's value."
     }
   }
 }
