@@ -272,6 +272,15 @@ This is useful for detecting sensitive inline HTTP headers. Messages contain the
 matching key names, never the map values. The prohibited names are supplied by
 each policy, not hard-coded into the helper.
 
+Configuration must supply at least one non-empty string key name with no leading
+or trailing whitespace. A single string is accepted through the dispatcher's
+normal array conversion. Empty lists, missing/null values, non-string entries,
+and names such as `"authorization "` are configuration errors, not passing
+checks. The normal `get_multi_summary` entry point returns `POLICY ERROR:` and
+refuses the whole policy; the linter reports `invalid-map-key-blacklist` as an
+error. This is separate from `presence-only`: here `values` lists **key names**,
+not empty attribute values. Empty/null values in the resource map remain allowed.
+
 ```rego
 conditions := [[
     {

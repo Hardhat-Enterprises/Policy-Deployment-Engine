@@ -143,6 +143,19 @@ Good:
 A path that only passes *through* an index (e.g. `["rsa", 0, "key"]`) is fine — this rule only
 looks at the **last** segment.
 
+## invalid-map-key-blacklist
+
+For `map key blacklist`, `values` supplies key names, not the map's values. It
+must contain at least one non-empty string name with no leading or trailing
+whitespace. A single string is also accepted by the dispatcher. Empty lists,
+missing/null values, non-string entries and names such as `"authorization "`
+are **errors**, because they can silently prevent the intended check.
+
+Correct the configured names rather than relying on trimming. The normal runtime
+summary also returns `POLICY ERROR:` for this configuration and checks nothing.
+This is not a `presence-only` warning; empty/null values in the actual resource
+map are still allowed by the helper.
+
 ## presence-only
 
 `values` is only `null`/`""` under a `blacklist`/`whitelist` `policy_type`: the check tests

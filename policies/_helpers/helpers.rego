@@ -62,6 +62,15 @@ get_multi_summary(conditions, tf_variables) = summary if {
         "details": []
     }
 } else = summary if {
+    # Preflight before comprehensions can turn a broken map-key condition into
+    # an empty result. Other policy types retain their existing values semantics.
+    problems := map_key_blacklist_problems(conditions)
+    count(problems) > 0
+    summary := {
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Use at least one non-empty key name with no leading or trailing whitespace.", [concat("; ", sort(problems))])],
+        "details": []
+    }
+} else = summary if {
     # Count resources without storing them
     resource_count := count([r |
         r := input.planned_values.root_module.resources[_]
@@ -221,6 +230,27 @@ valid_policy_types := [
 #     entries and wrong for a real check that simply forgot the key).
 policy_type_problems(conditions) := problems if {
     problems := _unknown_type_problems(conditions) | _missing_type_problems(conditions)
+}
+
+# `values` names map keys, not empty attribute values. Preserve ensure_array's
+# support for a single string, but reject empty/invalid configurations.
+map_key_blacklist_problems(conditions) := problems if {
+    problems := {sprintf("invalid map key blacklist values on '%s'", [shared.format_attribute_path(object.get(entry, "attribute_path", []))]) |
+        some group in conditions
+        some entry in group
+        lower(object.get(entry, "policy_type", "")) == "map key blacklist"
+        values := shared.ensure_array(object.get(entry, "values", null))
+        not _valid_map_key_blacklist_values(values)
+    }
+}
+
+_valid_map_key_blacklist_values(values) if {
+    count(values) > 0
+    every name in values {
+        is_string(name)
+        name != ""
+        name == trim_space(name)
+    }
 }
 
 # Normalised the same way evaluate_conditions normalises it (lowercased), so
