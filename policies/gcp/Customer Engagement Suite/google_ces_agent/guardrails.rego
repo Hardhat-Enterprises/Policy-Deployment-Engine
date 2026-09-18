@@ -6,20 +6,20 @@ import data.terraform.gcp.security.customer_engagement_suite.google_ces_agent.va
 conditions := [
     [
         {
-           "situation_description": "Customer Engagement Suite agents must reference concrete guardrails, not wildcard patterns.",
+           "situation_description": "Customer Engagement Suite agents must reference guardrails using the approved platform resource path shape.",
 
 
             "remedies": [
-                "Remove the unapproved guardrail from the agent configuration."
+                "Reference a concrete guardrail resource name: projects/{project}/locations/{location}/apps/{app}/guardrails/{guardrail}."
             ]
         },
         {
-            "condition": "Guardrails must not use wildcard resource references.",
+            "condition": "Guardrails must match the platform resource path shape.",
             "attribute_path": ["guardrails"],
             "values": [
-                "unapproved-guardrail"
+                "projects/*/locations/*/apps/*/guardrails/*"
             ],
-            "policy_type": "element blacklist"
+            "policy_type": "element pattern whitelist"
         }
     ]
 ]
