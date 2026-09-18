@@ -90,8 +90,8 @@
       "description": "The serverCaMode for the TLS enabled Redis cluster.\nIf not provided, SERVER_CA_MODE_GOOGLE_MANAGED_PER_INSTANCE_CA will be used as default Possible values: [\"SERVER_CA_MODE_GOOGLE_MANAGED_PER_INSTANCE_CA\", \"SERVER_CA_MODE_GOOGLE_MANAGED_SHARED_CA\", \"SERVER_CA_MODE_CUSTOMER_MANAGED_CAS_CA\", \"SERVER_CA_MODE_UNSPECIFIED\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls selection of the server certificate authority mode. Because SERVER_CA_MODE_UNSPECIFIED is an accepted sentinel value, policy should forbid that sentinel and require an explicit supported CA mode to be selected, without dictating which explicit CA mode must be used."
+      "security_impact": false,
+      "rationale": "Controls the server CA mode used for TLS. Although the enum contains SERVER_CA_MODE_UNSPECIFIED, when the field is omitted the service defaults to SERVER_CA_MODE_GOOGLE_MANAGED_PER_INSTANCE_CA, a supported secure CA mode. Forbidding only the UNSPECIFIED literal therefore does not produce a material security change compared with leaving the field unset. Requiring a particular alternative CA mode would be an organisation-specific trust decision rather than a reusable platform control."
     },
     "server_ca_pool": {
       "description": "The resource name of the server CA pool for an instance with SERVER_CA_MODE_CUSTOMER_MANAGED_CAS_CA\nas the server_ca_mode.\nFormat: projects/{project}/locations/{region}/caPools/{caPoolId}",
@@ -152,8 +152,8 @@
       "description": "The role of the cluster in cross cluster replication. Supported values are:\n\n1. 'CLUSTER_ROLE_UNSPECIFIED': This is an independent cluster that has never participated in cross cluster replication. It allows both reads and writes.\n\n1. 'NONE': This is an independent cluster that previously participated in cross cluster replication(either as a 'PRIMARY' or 'SECONDARY' cluster). It allows both reads and writes.\n\n1. 'PRIMARY': This cluster serves as the replication source for secondary clusters that are replicating from it. Any data written to it is automatically replicated to its secondary clusters. It allows both reads and writes.\n\n1. 'SECONDARY': This cluster replicates data from the primary cluster. It allows only reads. Possible values: [\"CLUSTER_ROLE_UNSPECIFIED\", \"NONE\", \"PRIMARY\", \"SECONDARY\"]",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls the explicitly selected role of the cluster in cross-cluster replication. Because CLUSTER_ROLE_UNSPECIFIED is an accepted sentinel value, policy should forbid that sentinel and require an explicit role such as NONE, PRIMARY, or SECONDARY, without dictating which explicit role the application must use."
+      "security_impact": false,
+      "rationale": "Controls the cluster's role in cross-cluster replication. Although the enum contains CLUSTER_ROLE_UNSPECIFIED, the provider describes it as an independent cluster allowing both reads and writes, which is functionally the same access posture as NONE; the only difference is whether the cluster previously participated in replication. Therefore, forbidding the UNSPECIFIED sentinel would not materially change permissions, replication behaviour, or security posture, while requiring PRIMARY or SECONDARY would depend on application-specific replication design."
     },
     "cross_cluster_replication_config.primary_cluster": {
       "type": "block",
