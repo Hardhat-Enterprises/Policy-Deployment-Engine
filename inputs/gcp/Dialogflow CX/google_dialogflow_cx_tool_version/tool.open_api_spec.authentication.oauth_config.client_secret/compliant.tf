@@ -11,7 +11,6 @@ resource "google_dialogflow_cx_tool_version" "compliant_example_1" {
         oauth_config {
           oauth_grant_type                 = "CLIENT_CREDENTIAL"
           client_id                        = "example-client-id"
-          client_secret                    = ""
           secret_version_for_client_secret = "projects/test-project/secrets/example-client-secret/versions/1"
           token_endpoint                   = "https://example.com/oauth/token"
         }

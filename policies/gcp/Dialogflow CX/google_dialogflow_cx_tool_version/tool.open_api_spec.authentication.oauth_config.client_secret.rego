@@ -9,11 +9,11 @@ conditions := [[
     "remedies": ["Use secret_version_for_client_secret instead of setting client_secret directly."],
   },
   {
-    "condition": "client_secret must not contain a plaintext credential.",
-    "attribute_path": ["tool", 0, "open_api_spec", 0, "authentication", 0, "oauth_config", 0, "client_secret"],
-    "values": [""],
-    "policy_type": "whitelist",
-  },
+  "condition": "OAuth client secret must not be stored directly in Terraform configuration.",
+  "attribute_path": ["tool", 0, "open_api_spec", 0, "authentication", 0, "oauth_config", 0, "client_secret"],
+  "values": ["", null],
+  "policy_type": "whitelist",
+},
 ]]
 
 result := helpers.get_multi_summary(conditions, vars.variables)

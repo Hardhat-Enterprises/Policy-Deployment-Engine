@@ -9,11 +9,11 @@ conditions := [[
     "remedies": ["Use secret_version_for_api_key instead of setting api_key directly."],
   },
   {
-    "condition": "api_key must not contain a plaintext credential.",
-    "attribute_path": ["tool", 0, "open_api_spec", 0, "authentication", 0, "api_key_config", 0, "api_key"],
-    "values": [""],
-    "policy_type": "whitelist",
-  },
+  "condition": "API key must not be stored directly in Terraform configuration.",
+  "attribute_path": ["tool", 0, "open_api_spec", 0, "authentication", 0, "api_key_config", 0, "api_key"],
+  "values": ["", null],
+  "policy_type": "whitelist",
+},
 ]]
 
 result := helpers.get_multi_summary(conditions, vars.variables)

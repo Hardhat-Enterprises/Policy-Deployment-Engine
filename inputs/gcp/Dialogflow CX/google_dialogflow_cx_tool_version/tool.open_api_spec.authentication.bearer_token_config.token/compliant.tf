@@ -10,7 +10,7 @@ resource "google_dialogflow_cx_tool_version" "compliant_example_1" {
       authentication {
         bearer_token_config {
           secret_version_for_token = "projects/test-project/secrets/example-bearer-token/versions/1"
-          token                    = ""
+          
         }
       }
 

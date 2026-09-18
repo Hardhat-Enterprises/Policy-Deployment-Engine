@@ -12,7 +12,7 @@ resource "google_dialogflow_cx_tool_version" "compliant_example_1" {
           key_name                   = "X-Api-Key"
           request_location           = "HEADER"
           secret_version_for_api_key = "projects/test-project/secrets/example-api-key/versions/1"
-          api_key                    = ""
+          
         }
       }
 
