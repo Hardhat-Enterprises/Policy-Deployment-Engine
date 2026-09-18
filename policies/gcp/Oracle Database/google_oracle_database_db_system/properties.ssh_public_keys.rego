@@ -6,7 +6,7 @@ import data.terraform.gcp.security.oracle_database.google_oracle_database_db_sys
 conditions := [
     [
         {
-            "situation_description": "The Oracle Database DB System has at least one SSH public key configured for secure authentication.",
+            "situation_description": "The Oracle Database DB System must have at least one SSH public key configured for secure authentication.",
             "remedies": [
                 "Configure at least one valid SSH public key in ssh_public_keys."
             ]
@@ -14,7 +14,7 @@ conditions := [
         {
             "condition": "The SSH public keys list must not be empty.",
             "attribute_path": ["properties", 0, "ssh_public_keys"],
-            "values": [[]],
+            "values": [[], [null]],
             "policy_type": "blacklist"
         }
     ]
