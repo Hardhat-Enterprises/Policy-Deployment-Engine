@@ -13,17 +13,15 @@ violating_resources contains resource.values[resource_value_name] if {
 
     postgresql := resource.values.postgresql
     count(postgresql) > 0
-
     ssl := object.get(postgresql[0], "ssl", [{}])[0]
-    value := object.get(ssl, "ca_certificate", "")
-
-    not regex.match(`^-----BEGIN CERTIFICATE-----[\s\S]+-----END CERTIFICATE-----\s*$`, value)
+    ca_certificate := object.get(ssl, "ca_certificate", null)
+    ca_certificate == null
 }
 
 message := [
-    "Situation 1: PostgreSQL SSL CA certificates must be PEM formatted.",
+    "Situation 1: PostgreSQL SSL profiles must configure a CA certificate for server identity verification.",
     sprintf("Non-Compliant Resources: %s", [concat(", ", [name | name := violating_resources[_]])]),
-    "Potential Remedies: Provide a PEM certificate bounded by BEGIN CERTIFICATE and END CERTIFICATE.",
+    "Potential Remedies: Set ssl.ca_certificate to the approved CA certificate.",
 ] if {
     count(violating_resources) > 0
 }

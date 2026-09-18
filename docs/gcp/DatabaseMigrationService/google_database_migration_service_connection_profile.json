@@ -398,8 +398,8 @@
             "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
             "required": false,
             "type": "string",
-            "security_impact": false,
-            "rationale": "Provides client key material only when an SSL mode requiring mutual TLS is selected. Because ssl.type can validly use server-only TLS, this field cannot be required as an independent platform-level policy."
+            "security_impact": true,
+            "rationale": "Provides a MySQL client private key. Inline private keys can be exposed through Terraform source, plans, and state, so the policy rejects non-empty inline keys and directs profiles to server-only TLS or externally managed credentials."
         },
         "mysql.ssl.type": {
             "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",
@@ -468,8 +468,8 @@
             "description": "Input only. SSH password. Only one of 'password' and 'private_key' can be configured.",
             "required": false,
             "type": "string",
-            "security_impact": false,
-            "rationale": "Password is one of two mutually exclusive authentication options for forward SSH connectivity; a private key may be used instead. It cannot be enforced independently as a generic platform policy."
+            "security_impact": true,
+            "rationale": "Provides a static password for Oracle forward SSH connectivity. Inline passwords can be disclosed through Terraform source, plans, and state, so the policy rejects password-based forward SSH authentication and directs profiles to private connectivity."
         },
         "oracle.forward_ssh_connectivity.port": {
             "description": "Port for the SSH tunnel, default value is 22.",
@@ -482,8 +482,8 @@
             "description": "Input only. SSH private key. Only one of 'password' and 'private_key' can be configured.",
             "required": false,
             "type": "string",
-            "security_impact": false,
-            "rationale": "Private key is one of two mutually exclusive authentication options for forward SSH connectivity; a password may be used instead. It cannot be enforced independently as a generic platform policy."
+            "security_impact": true,
+            "rationale": "Provides a private key for Oracle forward SSH connectivity. Inline private keys can be disclosed through Terraform source, plans, and state, so the policy rejects this credential path and directs profiles to private connectivity."
         },
         "oracle.forward_ssh_connectivity.username": {
             "description": "Required. Username for the SSH tunnel.",
@@ -623,21 +623,21 @@
             "required": false,
             "type": "string",
             "security_impact": true,
-            "rationale": "Provides the CA certificate for PostgreSQL SSL verification. A generic policy can validate that the configured value uses PEM certificate delimiters."
+            "rationale": "Provides the CA certificate used to verify the PostgreSQL source server identity. Leaving it unset prevents certificate-authority verification, so the policy requires a non-empty CA certificate."
         },
         "postgresql.ssl.client_certificate": {
             "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
             "required": false,
             "type": "string",
             "security_impact": true,
-            "rationale": "Provides the PostgreSQL client certificate for mutual TLS authentication. A generic policy can validate that the configured value uses PEM certificate delimiters."
+            "rationale": "Provides the client certificate for PostgreSQL mutual TLS. The policy does not require mutual TLS for every profile; it requires a non-empty client certificate only when a client private key has been configured."
         },
         "postgresql.ssl.client_key": {
             "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
             "required": false,
             "type": "string",
             "security_impact": true,
-            "rationale": "Provides the private key paired with the PostgreSQL client certificate. A generic policy can validate that the configured value uses PEM private-key delimiters."
+            "rationale": "Provides the private key paired with a PostgreSQL client certificate for mutual TLS. The policy does not require mutual TLS for every profile; it requires a non-empty client key only when a client certificate has been configured."
         },
         "postgresql.ssl.type": {
             "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",

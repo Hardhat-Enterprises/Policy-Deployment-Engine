@@ -3,21 +3,29 @@ resource "google_database_migration_service_connection_profile" "compliant_examp
   display_name          = "dbms_mj_compliant"
   location              = "australia-southeast2"
   project               = "gcp-project-id"
+
   postgresql {
     host     = "host"
     port     = 5432
     username = "username"
     password = "password"
+
     private_connectivity {
       private_connection = "URI"
     }
 
     ssl {
-      client_key = <<-PEM
+      client_certificate = <<-PEM
+-----BEGIN CERTIFICATE-----
+dGVzdC1jbGllbnQtY2VydGlmaWNhdGU=
+-----END CERTIFICATE-----
+PEM
+      client_key         = <<-PEM
 -----BEGIN PRIVATE KEY-----
 dGVzdC1jbGllbnQtcHJpdmF0ZS1rZXk=
 -----END PRIVATE KEY-----
 PEM
+
     }
   }
 }

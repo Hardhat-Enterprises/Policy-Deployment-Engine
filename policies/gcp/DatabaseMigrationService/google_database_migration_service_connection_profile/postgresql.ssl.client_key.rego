@@ -13,17 +13,17 @@ violating_resources contains resource.values[resource_value_name] if {
 
     postgresql := resource.values.postgresql
     count(postgresql) > 0
-
     ssl := object.get(postgresql[0], "ssl", [{}])[0]
-    value := object.get(ssl, "client_key", "")
-
-    not regex.match(`^-----BEGIN (RSA |EC )?PRIVATE KEY-----[\s\S]+-----END (RSA |EC )?PRIVATE KEY-----\s*$`, value)
+    client_certificate := object.get(ssl, "client_certificate", null)
+    client_key := object.get(ssl, "client_key", null)
+    client_certificate != null
+    client_key == null
 }
 
 message := [
-    "Situation 1: PostgreSQL SSL client keys must be PEM formatted.",
+    "Situation 1: PostgreSQL mutual TLS requires a client key when a client certificate is configured.",
     sprintf("Non-Compliant Resources: %s", [concat(", ", [name | name := violating_resources[_]])]),
-    "Potential Remedies: Provide a PEM private key bounded by matching BEGIN and END PRIVATE KEY markers.",
+    "Potential Remedies: Set ssl.client_key whenever ssl.client_certificate is configured.",
 ] if {
     count(violating_resources) > 0
 }

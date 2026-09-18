@@ -3,17 +3,24 @@ resource "google_database_migration_service_connection_profile" "non_compliant_e
   display_name          = "dbms_mj_compliant"
   location              = "australia-southeast2"
   project               = "gcp-project-id"
+
   postgresql {
     host     = "host"
     port     = 5432
     username = "username"
     password = "password"
+
     private_connectivity {
       private_connection = "URI"
     }
 
     ssl {
-      client_key = "not-a-pem-private-key"
+      client_certificate = <<-PEM
+-----BEGIN CERTIFICATE-----
+dGVzdC1jbGllbnQtY2VydGlmaWNhdGU=
+-----END CERTIFICATE-----
+PEM
+
     }
   }
 }

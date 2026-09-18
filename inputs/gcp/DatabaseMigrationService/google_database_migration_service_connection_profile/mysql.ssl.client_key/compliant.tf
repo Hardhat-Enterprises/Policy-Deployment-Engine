@@ -4,23 +4,12 @@ resource "google_database_migration_service_connection_profile" "compliant_examp
   location              = "australia-southeast2"
   project               = "gcp-project-id"
 
-  postgresql {
+  mysql {
     host     = "host"
-    port     = 5432
+    port     = 3306
     username = "username"
     password = "password"
 
-    private_connectivity {
-      private_connection = "URI"
-    }
-
-    ssl {
-      ca_certificate = <<-PEM
------BEGIN CERTIFICATE-----
-dGVzdC1jYS1jZXJ0aWZpY2F0ZQ==
------END CERTIFICATE-----
-PEM
-
-    }
+    ssl {}
   }
 }

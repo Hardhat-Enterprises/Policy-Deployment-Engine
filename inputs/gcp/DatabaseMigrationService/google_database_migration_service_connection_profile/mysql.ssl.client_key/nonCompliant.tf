@@ -4,18 +4,14 @@ resource "google_database_migration_service_connection_profile" "non_compliant_e
   location              = "australia-southeast2"
   project               = "gcp-project-id"
 
-  postgresql {
+  mysql {
     host     = "host"
-    port     = 5432
+    port     = 3306
     username = "username"
     password = "password"
 
-    private_connectivity {
-      private_connection = "URI"
-    }
-
     ssl {
-
+      client_key = "inline-client-private-key"
     }
   }
 }
