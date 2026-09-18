@@ -10,10 +10,7 @@ resource "google_clouddeploy_delivery_pipeline" "compliant_example_1" {
           postdeploy {
             tasks {
               container {
-                image = "us-docker.pkg.dev/my-project/my-repo/my-image:latest"
-                env = {
-                  "ENV_NAME" = "production"
-                }
+                image = "us-docker.pkg.dev/my-project/my-repo/my-image:v1.2.3"
               }
             }
           }

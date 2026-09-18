@@ -1,3 +1,4 @@
+# Rationale reframed to explicitly name the plaintext-secret-holder risk, per reviewer feedback.
 package terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline.serial_pipeline_stages_strategy_canary_canary_deployment_verify_config_tasks_container_env
 
 import data.terraform.helpers

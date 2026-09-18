@@ -189,8 +189,8 @@
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Requires container.env to be explicitly configured rather than left empty or absent, ensuring the container's runtime configuration is deliberately specified rather than silently falling back to undocumented image defaults, which could introduce untracked configuration drift between environments."
+      "security_impact": false,
+      "rationale": "This env field is a flat map(string) with no value_source/Secret Manager escape valve like some other GCP env-var schemas offer. It falls under the \"maps whose keys teams invent\" category: keys and values are entirely team-defined, so a generic platform policy cannot name or scan what to check, and blocking the whole map would also block legitimate, non-secret configuration."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.analysis.custom_checks.task.container.image": {
       "description": "Required. Image is the container image to use.",
@@ -288,7 +288,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": true,
-      "rationale": "Requires container.env to be explicitly configured rather than left empty or absent, ensuring the container's runtime configuration is deliberately specified rather than silently falling back to undocumented image defaults, which could introduce untracked configuration drift between environments."
+      "rationale": "Environment variables set here are held in plaintext (in state and logs), making this field a plaintext-secret holder. This schema has no value_source/Secret Manager reference alternative, so the policy requires the field to be explicitly non-empty rather than silently absent \u2014 this is a distinct, narrower control (presence-based, not content-based) than a full ban on secret-like values."
     },
     "serial_pipeline.stages.strategy.canary.canary_deployment.verify_config.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
@@ -394,8 +394,8 @@
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Requires container.env to be explicitly configured rather than left empty or absent, ensuring the container's runtime configuration is deliberately specified rather than silently falling back to undocumented image defaults, which could introduce untracked configuration drift between environments."
+      "security_impact": false,
+      "rationale": "This env field is a flat map(string) with no value_source/Secret Manager escape valve like some other GCP env-var schemas offer. It falls under the \"maps whose keys teams invent\" category: keys and values are entirely team-defined, so a generic platform policy cannot name or scan what to check, and blocking the whole map would also block legitimate, non-secret configuration."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.analysis.custom_checks.task.container.image": {
       "description": "Required. Image is the container image to use.",
@@ -492,8 +492,8 @@
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Requires container.env to be explicitly configured rather than left empty or absent, ensuring the container's runtime configuration is deliberately specified rather than silently falling back to undocumented image defaults, which could introduce untracked configuration drift between environments."
+      "security_impact": false,
+      "rationale": "This env field is a flat map(string) with no value_source/Secret Manager escape valve like some other GCP env-var schemas offer. It falls under the \"maps whose keys teams invent\" category: keys and values are entirely team-defined, so a generic platform policy cannot name or scan what to check, and blocking the whole map would also block legitimate, non-secret configuration."
     },
     "serial_pipeline.stages.strategy.canary.custom_canary_deployment.phase_configs.verify_config.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
@@ -716,7 +716,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": true,
-      "rationale": "Requires container.env to be explicitly configured rather than left empty or absent, ensuring the container's runtime configuration is deliberately specified rather than silently falling back to undocumented image defaults, which could introduce untracked configuration drift between environments."
+      "rationale": "Environment variables set here are held in plaintext (in state and logs), making this field a plaintext-secret holder. This schema has no value_source/Secret Manager reference alternative, so the policy requires the field to be explicitly non-empty rather than silently absent \u2014 this is a distinct, narrower control (presence-based, not content-based) than a full ban on secret-like values."
     },
     "serial_pipeline.stages.strategy.standard.analysis.custom_checks.task.container.image": {
       "description": "Required. Image is the container image to use.",
@@ -797,7 +797,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": true,
-      "rationale": "Requires container.env to be explicitly configured rather than left empty or absent, ensuring the container's runtime configuration is deliberately specified rather than silently falling back to undocumented image defaults, which could introduce untracked configuration drift between environments."
+      "rationale": "Environment variables set here are held in plaintext (in state and logs). Since content cannot be generically distinguished as safe or secret-bearing, and this schema has no value_source/Secret Manager reference alternative, the policy requires env to remain empty or absent entirely, treating any populated value as an unverifiable disclosure risk."
     },
     "serial_pipeline.stages.strategy.standard.postdeploy.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
@@ -846,8 +846,8 @@
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Requires container.env to be explicitly configured rather than left empty or absent, ensuring the container's runtime configuration is deliberately specified rather than silently falling back to undocumented image defaults, which could introduce untracked configuration drift between environments."
+      "security_impact": false,
+      "rationale": "This env field is a flat map(string) with no value_source/Secret Manager escape valve like some other GCP env-var schemas offer. It falls under the \"maps whose keys teams invent\" category: keys and values are entirely team-defined, so a generic platform policy cannot name or scan what to check, and blocking the whole map would also block legitimate, non-secret configuration."
     },
     "serial_pipeline.stages.strategy.standard.predeploy.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
@@ -889,8 +889,8 @@
       "description": "Optional. Environment variables that are set in the container.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Requires container.env to be explicitly configured rather than left empty or absent, ensuring the container's runtime configuration is deliberately specified rather than silently falling back to undocumented image defaults, which could introduce untracked configuration drift between environments."
+      "security_impact": false,
+      "rationale": "This env field is a flat map(string) with no value_source/Secret Manager escape valve like some other GCP env-var schemas offer. It falls under the \"maps whose keys teams invent\" category: keys and values are entirely team-defined, so a generic platform policy cannot name or scan what to check, and blocking the whole map would also block legitimate, non-secret configuration."
     },
     "serial_pipeline.stages.strategy.standard.verify_config.tasks.container.image": {
       "description": "Required. Image is the container image to use.",
