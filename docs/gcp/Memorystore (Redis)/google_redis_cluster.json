@@ -91,7 +91,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the server certificate authority mode used for TLS. If server_ca_mode is omitted, the service safely defaults to SERVER_CA_MODE_GOOGLE_MANAGED_PER_INSTANCE_CA. Policy should therefore allow omission and all explicit supported CA modes, while forbidding only the literal SERVER_CA_MODE_UNSPECIFIED sentinel."
+      "rationale": "Controls which certificate authority hierarchy issues server certificates for TLS. Requiring SERVER_CA_MODE_CUSTOMER_MANAGED_CAS_CA places certificate issuance under an organisation-controlled CA pool, providing greater control over the trust hierarchy and supporting compliance requirements. The policy constrains only the CA mode and does not pin a team-specific CA pool."
     },
     "server_ca_pool": {
       "description": "The resource name of the server CA pool for an instance with SERVER_CA_MODE_CUSTOMER_MANAGED_CAS_CA\nas the server_ca_mode.\nFormat: projects/{project}/locations/{region}/caPools/{caPoolId}",
@@ -153,7 +153,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the explicitly selected role of the cluster in cross-cluster replication. Because CLUSTER_ROLE_UNSPECIFIED is an accepted sentinel value, policy should forbid the unspecified state and require an explicit role such as NONE, PRIMARY, or SECONDARY, without dictating which explicit role the application must use."
+      "rationale": "Controls whether a cluster participates in cross-cluster replication as a read/write primary or a read-only secondary. For clusters configured with a primary_cluster source, policy should require cluster_role to be SECONDARY so the replica remains read-only. This enforces a real read/write security boundary rather than merely distinguishing CLUSTER_ROLE_UNSPECIFIED from NONE."
     },
     "cross_cluster_replication_config.primary_cluster": {
       "type": "block",

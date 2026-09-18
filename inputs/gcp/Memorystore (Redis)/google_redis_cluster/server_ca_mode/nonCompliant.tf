@@ -8,5 +8,5 @@ resource "google_redis_cluster" "non_compliant_example_1" {
   }
 
   transit_encryption_mode = "TRANSIT_ENCRYPTION_MODE_SERVER_AUTHENTICATION"
-  server_ca_mode = "SERVER_CA_MODE_UNSPECIFIED"
+  server_ca_mode = "SERVER_CA_MODE_GOOGLE_MANAGED_PER_INSTANCE_CA"
 }

@@ -8,6 +8,10 @@ resource "google_redis_cluster" "compliant_example_1" {
   }
 
   cross_cluster_replication_config {
-    cluster_role = "NONE"
+    cluster_role = "SECONDARY"
+
+    primary_cluster {
+      cluster = "projects/pde-project-vindya/locations/australia-southeast1/clusters/primary-cluster"
+    }
   }
 }
