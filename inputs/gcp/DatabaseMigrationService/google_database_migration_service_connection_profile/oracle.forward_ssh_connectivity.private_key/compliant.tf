@@ -11,8 +11,11 @@ resource "google_database_migration_service_connection_profile" "compliant_examp
     password         = "database-password"
     database_service = "dbprovider"
 
-    private_connectivity {
-      private_connection = "URI"
+    forward_ssh_connectivity {
+      hostname = "hostname"
+      username = "ssh-user"
+      port     = "22"
+      password = "password-for-fixture"
     }
   }
 }

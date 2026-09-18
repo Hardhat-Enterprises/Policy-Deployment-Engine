@@ -14,7 +14,8 @@ violating_resources contains resource.values[resource_value_name] if {
     oracle := resource.values.oracle
     count(oracle) > 0
     ssh := object.get(oracle[0], "forward_ssh_connectivity", [{}])[0]
-    password := object.get(ssh, "password", "")
+    password := object.get(ssh, "password", null)
+    password != null
     password != ""
 }
 

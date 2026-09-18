@@ -210,7 +210,7 @@
             "required": false,
             "type": "map(string)",
             "security_impact": true,
-            "rationale": "Controls the Cloud SQL cloudsql_iam_authentication database flag. Disabling this flag prevents IAM database authentication and weakens the approved authentication configuration."
+            "rationale": "Controls the Cloud SQL cloudsql_iam_authentication database flag. Enabling this flag permits IAM database authentication, reducing reliance on static database passwords, so the policy requires cloudsql_iam_authentication to be set to on."
         },
         "cloudsql.settings.database_version": {
             "description": "The database engine type and version.\nCurrently supported values located at https://cloud.google.com/database-migration/docs/reference/rest/v1/projects.locations.connectionProfiles#sqldatabaseversion",
@@ -629,8 +629,8 @@
             "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
             "required": false,
             "type": "string",
-            "security_impact": true,
-            "rationale": "Provides a PostgreSQL client certificate for mutual TLS. Embedding client authentication artifacts directly in Terraform source, plans, or state weakens their delivery and rotation controls. The policy rejects inline certificate values and requires out-of-band credential handling when mutual TLS is used."
+            "security_impact": false,
+            "rationale": "Provides the public X.509 client certificate used for PostgreSQL mutual TLS. A certificate is the public half of the authentication pair, so disclosure does not permit impersonation; the security-sensitive client_key is assessed separately. This field has no standalone platform-level security policy."
         },
         "postgresql.ssl.client_key": {
             "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",

@@ -7,6 +7,14 @@ resource_value_name := vars.variables.resource_value_name
 
 conditions := []
 
+empty(value) if {
+    value == null
+}
+
+empty(value) if {
+    value == ""
+}
+
 violating_resources contains resource.values[resource_value_name] if {
     resource := input.planned_values.root_module.resources[_]
     resource.type == resource_type
@@ -15,7 +23,7 @@ violating_resources contains resource.values[resource_value_name] if {
     count(postgresql) > 0
     ssl := object.get(postgresql[0], "ssl", [{}])[0]
     ca_certificate := object.get(ssl, "ca_certificate", null)
-    ca_certificate == null
+    empty(ca_certificate)
 }
 
 message := [
