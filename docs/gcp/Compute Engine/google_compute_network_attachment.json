@@ -34,8 +34,8 @@
       "description": "Projects that are allowed to connect to this network attachment. The project can be specified using its id or number.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "This list is the exposure control for which consumer projects may attach to this network attachment. A wildcard-like entry (e.g. \"*\") would function analogously to a public or wildcard IAM principal, exposing the attachment to any consumer project rather than an explicit, curated set. The policy forbids a literal wildcard entry, without pinning any specific real project ID."
+      "security_impact": false,
+      "rationale": "This field is an explicit list of consumer project IDs or numbers. Per GCP documentation there is no wildcard, public-equivalent token, or other structural pattern recognized by this field \u2014 it is only ever a literal list of real project identifiers. A platform policy cannot meaningfully constrain which projects are named, or their properties, from this field's content alone; that is a curation decision belonging to the team managing the attachment, parallel to how subnetworks is treated on this same resource."
     },
     "producer_reject_lists": {
       "description": "Projects that are not allowed to connect to this network attachment. The project can be specified using its id or number.",
