@@ -90,8 +90,8 @@
       "description": "The serverCaMode for the TLS enabled Redis cluster.\nIf not provided, SERVER_CA_MODE_GOOGLE_MANAGED_PER_INSTANCE_CA will be used as default Possible values: [\"SERVER_CA_MODE_GOOGLE_MANAGED_PER_INSTANCE_CA\", \"SERVER_CA_MODE_GOOGLE_MANAGED_SHARED_CA\", \"SERVER_CA_MODE_CUSTOMER_MANAGED_CAS_CA\", \"SERVER_CA_MODE_UNSPECIFIED\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls the server CA mode used for TLS, but when the field is omitted the service already defaults to SERVER_CA_MODE_GOOGLE_MANAGED_PER_INSTANCE_CA. Forbidding only the UNSPECIFIED sentinel therefore does not produce a meaningful security improvement, while requiring a particular stronger CA mode would be an organisation-specific trust decision."
+      "security_impact": true,
+      "rationale": "Controls selection of the server certificate authority mode. Because SERVER_CA_MODE_UNSPECIFIED is an accepted sentinel value, policy should forbid that sentinel and require an explicit supported CA mode to be selected, without dictating which explicit CA mode must be used."
     },
     "server_ca_pool": {
       "description": "The resource name of the server CA pool for an instance with SERVER_CA_MODE_CUSTOMER_MANAGED_CAS_CA\nas the server_ca_mode.\nFormat: projects/{project}/locations/{region}/caPools/{caPoolId}",
@@ -152,8 +152,8 @@
       "description": "The role of the cluster in cross cluster replication. Supported values are:\n\n1. 'CLUSTER_ROLE_UNSPECIFIED': This is an independent cluster that has never participated in cross cluster replication. It allows both reads and writes.\n\n1. 'NONE': This is an independent cluster that previously participated in cross cluster replication(either as a 'PRIMARY' or 'SECONDARY' cluster). It allows both reads and writes.\n\n1. 'PRIMARY': This cluster serves as the replication source for secondary clusters that are replicating from it. Any data written to it is automatically replicated to its secondary clusters. It allows both reads and writes.\n\n1. 'SECONDARY': This cluster replicates data from the primary cluster. It allows only reads. Possible values: [\"CLUSTER_ROLE_UNSPECIFIED\", \"NONE\", \"PRIMARY\", \"SECONDARY\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls the operational replication role of the cluster. CLUSTER_ROLE_UNSPECIFIED and NONE both represent independent read/write clusters, so forbidding the unspecified sentinel alone does not produce a meaningful security change. Enforcing PRIMARY or SECONDARY would depend on application-specific replication design, so this is not a reusable platform security control."
+      "security_impact": true,
+      "rationale": "Controls the explicitly selected role of the cluster in cross-cluster replication. Because CLUSTER_ROLE_UNSPECIFIED is an accepted sentinel value, policy should forbid that sentinel and require an explicit role such as NONE, PRIMARY, or SECONDARY, without dictating which explicit role the application must use."
     },
     "cross_cluster_replication_config.primary_cluster": {
       "type": "block",
@@ -205,8 +205,8 @@
       "description": "Required. The day of week that maintenance updates occur.\n\n- DAY_OF_WEEK_UNSPECIFIED: The day of the week is unspecified.\n- MONDAY: Monday\n- TUESDAY: Tuesday\n- WEDNESDAY: Wednesday\n- THURSDAY: Thursday\n- FRIDAY: Friday\n- SATURDAY: Saturday\n- SUNDAY: Sunday Possible values: [\"DAY_OF_WEEK_UNSPECIFIED\", \"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"SUNDAY\"]",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls the day on which scheduled maintenance occurs. Selecting a particular day, or leaving the day unspecified, is an operational scheduling decision and does not directly change access control, encryption, data exposure, or another reusable security control."
+      "security_impact": true,
+      "rationale": "Controls the explicitly selected day for the weekly maintenance window. Because DAY_OF_WEEK_UNSPECIFIED is an accepted sentinel value, policy should forbid that sentinel and require an explicit day to be selected, without mandating a particular day of the week."
     },
     "maintenance_policy.weekly_maintenance_window.start_time": {
       "type": "block",
