@@ -102,7 +102,7 @@ The engine dispatches on `policy_type`, and it knows **exactly seven** values:
 | `pattern blacklist` | A wildcard-extracted part of the value must not be one of these |
 | `pattern whitelist` | A wildcard-extracted part of the value must be one of these |
 | `element blacklist` | No element of an array may **contain** one of these substrings |
-| `element pattern whitelist` | Every element of an array must match a wildcard shape |
+| `element pattern whitelist` | Every element of an array must match one of the wildcard shapes |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
@@ -301,10 +301,13 @@ Blocks **array** attributes whose elements contain any blacklisted **substring**
 
 ### Element Pattern Whitelist
 
-Allows only **array** attributes whose **every** element matches a required wildcard
-shape. `values` is a single pattern string; each `*` matches one path segment (one or
-more non-`/` characters), so a `*` never spans a separator. This is the positive
-(allowlist) counterpart to `element blacklist` for lists of resource paths.
+Allows only **array** attributes whose **every** element matches one of the required
+wildcard shapes. `values` is a list of shape strings; an element passes if it matches
+any one of them. Each `*` matches one path segment (one or more non-`/` characters), so
+a `*` never spans a separator. A string attribute is checked as a one-item list. An
+empty `values` list matches nothing, so it flags every element (a loud failure). This
+is the positive (allowlist) counterpart to `element blacklist` for lists of resource
+paths.
 ```rego
     [
       {
