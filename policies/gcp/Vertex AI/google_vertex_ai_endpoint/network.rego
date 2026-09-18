@@ -6,26 +6,26 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.vars
 conditions := [
     [
         {
-            "situation_description": "Ensure Vertex AI Endpoint network is not empty or set to default.",
-            "remedies": ["Set the `network` attribute to a custom VPC."]
+            "situation_description": "Ensure Vertex AI Endpoint uses a valid VPC network resource path. Note: Private Service Connect (PSC) is explicitly disallowed by this policy to enforce strict VPC peering.",
+            "remedies": ["Set the `network` attribute to a valid VPC path matching projects/*/global/networks/*."]
         },
         {
-            "condition": "network is empty, default, or invalid literal",
+            "condition": "network does not match valid VPC pattern",
             "attribute_path": ["network"],
-            "values": ["", "default", "not-a-real-network"],
-            "policy_type": "blacklist"
+            "values": ["^projects/[^/]+/global/networks/[^/]+$"],
+            "policy_type": "pattern whitelist"
         }
     ],
     [
         {
-            "situation_description": "Ensure Vertex AI Endpoint uses a valid VPC network resource path.",
-            "remedies": ["Set `network` to match projects/*/global/networks/*."]
+            "situation_description": "Ensure Vertex AI Endpoint network is not empty, default, or a placeholder literal.",
+            "remedies": ["Provide a real VPC network path."]
         },
         {
-            "condition": "network does not match VPC pattern",
+            "condition": "network is an invalid literal",
             "attribute_path": ["network"],
-            "values": ["^projects/[^/]+/global/networks/[^/]+$"],
-            "policy_type": "pattern whitelist"
+            "values": ["", "default", "not-a-real-network"],
+            "policy_type": "blacklist"
         }
     ]
 ]
