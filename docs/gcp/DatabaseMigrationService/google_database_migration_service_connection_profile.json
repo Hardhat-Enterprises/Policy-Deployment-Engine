@@ -483,7 +483,7 @@
             "required": false,
             "type": "string",
             "security_impact": true,
-            "rationale": "Provides a private key for Oracle forward SSH connectivity. Inline private keys can be disclosed through Terraform source, plans, and state, so the policy rejects this credential path and directs profiles to private connectivity."
+            "rationale": "Provides an SSH private key for forward SSH connectivity. Key-based SSH is an acceptable authentication method, but literal key material embedded in Terraform source, plans, or state can be exposed. The policy rejects inline private-key values and requires out-of-band credential handling."
         },
         "oracle.forward_ssh_connectivity.username": {
             "description": "Required. Username for the SSH tunnel.",
@@ -630,14 +630,14 @@
             "required": false,
             "type": "string",
             "security_impact": true,
-            "rationale": "Provides the client certificate for PostgreSQL mutual TLS. The policy does not require mutual TLS for every profile; it requires a non-empty client certificate only when a client private key has been configured."
+            "rationale": "Provides a PostgreSQL client certificate for mutual TLS. Embedding client authentication artifacts directly in Terraform source, plans, or state weakens their delivery and rotation controls. The policy rejects inline certificate values and requires out-of-band credential handling when mutual TLS is used."
         },
         "postgresql.ssl.client_key": {
             "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
             "required": false,
             "type": "string",
             "security_impact": true,
-            "rationale": "Provides the private key paired with a PostgreSQL client certificate for mutual TLS. The policy does not require mutual TLS for every profile; it requires a non-empty client key only when a client certificate has been configured."
+            "rationale": "Provides the PostgreSQL client private key for mutual TLS. Literal private-key material embedded in Terraform source, plans, or state can be exposed. The policy rejects inline client-key values and requires out-of-band credential handling."
         },
         "postgresql.ssl.type": {
             "description": "The current connection profile state. Possible values: [\"SERVER_ONLY\", \"SERVER_CLIENT\", \"REQUIRED\", \"NONE\"]",

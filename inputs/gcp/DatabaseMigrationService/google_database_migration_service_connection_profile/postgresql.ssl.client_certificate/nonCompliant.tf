@@ -15,12 +15,11 @@ resource "google_database_migration_service_connection_profile" "non_compliant_e
     }
 
     ssl {
-      client_key = <<-PEM
------BEGIN PRIVATE KEY-----
-dGVzdC1jbGllbnQtcHJpdmF0ZS1rZXk=
------END PRIVATE KEY-----
+      client_certificate = <<-PEM
+-----BEGIN CERTIFICATE-----
+dGVzdC1jbGllbnQtY2VydGlmaWNhdGU=
+-----END CERTIFICATE-----
 PEM
-
     }
   }
 }

@@ -14,16 +14,14 @@ violating_resources contains resource.values[resource_value_name] if {
     postgresql := resource.values.postgresql
     count(postgresql) > 0
     ssl := object.get(postgresql[0], "ssl", [{}])[0]
-    client_certificate := object.get(ssl, "client_certificate", null)
     client_key := object.get(ssl, "client_key", null)
-    client_certificate != null
-    client_key == null
+    client_key != null
 }
 
 message := [
-    "Situation 1: PostgreSQL mutual TLS requires a client key when a client certificate is configured.",
+    "Situation 1: PostgreSQL client private keys must not be embedded in Terraform configuration.",
     sprintf("Non-Compliant Resources: %s", [concat(", ", [name | name := violating_resources[_]])]),
-    "Potential Remedies: Set ssl.client_key whenever ssl.client_certificate is configured.",
+    "Potential Remedies: Supply client private keys through an approved out-of-band credential-management process.",
 ] if {
     count(violating_resources) > 0
 }

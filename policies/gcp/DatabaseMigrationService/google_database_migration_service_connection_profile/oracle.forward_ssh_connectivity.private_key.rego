@@ -19,9 +19,9 @@ violating_resources contains resource.values[resource_value_name] if {
 }
 
 message := [
-    "Situation 1: Oracle forward SSH connectivity must not embed a private key in Terraform configuration.",
+    "Situation 1: Oracle forward SSH private keys must not be embedded in Terraform configuration.",
     sprintf("Non-Compliant Resources: %s", [concat(", ", [name | name := violating_resources[_]])]),
-    "Potential Remedies: Use private connectivity instead of an inline forward SSH private key.",
+    "Potential Remedies: Keep key-based SSH authentication out-of-band; do not embed its private key in Terraform configuration.",
 ] if {
     count(violating_resources) > 0
 }

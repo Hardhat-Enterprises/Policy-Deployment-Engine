@@ -14,18 +14,6 @@ resource "google_database_migration_service_connection_profile" "compliant_examp
       private_connection = "URI"
     }
 
-    ssl {
-      client_certificate = <<-PEM
------BEGIN CERTIFICATE-----
-dGVzdC1jbGllbnQtY2VydGlmaWNhdGU=
------END CERTIFICATE-----
-PEM
-      client_key         = <<-PEM
------BEGIN PRIVATE KEY-----
-dGVzdC1jbGllbnQtcHJpdmF0ZS1rZXk=
------END PRIVATE KEY-----
-PEM
-
-    }
+    ssl {}
   }
 }
