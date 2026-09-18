@@ -24,7 +24,7 @@ conditions := [
         {
             "condition": "network does not match VPC pattern",
             "attribute_path": ["network"],
-            "values": ["projects/.*/global/networks/.*"],
+            "values": ["^projects/[^/]+/global/networks/[^/]+$"],
             "policy_type": "pattern whitelist"
         }
     ]

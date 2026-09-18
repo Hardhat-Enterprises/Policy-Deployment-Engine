@@ -24,7 +24,7 @@ conditions := [
         {
             "condition": "kms_key_name format is invalid",
             "attribute_path": ["encryption_spec", 0, "kms_key_name"],
-            "values": ["projects/.*/locations/.*/keyRings/.*/cryptoKeys/.*"],
+            "values": ["^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+$"],
             "policy_type": "pattern whitelist"
         }
     ]
