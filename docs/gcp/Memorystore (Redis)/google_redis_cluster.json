@@ -28,7 +28,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Specifies the KMS key used to encrypt cluster data at rest. Restricting this to approved encryption keys supports organisational key-management and data-protection requirements."
+      "rationale": "Controls whether a customer-managed encryption key is configured for cluster data at rest. Leaving kms_key unset falls back to Google-managed encryption, so policy should require a non-empty valid customer-managed key path without pinning the cluster to any specific team-owned key."
     },
     "labels": {
       "description": "Resource labels to represent user provided metadata.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
@@ -91,14 +91,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the certificate authority model used to authenticate a TLS-enabled Redis server and therefore directly affects the trust model for encrypted client connections."
+      "rationale": "Controls which server certificate authority mode is explicitly selected for TLS. Policy should forbid SERVER_CA_MODE_UNSPECIFIED and require one of the explicit supported CA modes."
     },
     "server_ca_pool": {
       "description": "The resource name of the server CA pool for an instance with SERVER_CA_MODE_CUSTOMER_MANAGED_CAS_CA\nas the server_ca_mode.\nFormat: projects/{project}/locations/{region}/caPools/{caPoolId}",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the certificate authority pool used with customer-managed server certificates. Restricting this to approved CA pools supports trusted server authentication."
+      "security_impact": false,
+      "rationale": "Identifies the team-owned CA pool used when customer-managed CAs are selected. The security decision of whether customer-managed CAs are used is controlled by server_ca_mode, while constraining this reference would require hardcoding project- or team-specific CA pool identities."
     },
     "shard_count": {
       "description": "Required. Number of shards for the Redis cluster.",
@@ -123,8 +123,8 @@
       "description": "How long to keep automated backups before the backups are deleted.\nThe value should be between 1 day and 365 days. If not specified, the default value is 35 days.\nA duration in seconds with up to nine fractional digits, ending with 's'. Example: \"3.5s\".",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls how long automated backups are retained. Maintaining an appropriate retention period supports recovery from destructive incidents and data loss."
+      "security_impact": false,
+      "rationale": "Controls how long automated backups are retained. Retention length is a team data-management and recovery-policy choice rather than a reusable platform security control, unlike deletion-protection settings that directly block destructive operations."
     },
     "automated_backup_config.fixed_frequency_schedule": {
       "type": "block",
@@ -152,8 +152,8 @@
       "description": "The role of the cluster in cross cluster replication. Supported values are:\n\n1. 'CLUSTER_ROLE_UNSPECIFIED': This is an independent cluster that has never participated in cross cluster replication. It allows both reads and writes.\n\n1. 'NONE': This is an independent cluster that previously participated in cross cluster replication(either as a 'PRIMARY' or 'SECONDARY' cluster). It allows both reads and writes.\n\n1. 'PRIMARY': This cluster serves as the replication source for secondary clusters that are replicating from it. Any data written to it is automatically replicated to its secondary clusters. It allows both reads and writes.\n\n1. 'SECONDARY': This cluster replicates data from the primary cluster. It allows only reads. Possible values: [\"CLUSTER_ROLE_UNSPECIFIED\", \"NONE\", \"PRIMARY\", \"SECONDARY\"]",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Defines the operational role of the cluster in replication but does not independently configure authentication, encryption, or access control."
+      "security_impact": true,
+      "rationale": "Controls the explicit replication role of the cluster. Because CLUSTER_ROLE_UNSPECIFIED is an accepted sentinel value, policy should forbid that value and require an explicit role such as NONE, PRIMARY, or SECONDARY."
     },
     "cross_cluster_replication_config.primary_cluster": {
       "type": "block",
@@ -164,8 +164,8 @@
       "description": "The full resource path of the primary cluster in the format: projects/{project}/locations/{region}/clusters/{cluster-id}",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the primary cluster used as the replication source. Restricting replication sources to approved clusters helps prevent unintended cross-environment data replication."
+      "security_impact": false,
+      "rationale": "Identifies another cluster resource used as the replication source. This is a resource-reference field, and platform policy should secure the referenced cluster itself rather than hardcoding which team-owned cluster this field may name."
     },
     "cross_cluster_replication_config.secondary_clusters": {
       "type": "block",
@@ -176,8 +176,8 @@
       "description": "The full resource path of the secondary cluster in the format: projects/{project}/locations/{region}/clusters/{cluster-id}",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies secondary clusters receiving replicated data. Restricting replication destinations helps prevent data from being copied to unintended environments."
+      "security_impact": false,
+      "rationale": "Identifies secondary cluster resources that receive replicated data. This is a resource-reference field, so constraining it would require hardcoding team-specific cluster identities rather than enforcing a reusable structural security control."
     },
     "gcs_source": {
       "type": "block",
@@ -188,8 +188,8 @@
       "description": "URIs of the GCS objects to import. Example: gs://bucket1/object1, gs://bucket2/folder2/object2",
       "required": true,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "Specifies Cloud Storage objects imported into the Redis cluster. Restricting import sources to approved storage locations reduces the risk of loading data from unintended or untrusted sources."
+      "security_impact": false,
+      "rationale": "Identifies Cloud Storage bucket and object paths used as import sources. These are resource references, and platform policy should secure the referenced storage resources rather than whitelist specific team-owned bucket or object paths."
     },
     "maintenance_policy": {
       "type": "block",
@@ -205,8 +205,8 @@
       "description": "Required. The day of week that maintenance updates occur.\n\n- DAY_OF_WEEK_UNSPECIFIED: The day of the week is unspecified.\n- MONDAY: Monday\n- TUESDAY: Tuesday\n- WEDNESDAY: Wednesday\n- THURSDAY: Thursday\n- FRIDAY: Friday\n- SATURDAY: Saturday\n- SUNDAY: Sunday Possible values: [\"DAY_OF_WEEK_UNSPECIFIED\", \"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"SUNDAY\"]",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls operational maintenance scheduling and does not directly configure a security boundary."
+      "security_impact": true,
+      "rationale": "Controls the explicitly selected maintenance day. Because DAY_OF_WEEK_UNSPECIFIED is an accepted sentinel value, policy should forbid that value and require an explicit day of the week."
     },
     "maintenance_policy.weekly_maintenance_window.start_time": {
       "type": "block",
@@ -250,8 +250,8 @@
       "description": "Example: 'projects/{project}/locations/{location}/backupCollections/{collection}/backups/{backup}'.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the managed backup used as a restore source. Restricting restore sources to approved backups helps prevent restoration from unintended data sources."
+      "security_impact": false,
+      "rationale": "Identifies a specific managed backup resource used as a restore source. This is a resource-reference field, so platform policy should secure the referenced backup itself rather than constrain which team-owned backup may be named."
     },
     "persistence_config": {
       "type": "block",
@@ -305,8 +305,8 @@
       "description": "Required. The consumer network where the network address of\nthe discovery endpoint will be reserved, in the form of\nprojects/{network_project_id_or_number}/global/networks/{network_id}.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the consumer VPC network used for Private Service Connect access to the Redis cluster. Restricting this to approved networks directly limits network exposure."
+      "security_impact": false,
+      "rationale": "Identifies the consumer VPC network that hosts the Private Service Connect endpoint. This is a reference to a team-owned network resource, and constraining which specific network may be named would overreach beyond a reusable platform-level control."
     },
     "zone_distribution_config": {
       "type": "block",
@@ -324,8 +324,8 @@
       "description": "Immutable. The zone for single zone Memorystore Redis cluster.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Specifies placement for a single-zone deployment and primarily affects infrastructure location and availability rather than a direct security control."
+      "security_impact": true,
+      "rationale": "Determines the zone used for a single-zone Redis Cluster deployment. As a zone/location field, policy should restrict it to an approved zone whitelist to support organisational data-residency and deployment-location requirements."
     }
   }
 }
