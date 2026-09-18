@@ -629,8 +629,8 @@
             "description": "Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.\nIf this field is used then the 'clientKey' field is mandatory",
             "required": false,
             "type": "string",
-            "security_impact": false,
-            "rationale": "Provides the public X.509 client certificate used for PostgreSQL mutual TLS. A certificate is the public half of the authentication pair, so disclosure does not permit impersonation; the security-sensitive client_key is assessed separately. This field has no standalone platform-level security policy."
+            "security_impact": true,
+            "rationale": "Provides the PostgreSQL client certificate used for mutual TLS authentication. Requiring a non-empty, PEM-formatted client certificate supports mutual TLS when this authentication mode is configured, providing stronger client authentication than server-only TLS."
         },
         "postgresql.ssl.client_key": {
             "description": "Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate.\nIf this field is used then the 'clientCertificate' field is mandatory.",
