@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the resource. A generic policy can require PREVENT to reduce the risk of accidental or unauthorised deletion and protect resource availability."
     },
     "display_name": {
       "description": "The display name of the tool version.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable name for the tool version and does not directly affect authentication, authorisation, encryption, credential handling, or network security."
     },
     "parent": {
       "description": "The tool to create a Version for.\nFormat: projects/<Project ID>/locations/<Location ID>/agents/<Agent ID>/tools/<Tool ID>.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the parent Dialogflow CX tool for which the version is created. It identifies resource ownership and hierarchy rather than defining a generic security control."
     },
     "tool": {
       "type": "block",
@@ -32,15 +32,15 @@
       "description": "High level description of the Tool and its usage.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive metadata about the tool and does not directly configure authentication, authorisation, encryption, credential storage, or another security control."
     },
     "tool.display_name": {
       "description": "The human-readable name of the tool, unique within the agent.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable identifier for the tool and does not directly affect the security behaviour of the resource."
     },
     "tool.data_store_spec": {
       "type": "block",
@@ -56,22 +56,22 @@
       "description": "The full name of the referenced data store. Formats: projects/{project}/locations/{location}/collections/{collection}/dataStores/{dataStore} projects/{project}/locations/{location}/dataStores/{dataStore}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References an existing data store used by the tool. The security properties and access controls of the data store are configured on the referenced resource rather than by this reference."
     },
     "tool.data_store_spec.data_store_connections.data_store_type": {
       "description": "The type of the connected data store.\nSee [DataStoreType](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/DataStoreConnection#datastoretype) for valid values.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the functional type of the connected data store and does not itself configure a generic platform-level security control."
     },
     "tool.data_store_spec.data_store_connections.document_processing_mode": {
       "description": "The document processing mode for the data store connection. Should only be set for PUBLIC_WEB and UNSTRUCTURED data stores. If not set it is considered as DOCUMENTS, as this is the legacy mode.\nSee [DocumentProcessingMode](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/DataStoreConnection#documentprocessingmode) for valid values.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how documents in the connected data store are processed. This is a functional data-processing choice rather than a generic authentication, authorisation, or confidentiality control."
     },
     "tool.data_store_spec.fallback_prompt": {
       "type": "block",
@@ -87,15 +87,15 @@
       "description": "Optional. The JSON schema is encapsulated in a [google.protobuf.Struct](https://protobuf.dev/reference/protobuf/google.protobuf/#struct) to describe the input of the function.\nThis input is a JSON object that contains the function's parameters as properties of the object",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the structure of data accepted by the function and is primarily an interface and validation schema rather than a generic platform-level security control."
     },
     "tool.function_spec.output_schema": {
       "description": "Optional. The JSON schema is encapsulated in a [google.protobuf.Struct](https://protobuf.dev/reference/protobuf/google.protobuf/#struct) to describe the output of the function.\nThis output is a JSON object that contains the function's parameters as properties of the object",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the structure of data returned by the function and is primarily an interface schema rather than a generic platform-level security control."
     },
     "tool.open_api_spec": {
       "type": "block",
@@ -106,8 +106,8 @@
       "description": "The OpenAPI schema specified as a text.\nThis field is part of a union field 'schema': only one of 'textSchema' may be set.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the OpenAPI interface and operations exposed to the tool. Its contents are application-specific and are not suitable for a generic platform-level security policy."
     },
     "tool.open_api_spec.authentication": {
       "type": "block",
@@ -123,29 +123,29 @@
       "description": "Optional. The API key. If the 'secretVersionForApiKey'' field is set, this field will be ignored.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains an API credential directly in the Terraform configuration and state. A generic security policy can prevent direct credential storage and require a Secret Manager-backed alternative to reduce secret exposure."
     },
     "tool.open_api_spec.authentication.api_key_config.key_name": {
       "description": "The parameter name or the header name of the API key.\nE.g., If the API request is \"https://example.com/act?X-Api-Key=\", \"X-Api-Key\" would be the parameter name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the request parameter or header name used to carry an API key. It does not contain the credential itself or establish a generic security boundary."
     },
     "tool.open_api_spec.authentication.api_key_config.request_location": {
       "description": "Key location in the request.\nSee [RequestLocation](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.tools#requestlocation) for valid values.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects where the API key is placed in a request. This is an API integration requirement rather than a generic platform-level security control."
     },
     "tool.open_api_spec.authentication.api_key_config.secret_version_for_api_key": {
       "description": "Optional. The name of the SecretManager secret version resource storing the API key.\nIf this field is set, the apiKey field will be ignored.\nFormat: projects/{project}/secrets/{secret}/versions/{version}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a Secret Manager secret version containing the API key. It identifies the external secret resource rather than exposing or configuring the credential value itself."
     },
     "tool.open_api_spec.authentication.bearer_token_config": {
       "type": "block",
@@ -156,15 +156,15 @@
       "description": "Optional. The name of the SecretManager secret version resource storing the Bearer token. If this field is set, the 'token' field will be ignored.\nFormat: projects/{project}/secrets/{secret}/versions/{version}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a Secret Manager secret version containing the bearer token. It identifies an external secret resource rather than storing or configuring the token value directly."
     },
     "tool.open_api_spec.authentication.bearer_token_config.token": {
       "description": "Optional. The text token appended to the text Bearer to the request Authorization header.\n[Session parameters reference](https://cloud.google.com/dialogflow/cx/docs/concept/parameter#session-ref) can be used to pass the token dynamically, e.g. '$session.params.parameter-id'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains a bearer authentication credential that may be stored directly in Terraform configuration and state. A generic policy can prevent static token values and require a safer secret-backed or dynamic mechanism."
     },
     "tool.open_api_spec.authentication.oauth_config": {
       "type": "block",
@@ -175,43 +175,43 @@
       "description": "The client ID from the OAuth provider.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the OAuth client but is not itself a secret credential or generic platform-level security policy target."
     },
     "tool.open_api_spec.authentication.oauth_config.client_secret": {
       "description": "Optional. The client secret from the OAuth provider. If the 'secretVersionForClientSecret' field is set, this field will be ignored.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains an OAuth client credential directly in Terraform configuration and state. A generic policy can prevent direct client-secret storage and require the Secret Manager-backed alternative."
     },
     "tool.open_api_spec.authentication.oauth_config.oauth_grant_type": {
       "description": "OAuth grant types.\nSee [OauthGrantType](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.tools#oauthgranttype) for valid values",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the OAuth grant flow required by the external provider. It is an authentication architecture choice whose appropriate value depends on the integration rather than a generic platform security policy."
     },
     "tool.open_api_spec.authentication.oauth_config.scopes": {
       "description": "Optional. The OAuth scopes to grant.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the permissions requested from the OAuth provider. Restricting scopes to an approved least-privilege set can reduce unnecessary access granted to the tool."
     },
     "tool.open_api_spec.authentication.oauth_config.secret_version_for_client_secret": {
       "description": "Optional. The name of the SecretManager secret version resource storing the client secret.\nIf this field is set, the clientSecret field will be ignored.\nFormat: projects/{project}/secrets/{secret}/versions/{version}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a Secret Manager secret version containing the OAuth client secret. It identifies an external secret resource rather than storing or configuring the credential value directly."
     },
     "tool.open_api_spec.authentication.oauth_config.token_endpoint": {
       "description": "The token endpoint in the OAuth provider to exchange for an access token.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the OAuth provider endpoint used for token exchange. The correct endpoint is integration-specific and does not provide a suitable generic platform-level security policy target."
     },
     "tool.open_api_spec.authentication.service_agent_auth_config": {
       "type": "block",
@@ -222,8 +222,8 @@
       "description": "Optional. Indicate the auth token type generated from the Diglogflow service agent.\nThe generated token is sent in the Authorization header.\nSee [ServiceAgentAuth](https://cloud.google.com/dialogflow/cx/docs/reference/rest/v3/projects.locations.agents.tools#serviceagentauth) for valid values.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the authentication token type generated by the Dialogflow service agent and sent in the Authorization header. A generic policy can restrict the authentication mechanism to approved token types."
     },
     "tool.open_api_spec.service_directory_config": {
       "type": "block",
@@ -234,8 +234,8 @@
       "description": "The name of [Service Directory](https://cloud.google.com/service-directory/docs) service.\nFormat: projects/<ProjectID>/locations/<LocationID>/namespaces/<NamespaceID>/services/<ServiceID>. LocationID of the service directory must be the same as the location of the agent.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the Service Directory service used by the tool. It identifies a related service resource rather than defining a generic security control."
     },
     "tool.open_api_spec.tls_config": {
       "type": "block",
@@ -251,15 +251,15 @@
       "description": "The allowed custom CA certificates (in DER format) for HTTPS verification. This overrides the default SSL trust store.\nIf this is empty or unspecified, Dialogflow will use Google's default trust store to verify certificates.\nN.B. Make sure the HTTPS server certificates are signed with \"subject alt name\".\nFor instance a certificate can be self-signed using the following command:\n'''\n  openssl x509 -req -days 200 -in example.com.csr \\\n    -signkey example.com.key \\\n    -out example.com.crt \\\n    -extfile <(printf \"\\nsubjectAltName='DNS:www.example.com'\")\n'''\nA base64-encoded string.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Configures a custom CA certificate used for HTTPS certificate verification and overrides the default SSL trust store. Incorrect trust configuration could allow connections to certificates trusted by an unintended CA, so the value is security-relevant."
     },
     "tool.open_api_spec.tls_config.ca_certs.display_name": {
       "description": "The name of the allowed custom CA certificates. This can be used to disambiguate the custom CA certificates.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable name for a custom CA certificate and does not change the certificate trust material or TLS verification behaviour."
     }
   }
 }
