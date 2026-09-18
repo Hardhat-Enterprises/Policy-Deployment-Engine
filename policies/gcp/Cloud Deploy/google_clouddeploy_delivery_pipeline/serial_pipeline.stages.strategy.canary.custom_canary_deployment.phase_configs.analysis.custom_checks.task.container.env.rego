@@ -1,4 +1,4 @@
-package terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline.serial_pipeline_stages_strategy_canary_canary_deployment_verify_config_tasks_container_env
+package terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline.serial_pipeline_stages_strategy_canary_custom_canary_deployment_phase_configs_analysis_custom_checks_task_container_env
 
 import data.terraform.helpers
 import data.terraform.gcp.security.deploy.google_clouddeploy_delivery_pipeline.vars
@@ -11,7 +11,7 @@ conditions := [
         },
         {
             "condition": "container.env must remain empty or absent",
-            "attribute_path": ["serial_pipeline", 0, "stages", 0, "strategy", 0, "canary", 0, "canary_deployment", 0, "verify_config", 0, "tasks", 0, "container", 0, "env"],
+            "attribute_path": ["serial_pipeline", 0, "stages", 0, "strategy", 0, "canary", 0, "custom_canary_deployment", 0, "phase_configs", 0, "analysis", 0, "custom_checks", 0, "task", 0, "container", 0, "env"],
             "values": [null, {}],
             "policy_type": "whitelist"
         }

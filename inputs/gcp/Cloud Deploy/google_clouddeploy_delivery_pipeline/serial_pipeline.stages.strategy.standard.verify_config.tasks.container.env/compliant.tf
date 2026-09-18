@@ -6,14 +6,11 @@ resource "google_clouddeploy_delivery_pipeline" "compliant_example_1" {
     stages {
       target_id = "target-1"
       strategy {
-        canary {
-          canary_deployment {
-            percentages = [50]
-            verify_config {
-              tasks {
-                container {
-                  image = "us-docker.pkg.dev/my-project/my-repo/my-image:v1.2.3"
-                }
+        standard {
+          verify_config {
+            tasks {
+              container {
+                image = "us-docker.pkg.dev/my-project/my-repo/my-image:v1.2.3"
               }
             }
           }

@@ -9,10 +9,14 @@ resource "google_clouddeploy_delivery_pipeline" "compliant_example_1" {
         canary {
           canary_deployment {
             percentages = [50]
-            verify_config {
-              tasks {
-                container {
-                  image = "us-docker.pkg.dev/my-project/my-repo/my-image:v1.2.3"
+            analysis {
+              duration = "300s"
+              custom_checks {
+                id = "check-1"
+                task {
+                  container {
+                    image = "us-docker.pkg.dev/my-project/my-repo/my-image:v1.2.3"
+                  }
                 }
               }
             }
