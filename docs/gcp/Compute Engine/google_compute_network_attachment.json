@@ -63,7 +63,7 @@
       "required": true,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "This field is required and typed as a list of subnet URL strings, but the provider performs no client-side shape validation at plan time: a plan containing subnetworks = [\"*\"] generates successfully with no error, confirmed by this repository's own test harness. A wildcard or malformed entry therefore reaches a real deployment plan unchecked, and enforcing this at plan time is exactly the substantively enforceable, schema-permitted-but-insecure state a platform policy should catch before it reaches production."
+      "rationale": "This field names the subnets producer endpoints connect through, controlling which subnets can receive producer traffic. A real, API-accepted but security-relevant risk is referencing the auto-created \"default\" subnetwork: it is a genuine, valid subnet self-link, but is typically broader-access and shared across unrelated resources rather than purpose-built for this attachment. The policy forbids the literal subnetwork name \"default\" while leaving the project/region prefix unconstrained."
     }
   }
 }
