@@ -6,14 +6,14 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.vars
 conditions := [
     [
         {
-            "situation_description": "Ensure Vertex AI Endpoints are connected to a designated VPC network.",
-            "remedies": ["Configure the `network` attribute."]
+            "situation_description": "Ensure Vertex AI Endpoint does not use the default VPC network.",
+            "remedies": ["Set the `network` attribute to a custom VPC network."]
         },
         {
-            "condition": "network is not in the approved list",
+            "condition": "network is set to default",
             "attribute_path": ["network"],
-            "values": ["^projects/.*/global/networks/my-secure-vpc$"],
-            "policy_type": "pattern whitelist"
+            "values": ["default"],
+            "policy_type": "blacklist"
         }
     ]
 ]

@@ -6,14 +6,14 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.vars
 conditions := [
     [
         {
-            "situation_description": "Ensure Vertex AI Endpoints Private Service Connect project allowlist only contains approved projects.",
-            "remedies": ["Configure the `project_allowlist` within `private_service_connect_config` to match the approved project pattern."]
+            "situation_description": "Ensure private service connect project allowlist does not contain unauthorized projects.",
+            "remedies": ["Remove unauthorized projects from the `project_allowlist`."]
         },
         {
-            "condition": "project_allowlist is missing or contains unapproved projects",
-            "attribute_path": ["private_service_connect_config", 0, "project_allowlist", 0], # 注意末尾增加了 , 0
-            "values": ["^approved-project-.*$"],
-            "policy_type": "pattern whitelist"
+            "condition": "project_allowlist contains unauthorized projects",
+            "attribute_path": ["private_service_connect_config", 0, "project_allowlist"],
+            "values": ["unauthorized-project"],
+            "policy_type": "element blacklist"
         }
     ]
 ]
