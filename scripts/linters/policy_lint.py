@@ -79,9 +79,13 @@ RULES = {
         "`attribute_path` ends in a list index; check the whole list with "
         "`element blacklist`."),
     "unknown-policy-type": (
-        "`policy_type` is not one of the seven the engine dispatches, so the condition "
+        "`policy_type` is not one of the supported types the engine dispatches, so the condition "
         "is never evaluated. Set it to a valid type (lowercase, spaces not "
         "underscores)."),
+    "invalid-map-key-blacklist": (
+        "Map key blacklist `values` must contain at least one non-empty string "
+        "key name without leading or trailing whitespace. A single string is "
+        "also accepted, as in the dispatcher. Invalid configuration is an error."),
     "presence-only": (
         "`values` is only null/\"\": presence is the whole check. Acceptable when the "
         "rationale says presence is the control — the reviewer decides; pair with a "
@@ -403,6 +407,7 @@ VALID_POLICY_TYPES = (
     "blacklist", "whitelist", "range",
     "pattern blacklist", "pattern whitelist", "element blacklist",
     "element pattern whitelist",
+    "map key blacklist",
 )
 
 # Blacklist/whitelist only — a pattern or range policy with empty values means
@@ -937,6 +942,19 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                          f"everything. Set policy_type to one of: "
                          f"{', '.join(VALID_POLICY_TYPES)} (lowercase, and a space "
                          f"rather than an underscore).")
+
+            # These are key names, not a presence check on attribute values.
+            # Match the dispatcher's ensure_array normalisation and preflight.
+            if policy_type == "map key blacklist":
+                key_names = values if isinstance(values, list) else [values]
+                if not key_names or any(
+                        not isinstance(name, str) or not name
+                        or name != name.strip() for name in key_names):
+                    add_once("invalid-map-key-blacklist", path_text,
+                             f"'{path_text}' has invalid map key blacklist values. "
+                             "Use at least one non-empty string key name with no "
+                             "leading or trailing whitespace; empty lists and "
+                             "null/non-string entries cannot perform this check.")
 
             # --- index-path ------------------------------------------------ #
             if attribute_path and _is_index(attribute_path[-1]):
