@@ -15,18 +15,6 @@ conditions := [
             "values": [null, []],
             "policy_type": "blacklist"
         }
-    ],
-    [
-        {
-            "situation_description": "Ensure project_allowlist is not overly broad.",
-            "remedies": ["Remove wildcard entries from the allowlist."]
-        },
-        {
-            "condition": "project_allowlist contains a wildcard",
-            "attribute_path": ["private_service_connect_config", 0, "project_allowlist"],
-            "values": ["*"],
-            "policy_type": "element blacklist"
-        }
     ]
 ]
 
