@@ -18,7 +18,7 @@ conditions := [
     ],
     [
         {
-            "situation_description": "Ensure Vertex AI Endpoint uses a valid VPC network resource path. Note: For this specific environment, PSC-only endpoints are not a supported configuration, and VPC peering presence is strictly mandated as the exclusive security control.",
+            "situation_description": "Ensure Vertex AI Endpoint uses a valid VPC network resource path. Note: For this specific environment, PSC-only endpoints are not a supported configuration,and VPC peering presence is strictly mandated as the exclusive security control.",
             "remedies": ["Provide a real VPC network path."]
         },
         {
