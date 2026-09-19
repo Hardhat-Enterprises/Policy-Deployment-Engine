@@ -56,7 +56,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Leaving the network unset leaves the endpoint publicly reachable. To mitigate this public-exposure risk, the endpoint must be configured with either VPC peering (network) or Private Service Connect (PSC)."
+      "rationale": "Leaving the network attribute unset can leave the Vertex AI Endpoint without VPC network peering and may expose the endpoint to public access. A private networking configuration should therefore be required to reduce unintended public exposure. When VPC network peering is used, the configured network should reference an approved VPC network resource path."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
@@ -139,7 +139,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "This parameter acts as a critical network-exposure control that gates which tenants can reach the private resource. A platform policy must enforce that this allowlist exists and is appropriately bounded (non-empty and not overly broad) to prevent open-to-all misconfigurations, effectively restricting unauthorized network exposure without hardcoding specific immutable project IDs."
+      "rationale": "The project allowlist must be explicitly configured and non-empty to ensure that Private Service Connect access is restricted to specified GCP projects. This policy verifies that the allowlist is present and non-empty; it does not evaluate the breadth of the project list."
     },
     "private_service_connect_config.psc_automation_configs": {
       "type": "block",
