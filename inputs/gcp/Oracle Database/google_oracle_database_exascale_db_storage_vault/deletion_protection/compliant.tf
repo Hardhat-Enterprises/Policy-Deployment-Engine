@@ -1,6 +1,6 @@
 resource "google_oracle_database_exascale_db_storage_vault" "compliant_example_1" {
   exascale_db_storage_vault_id = "compliant-storage-vault-1"
-  display_name                 = "Compliant Storage Vault 1"
+  display_name                 = "test-exascale-vault"
   location                     = "australia-southeast1"
   deletion_protection          = true
 
