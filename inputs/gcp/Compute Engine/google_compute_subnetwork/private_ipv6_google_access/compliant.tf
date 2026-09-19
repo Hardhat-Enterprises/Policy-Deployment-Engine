@@ -4,5 +4,5 @@ resource "google_compute_subnetwork" "compliant_example_1" {
   network                    = "default"
   ip_cidr_range              = "10.10.0.0/24"
   region                     = "australia-southeast1"
-  private_ipv6_google_access = "ENABLE_GOOGLE_ACCESS"
+  private_ipv6_google_access = "ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE"
 }
