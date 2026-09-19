@@ -1,5 +1,5 @@
 resource "google_container_aws_node_pool" "compliant_example_1" {
-  name      = "c-container-aws-node-pool"
+  name      = "compliant_example_1"
   cluster   = "projects/my-project-name/locations/australia-southeast1/awsClusters/approved-cluster"
   location  = "australia-southeast1"
   subnet_id = "subnet-approved-private-a"

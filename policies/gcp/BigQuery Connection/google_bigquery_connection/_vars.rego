@@ -1,4 +1,4 @@
-package terraform.gcp.security.BigQuery.google_bigquery_connection.vars
+package terraform.gcp.security.bigquery.google_bigquery_connection.vars
 
 variables := {
     "friendly_resource_name": "BigQuery Connection",
