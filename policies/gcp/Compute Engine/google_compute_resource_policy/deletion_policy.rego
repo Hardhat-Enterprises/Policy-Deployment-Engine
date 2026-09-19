@@ -1,0 +1,26 @@
+package terraform.gcp.security.compute_engine.google_compute_resource_policy.deletion_policy
+
+import data.terraform.helpers as helpers
+import data.terraform.gcp.security.compute_engine.google_compute_resource_policy.vars as vars
+
+conditions := [[
+  {
+    "situation_description": "Google Compute Resources must be protected from accidental deletion.",
+    "remedies": [
+      "Set deletion_policy = PREVENT (recommended)",
+      "Set deletion_policy = ABANDON (As per your organisational data retention or lifecycle policy)"],
+  },
+  {
+    "condition": "deletion_policy must be PREVENT.",
+    "attribute_path": ["deletion_policy"],
+    "values": [
+      "PREVENT",
+      "ABANDON"
+      ],
+    "policy_type": "whitelist",
+  },
+]]
+
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details

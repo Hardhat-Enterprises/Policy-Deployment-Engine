@@ -1,6 +1,6 @@
 resource "google_spanner_backup_schedule" "non_compliant_example_1" {
-  instance           = "nc-instance"
-  database           = "nc-database"
+  instance           = "c-instance"
+  database           = "c-database"
   name               = "non_compliant_example_1"
   retention_duration = "86400s"
   full_backup_spec {}

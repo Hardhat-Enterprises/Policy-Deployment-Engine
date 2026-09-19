@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls whether the resource can be deleted or removed from Terraform management. It helps prevent accidental or unauthorized deletion when set to \"PREVENT\" and affects resource availability and infrastructure governance. Therefore, it has a security impact."
     },
     "deletion_protection": {
       "description": "Whether or not to allow Terraform to destroy the instance. Unless this field is set to false in Terraform state, a terraform destroy or terraform apply that would delete the instance will fail.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls whether the resource can be deleted through Terraform. Enabling deletion protection helps prevent accidental or unauthorized deletion, improving the availability and integrity of the resource. Therefore, it has a security impact."
     },
     "display_name": {
       "description": "The display name for the GoldengateConnectionAssignment.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument specifies a human-readable name used for identification and management of the resource. It is a cosmetic and descriptive field that does not configure or enforce security controls. Therefore, it is not a policy target and does not have a security impact."
     },
     "goldengate_connection_assignment_id": {
       "description": "The ID of the GoldengateConnectionAssignment to create.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument specifies the unique identifier of the GoldengateConnectionAssignment resource. It is used to identify the resource and does not configure or enforce security controls. Resource identifiers are not policy targets. Therefore, it does not have a security impact."
     },
     "labels": {
       "description": "The labels or tags associated with the GoldengateConnectionAssignment.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument assigns labels or tags to the resource for identification, organization, and resource management purposes. Labels are metadata and descriptive information and do not configure or enforce security controls. Therefore, they are not policy targets and do not have a security impact."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -48,27 +48,27 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the Google Cloud project in which the resource is created and managed. It is a project identifier/reference and does not directly configure access control, authentication, encryption, networking, or other security controls. Therefore, it does not have a security impact."
     },
     "properties": {
       "type": "block",
       "description": "The properties of a GoldengateConnectionAssignment.",
       "required": true
-    },
+      },
     "properties.goldengate_connection": {
       "description": "The GoldengateConnection resource to be assigned.\nFormat:\nprojects/{project}/locations/{location}/goldengateConnections/{goldengate_connection}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is a reference to another GoldengateConnection resource. It identifies the connection to be assigned but does not directly configure security controls or enforce access, permissions, encryption, or other security-related behaviour. Resource references are not constrained by security policies, so it does not have a security impact."
     },
     "properties.goldengate_deployment": {
       "description": "The GoldenGateDeployment to assign the connection to.\nFormat:\nprojects/{project}/locations/{location}/goldengateDeployments/{goldengate_deployment}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is a reference to another GoldenGateDeployment resource. It identifies the deployment associated with the connection but does not directly configure security controls or enforce access, permissions, encryption, or other security-related behaviour. Resource references are not constrained by security policies, so it does not have a security impact."
     }
   }
 }
