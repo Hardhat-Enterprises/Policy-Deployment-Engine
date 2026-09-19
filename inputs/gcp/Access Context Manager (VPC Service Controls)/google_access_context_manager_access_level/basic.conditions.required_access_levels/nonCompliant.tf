@@ -6,8 +6,9 @@ resource "google_access_context_manager_access_level" "non_compliant_example_1" 
   basic {
     conditions {
       required_access_levels = [
-        "accessPolicies/123456789/accessLevels/unapproved_level"
+        "invalidAccessLevel"
       ]
     }
   }
 }
+
