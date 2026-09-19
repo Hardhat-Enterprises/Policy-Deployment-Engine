@@ -1,7 +1,7 @@
 resource "google_gkeonprem_vmware_admin_cluster" "non_compliant_example_1" {
   name = "non_compliant_example_1"
   project = "PDE"
-  location = "us-west1"
+  location = "australia_southeast1"
   on_prem_version = "1.31.0-gke.35"
   network_config {
     service_address_cidr_blocks = ["10.96.0.0/12"]
@@ -53,7 +53,7 @@ resource "google_gkeonprem_vmware_admin_cluster" "non_compliant_example_1" {
     enabled = true
   }
   platform_config {
-    required_platform_version = "1.30.0"
+    required_platform_version = "1.31.0"
   }
   proxy {
     url = "http://my-proxy.example.local:80"

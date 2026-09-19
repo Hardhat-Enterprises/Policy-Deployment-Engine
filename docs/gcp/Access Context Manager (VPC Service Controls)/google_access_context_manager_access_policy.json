@@ -6,29 +6,29 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enforcing the destroy-blocking value prevents accidental deletion of the access policy, which could otherwise remove the security perimeters governed by that policy."
     },
     "parent": {
       "description": "The parent of this AccessPolicy in the Cloud Resource Hierarchy.\nFormat: 'organizations/{{organization_id}}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it is an organizational reference that identifies the parent resource of the Access Policy rather than defining or enforcing a security control."
     },
     "scopes": {
       "description": "Folder or project on which this policy is applicable.\nFormat: 'folders/{{folder_id}}' or 'projects/{{project_number}}'",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it identifies the projects or folders within the Access Policy scope. These values are organizational resource references rather than security controls, so the policy does not constrain these resource pointers."
     },
     "title": {
       "description": "Human readable title. Does not affect behavior.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument does not have a security impact because it is used only as a human-readable name for the Access Policy and does not affect its behavior or security settings."
     }
   }
 }
