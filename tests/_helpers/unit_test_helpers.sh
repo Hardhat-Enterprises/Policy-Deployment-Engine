@@ -99,6 +99,10 @@ run_test_suite "Element Blacklist Policy" \
     "tests/_helpers/element_blacklist_test.rego" \
     "policies/_helpers/policies/element_blacklist.rego"
 
+run_test_suite "Element Pattern Whitelist Policy" \
+    "tests/_helpers/element_pattern_whitelist_test.rego" \
+    "policies/_helpers/policies/element_pattern_whitelist.rego"
+
 run_test_suite "Map Key Blacklist Policy" \
     "tests/_helpers/map_key_blacklist_test.rego" \
     "policies/_helpers/policies/map_key_blacklist.rego" \

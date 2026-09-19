@@ -19,6 +19,7 @@ import data.terraform.helpers.policies.range
 import data.terraform.helpers.policies.pattern_blacklist
 import data.terraform.helpers.policies.pattern_whitelist
 import data.terraform.helpers.policies.element_blacklist
+import data.terraform.helpers.policies.element_pattern_whitelist
 import data.terraform.helpers.policies.map_key_blacklist
 
 ################################################################################
@@ -219,6 +220,7 @@ valid_policy_types := [
     "pattern blacklist",
     "pattern whitelist",
     "element blacklist",
+    "element pattern whitelist",
     "map key blacklist",
 ]
 
@@ -328,6 +330,10 @@ select_policy_logic(tf_variables, attribute_path, values_formatted, "pattern whi
 
 select_policy_logic(tf_variables, attribute_path, values_formatted, "element blacklist") = results if {
     results := element_blacklist.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "element pattern whitelist") = results if {
+    results := element_pattern_whitelist.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
 select_policy_logic(tf_variables, attribute_path, values_formatted, "map key blacklist") = results if {

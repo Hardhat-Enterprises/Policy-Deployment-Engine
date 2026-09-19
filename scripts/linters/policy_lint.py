@@ -406,6 +406,7 @@ def drift_exempt_keys(service, resource_type, stem, resource_dir=None):
 VALID_POLICY_TYPES = (
     "blacklist", "whitelist", "range",
     "pattern blacklist", "pattern whitelist", "element blacklist",
+    "element pattern whitelist",
     "map key blacklist",
 )
 
