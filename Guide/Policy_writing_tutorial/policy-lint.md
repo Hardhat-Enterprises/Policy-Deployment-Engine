@@ -50,13 +50,13 @@ finding straight to it.
 
 ## unknown-policy-type
 
-`policy_type` is not one of the six values the engine can dispatch, so the whole condition is
+`policy_type` is not one of the seven values the engine can dispatch, so the whole condition is
 never evaluated. This is the worst thing a policy can do quietly: the condition is not weak, it
 is *absent*, and the policy passes every resource you point it at.
 
-The six, exactly as the engine spells them:
+The seven, exactly as the engine spells them:
 
-    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist
+    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist
 
 They are **lowercase**, and the two-word ones use a **space, not an underscore**. Writing
 `pattern_whitelist` is the mistake this rule exists to catch. `element whitelist` is not a type
@@ -79,7 +79,7 @@ Good:
       "policy_type": "whitelist"
     }
 
-If none of the six expresses what you need, that is worth saying out loud rather than working
+If none of the seven expresses what you need, that is worth saying out loud rather than working
 around — raise it, so the type can be added to the helpers instead of a broken one shipping.
 
 Miss this and the test catches it too: the helper refuses to evaluate the policy at all and
