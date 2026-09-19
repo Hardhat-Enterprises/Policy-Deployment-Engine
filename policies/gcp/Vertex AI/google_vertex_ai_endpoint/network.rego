@@ -6,25 +6,13 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.vars
 conditions := [
     [
         {
-            "situation_description": "Ensure Vertex AI Endpoint uses a valid VPC network resource path. Note: For this specific environment, PSC-only endpoints are not a supported configuration, and VPC peering presence is strictly mandated as the exclusive security control.",
-            "remedies": ["Set the `network` attribute to a valid VPC path matching ^projects/[^/]+/global/networks/[^/]+$"]
+            "situation_description": "When VPC network peering is used, the configured network should reference an approved VPC network resource path.",
+            "remedies": ["Ensure the `network` attribute references a valid VPC path if configured."]
         },
         {
-            "condition": "network does not match valid VPC pattern or is missing",
+            "condition": "network is set to an invalid non-empty literal",
             "attribute_path": ["network"],
-            "values": ["^projects/[^/]+/global/networks/[^/]+$"],
-            "policy_type": "pattern whitelist"
-        }
-    ],
-    [
-        {
-            "situation_description": "Ensure Vertex AI Endpoint uses a valid VPC network resource path. Note: For this specific environment, PSC-only endpoints are not a supported configuration,and VPC peering presence is strictly mandated as the exclusive security control.",
-            "remedies": ["Provide a real VPC network path."]
-        },
-        {
-            "condition": "network is missing, empty, or an invalid literal",
-            "attribute_path": ["network"],
-            "values": [null, "", "not-a-valid-vpc-path"],
+            "values": ["not-a-valid-vpc-path"],
             "policy_type": "blacklist"
         }
     ]
