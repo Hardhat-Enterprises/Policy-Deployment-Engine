@@ -72,6 +72,15 @@ get_multi_summary(conditions, tf_variables) = summary if {
         "details": []
     }
 } else = summary if {
+    # The shared extractor can return an array when an index is omitted. Refuse
+    # non-map results before the helper's is_object guard can silently skip them.
+    problems := map_key_blacklist_path_problems(conditions, tf_variables)
+    count(problems) > 0
+    summary := {
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Check attribute_path and include numeric indexes for list blocks when selecting a map.", [concat("; ", sort(problems))])],
+        "details": []
+    }
+} else = summary if {
     # Count resources without storing them
     resource_count := count([r |
         r := input.planned_values.root_module.resources[_]
@@ -252,6 +261,22 @@ _valid_map_key_blacklist_values(values) if {
         is_string(name)
         name != ""
         name == trim_space(name)
+    }
+}
+
+# Missing/null optional maps are allowed; present non-map values are not. Limit
+# this check to the selected resource type and never include resource values in
+# the error message. Other helper types keep their existing path semantics.
+map_key_blacklist_path_problems(conditions, tf_variables) := problems if {
+    problems := {sprintf("map key blacklist path '%s' resolved to %s; expected a map", [shared.format_attribute_path(entry.attribute_path), type_name(value)]) |
+        some group in conditions
+        some entry in group
+        lower(object.get(entry, "policy_type", "")) == "map key blacklist"
+        some resource in input.planned_values.root_module.resources
+        resource.type == tf_variables.resource_type
+        value := shared.get_attribute_value(resource, entry.attribute_path)
+        value != null
+        not is_object(value)
     }
 }
 

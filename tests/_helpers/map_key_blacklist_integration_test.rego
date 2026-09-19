@@ -112,3 +112,64 @@ test_valid_single_string_and_mixed_case_remain_supported if {
 		not startswith(result.message[0], "POLICY ERROR:")
 	}
 }
+
+# A path that extracts a list of maps must not silently become an empty result.
+test_missing_generic_index_reports_policy_error if {
+	plan := plan_for({"generic_web_service": [{"request_headers": {"Authorization": "do-not-print"}}]})
+	result := helpers.get_multi_summary(header_conditions(["generic_web_service", "request_headers"]), variables) with input as plan
+	startswith(result.message[0], "POLICY ERROR:")
+	contains(result.message[0], "generic_web_service.request_headers")
+	contains(result.message[0], "array")
+	contains(result.message[0], "indexes")
+	result.details == []
+	not contains(json.marshal(result), "All passed")
+	not contains(json.marshal(result), "do-not-print")
+}
+
+test_missing_nested_index_reports_policy_error if {
+	plan := plan_for({"service_directory": [{"generic_web_service": [{"request_headers": {"Authorization": "do-not-print"}}]}]})
+	result := helpers.get_multi_summary(header_conditions(["service_directory", 0, "generic_web_service", "request_headers"]), variables) with input as plan
+	startswith(result.message[0], "POLICY ERROR:")
+	contains(result.message[0], "service_directory.[0].generic_web_service.request_headers")
+	result.details == []
+	not contains(json.marshal(result), "do-not-print")
+}
+
+test_present_non_map_values_report_policy_error if {
+	every value in [[], [{}], "do-not-print", "", 0, 7, false, true] {
+		plan := plan_for({"generic_web_service": [{"request_headers": value}]})
+		result := helpers.get_multi_summary(header_conditions(["generic_web_service", 0, "request_headers"]), variables) with input as plan
+		startswith(result.message[0], "POLICY ERROR:")
+		contains(result.message[0], "expected a map")
+		result.details == []
+		not contains(json.marshal(result), "do-not-print")
+	}
+}
+
+test_missing_null_and_empty_maps_remain_allowed if {
+	every values in [{}, {"generic_web_service": [{}]}, {"generic_web_service": [{"request_headers": null}]}, {"generic_web_service": [{"request_headers": {}}]}] {
+		result := helpers.get_multi_summary(header_conditions(["generic_web_service", 0, "request_headers"]), variables) with input as plan_for(values)
+		result.details[0].non_compliant_resources == set()
+		not startswith(result.message[0], "POLICY ERROR:")
+	}
+}
+
+test_non_map_on_unrelated_resource_is_ignored if {
+	plan := plan_for({"generic_web_service": [{"request_headers": "not-a-map"}]})
+	other_variables := object.union(variables, {"resource_type": "unrelated_resource"})
+	result := helpers.get_multi_summary(header_conditions(["generic_web_service", 0, "request_headers"]), other_variables) with input as plan
+	result.details[0].non_compliant_resources == set()
+	not startswith(result.message[0], "POLICY ERROR:")
+}
+
+test_bad_path_is_not_hidden_by_valid_condition if {
+	plan := plan_for({"generic_web_service": [{"request_headers": {"Authorization": "do-not-print"}}]})
+	conditions := array.concat(
+		header_conditions(["generic_web_service", 0, "request_headers"]),
+		header_conditions(["generic_web_service", "request_headers"]),
+	)
+	result := helpers.get_multi_summary(conditions, variables) with input as plan
+	startswith(result.message[0], "POLICY ERROR:")
+	result.details == []
+	not contains(json.marshal(result), "do-not-print")
+}

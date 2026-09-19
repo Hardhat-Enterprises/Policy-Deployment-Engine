@@ -308,9 +308,13 @@ requires the whole name: `Authorization` matches `AUTHORIZATION`, not
 `X-Authorization-Mode`.
 
 A matching key is flagged only when its value is neither `null` nor an empty
-string. Whitespace-only values are still non-empty. Missing, empty or non-map
-attributes are ignored; this helper does not require the map to exist or validate
-its shape. It checks known values in root-module resources, like the other helpers.
+string. Whitespace-only values are still non-empty. Missing/null maps and empty
+objects are allowed. Through `get_multi_summary`, a present non-map value causes
+`POLICY ERROR:` rather than a passing result. For example, omitting the `0` from
+the path below makes the shared extractor return an array of maps, not one map.
+Check the path and include the list indexes. Paths resolving to missing/null are
+still treated as absent optional maps. This checks known values in root-module
+resources, like the other helpers.
 
 ```rego
     [

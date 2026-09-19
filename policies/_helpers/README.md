@@ -264,9 +264,17 @@ get_violations(tf_variables, attribute_path, values) = results
 Use this type to reject specified map keys with populated values. Keys are compared
 by exact name ignoring capitalisation: `Authorization` and `AUTHORIZATION` match,
 but `X-Authorization-Mode` does not. Null and empty-string values are ignored;
-whitespace-only strings are populated values and are flagged. A missing, empty,
-or non-object map produces no violations. This helper does not validate map shape
-or require the map to exist.
+whitespace-only strings are populated values and are flagged. A missing or null
+map, or an empty object, produces no violations; the map is not required to exist.
+Through the normal `get_multi_summary` entry point, a present non-null value that
+is not a map produces `POLICY ERROR:` and refuses the whole policy. The error
+reports the path and value type, never the value itself.
+
+For example, `["generic_web_service", "request_headers"]` can make the shared
+extractor return an array of header maps. Use
+`["generic_web_service", 0, "request_headers"]` to select the map instead. This
+runtime check needs the plan data; it is not a static linter check. Paths that
+resolve to missing/null remain indistinguishable from absent optional maps.
 
 This is useful for detecting sensitive inline HTTP headers. Messages contain the
 matching key names, never the map values. The prohibited names are supplied by

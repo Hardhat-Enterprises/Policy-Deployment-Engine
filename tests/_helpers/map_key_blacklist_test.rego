@@ -210,10 +210,10 @@ test_whitespace_value_is_rejected if {
 	count(results) == 1
 }
 
-# 10. This helper checks keys, not whether the attribute has the correct shape.
-test_empty_or_non_map_input_is_ignored if {
-	every headers in [{}, [], "Authorization", null] {
-		resource := make_generic_resource("wrong-shape", headers)
+# 10. Empty/null maps remain allowed. Non-map errors are tested through the dispatcher.
+test_empty_or_null_map_is_allowed if {
+	every headers in [{}, null] {
+		resource := make_generic_resource("empty-map", headers)
 		results := map_key_blacklist.get_violations(
 			mock_variables,
 			["generic_web_service", 0, "request_headers"], blacklisted_header_names,
