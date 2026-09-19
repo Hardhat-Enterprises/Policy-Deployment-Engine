@@ -5,8 +5,8 @@ import data.terraform.helpers
 
 conditions := [[
         {
-                "situation_description": "A list of required access levels.",
-                "remedies": ["Configure required_access_levels using valid access levels defined within the applicable Access Context Manager policy."],
+                "situation_description": "Configured prerequisite access levels must use valid Access Context Manager resource-name structure.",
+                "remedies": ["Update each configured required_access_levels entry to use the documented accessPolicies/{policy_id}/accessLevels/{short_name} resource-name structure."],
         },
         {
                 "condition": "required_access_levels must be authorized",
