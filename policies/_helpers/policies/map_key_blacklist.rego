@@ -92,7 +92,7 @@ _build_violation(tf_variables, attribute_path, blacklisted_keys, resource) := vi
 	violation := {
 		"name": resource_name,
 		"message": sprintf(
-			"%s '%s' contains sensitive inline map key(s): %s",
+			"%s '%s' contains prohibited map key(s) with non-empty values: %s",
 			[
 				tf_variables.friendly_resource_name,
 				resource_name,
