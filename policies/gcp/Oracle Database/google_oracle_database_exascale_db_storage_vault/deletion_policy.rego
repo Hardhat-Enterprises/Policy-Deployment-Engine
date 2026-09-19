@@ -7,9 +7,9 @@ conditions := [
     {"situation_description" : "The Exascale DB Storage Vault does not prevent Terraform from destroying it",
     "remedies":[ "Set deletion_policy to \"PREVENT\" so Terraform refuses to delete the vault via destroy or a destructive apply"]},
     {
-        "condition": "Test if deletion_policy is not set to PREVENT",
+        "condition": "Test if deletion_policy is not set to PREVENT or ABANDON",
         "attribute_path" : ["deletion_policy"],
-        "values" : ["PREVENT"],
+        "values" : ["PREVENT", "ABANDON"],
         "policy_type" : "whitelist"
     }
     ]
