@@ -1,10 +1,10 @@
-package terraform.gcp.security.BigQuery.google_bigquery_dataset.location
+package terraform.gcp.security.bigquery.google_bigquery_dataset.location
 import data.terraform.helpers
-import data.terraform.gcp.security.BigQuery.google_bigquery_dataset.vars
+import data.terraform.gcp.security.bigquery.google_bigquery_dataset.vars
 
 conditions := [
     [
-        {"situation_description" : "Incorrect location",
+        {"situation_description" : "The dataset is created outside the approved region, so its data is stored where the organisation's data-residency and sovereignty commitments do not hold.",
          "remedies": ["Change to australia-southeast1"]},
         {
             "condition": "Check if any is set to australia-southeast1",
@@ -15,5 +15,7 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

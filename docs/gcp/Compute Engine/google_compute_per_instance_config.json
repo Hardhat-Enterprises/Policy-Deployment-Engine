@@ -6,171 +6,171 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Governs whether Terraform itself will refuse to destroy this per-instance-config resource. Because deleting it is what triggers remove_instance_on_destroy/remove_instance_state_on_destroy (which can cascade into destroying the underlying instance and stripping its preserved disks/IPs/metadata), the default 'DELETE' lets an accidental 'terraform destroy'/'apply' set that cascade in motion with no safeguard. Requiring 'PREVENT' adds a Terraform-level check before that chain can start."
     },
     "instance_group_manager": {
       "description": "The instance group manager this instance config is part of.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the parent MIG this config belongs to; required, so it can never be left blank. The MIG's own configuration (location, template, security posture) is that resource's responsibility, not something this pointer lets us constrain."
     },
     "minimal_action": {
       "description": "The minimal action to perform on the instance during an update.\nDefault is 'NONE'. Possible values are:\n* REPLACE\n* RESTART\n* REFRESH\n* NONE",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the floor for how disruptive an update to this instance must be at minimum (e.g. forcing at least a RESTART rather than a live REFRESH). This is a rollout/change-management trade-off between disruption and rollout speed, not an access-control or exposure setting — none of the four values expose the instance or its data differently."
     },
     "most_disruptive_allowed_action": {
       "description": "The most disruptive action to perform on the instance during an update.\nDefault is 'REPLACE'. Possible values are:\n* REPLACE\n* RESTART\n* REFRESH\n* NONE",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Caps how disruptive Terraform is allowed to be when reconciling a change to this instance. A restrictive cap (e.g. NONE) can incidentally delay a security-relevant preserved_state change from actually landing on the instance, but that is a reconciliation/rollout-policy trade-off the team makes deliberately, not an inherently unsafe value — there's no direction here that is generically 'more secure' for every workload."
     },
     "name": {
       "description": "The name for this per-instance config and its corresponding instance.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource identifier only; naming has no access-control effect."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which GCP project the resource is created in; a deployment routing detail with no intrinsic security value to enforce generically."
     },
     "remove_instance_on_destroy": {
       "description": "When true, deleting this config will immediately remove the underlying instance.\nWhen false, deleting this config will use the behavior as determined by remove_instance_on_destroy.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deleting this config resource must never, by itself, cascade into destroying the live instance it describes. remove_instance_on_destroy=true collapses removal of a config record into an irreversible compute-destruction action; false keeps the instance running under the MIG untouched. Policy should blacklist true as a structural platform guarantee: removing this resource must not have the side effect of destroying a resource it does not own."
     },
     "remove_instance_state_on_destroy": {
       "description": "When true, deleting this config will immediately remove any specified state from the underlying instance.\nWhen false, deleting this config will *not* immediately remove any state from the underlying instance.\nState will be removed on the next instance recreation or update.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether deleting this config immediately clears the instance's preserved disks/IPs/metadata, or defers that cleanup to an unscheduled future update. Policy should require true so state cleanup on destroy is deterministic rather than open-ended."
     },
     "zone": {
       "description": "Zone where the containing instance group manager is located",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the region/zone where the resource is created. Policy should restrict it to an approved-region whitelist for data residency; the allowed set is parameterised (a hardcoded example whitelist is acceptable)."
+      "security_impact": false,
+      "rationale": "This doesn't choose where the instance is provisioned — it must match wherever the referenced instance_group_manager already lives; the resource doesn't create a new location, it addresses an existing one. The actual data-residency decision belongs to the instance_group_manager (or region_instance_group_manager) resource being referenced, so a whitelist here would just be re-policing a value that resource already fixed, not an independent architecture choice of this resource's own."
+    },
+    "preserved_state.metadata": {
+      "description": "Preserved metadata defined for this instance. This is a list of key->value pairs.",
+      "required": false,
+      "type": "map(string)",
+      "security_impact": false,
+      "rationale": "A free-form key/value passthrough that lets specific metadata survive instance recreation. GCE does recognise some individually security-relevant metadata keys elsewhere (e.g. serial-port-enable, enable-oslogin, ssh-keys), but those are a property of the instance/instance-template's own metadata surface, not of this stateful-override mechanism — a generic policy can't single out 'dangerous' keys in an arbitrary map without assuming which keys a given team uses, and the instance resource is where that surface should be assessed."
+    },
+    "preserved_state.disk.delete_rule": {
+      "description": "A value that prescribes what should happen to the stateful disk when the VM instance is deleted.\nThe available options are 'NEVER' and 'ON_PERMANENT_INSTANCE_DELETION'.\n'NEVER' - detach the disk when the VM is deleted, but do not delete the disk.\n'ON_PERMANENT_INSTANCE_DELETION' will delete the stateful disk when the VM is permanently\ndeleted from the instance group. Default value: \"NEVER\" Possible values: [\"NEVER\", \"ON_PERMANENT_INSTANCE_DELETION\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Prescribes what happens to a stateful disk's own lifecycle once the instance it's attached to is permanently removed from the group: detach and keep it ('NEVER') or delete it too ('ON_PERMANENT_INSTANCE_DELETION'). This is a data-retention/cleanup configuration choice — the same kind of call as a backup retention window — not a resource-destruction-blocking flag like deletion_protection: it doesn't guard this per_instance_config resource (or the disk resource itself) against Terraform destroying it, it only decides the disk's own fate after the instance is already gone. Whether stateful disks should be cleaned up automatically or retained is a team data-management preference, not a platform security control."
+    },
+    "preserved_state.disk.device_name": {
+      "description": "A unique device name that is reflected into the /dev/ tree of a Linux operating system running within the instance.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "The in-guest device path the disk is exposed under; an addressing detail with no bearing on read/write access or data exposure (that's governed by mode)."
+    },
+    "preserved_state.disk.mode": {
+      "description": "The mode of the disk. Default value: \"READ_WRITE\" Possible values: [\"READ_ONLY\", \"READ_WRITE\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Sets whether the instance can write to this specific stateful disk. This looks like a least-privilege lever at first glance, but there's no dominant safe value to push teams toward: the entire reason a disk is made 'stateful' in a MIG is almost always to persist per-instance writes (e.g. a database or broker's local data volume) — read-only reference data doesn't usually need per-instance preservation at all, since it can just live in the instance template. A blanket 'must be READ_ONLY' policy would break the majority-legitimate use of this exact mechanism rather than harden it, unlike e.g. all_ports/ip_protocol where the restrictive value is nearly always the correct one."
+    },
+    "preserved_state.disk.source": {
+      "description": "The URI of an existing persistent disk to attach under the specified device-name in the format\n'projects/project-id/zones/zone/disks/disk-name'.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A reference to an existing persistent disk resource. That disk's own security properties (encryption, snapshot/retention policy) belong to the google_compute_disk resource itself; this field is only a pointer to it."
+    },
+    "preserved_state.external_ip.auto_delete": {
+      "description": "These stateful IPs will never be released during autohealing, update or VM instance recreate operations. This flag is used to configure if the IP reservation should be deleted after it is no longer used by the group, e.g. when the given instance or the whole group is deleted. Default value: \"NEVER\" Possible values: [\"NEVER\", \"ON_PERMANENT_INSTANCE_DELETION\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Controls whether an unused reserved external IP address is auto-released once it's no longer bound to any instance, versus staying reserved under the project indefinitely. Once detached, the address isn't attached to anything reachable — it's an idle, billed resource, not an active attack surface — so this is a cost/cleanup-hygiene choice (comparable to backup retention length), not a control over live exposure. If anything, 'NEVER' releasing it also avoids a stale address being freed back into Google's pool and later reassigned to someone else, so there is no clearly unsafe direction here either."
+    },
+    "preserved_state.external_ip.interface_name": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifies which network interface (e.g. nic0) this preserved external IP applies to; naming/addressing only, no access-control effect."
+    },
+    "preserved_state.external_ip.ip_address.address": {
+      "description": "The URL of the reservation for this IP address.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "This does not decide whether the instance has a public IP at all — that's set on the instance template's network_interface.access_config. This field only pins a specific, already-reserved external IP so it persists for this instance across recreations instead of being reassigned a fresh ephemeral one; it's a continuity reference, not the public/private exposure switch itself, so it isn't the same shape as load_balancing_scheme."
+    },
+    "preserved_state.internal_ip.auto_delete": {
+      "description": "These stateful IPs will never be released during autohealing, update or VM instance recreate operations. This flag is used to configure if the IP reservation should be deleted after it is no longer used by the group, e.g. when the given instance or the whole group is deleted. Default value: \"NEVER\" Possible values: [\"NEVER\", \"ON_PERMANENT_INSTANCE_DELETION\"]",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Same reasoning as preserved_state.external_ip.auto_delete: an idle reserved-address cleanup/cost lever, not an active exposure control — and an internal address is private (VPC-scoped) regardless, with reachability governed by firewall rules, not by whether its reservation lingers."
+    },
+    "preserved_state.internal_ip.interface_name": {
+      "description": "The identifier for this object. Format specified above.",
+      "required": true,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "Identifies which network interface this preserved internal IP applies to; naming/addressing only, no access-control effect."
+    },
+    "preserved_state.internal_ip.ip_address.address": {
+      "description": "The URL of the reservation for this IP address.",
+      "required": false,
+      "type": "string",
+      "security_impact": false,
+      "rationale": "A reference pinning a specific reserved internal IP for continuity across recreations, not a switch controlling reachability; internal-address exposure is governed by VPC firewall rules on the referenced network, not by this pointer."
     },
     "preserved_state": {
       "type": "block",
       "description": "The preserved state for this instance.",
       "required": false
     },
-    "preserved_state.metadata": {
-      "description": "Preserved metadata defined for this instance. This is a list of key->value pairs.",
-      "required": false,
-      "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
     "preserved_state.disk": {
       "type": "block",
       "description": "Stateful disks for the instance.",
       "required": false
-    },
-    "preserved_state.disk.delete_rule": {
-      "description": "A value that prescribes what should happen to the stateful disk when the VM instance is deleted.\nThe available options are 'NEVER' and 'ON_PERMANENT_INSTANCE_DELETION'.\n'NEVER' - detach the disk when the VM is deleted, but do not delete the disk.\n'ON_PERMANENT_INSTANCE_DELETION' will delete the stateful disk when the VM is permanently\ndeleted from the instance group. Default value: \"NEVER\" Possible values: [\"NEVER\", \"ON_PERMANENT_INSTANCE_DELETION\"]",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "preserved_state.disk.device_name": {
-      "description": "A unique device name that is reflected into the /dev/ tree of a Linux operating system running within the instance.",
-      "required": true,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "preserved_state.disk.mode": {
-      "description": "The mode of the disk. Default value: \"READ_WRITE\" Possible values: [\"READ_ONLY\", \"READ_WRITE\"]",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "preserved_state.disk.source": {
-      "description": "The URI of an existing persistent disk to attach under the specified device-name in the format\n'projects/project-id/zones/zone/disks/disk-name'.",
-      "required": true,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
     },
     "preserved_state.external_ip": {
       "type": "block",
       "description": "Preserved external IPs defined for this instance. This map is keyed with the name of the network interface.",
       "required": false
     },
-    "preserved_state.external_ip.auto_delete": {
-      "description": "These stateful IPs will never be released during autohealing, update or VM instance recreate operations. This flag is used to configure if the IP reservation should be deleted after it is no longer used by the group, e.g. when the given instance or the whole group is deleted. Default value: \"NEVER\" Possible values: [\"NEVER\", \"ON_PERMANENT_INSTANCE_DELETION\"]",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "preserved_state.external_ip.interface_name": {
-      "description": "The identifier for this object. Format specified above.",
-      "required": true,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
     "preserved_state.external_ip.ip_address": {
       "type": "block",
       "description": "Ip address representation",
       "required": false
-    },
-    "preserved_state.external_ip.ip_address.address": {
-      "description": "The URL of the reservation for this IP address.",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
     },
     "preserved_state.internal_ip": {
       "type": "block",
       "description": "Preserved internal IPs defined for this instance. This map is keyed with the name of the network interface.",
       "required": false
     },
-    "preserved_state.internal_ip.auto_delete": {
-      "description": "These stateful IPs will never be released during autohealing, update or VM instance recreate operations. This flag is used to configure if the IP reservation should be deleted after it is no longer used by the group, e.g. when the given instance or the whole group is deleted. Default value: \"NEVER\" Possible values: [\"NEVER\", \"ON_PERMANENT_INSTANCE_DELETION\"]",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
-    "preserved_state.internal_ip.interface_name": {
-      "description": "The identifier for this object. Format specified above.",
-      "required": true,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
     "preserved_state.internal_ip.ip_address": {
       "type": "block",
       "description": "Ip address representation",
       "required": false
-    },
-    "preserved_state.internal_ip.ip_address.address": {
-      "description": "The URL of the reservation for this IP address.",
-      "required": false,
-      "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
     }
   }
 }

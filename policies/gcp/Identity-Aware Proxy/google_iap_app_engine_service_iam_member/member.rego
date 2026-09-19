@@ -48,8 +48,8 @@ conditions := [
     {
       "condition": "member must use allowed prefix",
       "attribute_path": ["member"],
-      "values": ["users:jane@example.com"],
-      "policy_type": "blacklist"
+      "values": ["*:*@*", [["users"], [], []]],
+      "policy_type": "pattern blacklist"
     }
   ],
 
@@ -64,8 +64,8 @@ conditions := [
     {
       "condition": "member must not contain whitespace",
       "attribute_path": ["member"],
-      "values": [" user:jane@example.com "],
-      "policy_type": "blacklist"
+      "values": ["*:*@*", [[" user"], [], []]],
+      "policy_type": "pattern blacklist"
     }
   ],
 
@@ -80,8 +80,8 @@ conditions := [
     {
       "condition": "member must be a corporate email",
       "attribute_path": ["member"],
-      "values": ["user:jane@gmail.com"],
-      "policy_type": "blacklist"
+      "values": ["*:*@*", [[], [], ["gmail.com"]]],
+      "policy_type": "pattern blacklist"
     }
   ],
 
@@ -119,5 +119,7 @@ conditions := [
 ]
 
 # Summaries (unchanged usage with your helpers)
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

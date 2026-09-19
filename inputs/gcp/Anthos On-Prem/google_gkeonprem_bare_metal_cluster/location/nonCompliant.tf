@@ -3,7 +3,7 @@ resource "google_gkeonprem_bare_metal_cluster" "non_compliant_example_1" {
   project                  = "PDE"
   location                 = "asia1"
   admin_cluster_membership = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
-  bare_metal_version       = "1.10.0"
+  bare_metal_version         = "1.12.3"
 
   network_config {
     island_mode_cidr {
@@ -15,15 +15,15 @@ resource "google_gkeonprem_bare_metal_cluster" "non_compliant_example_1" {
   control_plane {
     control_plane_node_pool_config {
       node_pool_config {
-        labels           = {}
-        operating_system = "WINDOWS"
+        labels            = {}
+        operating_system  = "LINUX"
       }
     }
   }
 
   load_balancer {
     port_config {
-      control_plane_load_balancer_port = 80
+      control_plane_load_balancer_port = 443
     }
 
     vip_config {

@@ -3,5 +3,5 @@ resource "google_backup_dr_backup_plan" "non_compliant_example_1" {
   location       = "us-central1"
   backup_plan_id = "non_compliant_example_1"
   resource_type  = "compute.googleapis.com/Instance"
-  backup_vault   = "nc2"
+  backup_vault   = "c2"
 }
