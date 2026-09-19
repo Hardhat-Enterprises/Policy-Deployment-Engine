@@ -7,7 +7,7 @@ conditions := [
   [
     {
       "situation_description": "The backend service can still be destroyed by Terraform.",
-      "remedies": ["Set 'deletion_policy' to 'PREVENT' so an accidental 'terraform destroy'/'apply' can't delete the resource."]
+      "remedies": ["Set 'deletion_policy' to 'PREVENT' to block accidental deletion by 'terraform destroy'/'apply'"]
     },
     {
       "condition": "'deletion_policy' must be 'PREVENT'",
