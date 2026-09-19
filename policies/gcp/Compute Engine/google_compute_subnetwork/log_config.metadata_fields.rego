@@ -7,6 +7,19 @@ import data.terraform.gcp.security.compute_engine.google_compute_subnetwork.vars
 situation := "Custom flow log metadata is enabled without any metadata fields"
 remedies := ["Add at least one value to log_config.metadata_fields"]
 
+conditions := [[
+    {
+        "situation_description": situation,
+        "remedies": remedies
+    },
+    {
+        "condition": "Custom metadata must include at least one metadata field",
+        "attribute_path": ["log_config", 0, "metadata_fields"],
+        "values": [null, []],
+        "policy_type": "blacklist"
+    }
+]]
+
 missing_metadata_fields(value) if {
     value == null
 }

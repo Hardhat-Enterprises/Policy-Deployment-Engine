@@ -15,7 +15,7 @@ resource "google_compute_subnetwork" "compliant_example_2" {
   name          = "compliant-example-2"
   project       = "pde-project"
   network       = "default"
-  ip_cidr_range = "10.10.1.0/24"
+  ip_cidr_range = "10.10.0.0/24"
   region        = "australia-southeast1"
 
   log_config {
