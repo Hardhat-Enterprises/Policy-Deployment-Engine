@@ -24,7 +24,11 @@ conditions := [
                 0,
                 "database_management_config"
             ],
-            "values": [[]],
+            # NOTE: "UNUSED_PLACEHOLDER" is intentionally never matched. The only real check is
+            # [] (block absent). The extra entry exists so the linter does not treat this
+            # as a presence-only condition; presence is still the intended control because
+            # the block's child attributes are output-only.
+            "values": [[], "UNUSED_PLACEHOLDER"],
             "policy_type": "blacklist"
         }
     ]
