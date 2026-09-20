@@ -29,11 +29,11 @@ resource "google_oracle_database_db_system" "non_compliant_example_1" {
   db_version = "19.0.0.0"
 
   database {
-    admin_password      = "ABcde_1#234"
-    database_id         = "mydb"
-    db_name             = "db"
-    db_unique_name      = "db"
-    tde_wallet_password = "invalid-wallet-password"
+    admin_password     = "ABcde_1#234"
+    database_id        = "mydb"
+    db_name            = "db"
+    db_unique_name     = "db"
+    tde_wallet_password = "SecureWalletPassword123!"
   }
 }
   }

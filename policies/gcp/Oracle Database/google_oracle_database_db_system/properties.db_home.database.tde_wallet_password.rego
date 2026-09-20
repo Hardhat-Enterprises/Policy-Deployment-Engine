@@ -6,16 +6,26 @@ import data.terraform.gcp.security.oracle_database.google_oracle_database_db_sys
 conditions := [
     [
         {
-            "situation_description": "The Oracle Database has a TDE wallet password configured to protect the database encryption wallet.",
+            "situation_description": "The Oracle Database DB System must not use an inline cleartext TDE wallet password. The credential should be provided through an approved external secret-management reference.",
             "remedies": [
-                "Configure a secure TDE wallet password."
+                "Replace the inline TDE wallet password with a Google Cloud Secret Manager reference using the format projects/PROJECT_ID/secrets/SECRET_ID/versions/VERSION_ID."
             ]
         },
         {
-            "condition": "The TDE wallet password must not use an invalid placeholder value.",
-            "attribute_path": ["properties", 0, "db_home", 0, "database", 0, "tde_wallet_password"],
-            "values": ["invalid-wallet-password"],
-            "policy_type": "blacklist"
+            "condition": "The TDE wallet password must use a Google Cloud Secret Manager resource reference.",
+            "attribute_path": [
+                "properties",
+                0,
+                "db_home",
+                0,
+                "database",
+                0,
+                "tde_wallet_password"
+            ],
+            "values": [
+                "projects/*/secrets/*/versions/*"
+            ],
+            "policy_type": "element pattern whitelist"
         }
     ]
 ]
