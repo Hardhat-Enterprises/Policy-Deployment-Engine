@@ -1,0 +1,20 @@
+package terraform.gcp.security.data_loss_prevention.google_data_loss_prevention_inspect_template.deletion_policy
+import data.terraform.helpers
+import data.terraform.gcp.security.data_loss_prevention.google_data_loss_prevention_inspect_template.vars
+
+conditions := [
+    [
+    {"situation_description" : "The inspect template can be destroyed by Terraform, which is the prevent-destructive-loss archetype",
+    "remedies":[ "Set deletion_policy to PREVENT"]},
+    {
+        "condition": "Check if deletion_policy is set to PREVENT",
+        "attribute_path" : ["deletion_policy"],
+        "values" : ["PREVENT"],
+        "policy_type" : "whitelist"
+    }
+    ]
+]
+
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
