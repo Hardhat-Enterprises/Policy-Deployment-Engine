@@ -114,6 +114,18 @@ run_test_suite "Map Key Blacklist Integration" \
     "policies/_helpers" \
     "false" "false"
 
+# Orchestration itself: the preflights that refuse a broken policy (unknown
+# policy_type, unknown situation "match") and the ANY/ALL combining of a
+# situation's conditions. Mock-only, and needs the whole helpers package
+# because get_multi_summary dispatches into every policy module.
+#
+# NOTE: helpers_test.rego existed from #580 but was never registered here, so
+# none of it ran. Added 2026-09-20 with the "match" suite.
+run_test_suite "Policy Orchestration" \
+    "tests/_helpers/helpers_test.rego" \
+    "policies/_helpers" \
+    "false" "false"
+
 echo ""
 echo "================================"
 echo "Test Suites: $PASSED passed, $FAILED failed"

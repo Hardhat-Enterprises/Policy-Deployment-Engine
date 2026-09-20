@@ -287,6 +287,62 @@ Note this is the same `[null, ""]` shape that `presence-only` asks you to look p
 presence check *right* and pairing it with a real pattern are separate improvements, and a
 condition can fairly be told both things at once.
 
+## situation-match-unset
+
+A situation has two or more conditions and no `match` key, so it takes the default silently.
+
+A situation with one condition is unambiguous. With two, there are two very different readings,
+and the engine has to pick one:
+
+- **`"match": "any"`** (the default) — flag a resource that fails **any** condition. Right when
+  the conditions are several ways the *same* argument can be wrong: a presence check plus a
+  shape check, say, where either failing is a real problem.
+- **`"match": "all"`** — flag only a resource that fails **every** condition. Right when the
+  conditions are *alternatives*: two acceptable ways to configure something, where only a
+  resource that does neither is non-compliant.
+
+Both produce a green kit, and picking the wrong one is invisible in a test run — an over-flag
+reports a compliant resource, an under-flag reports nothing at all. The linter cannot tell which
+you meant, so it asks you to write it down.
+
+Bad — two alternatives under the default, which flags every endpoint that is missing *either*:
+
+    [
+      {
+        "situation_description": "Endpoint is reachable from the public internet.",
+        "remedies": ["Set network for VPC peering, or enable Private Service Connect."]
+      },
+      { "attribute_path": ["network"], "values": [null, ""], "policy_type": "blacklist" },
+      { "attribute_path": ["private_service_connect_config", 0, "enable_private_service_connect"],
+        "values": [true], "policy_type": "whitelist" }
+    ]
+
+Good:
+
+    [
+      {
+        "situation_description": "Endpoint is reachable from the public internet.",
+        "remedies": ["Set network for VPC peering, or enable Private Service Connect."],
+        "match": "all"
+      },
+      ...the same two conditions...
+    ]
+
+Also good — the same-argument pair, where the default is what you want and you are confirming it:
+
+    {
+      "situation_description": "Description is missing or malformed.",
+      "remedies": ["Set a description matching the standard."],
+      "match": "any"
+    }
+
+**This is a warning, and it does not fail your build.** It fires on existing policies whose
+behaviour is already correct — most multi-condition situations in the tree are the same-argument
+kind and want the default. Adding `"match": "any"` to those changes nothing; it just records
+that someone checked.
+
+See [policy.rego](policy-rego.md#top) for what each mode does to the evaluation.
+
 ## wrong-argument
 
 No condition in `<argument>.rego` reads the argument the file is named after — usually a
