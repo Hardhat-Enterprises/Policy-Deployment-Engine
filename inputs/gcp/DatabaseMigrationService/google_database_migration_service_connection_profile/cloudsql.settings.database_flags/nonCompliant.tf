@@ -9,9 +9,7 @@ resource "google_database_migration_service_connection_profile" "non_compliant_e
       tier             = "db-n1-standard-1"
       source_id        = "projects/gcp-project/locations/australia-southeast2/connectionProfiles/my-fromprofileid"
 
-      database_flags = {
-        cloudsql_iam_authentication = "off"
-      }
+
 
       ip_config {
         enable_ipv4     = true

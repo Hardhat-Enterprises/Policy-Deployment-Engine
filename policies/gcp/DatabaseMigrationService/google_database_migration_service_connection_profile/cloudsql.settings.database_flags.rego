@@ -11,8 +11,7 @@ violating_resources contains name if {
     resource := input.planned_values.root_module.resources[_]
     resource.type == resource_type
     name := resource.values[resource_value_name]
-    v := resource.values.cloudsql[0].settings[0].database_flags.cloudsql_iam_authentication
-    v != "on"
+   not resource.values.cloudsql[0].settings[0].database_flags.cloudsql_iam_authentication == "on"
 }
 
 message := [
