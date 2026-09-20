@@ -6,14 +6,14 @@ import data.terraform.gcp.security.vertex_ai.google_vertex_ai_endpoint.vars
 conditions := [
     [
         {
-            "situation_description": "When VPC network peering is used, the configured network should reference an approved VPC network resource path.",
-            "remedies": ["Ensure the `network` attribute references a valid VPC path if configured."]
+            "situation_description": "When network is set, it must be a VPC network path (projects/*/global/networks/*).",
+            "remedies": ["Ensure the `network` attribute matches the VPC network path format: projects/*/global/networks/*"]
         },
         {
-            "condition": "network is set to an invalid non-empty literal",
+            "condition": "network is explicitly set but does not match the required VPC path shape",
             "attribute_path": ["network"],
-            "values": ["not-a-valid-vpc-path"],
-            "policy_type": "blacklist"
+            "values": ["projects/*/global/networks/*"],
+            "policy_type": "element pattern whitelist"
         }
     ]
 ]
