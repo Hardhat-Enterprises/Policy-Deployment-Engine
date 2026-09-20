@@ -50,15 +50,15 @@ finding straight to it.
 
 ## unknown-policy-type
 
-`policy_type` is not one of the seven values the engine can dispatch, so the whole condition is
+`policy_type` is not one of the supported values the engine can dispatch, so the whole condition is
 never evaluated. This is the worst thing a policy can do quietly: the condition is not weak, it
 is *absent*, and the policy passes every resource you point it at.
 
-The seven, exactly as the engine spells them:
+The supported values, exactly as the engine spells them:
 
-    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist
+    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist
 
-They are **lowercase**, and the two-word ones use a **space, not an underscore**. Writing
+They are **lowercase**, and multi-word names use **spaces, not underscores**. Writing
 `pattern_whitelist` is the mistake this rule exists to catch. `element whitelist` is not a type
 either — for allowing a list, a plain `whitelist` already requires every element to be allowed
 (see [policy.rego](policy-rego.md#top) for what each type does).
@@ -79,7 +79,7 @@ Good:
       "policy_type": "whitelist"
     }
 
-If none of the seven expresses what you need, that is worth saying out loud rather than working
+If none of the supported types expresses what you need, that is worth saying out loud rather than working
 around — raise it, so the type can be added to the helpers instead of a broken one shipping.
 
 Miss this and the test catches it too: the helper refuses to evaluate the policy at all and
@@ -142,6 +142,19 @@ Good:
 
 A path that only passes *through* an index (e.g. `["rsa", 0, "key"]`) is fine — this rule only
 looks at the **last** segment.
+
+## invalid-map-key-blacklist
+
+For `map key blacklist`, `values` supplies key names, not the map's values. It
+must contain at least one non-empty string name with no leading or trailing
+whitespace. A single string is also accepted by the dispatcher. Empty lists,
+missing/null values, non-string entries and names such as `"authorization "`
+are **errors**, because they can silently prevent the intended check.
+
+Correct the configured names rather than relying on trimming. The normal runtime
+summary also returns `POLICY ERROR:` for this configuration and checks nothing.
+This is not a `presence-only` warning; empty/null values in the actual resource
+map are still allowed by the helper.
 
 ## presence-only
 

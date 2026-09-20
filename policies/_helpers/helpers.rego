@@ -20,6 +20,7 @@ import data.terraform.helpers.policies.pattern_blacklist
 import data.terraform.helpers.policies.pattern_whitelist
 import data.terraform.helpers.policies.element_blacklist
 import data.terraform.helpers.policies.element_pattern_whitelist
+import data.terraform.helpers.policies.map_key_blacklist
 
 ################################################################################
 # Public API
@@ -59,6 +60,24 @@ get_multi_summary(conditions, tf_variables) = summary if {
     count(problems) > 0
     summary := {
         "message": [policy_type_error_message(problems)],
+        "details": []
+    }
+} else = summary if {
+    # Preflight before comprehensions can turn a broken map-key condition into
+    # an empty result. Other policy types retain their existing values semantics.
+    problems := map_key_blacklist_problems(conditions)
+    count(problems) > 0
+    summary := {
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Use at least one non-empty key name with no leading or trailing whitespace.", [concat("; ", sort(problems))])],
+        "details": []
+    }
+} else = summary if {
+    # The shared extractor can return an array when an index is omitted. Refuse
+    # non-map results before the helper's is_object guard can silently skip them.
+    problems := map_key_blacklist_path_problems(conditions, tf_variables)
+    count(problems) > 0
+    summary := {
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Check attribute_path and include numeric indexes for list blocks when selecting a map.", [concat("; ", sort(problems))])],
         "details": []
     }
 } else = summary if {
@@ -211,6 +230,7 @@ valid_policy_types := [
     "pattern whitelist",
     "element blacklist",
     "element pattern whitelist",
+    "map key blacklist",
 ]
 
 # Every reason `conditions` cannot be dispatched, as human-readable phrases. Two
@@ -221,6 +241,43 @@ valid_policy_types := [
 #     entries and wrong for a real check that simply forgot the key).
 policy_type_problems(conditions) := problems if {
     problems := _unknown_type_problems(conditions) | _missing_type_problems(conditions)
+}
+
+# `values` names map keys, not empty attribute values. Preserve ensure_array's
+# support for a single string, but reject empty/invalid configurations.
+map_key_blacklist_problems(conditions) := problems if {
+    problems := {sprintf("invalid map key blacklist values on '%s'", [shared.format_attribute_path(object.get(entry, "attribute_path", []))]) |
+        some group in conditions
+        some entry in group
+        lower(object.get(entry, "policy_type", "")) == "map key blacklist"
+        values := shared.ensure_array(object.get(entry, "values", null))
+        not _valid_map_key_blacklist_values(values)
+    }
+}
+
+_valid_map_key_blacklist_values(values) if {
+    count(values) > 0
+    every name in values {
+        is_string(name)
+        name != ""
+        name == trim_space(name)
+    }
+}
+
+# Missing/null optional maps are allowed; present non-map values are not. Limit
+# this check to the selected resource type and never include resource values in
+# the error message. Other helper types keep their existing path semantics.
+map_key_blacklist_path_problems(conditions, tf_variables) := problems if {
+    problems := {sprintf("map key blacklist path '%s' resolved to %s; expected a map", [shared.format_attribute_path(entry.attribute_path), type_name(value)]) |
+        some group in conditions
+        some entry in group
+        lower(object.get(entry, "policy_type", "")) == "map key blacklist"
+        some resource in input.planned_values.root_module.resources
+        resource.type == tf_variables.resource_type
+        value := shared.get_attribute_value(resource, entry.attribute_path)
+        value != null
+        not is_object(value)
+    }
 }
 
 # Normalised the same way evaluate_conditions normalises it (lowercased), so
@@ -302,6 +359,10 @@ select_policy_logic(tf_variables, attribute_path, values_formatted, "element bla
 
 select_policy_logic(tf_variables, attribute_path, values_formatted, "element pattern whitelist") = results if {
     results := element_pattern_whitelist.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "map key blacklist") = results if {
+    results := map_key_blacklist.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
 # There is deliberately NO fallback rule for an unknown policy_type. One used to

@@ -116,7 +116,7 @@ def test_unknown_policy_type_is_an_error_not_a_warning(tmp_path):
 
 
 def test_unknown_policy_type_is_silent_on_every_valid_type(tmp_path):
-    # The rule must accept all seven, including the two-word ones — flagging a
+    # The rule must accept all supported types, including multi-word ones — flagging a
     # valid type would block every pattern/element policy in the tree.
     root = build_tree(tmp_path, "policy_smells")
     template = (root / "policies" / "gcp" / "Backup for GKE"
@@ -131,6 +131,58 @@ def test_unknown_policy_type_is_silent_on_every_valid_type(tmp_path):
         assert not [f for f in findings
                     if f.policy == "bogus_type" and f.rule == "unknown-policy-type"], \
             f"{valid!r} is a valid policy_type and must not be flagged"
+
+
+@pytest.mark.parametrize("values", [
+    [], None, [None], [""], [" "], ["authorization "], [" authorization"],
+    ["authorization\t"], [7], [{}], [["authorization"]], ["authorization", None],
+])
+def test_invalid_map_key_blacklist_is_an_error_not_presence_warning(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"map key blacklist"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    own = [f for f in findings if f.policy == "bogus_type"]
+    invalid = [f for f in own if f.rule == "invalid-map-key-blacklist"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+    assert "whitespace" in invalid[0].message
+    assert not [f for f in own if f.rule == "presence-only"]
+
+
+@pytest.mark.parametrize("values", [["authorization"], ["AUTHORIZATION"], "authorization"])
+def test_valid_map_key_blacklist_has_no_configuration_finding(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"Map Key Blacklist"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert not [f for f in findings if f.policy == "bogus_type"
+                and f.rule in {"invalid-map-key-blacklist", "presence-only", "unknown-policy-type"}]
+
+
+def test_missing_map_key_blacklist_values_is_an_error(tmp_path):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"map key blacklist"')
+    body = body.replace('"values": ["approved-*", [["approved-"]]],', '')
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert any(f.policy == "bogus_type" and f.rule == "invalid-map-key-blacklist"
+               and f.severity == "error" for f in findings)
 
 
 def test_unknown_policy_type_matches_what_the_helpers_dispatch(tmp_path):
