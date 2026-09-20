@@ -6,40 +6,16 @@ import data.terraform.gcp.security.datastream.google_datastream_connection_profi
 conditions := [
     [
         {
-            "situation_description": "The MongoDB TLS client private key is not referenced through Google Secret Manager, which may expose private-key material.",
+            "situation_description": "The configured MongoDB TLS client private-key reference does not follow the required Google Secret Manager secret-version resource format.",
             "remedies": [
-                "Store the PEM-encoded client private key in Google Secret Manager.",
-                "Configure secret_manager_stored_client_key instead of embedding client_key.",
-                "Use the format projects/{project}/secrets/{secret}/versions/{version}."
-            ]
-        },
-        {
-            "condition": "Check whether a Secret Manager reference is configured for the MongoDB TLS client key.",
-            "attribute_path": [
-                "mongodb_profile",
-                0,
-                "ssl_config",
-                0,
-                "secret_manager_stored_client_key"
-            ],
-            "values": [
-                null,
-                ""
-            ],
-            "policy_type": "blacklist"
-        }
-    ],
-    [
-        {
-            "situation_description": "The MongoDB TLS client-key reference does not follow the required Secret Manager secret-version resource format.",
-            "remedies": [
-                "Use a structurally valid Secret Manager secret-version reference.",
+                "Store the PEM-encoded MongoDB TLS client private key in Google Secret Manager.",
+                "Configure secret_manager_stored_client_key instead of embedding private-key material through client_key.",
                 "Use the format projects/{project}/secrets/{secret}/versions/{version}.",
-                "Use either a numeric version or an approved version alias."
+                "Grant access to the private-key secret using least-privilege IAM permissions."
             ]
         },
         {
-            "condition": "Check whether the MongoDB TLS client-key reference follows the Secret Manager secret-version resource format.",
+            "condition": "When configured, check whether the MongoDB TLS client-key reference follows the Secret Manager secret-version resource format.",
             "attribute_path": [
                 "mongodb_profile",
                 0,
