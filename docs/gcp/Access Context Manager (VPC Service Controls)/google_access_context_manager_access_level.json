@@ -87,7 +87,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "This argument lists other access levels in the same access policy that must all be granted for the condition to be true. Each entry is a resource-name reference that must have the form accessPolicies/{policy_id}/accessLevels/{short_name}. A generic policy can require every element to match that fully qualified form and forbid any entry that does not, such as a bare short name (e.g. 'corp_devices'), an empty string, or a path with missing or extra segments. This catches a malformed prerequisite at plan time instead of as an apply-time API error. The policy does not require the list to be non-empty, because the argument is optional and a condition can establish trust through other fields such as ip_subnetworks, members or device_policy. It names no specific access level or policy ID."
+      "rationale": "This argument lists other access levels in the same access policy that must all be granted for the condition to be true, so each entry adds a requirement to a layered check. The insecure state is a condition where this list is absent and every sibling field (ip_subnetworks, members, regions, device_policy) is also empty, because the condition then matches every request. Absence alone is a normal configuration and is not flagged, and that cross-field case is outside what a single-argument policy can check. The policy this argument supports requires every listed entry to be a fully qualified accessPolicies/{policy_id}/accessLevels/{short_name} reference, so the prerequisite chain is built only from well-formed references. It names no specific access level or policy ID."
     },
     "basic.conditions.device_policy": {
       "type": "block",
