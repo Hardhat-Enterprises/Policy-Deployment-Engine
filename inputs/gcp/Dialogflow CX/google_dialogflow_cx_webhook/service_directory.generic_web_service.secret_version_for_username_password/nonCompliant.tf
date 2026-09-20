@@ -7,6 +7,7 @@ resource "google_dialogflow_cx_webhook" "non_compliant_example_1" {
 
     generic_web_service {
       uri                                  = "https://example.internal/webhook"
+      service_agent_auth                   = "ID_TOKEN"
       secret_version_for_username_password = "projects/example-project/secrets/webhook-basic-auth/versions/1"
     }
   }

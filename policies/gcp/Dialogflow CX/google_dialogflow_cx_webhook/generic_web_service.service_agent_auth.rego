@@ -5,14 +5,14 @@ import data.terraform.helpers
 
 conditions := [[
 	{
-		"situation_description": "The generic webhook explicitly selects no service-agent authentication token.",
-		"remedies": ["Use ID_TOKEN or ACCESS_TOKEN when service-agent authentication is selected."],
+		"situation_description": "The generic webhook does not explicitly select a supported service-agent authentication token.",
+		"remedies": ["Set service_agent_auth to ID_TOKEN or ACCESS_TOKEN; NONE and omission do not satisfy this service-agent-token requirement."],
 	},
 	{
-		"condition": "Disallow the NONE service-agent authentication mode",
+		"condition": "Require an explicit ID_TOKEN or ACCESS_TOKEN service-agent authentication mode",
 		"attribute_path": ["generic_web_service", 0, "service_agent_auth"],
-		"values": ["NONE"],
-		"policy_type": "blacklist",
+		"values": ["ID_TOKEN", "ACCESS_TOKEN"],
+		"policy_type": "whitelist",
 	},
 ]]
 
