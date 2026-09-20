@@ -84,6 +84,7 @@ def test_policy_body_rules_fire_exactly_once_each(tmp_path):
         ("dead_pattern", "pattern-values-shape"),
         ("unset_blind", "presence-missing-null"),
         ("unset_blind", "presence-only"),
+        ("two_conditions", "situation-match-unset"),
     }
 
 
@@ -233,7 +234,8 @@ def test_only_advisory_rules_are_warnings(tmp_path):
     warns = {f.rule for f in findings if f.severity == "warn"}
     errors = {f.rule for f in findings if f.severity == "error"}
     assert warns == {"legacy-assign", "package-case", "presence-only",
-                     "pattern-values-shape", "presence-missing-null"}
+                     "pattern-values-shape", "presence-missing-null",
+                     "situation-match-unset"}
     assert not (warns & errors), "a rule must have one severity, not both"
 
 
@@ -528,6 +530,7 @@ def test_cli_json_output_and_exit_code(tmp_path, capsys):
         ("dead_pattern", "pattern-values-shape"),
         ("unset_blind", "presence-missing-null"),
         ("unset_blind", "presence-only"),
+        ("two_conditions", "situation-match-unset"),
     }
 
 
@@ -552,7 +555,8 @@ def test_cli_exits_zero_when_only_warnings_are_found(tmp_path, capsys):
     data = json.loads(capsys.readouterr().out)
     assert {e["severity"] for e in data} == {"warn"}
     assert {e["rule"] for e in data} == {"legacy-assign", "package-case", "presence-only",
-                                        "pattern-values-shape", "presence-missing-null"}
+                                        "pattern-values-shape", "presence-missing-null",
+                                        "situation-match-unset"}
     assert rc == 0
 
 
@@ -851,6 +855,44 @@ def test_pattern_values_shape_leaves_element_pattern_whitelist_alone(tmp_path):
     # pair rule must not be applied to it — the clean fixture would fail first,
     # but the guard is worth pinning against a future edit to PATTERN_POLICY_TYPES.
     assert "element pattern whitelist" not in policy_lint.PATTERN_POLICY_TYPES
+
+
+# --------------------------------------------------------------------------- #
+# A multi-condition situation must say whether it means ANY or ALL.
+# --------------------------------------------------------------------------- #
+def test_situation_match_unset_names_the_situation_and_both_options(tmp_path):
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    unset = [f for f in findings if f.rule == "situation-match-unset"]
+    assert len(unset) == 1
+    assert unset[0].policy == "two_conditions"
+    assert unset[0].severity == "warn"
+    # The author has to be able to act without reading the helper source.
+    assert "not configured for production" in unset[0].message
+    assert '"any"' in unset[0].message
+    assert '"all"' in unset[0].message
+
+
+def test_situation_match_unset_silent_on_a_single_condition(tmp_path):
+    # Every situation in the clean fixture has one condition; asking it to
+    # declare ANY vs ALL would be noise, since the two agree.
+    root = build_tree(tmp_path, "clean")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Cloud Storage", "google_storage_bucket")
+    assert findings == [], f"clean fixture must stay silent, got {findings}"
+
+
+def test_an_explicit_match_key_satisfies_the_rule_and_is_not_a_condition(tmp_path):
+    # sibling_gated.rego carries "match": "all" on its metadata entry and has
+    # two conditions. Three things must hold at once: the rule is satisfied, the
+    # metadata entry is not mistaken for a condition (which would trip
+    # unknown-policy-type, since it has no policy_type), and a condition reading
+    # a SIBLING argument does not trip wrong-argument.
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert not [f for f in findings if f.policy == "sibling_gated"]
 
 
 # --------------------------------------------------------------------------- #

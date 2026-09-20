@@ -99,6 +99,10 @@ RULES = {
         "A `blacklist` lists \"\" but not null, so an unset argument — which "
         "reaches the engine as null in the plan JSON — is not caught. Use "
         "[null, \"\"] (warn)."),
+    "situation-match-unset": (
+        "A situation has 2+ conditions and no `match` key, so it silently gets the "
+        "default: a resource is flagged when it fails ANY of them. Say which you "
+        "mean — `\"match\": \"any\"` or `\"match\": \"all\"` (warn)."),
     "wrong-argument": (
         "No condition in `<arg>.rego` reads the argument the file is named after."),
     "fixture-drift": (
@@ -148,6 +152,12 @@ RULES = {
 # the tree before the rule existed, so they start as findings a reviewer reads
 # rather than a gate that fails work already on dev.
 #
+# `situation-match-unset` is a warn for a different reason: the default it asks
+# about is CORRECT for most of the situations it will fire on (the presence +
+# shape pairs that need the union). It is a prompt to state an intention, not a
+# report of a defect, and erroring would demand edits to files whose behaviour
+# is already right.
+#
 # `repeated-helper-call` is deliberately NOT here: it is an error, by the owner's
 # call. The size of the backlog is what made that look risky — measured on dev
 # 2026-08-31, 498 of 1,395 policy files carried the pattern — but the mechanical
@@ -160,7 +170,8 @@ RULES = {
 # branch_scope.py stops a Service/* branch touching a file outside its own
 # resource type. A pre-existing finding elsewhere is reported, never failed on.
 WARN_RULES = {"legacy-assign", "package-case", "presence-only",
-              "pattern-values-shape", "presence-missing-null"}
+              "pattern-values-shape", "presence-missing-null",
+              "situation-match-unset"}
 
 # --------------------------------------------------------------------------- #
 # Rule constants
@@ -961,8 +972,29 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
             add(rule, message)
 
     joined_paths = []
-    for group in conditions:
+    for index, group in enumerate(conditions):
         metas, checks = _split_group(group)
+
+        # --- situation-match-unset (warn) ---------------------------------- #
+        # With 2+ conditions the situation gets one of two very different
+        # semantics, and saying nothing picks one of them silently. The default
+        # (union) is right for the common presence + shape pair and wrong for a
+        # rule meant to be conditional on a sibling argument — and the wrong one
+        # is invisible either way, since both produce a green kit. Asking the
+        # author to write it down is the only point at which the intention is
+        # known. See `match` in policies/_helpers/helpers.rego.
+        if len(checks) >= 2 and not any("match" in meta for meta in metas):
+            description = next((meta.get("situation_description")
+                                for meta in metas
+                                if meta.get("situation_description")), None)
+            named = f"'{description}'" if description else f"#{index + 1}"
+            add_once("situation-match-unset", index,
+                     f"situation {named} has {len(checks)} conditions and no "
+                     f"\"match\" key, so a resource is flagged when it fails ANY "
+                     f"of them. Add \"match\": \"any\" to confirm that, or "
+                     f"\"match\": \"all\" to flag only a resource that fails "
+                     f"every one (which is how a check is made conditional on a "
+                     f"sibling argument).")
 
         # --- trivial-message ---------------------------------------------- #
         for meta in metas:
