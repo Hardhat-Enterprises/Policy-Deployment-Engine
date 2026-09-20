@@ -86,6 +86,15 @@ RULES = {
         "`values` is only null/\"\": presence is the whole check. Acceptable when the "
         "rationale says presence is the control — the reviewer decides; pair with a "
         "pattern where a shape exists (warn)."),
+    "pattern-values-shape": (
+        "A `pattern whitelist`/`pattern blacklist` `values` is not the "
+        "[target, [[allowed per *], ...]] pair the engine reads, so the condition "
+        "can never flag anything. For a plain shape check use "
+        "`element pattern whitelist` (warn)."),
+    "presence-missing-null": (
+        "A `blacklist` lists \"\" but not null, so an unset argument — which "
+        "reaches the engine as null in the plan JSON — is not caught. Use "
+        "[null, \"\"] (warn)."),
     "wrong-argument": (
         "No condition in `<arg>.rego` reads the argument the file is named after."),
     "fixture-drift": (
@@ -129,6 +138,12 @@ RULES = {
 # (or the AI reviewer) makes, not something a linter can decide. It is surfaced
 # to the reviewer rather than failing a build.
 #
+# `pattern-values-shape` and `presence-missing-null` join them by the owner's
+# call (2026-09-20). Both describe a condition that silently under-checks rather
+# than one that is outright unparseable, and both were written this way across
+# the tree before the rule existed, so they start as findings a reviewer reads
+# rather than a gate that fails work already on dev.
+#
 # `repeated-helper-call` is deliberately NOT here: it is an error, by the owner's
 # call. The size of the backlog is what made that look risky — measured on dev
 # 2026-08-31, 498 of 1,395 policy files carried the pattern — but the mechanical
@@ -140,7 +155,8 @@ RULES = {
 # contributor OWNS (a file their own branch changed — see `_finding_owned`), and
 # branch_scope.py stops a Service/* branch touching a file outside its own
 # resource type. A pre-existing finding elsewhere is reported, never failed on.
-WARN_RULES = {"legacy-assign", "package-case", "presence-only"}
+WARN_RULES = {"legacy-assign", "package-case", "presence-only",
+              "pattern-values-shape", "presence-missing-null"}
 
 # --------------------------------------------------------------------------- #
 # Rule constants
@@ -410,6 +426,11 @@ VALID_POLICY_TYPES = (
 PRESENCE_POLICY_TYPES = {"blacklist", "whitelist"}
 EMPTY_VALUES = (None, "", [], {})
 
+# The two types whose `values` is a [target, groups] pair rather than a flat list.
+# `element pattern whitelist` is deliberately absent: its `values` IS a flat list
+# of wildcard shapes, so the pair rule below must not be applied to it.
+PATTERN_POLICY_TYPES = {"pattern whitelist", "pattern blacklist"}
+
 
 class PolicyLintError(RuntimeError):
     """One policy file could not be read (OPA refused to evaluate it).
@@ -662,6 +683,45 @@ def _is_location_argument(stem, attribute_path):
         return True
     return any(stem.endswith("_" + seg) or stem.endswith("." + seg)
                for seg in LOCATION_SEGMENTS)
+
+
+def _pattern_values_problem(values):
+    """Why this pattern `values` can never flag anything, or None if it is sound.
+
+    ``pattern whitelist``/``pattern blacklist`` read ``values_formatted[0]`` as a
+    wildcard target and ``values_formatted[1]`` as one list of allowed (or denied)
+    values per ``*`` in that target — see
+    ``policies/_helpers/policies/pattern_whitelist.rego``. The common mistake is
+    writing a single regex instead, which leaves ``[1]`` undefined: the helper's
+    comparison never binds, so unset, empty, malformed and valid values all pass
+    the condition equally. The kit can still go green on a sibling condition, so
+    nothing else in the pipeline notices.
+    """
+    dead = ("As written the condition can never flag anything, so unset, "
+            "malformed and valid values all pass it alike.")
+    if not isinstance(values, list) or len(values) != 2:
+        return (f"values is {values!r}, not the [target, [[...], ...]] pair the "
+                f"engine reads. {dead}")
+    target, groups = values
+    if not isinstance(target, str) or "*" not in target:
+        return (f"values[0] is {target!r}, which is not a wildcard target — it "
+                f"must be a string containing at least one '*'. {dead}")
+    if (not isinstance(groups, list) or not groups
+            or not all(isinstance(group, list) for group in groups)):
+        return (f"values[1] is {groups!r}, not a list holding one list of allowed "
+                f"values per '*' in {target!r}. {dead}")
+    # Only an EXCESS of lists is reported. Fewer lists than wildcards is the
+    # deliberate open-tail idiom — `["*://*", [["https"]]]` constrains the scheme
+    # and says nothing about the host — which 20 of the 31 conditions this rule
+    # matched on dev (2026-09-20) were using correctly. Flagging it would bury
+    # the 11 genuinely dead ones. An extra list has no wildcard to apply to and
+    # is always a mistake, so that direction stays.
+    wildcards = target.count("*")
+    if len(groups) > wildcards:
+        return (f"values[1] holds {len(groups)} lists but {target!r} has only "
+                f"{wildcards} '*' — the last {len(groups) - wildcards} can never "
+                f"apply to anything")
+    return None
 
 
 # --------------------------------------------------------------------------- #
@@ -951,6 +1011,33 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                 add_once("presence-only", path_text,
                          f"'{path_text}' only checks presence ({values!r}) under a "
                          f"{policy_type} — pair it with a pattern or justify it")
+
+            # --- presence-missing-null (warn) ------------------------------ #
+            # An argument the author left out reaches the engine as null in the
+            # plan JSON, not as "". A blacklist that denies only "" therefore
+            # passes the unset case, which is usually the one being guarded
+            # against.
+            if (policy_type == "blacklist" and isinstance(values, list)
+                    and "" in values and None not in values):
+                add_once("presence-missing-null", path_text,
+                         f"'{path_text}' blacklists \"\" but not null, so an unset "
+                         f"{path_text} still passes (the plan carries null) — use "
+                         f"[null, \"\"]")
+
+            # --- pattern-values-shape (warn) ------------------------------- #
+            # Checked after unknown-policy-type: a type the engine cannot
+            # dispatch is already reported, and reading its values would only
+            # add noise on top.
+            if policy_type in PATTERN_POLICY_TYPES:
+                problem = _pattern_values_problem(values)
+                if problem:
+                    add_once("pattern-values-shape", path_text,
+                             f"'{path_text}' under a {policy_type} — {problem} Give "
+                             f"it a target plus one list per '*' (e.g. "
+                             f"[\"projects/*/locations/*\", [[\"my-project\"], "
+                             f"[\"europe-west2\"]]]), or, if the check is that the "
+                             f"value has a shape at all, use "
+                             f"'element pattern whitelist' with that shape.")
 
             # --- hard-coded-value ------------------------------------------ #
             if not _is_location_argument(stem, attribute_path):

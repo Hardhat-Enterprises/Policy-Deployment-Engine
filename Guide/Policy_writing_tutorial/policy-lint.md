@@ -176,6 +176,104 @@ Good — paired with a pattern:
       "policy_type": "pattern blacklist"
     }
 
+## pattern-values-shape
+
+A `pattern whitelist` or `pattern blacklist` whose `values` is not the pair the engine reads.
+These two types are the only ones whose `values` is **not** a flat list. They take exactly two
+entries:
+
+    "values": [ <target with * wildcards>, [ [allowed at the 1st *], [allowed at the 2nd *], ... ] ]
+
+The engine replaces each `*` in the target with "one path segment", pulls the matched substrings
+out of the real value, and compares substring *i* against list *i*. So the target says **where
+to look** and the lists say **what is allowed there** — one list per `*`, in order.
+
+The mistake this rule catches is writing a **regex** instead:
+
+Bad — reads like a shape check, checks nothing:
+
+    {
+      "attribute_path": ["kms_key_name"],
+      "values": ["^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+$"],
+      "policy_type": "pattern whitelist"
+    }
+
+With that shape there is no second entry, so the comparison never binds and the condition
+**flags nothing at all** — unset, empty, malformed and correct values all pass it equally. It is
+`unknown-policy-type` by another route: the condition is not weak, it is absent. Your kit can
+still go green, because a sibling condition (typically a `blacklist` on `[null, ""]`) is what
+actually catches the nonCompliant fixture.
+
+Good — when you are constraining *what goes in a position*:
+
+    {
+      "attribute_path": ["kms_key_name"],
+      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*",
+                 [["my-project"], ["europe-west2"], ["approved-ring"], ["approved-key"]]],
+      "policy_type": "pattern whitelist"
+    }
+
+Good — when all you wanted was "this must *have* the full path shape", with no opinion about
+the segments, use **`element pattern whitelist`** instead. It takes a flat list of wildcard
+shapes and works on a plain string as well as a list:
+
+    {
+      "attribute_path": ["kms_key_name"],
+      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*"],
+      "policy_type": "element pattern whitelist"
+    }
+
+**This is a warning, and it does not fail your build** — but unlike `presence-only` there is no
+reading of it under which the condition is doing its job, so treat it as something to fix rather
+than to justify.
+
+**What this rule does *not* flag: fewer lists than `*`s.** Leaving the trailing positions
+without a list is a legitimate idiom — it says "constrain this part, I have no opinion about the
+rest":
+
+    "values": ["*://*", [["https"]]]      # the scheme must be https; the host is anything
+
+Position 1 simply goes unchecked. So if you are missing a list by accident, the linter will not
+tell you — count your `*`s against your lists yourself. An **extra** list *is* flagged, because
+it has no wildcard to apply to and can only be a mistake.
+
+Two limits of the pattern types worth knowing while you are here, because neither is a finding:
+a value that does **not** match the target at all is skipped rather than flagged, and no pattern
+type flags a **missing** value. If either case is part of the control, it needs its own
+condition alongside — see `presence-missing-null` below.
+
+## presence-missing-null
+
+A `blacklist` lists `""` but not `null`. An argument the author simply left out of their
+Terraform does not reach the engine as an empty string — the plan JSON carries it as **`null`** —
+so a blacklist that denies only `""` passes the unset case, which is usually the one you were
+guarding against.
+
+Bad — catches `description = ""`, misses the argument being absent:
+
+    {
+      "attribute_path": ["description"],
+      "values": [""],
+      "policy_type": "blacklist"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["description"],
+      "values": [null, ""],
+      "policy_type": "blacklist"
+    }
+
+**This is a warning, and it does not fail your build.** Occasionally denying only `""` is
+deliberate — a provider that always writes the field means absent is impossible, or a sibling
+condition already covers the unset case. Say so in the `rationale` if that is your situation;
+otherwise add the `null`, which costs nothing and is never wrong.
+
+Note this is the same `[null, ""]` shape that `presence-only` asks you to look past: getting the
+presence check *right* and pairing it with a real pattern are separate improvements, and a
+condition can fairly be told both things at once.
+
 ## wrong-argument
 
 No condition in `<argument>.rego` reads the argument the file is named after — usually a
