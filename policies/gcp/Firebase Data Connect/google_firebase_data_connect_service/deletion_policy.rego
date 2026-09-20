@@ -1,6 +1,6 @@
-package terraform.gcp.security.Firebase_Data_Connect.google_firebase_data_connect_service.deletion_policy
+package terraform.gcp.security.firebase_data_connect.google_firebase_data_connect_service.deletion_policy
 import data.terraform.helpers
-import data.terraform.gcp.security.Firebase_Data_Connect.google_firebase_data_connect_service.vars
+import data.terraform.gcp.security.firebase_data_connect.google_firebase_data_connect_service.vars
 
 conditions := [
     [

@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Any argument preventing resource destruction falls under the prevent-destructive-loss archetype and must be enforced, regardless of resource type."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when you\ncreate the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-text label with no functional effect on access, exposure, or data protection."
     },
     "health_aggregation_policy": {
       "description": "URL to the 'HealthAggregationPolicy' resource. Must be set. Must\nbe regional and in the same region as the 'HealthSource'. Can be\nmutated.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to another resource (the aggregation policy); it associates resources but is not itself a security control."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply with RFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier for the resource; it does not itself change security behaviour."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project determines resource ownership/location, similar to other identifier fields; it is not itself a security control."
     },
     "region": {
       "description": "URL of the region where the health source resides.",
@@ -48,15 +48,15 @@
       "description": "Specifies the type of the 'HealthSource'. The only allowed value\nis 'BACKEND_SERVICE'. Must be specified when the\n'HealthSource' is created, and cannot be mutated. Possible values: [\"BACKEND_SERVICE\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the kind of source resource being monitored; currently only one allowed value, and it does not itself control exposure or access."
     },
     "sources": {
       "description": "URLs to the source resources. Must be size 1. Must be a\n'BackendService' if the 'sourceType' is 'BACKEND_SERVICE'. The\n'BackendService' must have load balancing scheme\n'INTERNAL' or 'INTERNAL_MANAGED' and must be regional\nand in the same region as the 'HealthSource' (cross-region\ndeployment for 'INTERNAL_MANAGED' is not supported). The\n'BackendService' may use only IGs, MIGs, or NEGs of type\n'GCE_VM_IP' or 'GCE_VM_IP_PORT'. The\n'BackendService' may not use 'haPolicy'. Can be\nmutated.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the backend service(s) being health-checked; an association rather than a setting that itself changes exposure or access. The provider's own validation already restricts this to internal load-balancing schemes."
     }
   }
 }
