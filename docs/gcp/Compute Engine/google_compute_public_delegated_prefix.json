@@ -6,64 +6,64 @@
       "description": "The allocatable prefix length supported by this public delegated prefix. This field is optional and cannot be set for prefixes in DELEGATION mode. It cannot be set for IPv4 prefixes either, and it always defaults to 32.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how the delegated prefix can be divided for allocation. An unsuitable value can cause excessive address allocation or exhaustion, so it should be restricted to an approved prefix length."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the resource can be deleted or removed from Terraform management. Policy should require an approved value to reduce accidental deletion or unmanaged resources."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field only provides descriptive text and does not change access, routing, resource protection, or other security behaviour."
     },
     "ip_cidr_range": {
       "description": "The IP address range, in CIDR format, represented by this public delegated prefix.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the public IP range that is delegated and routed. Policy should restrict it to approved CIDR ranges to prevent unintended address delegation or network exposure."
     },
     "is_live_migration": {
       "description": "If true, the prefix will be live migrated.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the public prefix is live migrated. An incorrect setting can affect routing continuity and service availability, so the value should follow the approved migration configuration."
     },
     "mode": {
       "description": "Specifies the mode of this IPv6 PDP. MODE must be one of:\n  * DELEGATION\n  * EXTERNAL_IPV6_FORWARDING_RULE_CREATION\n  * EXTERNAL_IPV6_SUBNETWORK_CREATION\n  * INTERNAL_IPV6_SUBNETWORK_CREATION Possible values: [\"DELEGATION\", \"EXTERNAL_IPV6_FORWARDING_RULE_CREATION\", \"EXTERNAL_IPV6_SUBNETWORK_CREATION\", \"INTERNAL_IPV6_SUBNETWORK_CREATION\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines how the delegated prefix can be used, including external forwarding and external or internal subnet creation. Policy should restrict it to approved modes to control network exposure."
     },
     "name": {
       "description": "Name of the resource. The name must be 1-63 characters long, and\ncomply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?'\nwhich means the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit,\nexcept the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field is used to identify the resource and does not directly change permissions, routing, exposure, or other security behaviour."
     },
     "parent_prefix": {
       "description": "The URL of parent prefix. Either PublicAdvertisedPrefix or PublicDelegatedPrefix.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the parent from which the public prefix is delegated. Policy should restrict it to approved parent prefixes to preserve the intended delegation hierarchy and address ownership boundary."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the GCP project that owns the resource. Policy should restrict it to approved project IDs to prevent deployment outside the intended security and administrative boundary."
     },
     "region": {
       "description": "A region where the prefix will reside.",
