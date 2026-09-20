@@ -1,55 +1,41 @@
 package terraform.gcp.security.dialogflow_cx.google_dialogflow_cx_webhook.generic_web_service_service_account_auth_config_service_account
 
+import data.terraform.helpers
 import data.terraform.gcp.security.dialogflow_cx.google_dialogflow_cx_webhook.vars
 
-is_default_service_account(service_account) if {
-	is_string(service_account)
-	endswith(lower(service_account), "-compute@developer.gserviceaccount.com")
-}
+conditions := [[
+	{
+		"situation_description": "The generic webhook authenticates with a default service account",
+		"remedies": ["Use a dedicated least-privileged service account for webhook authentication."],
+	},
+	{
+		"condition": "Reject the Compute Engine default service account",
+		"attribute_path": ["generic_web_service", 0, "service_account_auth_config", 0, "service_account"],
+		"values": [
+			"*-*@*",
+			[
+				[],
+				["compute"],
+				["developer.gserviceaccount.com"],
+			],
+		],
+		"policy_type": "pattern blacklist",
+	},
+	{
+		"condition": "Reject the App Engine default service account",
+		"attribute_path": ["generic_web_service", 0, "service_account_auth_config", 0, "service_account"],
+		"values": [
+			"*@*",
+			[
+				[],
+				["appspot.gserviceaccount.com"],
+			],
+		],
+		"policy_type": "pattern blacklist",
+	},
+]]
 
-is_default_service_account(service_account) if {
-	is_string(service_account)
-	endswith(lower(service_account), "@appspot.gserviceaccount.com")
-}
+result := helpers.get_multi_summary(conditions, vars.variables)
 
-violating_resources := {resource |
-	resource := input.planned_values.root_module.resources[_]
-	resource.type == vars.variables.resource_type
-	auth_configs := object.get(resource.values, ["generic_web_service", 0, "service_account_auth_config"], [])
-	is_array(auth_configs)
-	count(auth_configs) > 0
-	service_account := object.get(auth_configs[0], "service_account", "")
-	is_default_service_account(service_account)
-}
-
-non_compliant_names := sort([name |
-	some resource in violating_resources
-	name := object.get(resource.values, vars.variables.resource_value_name, resource.name)
-])
-
-resource_count := count([resource |
-	resource := input.planned_values.root_module.resources[_]
-	resource.type == vars.variables.resource_type
-])
-
-display_names(names) := ["None - All passed"] if {
-	count(names) == 0
-}
-
-display_names(names) := names if {
-	count(names) > 0
-}
-
-message := [
-	sprintf("Total %s detected: %d ", [vars.variables.friendly_resource_name, resource_count]),
-	"Situation 1: The generic webhook authenticates with a default service account",
-	sprintf("Non-Compliant Resources: %s", [concat(", ", display_names(non_compliant_names))]),
-	"Potential Remedies: Use a dedicated least-privileged service account for webhook authentication",
-]
-
-details := [{
-	"situation": "The generic webhook authenticates with a default service account",
-	"remedies": ["Use a dedicated least-privileged service account for webhook authentication."],
-	"non_compliant_resources": non_compliant_names,
-	"conditions": ["Reject Compute Engine and App Engine default service-account addresses."],
-}]
+message := result.message
+details := result.details
