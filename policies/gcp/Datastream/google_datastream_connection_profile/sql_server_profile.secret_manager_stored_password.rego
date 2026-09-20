@@ -6,30 +6,47 @@ import data.terraform.gcp.security.datastream.google_datastream_connection_profi
 conditions := [
     [
         {
-            "situation_description": "The SQL Server password reference does not use the latest Secret Manager version, which may prevent centrally rotated credentials from being applied.",
+            "situation_description": "The SQL Server password is not referenced through Google Secret Manager, which may expose the credential or prevent centralised access control, auditing, and rotation.",
             "remedies": [
                 "Store the SQL Server password in Google Secret Manager.",
                 "Configure secret_manager_stored_password instead of embedding password directly.",
-                "Use the resource format projects/{project}/secrets/{secret}/versions/latest.",
-                "Grant access to the secret using least-privilege IAM permissions."
+                "Use the format projects/{project}/secrets/{secret}/versions/{version}."
             ]
         },
         {
-            "condition": "Check whether the SQL Server stored-password reference uses the latest Secret Manager version.",
+            "condition": "Check whether a Secret Manager reference is configured for the SQL Server password.",
             "attribute_path": [
                 "sql_server_profile",
                 0,
                 "secret_manager_stored_password"
             ],
             "values": [
-                "versions/*",
-                [
-                    [
-                        "latest"
-                    ]
-                ]
+                null,
+                ""
             ],
-            "policy_type": "pattern whitelist"
+            "policy_type": "blacklist"
+        }
+    ],
+    [
+        {
+            "situation_description": "The SQL Server password reference does not follow the required Secret Manager secret-version resource format.",
+            "remedies": [
+                "Use a structurally valid Secret Manager secret-version reference.",
+                "Use the format projects/{project}/secrets/{secret}/versions/{version}.",
+                "Use either a numeric secret version or an approved version alias."
+            ]
+        },
+        {
+            "condition": "Check whether the SQL Server password reference follows the Secret Manager secret-version resource format.",
+            "attribute_path": [
+                "sql_server_profile",
+                0,
+                "secret_manager_stored_password"
+            ],
+            "values": [
+                "projects/*/secrets/*/versions/*"
+            ],
+            "policy_type": "element pattern whitelist"
         }
     ]
 ]

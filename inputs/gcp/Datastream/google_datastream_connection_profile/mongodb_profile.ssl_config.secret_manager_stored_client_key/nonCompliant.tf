@@ -20,7 +20,7 @@ resource "google_datastream_connection_profile" "non_compliant_example_1" {
     standard_connection_format {}
 
     ssl_config {
-      secret_manager_stored_client_key = "projects/example-project/secrets/mongodb-client-key/versions/1"
+      secret_manager_stored_client_key = "projects/example-project/hello/mongodb-client-key/versions/1"
     }
   }
 }

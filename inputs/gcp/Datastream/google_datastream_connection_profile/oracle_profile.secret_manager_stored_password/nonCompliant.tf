@@ -12,6 +12,6 @@ resource "google_datastream_connection_profile" "non_compliant_example_1" {
     username         = "datastream-user"
     database_service = "ORCL"
 
-    secret_manager_stored_password = "projects/example-project/secrets/oracle-password/versions/1"
+    secret_manager_stored_password = "projects/example-project/secrets/oracle-password"
   }
 }
