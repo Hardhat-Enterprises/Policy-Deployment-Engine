@@ -231,15 +231,34 @@ Ensures a value falls within a specific range.
 
 Allows only values that match a defined pattern. `values` is **two** entries: a target string
 whose `*` wildcards mark the parts you care about, then a list of allowed values *per wildcard
-position* (first list for the first `*`, and so on). It is a wildcard match, not a regex — a
-regex in `values[0]` will not do what you expect.
+position* (first list for the first `*`, and so on). It is a wildcard match, not a regex.
+
+> **Both entries are required, and a lone regex silently disables the condition.** Writing
+> `"values": ["^projects/[^/]+/.../cryptoKeys/[^/]+$"]` is the most common mistake on this type.
+> With only one entry there is no per-position list to compare against, so the condition
+> **flags nothing at all** — unset, empty, malformed and correct values pass it equally. Nothing
+> in your test run says so either: the kit still goes green, because a sibling condition is what
+> catches your nonCompliant fixture. `policy_lint`'s
+> [`pattern-values-shape`](policy-lint.md#pattern-values-shape) rule catches this. If what you
+> want is "the value must have this shape", that is **`element pattern whitelist`** (below) —
+> it takes a flat list of wildcard shapes and works on a plain string too.
+>
+> Giving *fewer* lists than there are `*`s is fine and deliberate: `["*://*", [["https"]]]`
+> constrains the scheme and leaves the host unchecked. The lists are matched to the `*`s in
+> order, and any position without a list is simply not checked.
 
 > **A value that does not match the target is never flagged.** The helper extracts the wildcard
 > parts out of the value first; if the value does not fit the target shape at all, there is
 > nothing to extract and the resource passes. So `"project/*/gcp/*"` says "*if* it looks like
 > this, the parts must be allowed" — it does **not** say "it must look like this". If the shape
-> itself is the control, check the shape with a `whitelist` (or a `pattern blacklist` on the
-> bad shape) as a second condition.
+> itself is the control, check the shape with an `element pattern whitelist` (or a `whitelist`,
+> or a `pattern blacklist` on the bad shape) as a second condition.
+
+> **Neither pattern type flags a missing value.** An argument that is absent has nothing to
+> extract from, so it passes. Pair the pattern with a `blacklist` on `[null, ""]` when "it must
+> be set" is part of the control — and list `null`, not just `""`: an argument left out of the
+> Terraform reaches the engine as `null`. See
+> [`presence-missing-null`](policy-lint.md#presence-missing-null).
 ```rego
     [
       {
