@@ -15,9 +15,9 @@ violating_resources contains name if {
 }
 
 message := [
-    "Situation 1: CloudSQL database flags do not match the approved secure configuration.",
+    "Situation 1: CloudSQL IAM database authentication is disabled, which can require reliance on static database passwords.",
     sprintf("Non-Compliant Resources: %s", [concat(", ", violating_resources)]),
-    "Potential Remedies: Set cloudsql.settings.database_flags to the approved secure configuration.",
+    "Potential Remedies: Set cloudsql_iam_authentication to \"on\" in cloudsql.settings.database_flags.",
 ] if {
     count(violating_resources) > 0
 }
