@@ -1,7 +1,7 @@
 """An unrecognised policy_type must fail the check loudly, naming the bad type.
 
-`policies/_helpers/helpers.rego` dispatches exactly six policy types. A policy
-naming a seventh used to build an error object and then throw it away, so the
+`policies/_helpers/helpers.rego` dispatches exactly seven policy types. A policy
+naming an eighth used to build an error object and then throw it away, so the
 policy evaluated to "None - All passed" and the check went green whenever some
 *other* condition in the file happened to flag the fixture. The helper now
 refuses the whole summary and emits a POLICY ERROR message instead; these tests
@@ -20,7 +20,7 @@ from scripts.auto_test import auto_test
 ERROR_MESSAGE = (
     "POLICY ERROR: unknown policy_type 'pattern_whitelist'. Nothing in this policy "
     "was checked. Valid values are: blacklist, whitelist, range, pattern blacklist, "
-    "pattern whitelist, element blacklist. Edit the \"policy_type\" in this policy's "
+    "pattern whitelist, element blacklist, element pattern whitelist. Edit the \"policy_type\" in this policy's "
     "conditions to one of those - they are lowercase and use a SPACE, not an "
     "underscore (\"pattern whitelist\", not \"pattern_whitelist\") - then run the "
     "test again."
