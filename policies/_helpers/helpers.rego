@@ -572,3 +572,5 @@ set_intersection_all(sets) = result if {
         }
     }
 }
+
+# ci-proof: no-op comment to exercise the whole-tree engine check in CI. DO NOT MERGE.
