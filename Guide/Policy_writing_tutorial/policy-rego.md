@@ -380,6 +380,81 @@ paths.
     ]
 ```
 
+---
+
+## Combining a situation's conditions: `"match"`
+
+Everything above describes one **condition**. A **situation** is the group it lives in — the
+metadata entry (`situation_description`, `remedies`) plus one or more conditions — and a policy
+is a list of situations.
+
+Situations are always **alternatives**: a resource is non-compliant if any situation flags it.
+What `match` controls is how the conditions *inside* one situation combine.
+
+| on the metadata entry | a resource is flagged when it fails | use it for |
+|---|---|---|
+| nothing, or `"match": "any"` | **any** condition in the situation | several ways the *same* argument can be wrong |
+| `"match": "all"` | **every** condition in the situation | *alternatives* — several acceptable configurations |
+
+`"any"` is the default, so a policy written before this key existed behaves exactly as it always
+did. You only ever need to write `"all"` — but writing `"any"` explicitly is worth doing, and
+`policy_lint` will
+[ask you to](policy-lint.md#situation-match-unset) whenever a situation has two or more
+conditions.
+
+### When you need `"all"`
+
+Some resources offer more than one acceptable way to do the right thing. A Vertex AI endpoint
+can be kept off the public internet **either** by VPC peering (`network`) **or** by Private
+Service Connect — you use one or the other, never both. Neither condition is wrong on its own,
+and only an endpoint that does *neither* is actually exposed.
+
+Under the default, each condition flags on its own and a perfectly good endpoint gets reported:
+
+| endpoint | `network` set | PSC enabled | default (`any`) | `"match": "all"` |
+|---|---|---|---|---|
+| VPC peered | yes | no | flagged ❌ | passes ✅ |
+| PSC only | no | yes | flagged ❌ | passes ✅ |
+| neither | no | no | flagged ✅ | flagged ✅ |
+
+```rego
+    [
+      {
+        "situation_description": "Endpoint is reachable from the public internet",
+        "remedies": [
+          "Set network to a VPC path for peering, or enable Private Service Connect"
+        ],
+        "match": "all"
+      },
+      {
+        "condition": "No VPC peering network is set",
+        "attribute_path": ["network"],
+        "values": [null, ""],
+        "policy_type": "blacklist"
+      },
+      {
+        "condition": "Private Service Connect is not enabled",
+        "attribute_path": ["private_service_connect_config", 0, "enable_private_service_connect"],
+        "values": [true],
+        "policy_type": "whitelist"
+      }
+    ]
+```
+
+The same shape is how you make a check **conditional on a sibling argument** — "if `state` is
+ACTIVE, then `action` must not be DELETE" is a situation whose two conditions are "state is
+ACTIVE" and "action is DELETE", matched with `"all"`.
+
+> **`"all"` fails quietly, so be deliberate about it.** If one of its conditions can never flag
+> — a dead `pattern whitelist`, an `attribute_path` that does not exist — the intersection is
+> empty and the whole situation reports "All passed" forever. That looks exactly like a
+> compliant tree. Under the default a broken condition only costs you the coverage of that one
+> condition; under `"all"` it costs you the situation. Test the nonCompliant fixture and check
+> it is actually flagged.
+
+Anything other than `"any"` or `"all"` is refused outright — the engine reports
+`POLICY ERROR: unknown match ...` and checks nothing, rather than guessing.
+
 <div align="center">
 
 [⬅️ Previous: _vars.rego](vars-rego.md#top) &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;

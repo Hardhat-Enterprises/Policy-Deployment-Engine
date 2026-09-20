@@ -106,7 +106,7 @@ policies/_helpers/
 **Key Functions:**
 - `get_multi_summary(conditions, tf_variables)` - Main entry point
 - `select_policy_logic(...)` - Routes to correct policy module
-- `set_intersection_all(sets)` - Set intersection. `find_failing_resources` only ever passes it **one** set (the union of every condition's violations), so the cross-condition semantics is OR
+- `set_intersection_all(sets)` - Set intersection. Which sets it receives depends on the situation's `match`: under the default `"any"`, **one** set (the union of every condition's violations), so the cross-condition semantics is OR; under `"match": "all"`, **one set per condition**, so it intersects and the semantics is AND
 
 #### **shared.rego** - Utility Library
 - **Package:** `terraform.helpers.shared`
@@ -664,13 +664,15 @@ opa eval --explain full --data ./policies/_helpers --data ./policies/gcp \
 ## Performance Considerations
 
 ### Set Operations
-The framework builds each situation's violations as a single set comprehension, so no
-per-condition intersection pass is needed:
+Under the default `"match": "any"` the framework builds each situation's violations as a single
+set comprehension, so no per-condition intersection pass is needed:
 ```rego
 # One set holding every condition's violations (OR logic); set_intersection_all
 # receives exactly one set and returns it unchanged.
 failing_resources := set_intersection_all(resource_sets)
 ```
+Only a situation that opts into `"match": "all"` pays for the intersection, and then the
+comprehension runs once per condition instead of once per situation.
 
 ### Resource Filtering
 Policy modules use set comprehensions for parallel evaluation:

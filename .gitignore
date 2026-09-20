@@ -143,6 +143,13 @@ tfplan
 tfplan.json
 tfplan.binary
 
+# ...except the Rego unit-test fixtures, which are hand-held sample plans, not
+# generated artefacts. `plan.json` above swallowed them when #261 deleted them,
+# and re-adding them was silently impossible for nine months — 8 of the 11 suites
+# in tests/_helpers/unit_test_helpers.sh could not load, so 216 tests never ran.
+# Keep this negation directly under the rule it exempts.
+!tests/_helpers/fixtures/**/plan.json
+
 # CLI configuration files
 .terraformrc
 terraform.rc
