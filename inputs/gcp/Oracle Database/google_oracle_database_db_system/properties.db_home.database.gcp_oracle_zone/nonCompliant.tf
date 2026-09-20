@@ -29,7 +29,7 @@ resource "google_oracle_database_db_system" "non_compliant_example_1" {
         database_id     = "mydb"
         db_name         = "db"
         db_unique_name  = "db"
-        gcp_oracle_zone = "invalid-zone"
+        gcp_oracle_zone = "us-east4-b-r2"
       }
     }
   }
