@@ -1,0 +1,12 @@
+resource "google_bigquery_analytics_hub_listing" "compliant_example_1" {
+  location         = "us"
+  data_exchange_id = "c"
+  listing_id       = "compliant_example_1"
+  display_name     = "c"
+  description      = "Compliant listing with replicas restricted to an approved region"
+
+  bigquery_dataset {
+    dataset           = "projects/my-project/datasets/c"
+    replica_locations = ["us-central1"]
+  }
+}
