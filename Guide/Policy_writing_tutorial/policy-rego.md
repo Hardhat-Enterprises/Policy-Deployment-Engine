@@ -92,7 +92,7 @@ The attribute path would be:
 
 ### Different ways to write your policy
 
-The engine dispatches on `policy_type`, and it knows **exactly seven** values:
+The engine dispatches on `policy_type`, using these supported values:
 
 | `policy_type` | Use it when |
 |---|---|
@@ -103,6 +103,7 @@ The engine dispatches on `policy_type`, and it knows **exactly seven** values:
 | `pattern whitelist` | A wildcard-extracted part of the value must be one of these |
 | `element blacklist` | No element of an array may **contain** one of these substrings |
 | `element pattern whitelist` | Every element of an array must match one of the wildcard shapes |
+| `map key blacklist` | No map key may match a prohibited name, ignoring capitalisation, with a non-empty value |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
@@ -230,15 +231,34 @@ Ensures a value falls within a specific range.
 
 Allows only values that match a defined pattern. `values` is **two** entries: a target string
 whose `*` wildcards mark the parts you care about, then a list of allowed values *per wildcard
-position* (first list for the first `*`, and so on). It is a wildcard match, not a regex — a
-regex in `values[0]` will not do what you expect.
+position* (first list for the first `*`, and so on). It is a wildcard match, not a regex.
+
+> **Both entries are required, and a lone regex silently disables the condition.** Writing
+> `"values": ["^projects/[^/]+/.../cryptoKeys/[^/]+$"]` is the most common mistake on this type.
+> With only one entry there is no per-position list to compare against, so the condition
+> **flags nothing at all** — unset, empty, malformed and correct values pass it equally. Nothing
+> in your test run says so either: the kit still goes green, because a sibling condition is what
+> catches your nonCompliant fixture. `policy_lint`'s
+> [`pattern-values-shape`](policy-lint.md#pattern-values-shape) rule catches this. If what you
+> want is "the value must have this shape", that is **`element pattern whitelist`** (below) —
+> it takes a flat list of wildcard shapes and works on a plain string too.
+>
+> Giving *fewer* lists than there are `*`s is fine and deliberate: `["*://*", [["https"]]]`
+> constrains the scheme and leaves the host unchecked. The lists are matched to the `*`s in
+> order, and any position without a list is simply not checked.
 
 > **A value that does not match the target is never flagged.** The helper extracts the wildcard
 > parts out of the value first; if the value does not fit the target shape at all, there is
 > nothing to extract and the resource passes. So `"project/*/gcp/*"` says "*if* it looks like
 > this, the parts must be allowed" — it does **not** say "it must look like this". If the shape
-> itself is the control, check the shape with a `whitelist` (or a `pattern blacklist` on the
-> bad shape) as a second condition.
+> itself is the control, check the shape with an `element pattern whitelist` (or a `whitelist`,
+> or a `pattern blacklist` on the bad shape) as a second condition.
+
+> **Neither pattern type flags a missing value.** An argument that is absent has nothing to
+> extract from, so it passes. Pair the pattern with a `blacklist` on `[null, ""]` when "it must
+> be set" is part of the control — and list `null`, not just `""`: an argument left out of the
+> Terraform reaches the engine as `null`. See
+> [`presence-missing-null`](policy-lint.md#presence-missing-null).
 ```rego
     [
       {
@@ -299,6 +319,43 @@ Blocks **array** attributes whose elements contain any blacklisted **substring**
     ]
 ```
 
+### Map Key Blacklist
+
+Checks the **names inside a map**, rather than list elements or the map's values.
+`values` is a flat list of prohibited names. Matching ignores capitalisation but
+requires the whole name: `Authorization` matches `AUTHORIZATION`, not
+`X-Authorization-Mode`.
+
+A matching key is flagged only when its value is neither `null` nor an empty
+string. Whitespace-only values are still non-empty. Missing/null maps and empty
+objects are allowed. Through `get_multi_summary`, a present non-map value causes
+`POLICY ERROR:` rather than a passing result. For example, omitting the `0` from
+the path below makes the shared extractor return an array of maps, not one map.
+Check the path and include the list indexes. Paths resolving to missing/null are
+still treated as absent optional maps. This checks known values in root-module
+resources, like the other helpers.
+
+```rego
+    [
+      {
+        "situation_description": "The webhook contains sensitive inline request headers",
+        "remedies": ["Move credentials to secret_versions_for_request_headers."]
+      },
+      {
+        "condition": "Reject sensitive header names with non-empty inline values",
+        "attribute_path": ["generic_web_service", 0, "request_headers"],
+        "values": ["authorization", "proxy-authorization", "api-key", "x-api-key", "x-auth-token"],
+        "policy_type": "map key blacklist"
+      }
+    ]
+```
+
+For the Service Directory webhook, use
+`["service_directory", 0, "generic_web_service", 0, "request_headers"]` instead.
+Violation messages name the matching keys without printing their values.
+See the [helper documentation](../../policies/_helpers/README.md#7-map-key-blacklist)
+for a complete conditions example and the test command.
+
 ### Element Pattern Whitelist
 
 Allows only **array** attributes whose **every** element matches one of the required
@@ -322,6 +379,81 @@ paths.
       }
     ]
 ```
+
+---
+
+## Combining a situation's conditions: `"match"`
+
+Everything above describes one **condition**. A **situation** is the group it lives in — the
+metadata entry (`situation_description`, `remedies`) plus one or more conditions — and a policy
+is a list of situations.
+
+Situations are always **alternatives**: a resource is non-compliant if any situation flags it.
+What `match` controls is how the conditions *inside* one situation combine.
+
+| on the metadata entry | a resource is flagged when it fails | use it for |
+|---|---|---|
+| nothing, or `"match": "any"` | **any** condition in the situation | several ways the *same* argument can be wrong |
+| `"match": "all"` | **every** condition in the situation | *alternatives* — several acceptable configurations |
+
+`"any"` is the default, so a policy written before this key existed behaves exactly as it always
+did. You only ever need to write `"all"` — but writing `"any"` explicitly is worth doing, and
+`policy_lint` will
+[ask you to](policy-lint.md#situation-match-unset) whenever a situation has two or more
+conditions.
+
+### When you need `"all"`
+
+Some resources offer more than one acceptable way to do the right thing. A Vertex AI endpoint
+can be kept off the public internet **either** by VPC peering (`network`) **or** by Private
+Service Connect — you use one or the other, never both. Neither condition is wrong on its own,
+and only an endpoint that does *neither* is actually exposed.
+
+Under the default, each condition flags on its own and a perfectly good endpoint gets reported:
+
+| endpoint | `network` set | PSC enabled | default (`any`) | `"match": "all"` |
+|---|---|---|---|---|
+| VPC peered | yes | no | flagged ❌ | passes ✅ |
+| PSC only | no | yes | flagged ❌ | passes ✅ |
+| neither | no | no | flagged ✅ | flagged ✅ |
+
+```rego
+    [
+      {
+        "situation_description": "Endpoint is reachable from the public internet",
+        "remedies": [
+          "Set network to a VPC path for peering, or enable Private Service Connect"
+        ],
+        "match": "all"
+      },
+      {
+        "condition": "No VPC peering network is set",
+        "attribute_path": ["network"],
+        "values": [null, ""],
+        "policy_type": "blacklist"
+      },
+      {
+        "condition": "Private Service Connect is not enabled",
+        "attribute_path": ["private_service_connect_config", 0, "enable_private_service_connect"],
+        "values": [true],
+        "policy_type": "whitelist"
+      }
+    ]
+```
+
+The same shape is how you make a check **conditional on a sibling argument** — "if `state` is
+ACTIVE, then `action` must not be DELETE" is a situation whose two conditions are "state is
+ACTIVE" and "action is DELETE", matched with `"all"`.
+
+> **`"all"` fails quietly, so be deliberate about it.** If one of its conditions can never flag
+> — a dead `pattern whitelist`, an `attribute_path` that does not exist — the intersection is
+> empty and the whole situation reports "All passed" forever. That looks exactly like a
+> compliant tree. Under the default a broken condition only costs you the coverage of that one
+> condition; under `"all"` it costs you the situation. Test the nonCompliant fixture and check
+> it is actually flagged.
+
+Anything other than `"any"` or `"all"` is refused outright — the engine reports
+`POLICY ERROR: unknown match ...` and checks nothing, rather than guessing.
 
 <div align="center">
 
