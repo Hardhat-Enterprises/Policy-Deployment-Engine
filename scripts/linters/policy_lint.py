@@ -62,7 +62,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 # cached plan belongs to this fixture". Importing keeps the two in lockstep: a
 # provider bump changes the sha in both places at once.
 from scripts.auto_test.auto_test import (  # noqa: E402
-    find_denormalised_plan, plan_cache_path)
+    find_denormalised_plan, make_streams_encoding_safe, plan_cache_path)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HELPERS_DIR = REPO_ROOT / "policies" / "_helpers"
@@ -1699,6 +1699,7 @@ def _print_rules():
 
 
 def main(argv=None):
+    make_streams_encoding_safe()
     parser = argparse.ArgumentParser(
         description="Lint the content of a policy kit (conditions, _vars, fixtures).",
         formatter_class=argparse.RawDescriptionHelpFormatter)
