@@ -8,7 +8,7 @@ cd "$(git rev-parse --show-toplevel)" || exit 1
 echo "Policy Helper Unit Tests"
 echo "============================"
 
-# Common fixtures needed by all tests
+# Common fixtures used by the fixture-based suites
 FIXTURES=(
     "tests/_helpers/fixtures/gcp_storage_bucket/plan.json"
     "tests/_helpers/fixtures/gcp_project/plan.json"
@@ -35,17 +35,21 @@ run_test_suite() {
     local test_file="$2"
     local policy_file="$3"
     local include_test_helpers="${4:-true}"  # Default to true
+    local include_fixtures="${5:-true}"  # Mock-only suites do not need plan files
     
     echo ""
     echo "Testing $name..."
     echo "============================"
     
-    # Build test command with optional test helpers
+    # Keep existing suites' inputs; allow self-contained suites to opt out.
+    local test_inputs=("$test_file" "$policy_file" "${HELPERS[@]}")
     if [ "$include_test_helpers" = "true" ]; then
-        output=$(opa test "$test_file" "$policy_file" "${HELPERS[@]}" "${TEST_HELPERS[@]}" "${FIXTURES[@]}" -v 2>&1)
-    else
-        output=$(opa test "$test_file" "$policy_file" "${HELPERS[@]}" "${FIXTURES[@]}" -v 2>&1)
+        test_inputs+=("${TEST_HELPERS[@]}")
     fi
+    if [ "$include_fixtures" = "true" ]; then
+        test_inputs+=("${FIXTURES[@]}")
+    fi
+    output=$(opa test "${test_inputs[@]}" -v 2>&1)
     exit_code=$?
     
     echo "$output"
@@ -94,6 +98,21 @@ run_test_suite "Pattern Whitelist Policy" \
 run_test_suite "Element Blacklist Policy" \
     "tests/_helpers/element_blacklist_test.rego" \
     "policies/_helpers/policies/element_blacklist.rego"
+
+run_test_suite "Element Pattern Whitelist Policy" \
+    "tests/_helpers/element_pattern_whitelist_test.rego" \
+    "policies/_helpers/policies/element_pattern_whitelist.rego"
+
+run_test_suite "Map Key Blacklist Policy" \
+    "tests/_helpers/map_key_blacklist_test.rego" \
+    "policies/_helpers/policies/map_key_blacklist.rego" \
+    "false" "false"
+
+# This suite exercises conditions through the complete dispatcher and summary.
+run_test_suite "Map Key Blacklist Integration" \
+    "tests/_helpers/map_key_blacklist_integration_test.rego" \
+    "policies/_helpers" \
+    "false" "false"
 
 echo ""
 echo "================================"

@@ -92,7 +92,7 @@ The attribute path would be:
 
 ### Different ways to write your policy
 
-The engine dispatches on `policy_type`, and it knows **exactly six** values:
+The engine dispatches on `policy_type`, using these supported values:
 
 | `policy_type` | Use it when |
 |---|---|
@@ -102,13 +102,17 @@ The engine dispatches on `policy_type`, and it knows **exactly six** values:
 | `pattern blacklist` | A wildcard-extracted part of the value must not be one of these |
 | `pattern whitelist` | A wildcard-extracted part of the value must be one of these |
 | `element blacklist` | No element of an array may **contain** one of these substrings |
+| `element pattern whitelist` | Every element of an array must match one of the wildcard shapes |
+| `map key blacklist` | No map key may match a prohibited name, ignoring capitalisation, with a non-empty value |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
 `POLICY ERROR: unknown policy_type ...` and your test goes red. `policy_lint`'s
 [`unknown-policy-type`](policy-lint.md#unknown-policy-type) rule catches it before you get that far.
 
-There is no `element whitelist`, and you do not need one — see the Whitelist note below.
+There is no *exact-match* `element whitelist`, and you do not need one — plain `whitelist`
+already covers that (see the Whitelist note below). For *pattern*-based list whitelisting,
+use `element pattern whitelist`.
 
 ---
 
@@ -119,8 +123,10 @@ Whitelist allows only specific values and blocks everything else.
 > **Whitelist already handles lists.** When the attribute is an array, the helper requires
 > *every* element to be in your `values` set (it is a subset test), so
 > `"attribute_path": ["allowed_ips"]` under a `whitelist` is a complete check — you do not need,
-> and will not find, an `element whitelist`. `element blacklist` exists as a separate type only
-> because *forbidding* a list needs substring matching, which the plain `blacklist` does not do.
+> and will not find, an *exact-match* `element whitelist`. `element blacklist` exists as a separate
+> type only because *forbidding* a list needs substring matching, which the plain `blacklist` does
+> not do. For *pattern*-based list validation (every element must match a shape), use
+> `element pattern whitelist`.
 
 ```rego
 
@@ -225,15 +231,34 @@ Ensures a value falls within a specific range.
 
 Allows only values that match a defined pattern. `values` is **two** entries: a target string
 whose `*` wildcards mark the parts you care about, then a list of allowed values *per wildcard
-position* (first list for the first `*`, and so on). It is a wildcard match, not a regex — a
-regex in `values[0]` will not do what you expect.
+position* (first list for the first `*`, and so on). It is a wildcard match, not a regex.
+
+> **Both entries are required, and a lone regex silently disables the condition.** Writing
+> `"values": ["^projects/[^/]+/.../cryptoKeys/[^/]+$"]` is the most common mistake on this type.
+> With only one entry there is no per-position list to compare against, so the condition
+> **flags nothing at all** — unset, empty, malformed and correct values pass it equally. Nothing
+> in your test run says so either: the kit still goes green, because a sibling condition is what
+> catches your nonCompliant fixture. `policy_lint`'s
+> [`pattern-values-shape`](policy-lint.md#pattern-values-shape) rule catches this. If what you
+> want is "the value must have this shape", that is **`element pattern whitelist`** (below) —
+> it takes a flat list of wildcard shapes and works on a plain string too.
+>
+> Giving *fewer* lists than there are `*`s is fine and deliberate: `["*://*", [["https"]]]`
+> constrains the scheme and leaves the host unchecked. The lists are matched to the `*`s in
+> order, and any position without a list is simply not checked.
 
 > **A value that does not match the target is never flagged.** The helper extracts the wildcard
 > parts out of the value first; if the value does not fit the target shape at all, there is
 > nothing to extract and the resource passes. So `"project/*/gcp/*"` says "*if* it looks like
 > this, the parts must be allowed" — it does **not** say "it must look like this". If the shape
-> itself is the control, check the shape with a `whitelist` (or a `pattern blacklist` on the
-> bad shape) as a second condition.
+> itself is the control, check the shape with an `element pattern whitelist` (or a `whitelist`,
+> or a `pattern blacklist` on the bad shape) as a second condition.
+
+> **Neither pattern type flags a missing value.** An argument that is absent has nothing to
+> extract from, so it passes. Pair the pattern with a `blacklist` on `[null, ""]` when "it must
+> be set" is part of the control — and list `null`, not just `""`: an argument left out of the
+> Terraform reaches the engine as `null`. See
+> [`presence-missing-null`](policy-lint.md#presence-missing-null).
 ```rego
     [
       {
@@ -290,6 +315,67 @@ Blocks **array** attributes whose elements contain any blacklisted **substring**
         "attribute_path": ["resource_names"],
         "values": ["attacker-project", "test-project", "dev-", "-sandbox"],
         "policy_type": "element blacklist"
+      }
+    ]
+```
+
+### Map Key Blacklist
+
+Checks the **names inside a map**, rather than list elements or the map's values.
+`values` is a flat list of prohibited names. Matching ignores capitalisation but
+requires the whole name: `Authorization` matches `AUTHORIZATION`, not
+`X-Authorization-Mode`.
+
+A matching key is flagged only when its value is neither `null` nor an empty
+string. Whitespace-only values are still non-empty. Missing/null maps and empty
+objects are allowed. Through `get_multi_summary`, a present non-map value causes
+`POLICY ERROR:` rather than a passing result. For example, omitting the `0` from
+the path below makes the shared extractor return an array of maps, not one map.
+Check the path and include the list indexes. Paths resolving to missing/null are
+still treated as absent optional maps. This checks known values in root-module
+resources, like the other helpers.
+
+```rego
+    [
+      {
+        "situation_description": "The webhook contains sensitive inline request headers",
+        "remedies": ["Move credentials to secret_versions_for_request_headers."]
+      },
+      {
+        "condition": "Reject sensitive header names with non-empty inline values",
+        "attribute_path": ["generic_web_service", 0, "request_headers"],
+        "values": ["authorization", "proxy-authorization", "api-key", "x-api-key", "x-auth-token"],
+        "policy_type": "map key blacklist"
+      }
+    ]
+```
+
+For the Service Directory webhook, use
+`["service_directory", 0, "generic_web_service", 0, "request_headers"]` instead.
+Violation messages name the matching keys without printing their values.
+See the [helper documentation](../../policies/_helpers/README.md#7-map-key-blacklist)
+for a complete conditions example and the test command.
+
+### Element Pattern Whitelist
+
+Allows only **array** attributes whose **every** element matches one of the required
+wildcard shapes. `values` is a list of shape strings; an element passes if it matches
+any one of them. Each `*` matches one path segment (one or more non-`/` characters), so
+a `*` never spans a separator. A string attribute is checked as a one-item list. An
+empty `values` list matches nothing, so it flags every element (a loud failure). This
+is the positive (allowlist) counterpart to `element blacklist` for lists of resource
+paths.
+```rego
+    [
+      {
+        "situation_description": "Guardrails must be explicit platform resource paths",
+        "remedies": ["Reference a concrete guardrail resource path"]
+      },
+      {
+        "condition": "Guardrails must match the platform path shape",
+        "attribute_path": ["guardrails"],
+        "values": ["projects/*/locations/*/apps/*/guardrails/*"],
+        "policy_type": "element pattern whitelist"
       }
     ]
 ```
