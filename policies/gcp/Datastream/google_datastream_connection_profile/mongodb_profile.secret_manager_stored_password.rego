@@ -6,39 +6,52 @@ import data.terraform.gcp.security.datastream.google_datastream_connection_profi
 conditions := [
     [
         {
-            "situation_description": "The MongoDB password reference does not use the latest Secret Manager secret version, which may prevent centrally rotated credentials from being used.",
+            "situation_description": "The MongoDB password is not referenced through Google Secret Manager, which may expose the credential or prevent centralised access control and auditing.",
             "remedies": [
-                "Store the MongoDB connection password in Google Secret Manager.",
-                "Reference the password through secret_manager_stored_password.",
-                "Use the resource format projects/{project}/secrets/{secret}/versions/latest.",
-                "Grant access to the secret using least-privilege IAM permissions."
+                "Store the MongoDB password in Google Secret Manager.",
+                "Configure secret_manager_stored_password instead of embedding the password.",
+                "Use the format projects/{project}/secrets/{secret}/versions/{version}."
             ]
         },
         {
-            "condition": "Check whether the MongoDB stored-password reference uses the latest Secret Manager version.",
+            "condition": "Check whether a MongoDB Secret Manager password reference is configured.",
             "attribute_path": [
                 "mongodb_profile",
                 0,
                 "secret_manager_stored_password"
             ],
             "values": [
-                "versions/*",
-                [
-                    [
-                        "latest"
-                    ]
-                ]
+                null,
+                ""
             ],
-            "policy_type": "pattern whitelist"
+            "policy_type": "blacklist"
+        }
+    ],
+    [
+        {
+            "situation_description": "The MongoDB password reference does not follow the required Secret Manager secret-version resource format.",
+            "remedies": [
+                "Use a structurally valid Secret Manager secret-version reference.",
+                "Use the format projects/{project}/secrets/{secret}/versions/{version}.",
+                "Use either a numeric version or an approved version alias."
+            ]
+        },
+        {
+            "condition": "Check whether the MongoDB password reference follows the Secret Manager secret-version resource format.",
+            "attribute_path": [
+                "mongodb_profile",
+                0,
+                "secret_manager_stored_password"
+            ],
+            "values": [
+                "projects/*/secrets/*/versions/*"
+            ],
+            "policy_type": "element pattern whitelist"
         }
     ]
 ]
 
-# Evaluate the configured conditions against each connection profile.
 result := helpers.get_multi_summary(conditions, vars.variables)
 
-# Display the overall compliance result.
 message := result.message
-
-# Display detailed results for each connection profile.
 details := result.details
