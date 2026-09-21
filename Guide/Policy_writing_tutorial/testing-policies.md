@@ -19,11 +19,17 @@ you which check failed:
 
 If it prints `[OK] <resource>: every check passed`, CI will agree. **Run it before every push.**
 
-The `pre-commit` hooks run these for you on every commit, but only as far as the commit reaches:
-a commit that touches nothing under your resource skips checks 4-6, a docs-only commit skips
-check 6, and a fixture you have just edited skips it as well — building its plan means running
-`terraform`, which is not something a git hook should do to you. **This command is the one that
-tells you everything is green**, so run it before every push.
+The `pre-commit` hooks run checks 1-4 for you on every commit (a commit that touches nothing
+under your resource skips check 4 too). They **never** run check 5 or check 6. You write and get
+approval for your resource's docs before you write any policies, so until then every
+`security_impact: true` argument is a coverage gap. That is expected, and it must not stop you
+committing. Coverage asks "is this resource finished?", so the pull request enforces it: gaps
+block the PR from merging, not your commits. Check 6 is skipped with it, because without the
+policies and fixtures it would only fail on files you have not written yet.
+
+**This command is the one that tells you everything is green**, so run it before every push.
+While you are still writing policies, a `[FAIL] True-arg coverage` here only means you have
+arguments left to cover.
 
 ![linters-output](images/linters-output.PNG)
 

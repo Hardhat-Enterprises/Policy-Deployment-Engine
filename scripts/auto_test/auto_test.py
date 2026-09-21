@@ -664,6 +664,22 @@ def get_policy_metadata(policy_file: Path, service: str, resource: str, attribut
     return message_query, vars_query
 
 
+def make_streams_encoding_safe():
+    """Make stdout and stderr able to print this harness's own output anywhere.
+
+    The messages here carry ✅, ❌ and — . A Windows console on a legacy code page
+    (cp1252) cannot encode them, so the print that announces a passing run raised
+    UnicodeEncodeError instead, the process exited non-zero, and check_resource.py
+    reported a resource that passed as failed. UTF-8 is what every terminal that
+    can draw the glyphs expects; ``errors="replace"`` means one that truly cannot
+    shows ``?`` rather than raising. Called from main(), never at import — the
+    linters import this module, and a test's captured stream is not ours to change.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):   # absent on a replaced stream (StringIO)
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 # Add a lock for thread-safe printing
 print_lock = Lock()
 
@@ -901,6 +917,7 @@ def write_report(results: list, path: str) -> None:
 
 
 def main():
+    make_streams_encoding_safe()
     parser = argparse.ArgumentParser(
         description="Run Terraform + OPA policy checks for matched input/policy pairs.",
         epilog="Examples:\n"
