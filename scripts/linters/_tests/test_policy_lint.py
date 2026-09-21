@@ -81,6 +81,10 @@ def test_policy_body_rules_fire_exactly_once_each(tmp_path):
         ("badcase", "package-case"),
         ("bogus_type", "unknown-policy-type"),
         ("no_type", "unknown-policy-type"),
+        ("dead_pattern", "pattern-values-shape"),
+        ("unset_blind", "presence-missing-null"),
+        ("unset_blind", "presence-only"),
+        ("two_conditions", "situation-match-unset"),
     }
 
 
@@ -113,7 +117,7 @@ def test_unknown_policy_type_is_an_error_not_a_warning(tmp_path):
 
 
 def test_unknown_policy_type_is_silent_on_every_valid_type(tmp_path):
-    # The rule must accept all seven, including the two-word ones — flagging a
+    # The rule must accept all supported types, including multi-word ones — flagging a
     # valid type would block every pattern/element policy in the tree.
     root = build_tree(tmp_path, "policy_smells")
     template = (root / "policies" / "gcp" / "Backup for GKE"
@@ -128,6 +132,58 @@ def test_unknown_policy_type_is_silent_on_every_valid_type(tmp_path):
         assert not [f for f in findings
                     if f.policy == "bogus_type" and f.rule == "unknown-policy-type"], \
             f"{valid!r} is a valid policy_type and must not be flagged"
+
+
+@pytest.mark.parametrize("values", [
+    [], None, [None], [""], [" "], ["authorization "], [" authorization"],
+    ["authorization\t"], [7], [{}], [["authorization"]], ["authorization", None],
+])
+def test_invalid_map_key_blacklist_is_an_error_not_presence_warning(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"map key blacklist"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    own = [f for f in findings if f.policy == "bogus_type"]
+    invalid = [f for f in own if f.rule == "invalid-map-key-blacklist"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+    assert "whitespace" in invalid[0].message
+    assert not [f for f in own if f.rule == "presence-only"]
+
+
+@pytest.mark.parametrize("values", [["authorization"], ["AUTHORIZATION"], "authorization"])
+def test_valid_map_key_blacklist_has_no_configuration_finding(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"Map Key Blacklist"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert not [f for f in findings if f.policy == "bogus_type"
+                and f.rule in {"invalid-map-key-blacklist", "presence-only", "unknown-policy-type"}]
+
+
+def test_missing_map_key_blacklist_values_is_an_error(tmp_path):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"map key blacklist"')
+    body = body.replace('"values": ["approved-*", [["approved-"]]],', '')
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert any(f.policy == "bogus_type" and f.rule == "invalid-map-key-blacklist"
+               and f.severity == "error" for f in findings)
 
 
 def test_unknown_policy_type_matches_what_the_helpers_dispatch(tmp_path):
@@ -168,14 +224,18 @@ def test_hard_coded_value_message_names_the_literal(tmp_path):
 
 
 def test_only_advisory_rules_are_warnings(tmp_path):
-    # The two style conventions plus presence-only, which is a judgement about
-    # the argument's rationale that the reviewer makes, not the linter.
+    # The two style conventions, plus the three rules about a condition that
+    # under-checks rather than one that is malformed: whether that is acceptable
+    # is a judgement about the argument's rationale that the reviewer makes, not
+    # the linter.
     root = build_tree(tmp_path, "policy_smells")
     findings = policy_lint.lint_resource(
         root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
     warns = {f.rule for f in findings if f.severity == "warn"}
     errors = {f.rule for f in findings if f.severity == "error"}
-    assert warns == {"legacy-assign", "package-case", "presence-only"}
+    assert warns == {"legacy-assign", "package-case", "presence-only",
+                     "pattern-values-shape", "presence-missing-null",
+                     "situation-match-unset"}
     assert not (warns & errors), "a rule must have one severity, not both"
 
 
@@ -467,6 +527,10 @@ def test_cli_json_output_and_exit_code(tmp_path, capsys):
         ("badcase", "package-case"),
         ("bogus_type", "unknown-policy-type"),
         ("no_type", "unknown-policy-type"),
+        ("dead_pattern", "pattern-values-shape"),
+        ("unset_blind", "presence-missing-null"),
+        ("unset_blind", "presence-only"),
+        ("two_conditions", "situation-match-unset"),
     }
 
 
@@ -490,7 +554,9 @@ def test_cli_exits_zero_when_only_warnings_are_found(tmp_path, capsys):
         "gcp/Backup for GKE/google_gke_backup_restore_channel"])
     data = json.loads(capsys.readouterr().out)
     assert {e["severity"] for e in data} == {"warn"}
-    assert {e["rule"] for e in data} == {"legacy-assign", "package-case", "presence-only"}
+    assert {e["rule"] for e in data} == {"legacy-assign", "package-case", "presence-only",
+                                        "pattern-values-shape", "presence-missing-null",
+                                        "situation-match-unset"}
     assert rc == 0
 
 
@@ -735,9 +801,121 @@ def test_presence_only_is_a_warning(tmp_path):
     findings = policy_lint.lint_resource(
         root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
     presence = [f for f in findings if f.rule == "presence-only"]
-    assert len(presence) == 1
-    assert presence[0].severity == "warn"
+    # labels.rego and unset_blind.rego both check presence and nothing else.
+    assert {f.policy for f in presence} == {"labels", "unset_blind"}
+    assert {f.severity for f in presence} == {"warn"}
     assert "presence-only" in policy_lint.WARN_RULES
+
+
+# --------------------------------------------------------------------------- #
+# A pattern condition whose `values` is not [target, groups] flags nothing.
+# --------------------------------------------------------------------------- #
+def test_pattern_values_shape_names_the_shape_and_the_alternative(tmp_path):
+    # The finding has to be actionable in CI on its own: the author needs to see
+    # that the condition is dead, not merely imprecise, and which type to reach
+    # for when all they wanted was a shape check.
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    shape = [f for f in findings if f.rule == "pattern-values-shape"]
+    assert len(shape) == 1
+    assert shape[0].severity == "warn"
+    assert "can never flag anything" in shape[0].message
+    assert "element pattern whitelist" in shape[0].message
+
+
+@pytest.mark.parametrize("values", [
+    ["^projects/.+/secrets/.+"],                    # a regex, the mistake in the wild
+    [],                                             # nothing at all
+    "projects/*",                                   # a bare string, not a pair
+    ["projects/*/locations/*", ["a", "b"]],         # groups not nested
+    ["projects/*/locations/*", []],                 # no groups
+    ["projects/*", [["a"], ["b"]]],                 # a list with no '*' to apply to
+    ["projects/one/locations/two", [["a"], ["b"]]],  # a target with no wildcard
+])
+def test_pattern_values_problem_rejects_shapes_that_cannot_flag(values):
+    assert policy_lint._pattern_values_problem(values) is not None
+
+
+@pytest.mark.parametrize("values", [
+    ["projects/*", [["my-project"]]],
+    ["projects/*/locations/*", [["my-project"], ["europe-west2", "europe-west1"]]],
+    ["*://", [["https"]]],
+    # The open-tail idiom: constrain the scheme, say nothing about the host.
+    # Fewer lists than wildcards leaves the trailing positions unchecked on
+    # purpose, and 20 of the 31 conditions on dev were written this way.
+    ["*://*", [["https"]]],
+])
+def test_pattern_values_problem_accepts_the_shape_the_engine_reads(values):
+    assert policy_lint._pattern_values_problem(values) is None
+
+
+def test_pattern_values_shape_leaves_element_pattern_whitelist_alone(tmp_path):
+    # `element pattern whitelist` takes a FLAT list of wildcard shapes, so the
+    # pair rule must not be applied to it — the clean fixture would fail first,
+    # but the guard is worth pinning against a future edit to PATTERN_POLICY_TYPES.
+    assert "element pattern whitelist" not in policy_lint.PATTERN_POLICY_TYPES
+
+
+# --------------------------------------------------------------------------- #
+# A multi-condition situation must say whether it means ANY or ALL.
+# --------------------------------------------------------------------------- #
+def test_situation_match_unset_names_the_situation_and_both_options(tmp_path):
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    unset = [f for f in findings if f.rule == "situation-match-unset"]
+    assert len(unset) == 1
+    assert unset[0].policy == "two_conditions"
+    assert unset[0].severity == "warn"
+    # The author has to be able to act without reading the helper source.
+    assert "not configured for production" in unset[0].message
+    assert '"any"' in unset[0].message
+    assert '"all"' in unset[0].message
+
+
+def test_situation_match_unset_silent_on_a_single_condition(tmp_path):
+    # Every situation in the clean fixture has one condition; asking it to
+    # declare ANY vs ALL would be noise, since the two agree.
+    root = build_tree(tmp_path, "clean")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Cloud Storage", "google_storage_bucket")
+    assert findings == [], f"clean fixture must stay silent, got {findings}"
+
+
+def test_an_explicit_match_key_satisfies_the_rule_and_is_not_a_condition(tmp_path):
+    # sibling_gated.rego carries "match": "all" on its metadata entry and has
+    # two conditions. Three things must hold at once: the rule is satisfied, the
+    # metadata entry is not mistaken for a condition (which would trip
+    # unknown-policy-type, since it has no policy_type), and a condition reading
+    # a SIBLING argument does not trip wrong-argument.
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert not [f for f in findings if f.policy == "sibling_gated"]
+
+
+# --------------------------------------------------------------------------- #
+# A presence blacklist that denies "" but not null misses the unset case.
+# --------------------------------------------------------------------------- #
+def test_presence_missing_null_is_a_warning_that_names_the_fix(tmp_path):
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    missing = [f for f in findings if f.rule == "presence-missing-null"]
+    assert len(missing) == 1
+    assert missing[0].policy == "unset_blind"
+    assert missing[0].severity == "warn"
+    assert '[null, ""]' in missing[0].message
+
+
+def test_presence_missing_null_silent_when_null_is_listed(tmp_path):
+    # labels.rego blacklists [null, ""] — the correct shape. It trips
+    # presence-only and must not also trip this rule.
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert ("labels", "presence-missing-null") not in pairs(findings)
 
 
 # --------------------------------------------------------------------------- #
