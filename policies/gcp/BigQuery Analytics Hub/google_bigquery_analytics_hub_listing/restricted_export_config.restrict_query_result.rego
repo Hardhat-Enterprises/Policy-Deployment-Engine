@@ -7,6 +7,7 @@ conditions := [[
         {
                 "situation_description": "restricted_export_config.restrict_query_result is not enabled, allowing export of derived query results",
                 "remedies": ["Set restricted_export_config.restrict_query_result to true to prevent export of derived query results"],
+                "match": "any",
         },
         {
                 "condition": "restricted_export_config must exist",

@@ -3,7 +3,7 @@ resource "google_bigquery_analytics_hub_listing" "non_compliant_example_1" {
   data_exchange_id                    = "c"
   listing_id                          = "non_compliant_example_1"
   display_name                        = "c"
-  description                         = "Non-compliant listing without subscriber query logging"
+  description                         = "Listing for log_linked_dataset_query_user_email policy test"
   log_linked_dataset_query_user_email = false
 
   bigquery_dataset {

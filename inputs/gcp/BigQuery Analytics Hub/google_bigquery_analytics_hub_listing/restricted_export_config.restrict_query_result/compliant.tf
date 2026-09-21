@@ -3,7 +3,7 @@ resource "google_bigquery_analytics_hub_listing" "compliant_example_1" {
   data_exchange_id = "c"
   listing_id       = "compliant_example_1"
   display_name     = "c"
-  description      = "Compliant listing restricting export of derived query results"
+  description      = "Listing for restrict_query_result policy test"
 
   bigquery_dataset {
     dataset = "projects/my-project/datasets/c"

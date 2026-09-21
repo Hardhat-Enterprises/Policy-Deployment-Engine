@@ -7,7 +7,7 @@ resource "google_bigquery_analytics_hub_listing" "compliant_example_1" {
   data_exchange_id = "c"
   listing_id       = "compliant_example_1"
   display_name     = "c"
-  description      = "Compliant listing with data affinity restricted to an approved region"
+  description      = "Listing for data_affinity_regions policy test"
 
   pubsub_topic {
     topic                 = google_pubsub_topic.compliant_example_1.id
