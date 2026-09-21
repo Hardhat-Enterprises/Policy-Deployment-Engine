@@ -199,8 +199,8 @@
       "description": "Region hint on where the data might be published. Data affinity regions are modifiable.\nSee https://cloud.google.com/about/locations for full listing of possible Cloud regions.",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "The provider explicitly describes this as a non-binding hint on where data might be published, not an enforced placement control. The pubsub topic's actual data location is governed by the topic resource itself and other infrastructure, not by this field on the listing. Constraining this value to a region whitelist would not change the platform's actual data-residency posture, since the approved-looking value here has no bearing on where the underlying data actually lives."
+      "security_impact": true,
+      "rationale": "A region-selecting field, structurally similar to bigquery_dataset.replica_locations on the same resource. Even though the value is described as advisory rather than binding, a platform policy can still require it be drawn from an approved region whitelist, since leaving a region field entirely unconstrained is inconsistent with how other region fields on this resource are treated."
     },
     "pubsub_topic.topic": {
       "description": "Resource name of the Pub/Sub topic source for this listing. e.g. projects/myproject/topics/topicId",
