@@ -1,7 +1,3 @@
-resource "google_pubsub_topic" "non_compliant_example_1" {
-  name = "non-compliant-example-1"
-}
-
 resource "google_bigquery_analytics_hub_listing" "non_compliant_example_1" {
   location         = "us"
   data_exchange_id = "c"
@@ -10,7 +6,7 @@ resource "google_bigquery_analytics_hub_listing" "non_compliant_example_1" {
   description      = "Listing for data_affinity_regions policy test"
 
   pubsub_topic {
-    topic                 = google_pubsub_topic.non_compliant_example_1.id
+    topic                 = "projects/fake-project/topics/fake-topic"
     data_affinity_regions = ["asia-northeast1"]
   }
 }
