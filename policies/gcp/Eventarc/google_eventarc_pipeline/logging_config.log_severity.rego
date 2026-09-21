@@ -8,9 +8,9 @@ conditions := [
         {"situation_description" : "Platform Telemetry logging is disabled for the Pipeline, leaving message processing and failures unaudited.",
         "remedies":[ "Set logging_config.log_severity to a severity other than NONE so Pipeline activity is logged."]},
         {
-            "condition": "log_severity must not be NONE",
+            "condition": "log_severity must not be NONE, including when left unset (which defaults to NONE)",
             "attribute_path" : ["logging_config", 0, "log_severity"],
-            "values" : ["NONE"],
+            "values" : [null, "", "NONE"],
             "policy_type" : "blacklist"
         }
     ]

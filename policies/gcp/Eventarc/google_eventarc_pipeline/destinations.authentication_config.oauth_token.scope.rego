@@ -13,9 +13,9 @@ conditions := [
             ]
         },
         {
-            "condition": "Check whether the broad default OAuth scope is being used.",
+            "condition": "Check whether the broad default OAuth scope is being used, including when scope is left unset (which defaults to the same broad scope).",
             "attribute_path": ["destinations", 0, "authentication_config", 0, "oauth_token", 0, "scope"],
-            "values": ["https://www.googleapis.com/auth/cloud-platform"],
+            "values": [null, "", "https://www.googleapis.com/auth/cloud-platform"],
             "policy_type": "blacklist"
         }
     ]

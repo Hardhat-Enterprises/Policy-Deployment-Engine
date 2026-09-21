@@ -15,3 +15,21 @@ resource "google_eventarc_pipeline" "non_compliant_example_1" {
     }
   }
 }
+
+resource "google_eventarc_pipeline" "non_compliant_example_2" {
+  pipeline_id = "non-compliant-example-2"
+  location    = "us-central1"
+  project     = "pde-project"
+
+  destinations {
+    http_endpoint {
+      uri = "https://svc.us-central1.p.local:8080/route"
+    }
+    authentication_config {
+      oauth_token {
+        service_account = "eventarc-invoker@pde-project.iam.gserviceaccount.com"
+        # scope left unset: defaults to the same broad cloud-platform scope.
+      }
+    }
+  }
+}
