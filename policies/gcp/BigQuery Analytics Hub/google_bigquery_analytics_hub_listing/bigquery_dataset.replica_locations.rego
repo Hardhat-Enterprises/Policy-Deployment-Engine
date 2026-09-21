@@ -12,7 +12,7 @@ conditions := [[
                 "condition": "Test if replica_locations contains a non-approved region",
                 "attribute_path": ["bigquery_dataset", 0, "replica_locations"],
                 "values": ["us-central1", "australia-southeast1"],
-                "policy_type": "whitelist",
+                "policy_type": "element pattern whitelist",
         },
 ]]
 
