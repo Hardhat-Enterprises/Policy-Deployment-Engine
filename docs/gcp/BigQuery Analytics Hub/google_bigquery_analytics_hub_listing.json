@@ -6,8 +6,8 @@
       "description": "If true, the listing is only available to get the resource metadata. Listing is non subscribable.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether the underlying shared data itself is accessible, or only its metadata. Setting this to false on a listing (especially a public one) exposes the real data, not just descriptive information, making this a genuine data-exposure control."
+      "security_impact": false,
+      "rationale": "This flag selects between two listing product types (full-data sharing vs metadata-only), not who may access the shared data — subscriber access is governed separately by IAM on the exchange/listing. Forcing metadata-only platform-wide would disable the resource's core data-sharing function rather than close an access-control gap."
     },
     "categories": {
       "description": "Categories of the listing. Up to two categories are allowed.",
@@ -28,7 +28,7 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "The resource's own description explicitly calls this a safety guard against accidental deletion. Deletion-blocking flags follow the prevent-destructive-loss archetype, so this is treated as security-relevant."
+      "rationale": "The API blocks deletion of a commercial listing by default unless this field is explicitly set to true — that default failure is the actual safety guard against accidental deletion. A policy should require this stay false or unset, since pre-setting it to true bypasses the built-in confirmation rather than preserving it."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
@@ -199,8 +199,8 @@
       "description": "Region hint on where the data might be published. Data affinity regions are modifiable.\nSee https://cloud.google.com/about/locations for full listing of possible Cloud regions.",
       "required": false,
       "type": "set(string)",
-      "security_impact": false,
-      "rationale": "The resource's own description explicitly calls this a non-binding hint rather than an enforced restriction, unlike bigquery_dataset.replica_locations which represents actual data replicas. As a hint, it is not itself a security control."
+      "security_impact": true,
+      "rationale": "A region-selecting field, structurally similar to bigquery_dataset.replica_locations on the same resource. Although the values are described as a non-binding hint rather than an enforced placement, a residency whitelist can still meaningfully restrict which regions are accepted here, so this is treated as security-relevant."
     },
     "pubsub_topic.topic": {
       "description": "Resource name of the Pub/Sub topic source for this listing. e.g. projects/myproject/topics/topicId",

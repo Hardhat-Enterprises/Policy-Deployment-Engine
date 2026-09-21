@@ -5,14 +5,14 @@ import data.terraform.helpers
 
 conditions := [[
         {
-                "situation_description": "delete_commercial safety guard is not set to true",
-                "remedies": ["Set delete_commercial to true to protect against accidental deletion of commercial listings"],
+                "situation_description": "delete_commercial is pre-set to true, bypassing the built-in delete confirmation guard",
+                "remedies": ["Leave delete_commercial false or unset to preserve the accidental-deletion safeguard"],
         },
         {
-                "condition": "Test if delete_commercial is not true",
+                "condition": "Test if delete_commercial is true",
                 "attribute_path": ["delete_commercial"],
                 "values": [true],
-                "policy_type": "whitelist",
+                "policy_type": "blacklist",
         },
 ]]
 
