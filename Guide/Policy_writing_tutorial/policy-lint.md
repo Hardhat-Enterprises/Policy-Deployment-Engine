@@ -50,15 +50,15 @@ finding straight to it.
 
 ## unknown-policy-type
 
-`policy_type` is not one of the six values the engine can dispatch, so the whole condition is
+`policy_type` is not one of the supported values the engine can dispatch, so the whole condition is
 never evaluated. This is the worst thing a policy can do quietly: the condition is not weak, it
 is *absent*, and the policy passes every resource you point it at.
 
-The six, exactly as the engine spells them:
+The supported values, exactly as the engine spells them:
 
-    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist
+    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist
 
-They are **lowercase**, and the two-word ones use a **space, not an underscore**. Writing
+They are **lowercase**, and multi-word names use **spaces, not underscores**. Writing
 `pattern_whitelist` is the mistake this rule exists to catch. `element whitelist` is not a type
 either — for allowing a list, a plain `whitelist` already requires every element to be allowed
 (see [policy.rego](policy-rego.md#top) for what each type does).
@@ -79,7 +79,7 @@ Good:
       "policy_type": "whitelist"
     }
 
-If none of the six expresses what you need, that is worth saying out loud rather than working
+If none of the supported types expresses what you need, that is worth saying out loud rather than working
 around — raise it, so the type can be added to the helpers instead of a broken one shipping.
 
 Miss this and the test catches it too: the helper refuses to evaluate the policy at all and
@@ -143,6 +143,19 @@ Good:
 A path that only passes *through* an index (e.g. `["rsa", 0, "key"]`) is fine — this rule only
 looks at the **last** segment.
 
+## invalid-map-key-blacklist
+
+For `map key blacklist`, `values` supplies key names, not the map's values. It
+must contain at least one non-empty string name with no leading or trailing
+whitespace. A single string is also accepted by the dispatcher. Empty lists,
+missing/null values, non-string entries and names such as `"authorization "`
+are **errors**, because they can silently prevent the intended check.
+
+Correct the configured names rather than relying on trimming. The normal runtime
+summary also returns `POLICY ERROR:` for this configuration and checks nothing.
+This is not a `presence-only` warning; empty/null values in the actual resource
+map are still allowed by the helper.
+
 ## presence-only
 
 `values` is only `null`/`""` under a `blacklist`/`whitelist` `policy_type`: the check tests
@@ -176,6 +189,160 @@ Good — paired with a pattern:
       "policy_type": "pattern blacklist"
     }
 
+## pattern-values-shape
+
+A `pattern whitelist` or `pattern blacklist` whose `values` is not the pair the engine reads.
+These two types are the only ones whose `values` is **not** a flat list. They take exactly two
+entries:
+
+    "values": [ <target with * wildcards>, [ [allowed at the 1st *], [allowed at the 2nd *], ... ] ]
+
+The engine replaces each `*` in the target with "one path segment", pulls the matched substrings
+out of the real value, and compares substring *i* against list *i*. So the target says **where
+to look** and the lists say **what is allowed there** — one list per `*`, in order.
+
+The mistake this rule catches is writing a **regex** instead:
+
+Bad — reads like a shape check, checks nothing:
+
+    {
+      "attribute_path": ["kms_key_name"],
+      "values": ["^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+$"],
+      "policy_type": "pattern whitelist"
+    }
+
+With that shape there is no second entry, so the comparison never binds and the condition
+**flags nothing at all** — unset, empty, malformed and correct values all pass it equally. It is
+`unknown-policy-type` by another route: the condition is not weak, it is absent. Your kit can
+still go green, because a sibling condition (typically a `blacklist` on `[null, ""]`) is what
+actually catches the nonCompliant fixture.
+
+Good — when you are constraining *what goes in a position*:
+
+    {
+      "attribute_path": ["kms_key_name"],
+      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*",
+                 [["my-project"], ["europe-west2"], ["approved-ring"], ["approved-key"]]],
+      "policy_type": "pattern whitelist"
+    }
+
+Good — when all you wanted was "this must *have* the full path shape", with no opinion about
+the segments, use **`element pattern whitelist`** instead. It takes a flat list of wildcard
+shapes and works on a plain string as well as a list:
+
+    {
+      "attribute_path": ["kms_key_name"],
+      "values": ["projects/*/locations/*/keyRings/*/cryptoKeys/*"],
+      "policy_type": "element pattern whitelist"
+    }
+
+**This is a warning, and it does not fail your build** — but unlike `presence-only` there is no
+reading of it under which the condition is doing its job, so treat it as something to fix rather
+than to justify.
+
+**What this rule does *not* flag: fewer lists than `*`s.** Leaving the trailing positions
+without a list is a legitimate idiom — it says "constrain this part, I have no opinion about the
+rest":
+
+    "values": ["*://*", [["https"]]]      # the scheme must be https; the host is anything
+
+Position 1 simply goes unchecked. So if you are missing a list by accident, the linter will not
+tell you — count your `*`s against your lists yourself. An **extra** list *is* flagged, because
+it has no wildcard to apply to and can only be a mistake.
+
+Two limits of the pattern types worth knowing while you are here, because neither is a finding:
+a value that does **not** match the target at all is skipped rather than flagged, and no pattern
+type flags a **missing** value. If either case is part of the control, it needs its own
+condition alongside — see `presence-missing-null` below.
+
+## presence-missing-null
+
+A `blacklist` lists `""` but not `null`. An argument the author simply left out of their
+Terraform does not reach the engine as an empty string — the plan JSON carries it as **`null`** —
+so a blacklist that denies only `""` passes the unset case, which is usually the one you were
+guarding against.
+
+Bad — catches `description = ""`, misses the argument being absent:
+
+    {
+      "attribute_path": ["description"],
+      "values": [""],
+      "policy_type": "blacklist"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["description"],
+      "values": [null, ""],
+      "policy_type": "blacklist"
+    }
+
+**This is a warning, and it does not fail your build.** Occasionally denying only `""` is
+deliberate — a provider that always writes the field means absent is impossible, or a sibling
+condition already covers the unset case. Say so in the `rationale` if that is your situation;
+otherwise add the `null`, which costs nothing and is never wrong.
+
+Note this is the same `[null, ""]` shape that `presence-only` asks you to look past: getting the
+presence check *right* and pairing it with a real pattern are separate improvements, and a
+condition can fairly be told both things at once.
+
+## situation-match-unset
+
+A situation has two or more conditions and no `match` key, so it takes the default silently.
+
+A situation with one condition is unambiguous. With two, there are two very different readings,
+and the engine has to pick one:
+
+- **`"match": "any"`** (the default) — flag a resource that fails **any** condition. Right when
+  the conditions are several ways the *same* argument can be wrong: a presence check plus a
+  shape check, say, where either failing is a real problem.
+- **`"match": "all"`** — flag only a resource that fails **every** condition. Right when the
+  conditions are *alternatives*: two acceptable ways to configure something, where only a
+  resource that does neither is non-compliant.
+
+Both produce a green kit, and picking the wrong one is invisible in a test run — an over-flag
+reports a compliant resource, an under-flag reports nothing at all. The linter cannot tell which
+you meant, so it asks you to write it down.
+
+Bad — two alternatives under the default, which flags every endpoint that is missing *either*:
+
+    [
+      {
+        "situation_description": "Endpoint is reachable from the public internet.",
+        "remedies": ["Set network for VPC peering, or enable Private Service Connect."]
+      },
+      { "attribute_path": ["network"], "values": [null, ""], "policy_type": "blacklist" },
+      { "attribute_path": ["private_service_connect_config", 0, "enable_private_service_connect"],
+        "values": [true], "policy_type": "whitelist" }
+    ]
+
+Good:
+
+    [
+      {
+        "situation_description": "Endpoint is reachable from the public internet.",
+        "remedies": ["Set network for VPC peering, or enable Private Service Connect."],
+        "match": "all"
+      },
+      ...the same two conditions...
+    ]
+
+Also good — the same-argument pair, where the default is what you want and you are confirming it:
+
+    {
+      "situation_description": "Description is missing or malformed.",
+      "remedies": ["Set a description matching the standard."],
+      "match": "any"
+    }
+
+**This is a warning, and it does not fail your build.** It fires on existing policies whose
+behaviour is already correct — most multi-condition situations in the tree are the same-argument
+kind and want the default. Adding `"match": "any"` to those changes nothing; it just records
+that someone checked.
+
+See [policy.rego](policy-rego.md#top) for what each mode does to the evaluation.
+
 ## wrong-argument
 
 No condition in `<argument>.rego` reads the argument the file is named after — usually a
@@ -205,6 +372,100 @@ Good:
 The whole point of the pair is to isolate a single variable: if two things differ and the policy
 flags the non-compliant resource, you cannot tell which of the two the policy actually caught.
 Fix it by making every other attribute identical between the two files.
+
+Two kinds of difference are **not** reported, because neither is a second variable:
+
+- **Naming your examples.** `odb_subnet_id = "compliant-example-1"` against
+  `"non-compliant-example-1"` is one label written twice. Any value that starts
+  `compliant-`/`compliant_` on the compliant side and `non-compliant-`/`non_compliant_` on the
+  other is read as naming, not drift. (Many GCP id fields reject underscores, which is why the
+  hyphenated form is what you have to write.)
+- **Values the provider derives from the one under test.** `google_service_account.email` is
+  built out of `account_id`; a regional resource's `target` URL contains its `region`. Changing
+  the argument necessarily changes them.
+
+### When the provider gives you no choice
+
+Occasionally the argument under test belongs to a set Terraform allows only one of —
+`predefined_acl` and `role_entity` on a `google_storage_object_acl`, `managed` and
+`self_managed` on a certificate. Showing a compliant and a non-compliant value of one of them
+*forces* the other to differ, and there is no version of the fixture that terraform will accept
+without that second difference.
+
+**Check first that it really is forced.** Most of these findings are an attribute that simply
+drifted while the fixture was being written, and those are yours to fix. The test that it is
+forced is simple: if you make the two files differ only on the argument under test, does
+`terraform plan` refuse the fixture? If it plans fine, the difference was yours to remove.
+
+Some of these you never have to declare at all:
+
+- **Write-only secrets.** A provider that takes a secret takes it twice — `private_key` and
+  `private_key_wo` (write-only, kept out of state), plus `private_key_wo_version`. Only one of
+  the pair may be set, so a fixture testing `private_key` has to carry the compliant secret as
+  `private_key_wo`. The linter recognises the `_wo` / `_wo_version` suffixes and treats the trio
+  as one setting, so none of them is ever reported as drift against the others. Nothing to
+  declare.
+- **The maintainer list.** A handful of older cases are listed in `FIXTURE_DRIFT_EXEMPT` in
+  `scripts/linters/policy_lint.py`. You cannot add to that one — it lives under `scripts/`, which
+  a `Service/` branch may not change.
+
+For everything else, declare it in your own resource's folder.
+
+### drift_exemptions.json
+
+An optional file inside your resource's policy folder — your branch owns it, so you can add it
+yourself and it can never conflict with another student's:
+
+    policies/<platform>/<service folder>/<resource_type>/drift_exemptions.json
+
+The key is the argument under test (the same name as your `.rego` file and your fixture folder).
+`keys` lists the *other* members of the mutually exclusive set, and `reason` says why the
+provider will not let you set both:
+
+    {
+      "private_key": {
+        "keys": ["private_key_wo"],
+        "reason": "Terraform allows only one of private_key or private_key_wo to be set."
+      }
+    }
+
+Two things to know before you reach for it:
+
+- **It is checked, not trusted.** The portal's AI review reads each entry during the policy
+  review and verifies it against the official Terraform registry documentation for this
+  resource, at the provider version your `docs/` JSON was generated from. An entry the
+  documentation does not support is rejected there and blocks the resource, with the normal
+  rebuttal path — so if you believe the rejection is wrong, escalate with your `terraform plan`
+  error output as evidence.
+- **A stale entry is a finding.** If the fixture is later rewritten so it no longer needs the
+  exemption, `drift-exemption-stale` fires. An entry that silences nothing today would silence a
+  real difference tomorrow.
+
+## drift-exemption-invalid
+
+Your `drift_exemptions.json` cannot be used as written. The file exempts **nothing** until this
+is fixed — a malformed entry never silences a finding by accident.
+
+Causes, all reported against the entry (or against `drift_exemptions` for the file itself):
+
+- the file is not valid JSON, or its top level is not an object;
+- an entry is not an object of the shape `{"keys": [...], "reason": "..."}`;
+- `keys` is missing, empty, or holds anything but non-empty argument names;
+- `reason` is missing or blank — an entry without a reason is a silenced finding, not a
+  recorded fact;
+- the entry's key, or one of its `keys`, is not a documented argument of this resource. Check it
+  against `docs/<platform>/<service folder>/<resource_type>.json`; a typo here exempts nothing
+  while looking like it works.
+
+## drift-exemption-stale
+
+An entry names a key the fixture does not actually differ on, so it is silencing nothing — and
+would quietly hide a real second difference if one appeared later. Remove the key, or the whole
+entry if that was its only one.
+
+You will also see this if you declared a pair the linter already handles without a file (the
+`_wo` write-only suffixes above), or one already in the maintainer list. The entry is redundant
+in both cases; deleting it changes nothing about whether your fixture passes.
 
 Bad — `public_access_prevention.rego`, but `storage_class` moved too:
 
@@ -278,11 +539,15 @@ the two files are numbered independently of each other:
 
 ## fixture-missing-plan
 
-There's no committed plan cache for this fixture pair at `inputs/plan_cache/gcp/<sha>.json`. Run
-the test harness locally and commit what it produces:
+There's no committed plan for this fixture pair. Every fixture directory holds one, named
+`<sha>.json` for the hash of the `*.tf` beside it. Run the test harness locally and commit what
+it writes into your fixture directories:
 
     python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
-    git add inputs/plan_cache/
+    git add "inputs/gcp/<Service>/<resource type>"
+
+If you changed a fixture, the same run also deletes the plan of its previous version — commit
+that deletion too.
 
 See [Testing your policies](testing-policies.md#top) for the full local test loop.
 
