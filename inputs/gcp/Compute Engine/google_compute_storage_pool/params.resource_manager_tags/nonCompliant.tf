@@ -14,7 +14,7 @@ resource "google_compute_storage_pool" "non_compliant_example_1" {
 
   params {
     resource_manager_tags = {
-      "pde-project-vindya/security" = "not-required"
+      "tagKeys/123456789" = "not-required"
     }
   }
 }
