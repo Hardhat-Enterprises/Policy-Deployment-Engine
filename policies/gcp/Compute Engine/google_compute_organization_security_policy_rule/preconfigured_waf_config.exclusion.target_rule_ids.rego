@@ -14,7 +14,7 @@ conditions := [
         {
             "condition": "Check if target_rule_ids is missing or empty, defaulting to excluding all rule IDs",
             "attribute_path": ["preconfigured_waf_config", 0, "exclusion", 0, "target_rule_ids"],
-            "values": [[]],
+            "values": [null, []],
             "policy_type": "Blacklist"
         }
     ]
