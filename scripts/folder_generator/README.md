@@ -35,7 +35,7 @@ python main.py
 1. Select a cloud provider (e.g., GCP).
 2. Select a service from the list (populated from local JSON files).
 3. Select a resource under the chosen service.
-4. Enter a policy name (alphabetical characters with optional underscores).
+4. Enter the documented argument name, including dots for nested arguments.
 5. Click **Create Policy** to generate the policy files and folder structure.
 6. Use **Refresh Services** to rescan the docs folder if JSON files change.
 
@@ -51,17 +51,20 @@ policies/{cloud}/{service}/{resource}/{policy_name}/
 policies/{cloud}/{service}/{resource}/_vars.rego   # created once per resource
 ```
 
+Complete the layout migration before generating real policies. The generator
+refuses to create policies if the shared configuration is absent.
 No `config.tf` is generated: there is one shared provider stub per platform at
 `policies/{cloud}/config.tf`, which the test runner copies into a temporary
-workspace when it needs to run `terraform plan`.
+workspace when it needs to run `terraform plan`. An optional local `config.tf`
+replaces that default for one argument. The harness writes `<sha>.json` beside
+the fixtures; commit it with them.
 
 
 ## Notes
 
 - Service/resource data lives only in runtime memory; no JSON cache files are saved.
-- Policy names must conform to the pattern: alphabets and underscores only (e.g `my_policy`).
+- Argument names contain letters, digits and underscores, with dots separating nested segments (e.g. `encryption_spec.kms_key_name`).
 - The templates folder must contain the required Terraform and Rego template files mentioned in the config.
 - The app requires Python 3 with dependencies installed via `pip install -r requirements.txt`.
 
 ---
-

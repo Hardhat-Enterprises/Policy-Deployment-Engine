@@ -3,10 +3,11 @@
 Tracking work needed on the contributor guide under `Guide/Policy_writing_tutorial/`.
 
 The **text** of the guide was reconciled with the post-restructure repo (one self-contained
-folder per attribute under `policies/`, no `inputs/` tree, no per-attribute `config.tf`) and
+folder per attribute under `policies/`, shared config plus optional per-argument overrides) and
 every link/image reference resolves. The items below
 are things that could not be fixed from text alone — mostly **screenshots** whose *content* is
 outdated (they still render; they just depict the old layout), plus a few content gaps.
+Production data is still unmigrated during preparation; see [cutover](layout-cutover.md).
 
 Paths below are relative to `Guide/Policy_writing_tutorial/` unless noted.
 

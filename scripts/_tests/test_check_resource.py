@@ -164,6 +164,9 @@ def test_a_false_argument_needs_no_policy_or_fixture(tmp_path, monkeypatch):
 # --if-cached: is every plan committed?
 # --------------------------------------------------------------------------- #
 def _fixture_dir(tmp_path, argument="location"):
+    pin = tmp_path / "scripts/auto_test/provider_version.txt"
+    pin.parent.mkdir(parents=True, exist_ok=True)
+    pin.write_text("test-provider")
     d = (tmp_path / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket" / argument)
     d.mkdir(parents=True)
     (d / "compliant.tf").write_text('resource "google_storage_bucket" "a" {}\n')
@@ -314,3 +317,61 @@ def test_the_real_repo_passes_its_own_gate(capsys):
     assert cr.main(["--branch", "Service/gcp/api_hub/google_apihub_plugin", "--gate-only"]) == 0
     out = capsys.readouterr().out
     assert "Doc completeness" in out and "True-arg coverage" in out and "OPA test" in out
+
+
+# --------------------------------------------------------------------------- #
+# --skip-coverage: docs-first commits are never blocked on coverage
+# --------------------------------------------------------------------------- #
+GAPPED = ["Service/gcp/api_hub/google_apihub_plugin", "--gate-only"]
+
+
+@pytest.fixture
+def coverage_gaps(monkeypatch):
+    """A complete doc whose true arguments have no policies or fixtures yet — the
+    state of every resource between docs approval and its first policy."""
+    monkeypatch.setattr(cr, "check_true_arg_coverage",
+                        lambda *a: ["x: missing policy", "x: missing input fixture"])
+
+    def no_opa(*a, **k):
+        raise AssertionError("the OPA test must not run")
+    monkeypatch.setattr(cr, "step_opa", no_opa)
+
+
+def test_skip_coverage_passes_a_complete_doc_with_gaps(coverage_gaps, capsys):
+    assert cr.main(["--branch", *GAPPED, "--skip-coverage"]) == 0
+    out = capsys.readouterr().out
+    assert "[OK]   Doc completeness" in out
+    assert "[skip] True-arg coverage" in out
+    assert "checked on the PR" in out
+    assert "[skip] OPA test" in out
+    assert "[FAIL]" not in out
+
+
+def test_skip_coverage_still_fails_an_incomplete_doc(coverage_gaps, monkeypatch, capsys):
+    monkeypatch.setattr(cr, "check_doc_completeness", lambda doc: ["x: no rationale"])
+    assert cr.main(["--branch", *GAPPED, "--skip-coverage"]) == 1
+    assert "[FAIL] Doc completeness" in capsys.readouterr().out
+
+
+def test_without_the_flag_the_same_gaps_still_fail(coverage_gaps, capsys):
+    # The full run and CI: nothing about the hook's exemption weakens them.
+    assert cr.main(["--branch", *GAPPED]) == 1
+    out = capsys.readouterr().out
+    assert "[FAIL] True-arg coverage" in out
+    assert "block merging the PR, not your commits" in out
+    assert "[skip] OPA test" in out
+
+
+def test_the_commit_hook_skips_coverage_and_ci_does_not():
+    import yaml  # pre-commit itself depends on PyYAML; CI installs it for this test
+    config = yaml.safe_load((project_root / ".pre-commit-config.yaml").read_text())
+    hooks = {h["id"]: h for repo in config["repos"] for h in repo["hooks"]}
+    assert "--skip-coverage" in hooks["resource-gate"]["entry"].split()
+
+    workflow = yaml.safe_load(
+        (project_root / ".github/workflows/policy_check_PR.yaml").read_text())
+    calls = [step["run"] for job in workflow["jobs"].values()
+             for step in job.get("steps", [])
+             if "check_resource.py" in step.get("run", "")]
+    assert calls, "policy_check_PR.yaml no longer calls check_resource.py"
+    assert all("--skip-coverage" not in c for c in calls)

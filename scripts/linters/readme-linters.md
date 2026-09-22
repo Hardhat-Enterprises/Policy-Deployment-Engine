@@ -1,11 +1,14 @@
 # 🛡️ Policy Deployment Engine — Linters
 
 A single linter, `scripts/linters/linter.py`, enforces structure and
-cross-consistency across three trees — `docs/`, `inputs/`, `policies/` —
-treating `docs/` as the source of truth that `inputs/` and `policies/` must
+cross-consistency between `docs/` and `policies/`,
+treating `docs/` as the source of truth that policy directories and fixtures must
 reconcile to. It uses only the Python standard library (no extra installs).
 
-There are four supporting scripts:
+During preparation, production data is still in the old layout and whole-tree
+checks are expected to fail. See [cutover](../../Guide/layout-cutover.md).
+
+Supporting scripts:
 
 - `run_precommit_linter.py` — runs the linter but fails only on **your** changed
   files (so you are never blocked by the repo-wide backlog). It also runs
@@ -17,9 +20,11 @@ There are four supporting scripts:
 - `../check_resource.py` — not a linter itself: the single entry point that runs
   all of these plus the per-resource gate (doc completeness, argument coverage,
   OPA test), in the order CI runs them. It is what contributors are told to run
-  and what CI's `policy_check` job calls with `--gate-only`.
+  and what CI's `policy_check` job calls with `--gate-only`. The pre-commit hook
+  adds `--skip-coverage`: coverage and the OPA test are PR-time checks, since
+  docs are written and approved before any policy exists.
 - `branch_scope.py` — enforces that a `Service/<platform>/<service_slug>/<resource_type>`
-  branch changes **only** that resource's files (`docs/` JSON, `inputs/`,
+  branch changes **only** that resource's files (`docs/` JSON,
   `policies/`). It catches the two silent mistakes — editing the shared harness
   and sweeping up another resource's files — neither of which fails any test on
   the branch that caused it. Rules are documented in
@@ -47,7 +52,7 @@ There are four supporting scripts:
 # from the repo root
 python scripts/linters/linter.py                      # lint every tree
 python scripts/linters/linter.py --tree docs
-python scripts/linters/linter.py --tree inputs --platform gcp
+python scripts/linters/linter.py --tree policies --platform gcp
 python scripts/linters/linter.py --tree policies
 python scripts/linters/linter.py --no-content-checks  # structural only (skip §3 checks)
 ```
@@ -58,29 +63,28 @@ Exit code is `1` if any error is found, else `0`.
 
 ## 2. Structural rules (always on)
 
-The structural pass never opens a `.tf`/`.rego` file (it does parse docs JSON).
+The structural pass validates directories, required files and committed plans.
 
 - **docs/** — only the platform folders (`gcp`, `aws`, `azure`); `gcp/<service>/`
   holds one `*.json` per resource, each matching the doc schema (`last_updated`,
   `provider_version`, `arguments`).
-- **inputs/** — reconciles **exactly** to docs:
-  `inputs/gcp/<service>/<resource>/<argument>/` where `<service>` and `<resource>`
+- **policies/** — reconciles to docs:
+  `policies/gcp/<service>/<resource>/<argument>/` where `<service>` and `<resource>`
   match a `docs/gcp/<service>/<resource>.json`, and `<argument>` is a **non-block**
-  argument key in that doc. Each argument dir must contain `compliant.tf`,
-  `config.tf`, `nonCompliant.tf` (terraform artifacts tolerated; anything else flagged).
-- **policies/** — same taxonomy, but each argument is a single `<argument>.rego`
-  file plus an optional per-resource `_vars.rego` (underscore-prefixed so it is
-  never mistaken for a policy).
+  argument key in that doc. Each argument directory requires `policy.rego`,
+  `compliant.tf`, `nonCompliant.tf` and the expected valid `<sha>.json`.
+  Local `config.tf` replaces the shared `policies/gcp/config.tf` default.
+  `_vars.rego` stays at resource level. Stale plans, tracked Terraform artifacts,
+  incomplete arguments and legacy flat policy placement are rejected.
 
 ---
 
 ## 3. Content checks (on by default; `--no-content-checks` to skip)
 
-These read inside files. They run by default (the fixture backlog is cleared and
-the whole tree passes). Pass `--no-content-checks` for structural validation only.
+These read inside files and run by default. Pass `--no-content-checks` for structural validation only.
 
 - **A — rego package path:** each `.rego` `package` is
-  `terraform.gcp.security.<service>.<resource>.<seg>` (`<seg>` = filename stem with
+  `terraform.gcp.security.<service>.<resource>.<seg>` (`<seg>` = argument directory name with
   `.`→`_`; `_vars.rego` → `.<resource>.vars`). The `<service>` segment is not asserted.
 - **B — single tested resource:** a `compliant.tf` / `nonCompliant.tf` contains
   **only** the tested resource type (== its dir). Dependency resources are
@@ -137,6 +141,12 @@ python scripts/linters/run_precommit_linter.py --all      # whole tree, fail on 
 python scripts/linters/branch_scope.py --staged           # what you are about to commit
 python scripts/linters/branch_scope.py --base origin/dev  # the whole branch vs dev (CI)
 ```
+
+The `resource-gate` hook runs `check_resource.py --gate-only --if-cached
+--changed-only --skip-coverage`, which means doc completeness only. It never checks
+true-arg coverage, which answers "is this resource finished?" and would otherwise
+block every commit made while the docs exist but the policies don't. The PR and
+the full `check_resource.py` run still fail on coverage gaps.
 
 **CI (the `Branch scope` job in `.github/workflows/policy_check_PR.yaml`):** it runs
 `branch_scope.py --branch <head ref> --base origin/<base>` on every pull request

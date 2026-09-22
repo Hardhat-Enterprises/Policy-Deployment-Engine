@@ -47,6 +47,9 @@ def test_the_sha_tracks_the_tf_contents(tmp_path):
 
 def test_explicit_root_does_not_escape_into_another_checkout(tmp_path):
     d = _fixture(tmp_path)
+    pin = tmp_path / "scripts/auto_test/provider_version.txt"
+    pin.parent.mkdir(parents=True)
+    pin.write_text(auto_test.TARGET_PROVIDER_VERSION)
     assert auto_test.plan_cache_path(d, tmp_path).parent == d
     with pytest.raises(ValueError):
         auto_test.plan_cache_path(d, tmp_path / "unrelated")
@@ -56,7 +59,7 @@ def test_explicit_root_does_not_escape_into_another_checkout(tmp_path):
 def test_pruning_removes_every_other_json(tmp_path, stale):
     d = _fixture(tmp_path)
     keep = auto_test.plan_cache_path(d)
-    keep.write_text("{}")
+    keep.write_text('{"planned_values": {}}')
     (d / stale).write_text("{}")
 
     assert auto_test.prune_stale_plans(d, keep=keep) == 1

@@ -328,10 +328,10 @@ class PolicyApp(ctk.CTk):
         if not policy_name:
             messagebox.showerror("Error", "Policy name cannot be empty.")
             return
-        if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', policy_name):
+        if not re.fullmatch(r'[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)*', policy_name):
             messagebox.showerror(
                 "Invalid Policy Name",
-                "Policy name must start with a letter and contain only letters, digits, and underscores. Examples: MyPolicy, My_Policy, policy1"
+                "Use a documented argument name: letters, digits and underscores, with dots between nested arguments. Examples: labels, encryption_spec.kms_key_name"
             )
             return
         create_policy_files(cloud, service, resource, policy_name)

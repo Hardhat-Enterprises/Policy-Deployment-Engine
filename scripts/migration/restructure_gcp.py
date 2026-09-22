@@ -71,10 +71,10 @@ def valid_plan(path: Path) -> None:
         raise Abort(f"Invalid Terraform plan {path}: {exc}") from exc
 
 
-def source_plan(directory: Path, files: dict[str, Path], sha: str) -> Path:
+def source_plan(directory: Path, files: dict[str, Path], sha: str, root: Path) -> Path:
     """Accept only the current hash or a provably equivalent old text spelling."""
-    alternatives = {sha_for_files(files, lambda b: b),
-                    sha_for_files(files, lambda b: canonical_text_bytes(b).replace(b"\n", b"\r\n"))}
+    alternatives = {sha_for_files(files, lambda b: b, repo_root=root),
+                    sha_for_files(files, lambda b: canonical_text_bytes(b).replace(b"\n", b"\r\n"), repo_root=root)}
     candidates = sorted(directory.glob("*.json"))
     if len(candidates) != 1:
         raise Abort(f"{directory}: expected exactly one committed plan, found {len(candidates)}; "
@@ -132,8 +132,8 @@ def prepare(root: Path) -> Migration:
     if not policies_root.is_dir():
         raise Abort(f"Not a GCP policy checkout: {policies_root} is missing")
     regos = sorted(policies_root.rglob("*.rego"))
-    flat = [p for p in regos if p.name not in {"_vars.rego", "policy.rego"}]
-    nested = [p for p in regos if p.name == "policy.rego"]
+    nested = [p for p in regos if p.name == "policy.rego" and len(p.relative_to(policies_root).parts) == 4]
+    flat = [p for p in regos if p.name != "_vars.rego" and p not in nested]
     old_files = [p for p in inputs_root.rglob("*") if p.is_file() and p.name != ".gitkeep"]
     if nested:
         if flat or old_files:
@@ -148,6 +148,8 @@ def prepare(root: Path) -> Migration:
         raise Abort("Legacy central plan cache remains; sync dev's fixture-local plans before cutover")
 
     result = Migration(root)
+    pin = root / "scripts/auto_test/provider_version.txt"
+    result.fingerprints[pin] = fingerprint(pin)
     records = []
     config_groups = defaultdict(list)
     accounted = set()
@@ -172,8 +174,8 @@ def prepare(root: Path) -> Migration:
             if not entry.is_file() or (entry.name not in required and not entry.name.endswith(".json")):
                 raise Abort(f"Unexpected fixture entry: {entry}; clean it up before cutover")
         files = {name: source / name for name in required}
-        sha = sha_for_files(files)
-        committed = source_plan(source, files, sha)
+        sha = sha_for_files(files, repo_root=root)
+        committed = source_plan(source, files, sha, root)
         config_groups[canonical_text_bytes(files["config.tf"].read_bytes())].append(files["config.tf"])
         records.append((identity, policy, source, target, committed, sha))
         result.hashes[identity] = sha
@@ -202,7 +204,7 @@ def prepare(root: Path) -> Migration:
         # Check the proposed effective file set before any moves, using source bytes.
         effective = {name: source / name for name in FIXTURES}
         effective["config.tf"] = canonical if canonical_text_bytes(config.read_bytes()) == canonical_bytes else config
-        if sha_for_files(effective) != sha:
+        if sha_for_files(effective, repo_root=root) != sha:
             raise Abort(f"Effective fixture hash would change: {identity}")
 
     destinations = set()

@@ -49,6 +49,14 @@ Options
 ``--changed-only``   skip steps whose inputs this commit does not touch, judged from
                      the staged files. Also for the pre-commit hook: it runs on every
                      commit, and most commits change nothing this gate reads.
+``--skip-coverage``  skip true-arg coverage, and with it the OPA test. Coverage asks
+                     "is this resource finished?", which is a question for the pull
+                     request, not for every commit: docs are written and approved
+                     before any policy exists, so a commit hook that checked it would
+                     block that work outright. The OPA test goes too, because without
+                     coverage it would fail confusingly on the missing policies and
+                     fixtures. Doc completeness still runs. Used by the pre-commit
+                     hook; CI and the full run never pass it.
 
 Exits 0 when everything passed (or was legitimately skipped), 1 on any failure.
 """
@@ -66,7 +74,8 @@ from _service_slug import slug_to_folder  # noqa: E402
 
 # The single definition of which plan belongs to which fixture — imported, never
 # re-derived, so --if-cached asks exactly the question auto_test itself asks.
-from scripts.auto_test.auto_test import plan_cache_path, discover_policies, is_committed_plan  # noqa: E402
+from scripts.auto_test.auto_test import (  # noqa: E402
+    make_streams_encoding_safe, plan_cache_path, discover_policies, is_committed_plan)
 
 DOCS, POLICIES = "docs", "policies"
 LINTERS = REPO / "scripts" / "linters"
@@ -119,9 +128,15 @@ class Report:
 
 
 def run(cmd, **kwargs):
-    """Run a subprocess from the repo root, capturing its output."""
-    return subprocess.run([sys.executable, *cmd], cwd=REPO,
-                          capture_output=True, text=True, **kwargs)
+    """Run a subprocess from the repo root, capturing its output.
+
+    The child's stdout is a pipe, which on Windows takes the ANSI code page rather
+    than the console's — so the child is told to write UTF-8, and we read UTF-8.
+    """
+    env = {**os.environ, "PYTHONUTF8": "1"}
+    return subprocess.run([sys.executable, *cmd], cwd=REPO, env=env,
+                          capture_output=True, encoding="utf-8", errors="replace",
+                          **kwargs)
 
 
 def show(result):
@@ -324,10 +339,15 @@ def step_opa(report, platform, folder, resource, if_cached):
         show(result)
 
 
+COVERAGE_SKIPPED = ("not a commit-time check — checked on the PR and by the full "
+                    "`python scripts/check_resource.py` run")
+
+
 # --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
 def main(argv=None):
+    make_streams_encoding_safe()
     parser = argparse.ArgumentParser(
         description="Run every check CI runs against your resource branch.")
     parser.add_argument("--branch", default=None,
@@ -341,6 +361,9 @@ def main(argv=None):
                              "than running terraform to build one.")
     parser.add_argument("--changed-only", action="store_true",
                         help="Skip steps whose inputs the staged files do not touch.")
+    parser.add_argument("--skip-coverage", action="store_true",
+                        help="Skip true-arg coverage and the OPA test (checked on the PR "
+                             "and by the full run). For the pre-commit hook.")
     args = parser.parse_args(argv)
 
     branch = args.branch or os.getenv("GITHUB_HEAD_REF") or current_branch()
@@ -388,7 +411,7 @@ def main(argv=None):
                                          f"{resource}'s docs, fixtures or policies")
             return report.summarise(resource)
         if not touches_opa_inputs(mine):
-            # Docs-only edit: coverage and completeness can move, the plan cannot.
+            # Docs-only edit: completeness (and coverage) can move, the plan cannot.
             args.if_cached = True
             staged_opa = False
         else:
@@ -412,9 +435,19 @@ def main(argv=None):
         report.ok("Doc completeness", "every argument has a real security_impact and a "
                                       f"rationale; {compared}")
 
+    if args.skip_coverage:
+        # Not a commit-time question: docs land before policies, so gaps are normal
+        # here. The pull request and the full run are where "finished" is enforced.
+        report.skip("True-arg coverage", COVERAGE_SKIPPED)
+        report.skip("OPA test", "skipped with coverage: until every policy and fixture "
+                                "exists it would only fail on files not written yet")
+        return report.summarise(resource)
+
     cover_errors = check_true_arg_coverage(doc, platform, folder, resource)
     if cover_errors:
-        report.fail("True-arg coverage", f"{len(cover_errors)} gap(s)")
+        report.fail("True-arg coverage",
+                    f"{len(cover_errors)} gap(s) — expected until the policies and "
+                    "fixtures are written; they block merging the PR, not your commits")
         for e in cover_errors:
             print(f"      - {e}")
     else:

@@ -95,10 +95,24 @@ def canonical_text_bytes(data: bytes) -> bytes:
     return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
 
 
-def sha_for_files(files: dict[str, Path], transform=canonical_text_bytes) -> str:
+def provider_version(repo_root: Path | None = None) -> str:
+    """Read an explicitly selected checkout's pin, never another checkout's pin."""
+    if repo_root is None:
+        return TARGET_PROVIDER_VERSION
+    return (Path(repo_root) / "scripts/auto_test/provider_version.txt").read_text(encoding="utf-8-sig").strip()
+
+
+def fixture_repo_root(policy_dir: Path, repo_root: Path | None = None) -> Path | None:
+    root = policy_root(policy_dir, repo_root).parent
+    # Standalone synthetic fixture trees may omit tooling. Real checkouts always
+    # use their own provider pin; explicit roots require it to exist.
+    return root if repo_root is not None or (root / "scripts/auto_test/provider_version.txt").is_file() else None
+
+
+def sha_for_files(files: dict[str, Path], transform=canonical_text_bytes, *, repo_root: Path | None = None) -> str:
     """Hash named effective files. Also used by the read-only legacy migration adapter."""
     h = hashlib.sha256()
-    h.update(f"provider={TARGET_PROVIDER_VERSION}\n".encode())
+    h.update(f"provider={provider_version(repo_root)}\n".encode())
     for name in sorted(files):
         h.update(name.encode())
         h.update(b"\0")
@@ -108,7 +122,7 @@ def sha_for_files(files: dict[str, Path], transform=canonical_text_bytes) -> str
 
 
 def fixture_sha(policy_dir: Path, repo_root: Path | None = None) -> str:
-    return sha_for_files(fixture_files(policy_dir, repo_root))
+    return sha_for_files(fixture_files(policy_dir, repo_root), repo_root=fixture_repo_root(policy_dir, repo_root))
 
 
 def plan_cache_path(policy_dir: Path, repo_root: Path | None = None) -> Path:
@@ -116,7 +130,7 @@ def plan_cache_path(policy_dir: Path, repo_root: Path | None = None) -> Path:
 
 
 def _sha_over(policy_dir: Path, transform) -> str:
-    return sha_for_files(fixture_files(policy_dir), transform)
+    return sha_for_files(fixture_files(policy_dir), transform, repo_root=fixture_repo_root(policy_dir))
 
 
 def _to_crlf(data: bytes) -> bytes:
@@ -236,7 +250,9 @@ def get_or_build_plan(policy_dir: Path, cache_path: Path, verbose: bool = False)
 
 
 def prune_stale_plans(input_dir: Path, keep: Path) -> int:
-    """Delete every .json in a fixture dir except ``keep``. Returns the count."""
+    """Prune only after this fixture's expected, valid replacement is present."""
+    if keep.resolve() != plan_cache_path(input_dir).resolve() or not is_committed_plan(keep):
+        return 0
     removed = 0
     for f in input_dir.glob("*.json"):
         if f.name == keep.name:
@@ -249,7 +265,7 @@ def prune_stale_plans(input_dir: Path, keep: Path) -> int:
     return removed
 
 
-def ensure_cache_ready() -> None:
+def ensure_cache_ready(repo_root: Path | None = None) -> None:
     """Make sure the project-local provider cache exists; build it if not.
 
     The cache (.terraform-cache/) is gitignored, so a fresh checkout won't have
@@ -257,7 +273,12 @@ def ensure_cache_ready() -> None:
     cache and run cache_setup.sh for them once (it needs the registry reachable on
     that first build). Subsequent runs are fully offline from the mirror.
     """
-    if CLI_CONFIG_FILE.exists() and any(MIRROR_DIR.rglob("terraform-provider-*")):
+    root = Path(repo_root).resolve() if repo_root is not None else REPO_ROOT
+    cli_config = root / ".terraform-cache/cli.tfrc"
+    mirror = root / ".terraform-cache/mirror"
+    version = provider_version(root)
+    provider_pattern = f"terraform-provider-google_v{version}_*"
+    if cli_config.exists() and any(mirror.rglob(provider_pattern)):
         return
     print("⏳ Provider cache not found — running cache_setup.sh (one-time setup)…")
     # Pass the script as a RELATIVE forward-slash path: absolute Windows paths
@@ -276,10 +297,10 @@ def ensure_cache_ready() -> None:
         bash = shutil.which("bash")
     if bash is None:
         sys.exit("❌ bash not found. Install Git Bash (Windows) or run inside WSL.")
-    script_rel = CACHE_SETUP_SCRIPT.relative_to(REPO_ROOT).as_posix()
-    result = subprocess.run([bash, script_rel], cwd=str(REPO_ROOT))
-    if result.returncode != 0 or not CLI_CONFIG_FILE.exists() \
-            or not any(MIRROR_DIR.rglob("terraform-provider-*")):
+    script_rel = "scripts/auto_test/cache_setup.sh"
+    result = subprocess.run([bash, script_rel], cwd=str(root))
+    if result.returncode != 0 or not cli_config.exists() \
+            or not any(mirror.rglob(provider_pattern)):
         sys.exit("❌ Could not set up the Terraform provider cache. "
                  "Run 'bash scripts/auto_test/cache_setup.sh' manually and retry.")
 
@@ -589,7 +610,7 @@ def run_terraform_commands(policy_dir: Path, verbose: bool = False) -> str | Non
         # workspace's .terraform is isolated (concurrency-safe) and symlinks into the
         # shared mirror; the whole workspace is deleted below. The provider comes from a
         # filesystem mirror (not TF_PLUGIN_CACHE_DIR), so no plugin-cache env is set.
-        'TF_CLI_CONFIG_FILE': str(CLI_CONFIG_FILE),
+        'TF_CLI_CONFIG_FILE': str((fixture_repo_root(policy_dir) or REPO_ROOT) / ".terraform-cache/cli.tfrc"),
     })
 
     commands = [
@@ -646,6 +667,22 @@ def get_policy_metadata(policy_file: Path, service: str, resource: str, attribut
     vars_pkg = vars_import or f"data.terraform.gcp.security.{service}.{resource}.vars"
     vars_query = f"{vars_pkg}.variables"
     return message_query, vars_query
+
+
+def make_streams_encoding_safe():
+    """Make stdout and stderr able to print this harness's own output anywhere.
+
+    The messages here carry ✅, ❌ and — . A Windows console on a legacy code page
+    (cp1252) cannot encode them, so the print that announces a passing run raised
+    UnicodeEncodeError instead, the process exited non-zero, and check_resource.py
+    reported a resource that passed as failed. UTF-8 is what every terminal that
+    can draw the glyphs expects; ``errors="replace"`` means one that truly cannot
+    shows ``?`` rather than raising. Called from main(), never at import — the
+    linters import this module, and a test's captured stream is not ours to change.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):   # absent on a replaced stream (StringIO)
+            stream.reconfigure(encoding="utf-8", errors="replace")
 
 
 # Add a lock for thread-safe printing
@@ -886,16 +923,7 @@ def verify_plan_cache(pairs, verbose: bool = False) -> int:
 
 
 def main():
-    # The progress line and summary use emoji. On Windows, piping stdout switches
-    # Python from the console's UTF-8 to the locale codepage (cp1252), which cannot
-    # encode them — so `auto_test.py | tee log` died with UnicodeEncodeError. Ask for
-    # UTF-8 explicitly; harmless where it is already the default.
-    for stream in (sys.stdout, sys.stderr):
-        try:
-            stream.reconfigure(encoding="utf-8")
-        except (AttributeError, OSError):
-            pass
-
+    make_streams_encoding_safe()
     parser = argparse.ArgumentParser(
         description="Run Terraform + OPA policy checks over the policies tree.",
         epilog="Examples:"
@@ -938,6 +966,8 @@ def main():
     pairs, malformed = discover_policies(policies_search_root)
     if not pairs and not malformed:
         print(f" No policies found under {policies_search_root}.")
+        if args.report:
+            write_report([], args.report)
         sys.exit(1)
 
     if args.verify_plan_cache:
@@ -957,7 +987,16 @@ def main():
     misses = sum(1 for cp in pair_cache.values() if not is_committed_plan(cp))
     if misses:
         print(f"[*] {misses}/{len(pairs)} plan(s) not cached — ensuring terraform provider cache…")
-        ensure_cache_ready()
+        try:
+            ensure_cache_ready(policies_base_root.parent)
+        except (SystemExit, OSError) as exc:
+            if args.report:
+                failed = [make_failure(extract_path_parts(d)[2], f"Provider cache setup failed: {exc}",
+                                       extract_path_parts(d)[0], extract_path_parts(d)[1]) for d, _ in pairs]
+                failed.extend(make_failure(extract_path_parts(d)[2], reason,
+                                           extract_path_parts(d)[0], extract_path_parts(d)[1]) for d, reason in malformed)
+                write_report(failed, args.report)
+            raise
     else:
         print(f"[*] all {len(pairs)} plan(s) cached — skipping terraform entirely")
 

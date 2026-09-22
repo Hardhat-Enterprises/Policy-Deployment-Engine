@@ -67,6 +67,9 @@ from dataclasses import dataclass, asdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _service_slug import slug_to_folder  # noqa: E402
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from scripts.auto_test.auto_test import make_streams_encoding_safe  # noqa: E402
+
 RULES = {
     "legacy-layout": "GCP fixtures now live beside policy.rego under policies/.",
     "out-of-scope-file": (
@@ -581,6 +584,7 @@ def _report(findings, max_per_rule, base="origin/dev", staged=False):
 
 
 def main(argv=None):
+    make_streams_encoding_safe()
     parser = argparse.ArgumentParser(
         description="Check that a Service/ branch changes only its own resource's files.",
         formatter_class=argparse.RawDescriptionHelpFormatter)

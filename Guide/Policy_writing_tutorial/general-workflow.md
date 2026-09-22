@@ -6,10 +6,9 @@
 1. Get assigned a service from PDE Leadership (e.g. `Cloud Functions`).  
 2. Research the service and identify security-relevant arguments.  
 
-3. Create the required folder structure. Note the two trees are **not** symmetrical:
-   - `inputs/gcp/<Service>/<resource>/<attribute>/` — one folder **per attribute** (holds the fixtures)
-   - `policies/gcp/<Service>/<resource>/` — the policy is a **flat file** `<attribute>.rego` here,
-     plus a single `_vars.rego` for the whole resource (not a folder per attribute)
+3. After layout cutover, create one `policies/gcp/<Service>/<resource>/<attribute>/`
+   directory containing `policy.rego` and the fixtures. Keep one `_vars.rego` in
+   `policies/gcp/<Service>/<resource>/` for the whole resource.
 
    `<Service>` is the docs-taxonomy folder name (e.g. `Cloud Functions`, with spaces);
    `<resource>` and `<attribute>` are the exact Terraform resource type and argument names.
@@ -17,22 +16,20 @@
 4. Create and configure the fixtures (copy them from `templates/gcp`):
    - `compliant.tf` (compliant example)  
    - `nonCompliant.tf` (non-compliant example)  
-   - `config.tf`  
+   - Inherit `policies/gcp/config.tf`, or supply a local `config.tf` that replaces it.
 
-5. (Optional, to discover the attribute path) Generate a Terraform plan and inspect it:
+5. Generate and inspect the plan through the harness:
 
-    terraform init  
-    terraform plan --out=plan  
-    terraform show -json plan > plan.json  
+    python scripts/auto_test/auto_test.py "gcp/<Service>/<resource>"
 
-   You don't commit this `plan.json` — it is gitignored. The test harness writes the plan that
-   *is* committed: a `<sha>.json` in the fixture's own directory, named for the hash of its
-   `*.tf`.
+   The harness assembles the effective configuration in a temporary workspace and
+   writes the committed `<sha>.json` in the argument directory. Inspect that JSON
+   to find your attribute path, then finish the policy and rerun the checks.
 
 6. Use the plan JSON to determine your attribute path.  
 
 7. Write your:
-   - `<attribute>.rego` (policy logic)  
+   - `<attribute>/policy.rego` (policy logic)
    - `_vars.rego` (resource metadata — one per resource)  
 
 8. Check your work. One command runs everything CI will run — branch name, branch scope,
@@ -81,4 +78,3 @@
 [📘 Back to Contents](policy-writing-tutorial.md#top) &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;
 
 </div>
-

@@ -50,8 +50,8 @@ is one self-contained directory holding its policy and both terraform fixtures:
     documented resource for that service (a ``docs/gcp/<service>/<resource>.json``).
 3f. Each resource-dir holds an optional ``_vars.rego`` plus one DIRECTORY per argument,
     where the directory name is a *non-block* argument key in that resource's doc JSON.
-3g. Each argument-dir contains exactly ``policy.rego``, ``compliant.tf`` and
-    ``nonCompliant.tf`` — nothing else.
+3g. Each argument-dir contains ``policy.rego``, ``compliant.tf``, ``nonCompliant.tf``
+    and its valid ``<sha>.json`` plan; an optional ``config.tf`` replaces the shared default.
 
 Run from the repo root (the folder containing ``docs/`` and ``policies/``):
     uv run python scripts/linters/linter.py                 # lint every tree
@@ -70,7 +70,7 @@ from datetime import datetime
 from pathlib import Path
 import subprocess
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from scripts.auto_test.auto_test import PLAN_FILE_RE, alternate_fixture_shas, plan_cache_path
+from scripts.auto_test.auto_test import PLAN_FILE_RE, alternate_fixture_shas, plan_cache_path, is_committed_plan
 from scripts.docgen.lib.canonical import canonical_for
 
 
@@ -554,6 +554,8 @@ class PoliciesValidator:
             expected, alternates = None, set()
         if expected and not (Path(arg_path) / expected).is_file():
             self.logger.log(f"{rel}: missing committed plan '{expected}' (run auto_test and commit its output)")
+        elif expected and not is_committed_plan(Path(arg_path) / expected):
+            self.logger.log(f"{rel}/{expected}: invalid committed Terraform plan")
         fallback = {".terraform.lock.hcl", "plan", "plan.json", "tfplan", "tfplan.json",
                     "terraform.tfstate", "terraform.tfstate.backup", "crash.log"}
         for entry in entries:

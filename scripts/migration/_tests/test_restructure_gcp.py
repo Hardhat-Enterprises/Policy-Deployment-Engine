@@ -13,6 +13,10 @@ CONFIG = b'terraform { required_providers { google = { source = "hashicorp/googl
 
 
 def fixture(root, argument="location", config=CONFIG, resource="google_test"):
+    pin = root / "scripts/auto_test/provider_version.txt"
+    pin.parent.mkdir(parents=True, exist_ok=True)
+    if not pin.exists():
+        pin.write_text(at.TARGET_PROVIDER_VERSION, encoding="utf-8")
     resource_dir = root / "policies/gcp/Service With Spaces" / resource
     resource_dir.mkdir(parents=True, exist_ok=True)
     (resource_dir / f"{argument}.rego").write_text(
@@ -25,7 +29,7 @@ def fixture(root, argument="location", config=CONFIG, resource="google_test"):
     (directory / "compliant.tf").write_bytes(b'# compliant fixture\n')
     (directory / "nonCompliant.tf").write_bytes(b'# noncompliant fixture\n')
     files = {p.name: p for p in directory.glob("*.tf")}
-    sha = at.sha_for_files(files)
+    sha = at.sha_for_files(files, repo_root=root)
     (directory / f"{sha}.json").write_text(json.dumps({"planned_values": {"root_module": {"resources": []}}}), encoding="utf-8")
     return directory
 
@@ -39,6 +43,33 @@ def test_dry_run_preserves_every_byte(tmp_path, capsys):
     before = snapshot(tmp_path)
     assert migration.main(["--repo-root", str(tmp_path)]) == 0
     assert "DRY RUN" in capsys.readouterr().out
+    assert snapshot(tmp_path) == before
+
+
+def test_argument_named_policy_is_not_mistaken_for_migrated_layout(tmp_path):
+    fixture(tmp_path, argument="policy")
+    migration.apply(migration.prepare(tmp_path))
+    assert (tmp_path / "policies/gcp/Service With Spaces/google_test/policy/policy.rego").is_file()
+
+
+def test_migration_uses_selected_checkout_provider_pin(tmp_path, monkeypatch):
+    pin = tmp_path / "scripts/auto_test/provider_version.txt"
+    pin.parent.mkdir(parents=True)
+    pin.write_text("selected-version")
+    fixture(tmp_path)
+    expected = migration.prepare(tmp_path).hashes
+    monkeypatch.setattr(at, "TARGET_PROVIDER_VERSION", "other-version")
+    migration.apply(migration.prepare(tmp_path))
+    assert migration.prepare(tmp_path).hashes == expected
+
+
+def test_provider_change_after_preflight_aborts_before_moving(tmp_path):
+    fixture(tmp_path)
+    plan = migration.prepare(tmp_path)
+    (tmp_path / "scripts/auto_test/provider_version.txt").write_text("changed-version")
+    before = snapshot(tmp_path)
+    with pytest.raises(migration.Abort, match="Source changed"):
+        migration.apply(plan)
     assert snapshot(tmp_path) == before
 
 
@@ -159,11 +190,12 @@ def test_migrated_noop_still_rejects_a_stale_plan(tmp_path):
         migration.prepare(tmp_path)
 
 
-def test_apply_accepts_a_clean_feature_branch_and_requires_clean_git(tmp_path):
+@pytest.mark.parametrize("branch", ["feature/restructure", "Task/pde_folder_restructure"])
+def test_apply_accepts_restructuring_branches_and_requires_clean_git(tmp_path, branch):
     fixture(tmp_path)
     def git(*args):
         return subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True)
-    git("init", "-q", "-b", "feature/restructure")
+    git("init", "-q", "-b", branch)
     git("-c", "user.name=Test", "-c", "user.email=test@example.com", "add", ".")
     git("-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-qm", "fixtures")
     (tmp_path / "uncommitted.txt").write_text("do not migrate a dirty checkout")
@@ -172,7 +204,7 @@ def test_apply_accepts_a_clean_feature_branch_and_requires_clean_git(tmp_path):
     assert snapshot(tmp_path / "policies") == before
     (tmp_path / "uncommitted.txt").unlink()
     assert migration.main(["--repo-root", str(tmp_path), "--apply"]) == 0
-    assert git("branch", "--show-current").stdout.strip() == b"feature/restructure"
+    assert git("branch", "--show-current").stdout.decode().strip() == branch
 
 
 def test_unrelated_platform_data_is_preserved(tmp_path):
