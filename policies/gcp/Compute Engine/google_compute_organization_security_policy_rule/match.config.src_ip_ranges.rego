@@ -4,18 +4,18 @@ import data.terraform.gcp.security.compute_engine.google_compute_organization_se
 conditions := [
     [
         {
-            "situation_description": "The rule's src_ip_ranges is set to an overly broad CIDR range (0.0.0.0/0), directly widening which traffic the rule's action applies to.",
+            "situation_description": "The rule's src_ip_ranges contains the overly broad CIDR range 0.0.0.0/0 among its entries, directly widening which traffic the rule's action applies to, regardless of what other ranges are also present.",
             "remedies": [
                 "Scope src_ip_ranges to the minimum necessary CIDR range(s) for this rule.",
-                "Avoid 0.0.0.0/0 unless the rule is intentionally meant to match all traffic.",
+                "Avoid including 0.0.0.0/0 unless the rule is intentionally meant to match all traffic.",
                 "Consult Google Cloud documentation on organization security policy rule matching for details."
             ]
         },
         {
-            "condition": "Check if src_ip_ranges contains the overly broad 0.0.0.0/0 range",
+            "condition": "Check if any entry in src_ip_ranges is the overly broad 0.0.0.0/0 range",
             "attribute_path": ["match", 0, "config", 0, "src_ip_ranges"],
             "values": ["0.0.0.0/0"],
-            "policy_type": "Blacklist"
+            "policy_type": "Element Blacklist"
         }
     ]
 ]
