@@ -1,437 +1,368 @@
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-
-sys.path.insert(
-    0,
-    str(REPO_ROOT),
-)
+sys.path.insert(0, str(REPO_ROOT))
 
 
-from scripts.mutation_test.evaluator import (
-    evaluate_plan,
-    extract_non_compliant_resources,
-)
-
-from scripts.mutation_test.metadata import (
-    extract_mutation_specs,
-    get_package_name,
-    get_policy_conditions,
-)
-
-from scripts.mutation_test.mutators import (
-    get_nested_value,
-    set_nested_value,
+from scripts.mutation_test.report import write_json_report
+from scripts.mutation_test.resource_runner import (
+    discover_policy_targets,
+    run_single_policy,
 )
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description=(
-            "Mutation test a PDE policy using its "
-            "committed Terraform fixture."
+            "Mutation-test PDE Rego policies using "
+            "committed Terraform plan fixtures."
         )
     )
 
     parser.add_argument(
-        "policy",
+        "target",
         help=(
-            "Policy path relative to the platform. "
-            "Example: "
-            "'gcp/API Hub/"
-            "google_apihub_curation/"
-            "deletion_policy'"
+            "Resource or individual policy path. "
+            "Examples: "
+            "'gcp/API Hub/google_apihub_curation' "
+            "or "
+            "'gcp/API Hub/google_apihub_curation/deletion_policy'"
+        ),
+    )
+
+    parser.add_argument(
+        "--report",
+        help=(
+            "Optional path for a machine-readable "
+            "JSON mutation report."
         ),
     )
 
     return parser.parse_args()
 
 
-def find_resource(
-    resources: list,
-    name: str,
-):
+def is_policy_target(target: Path) -> bool:
     """
-    Find a Terraform resource in planned_values by Terraform label.
+    Determine whether the supplied target identifies
+    one individual PDE policy.
     """
-    for index, resource in enumerate(
-        resources
-    ):
-        if resource.get("name") == name:
-            return index, resource
 
-    return None, None
-
-
-def load_plan(
-    fixture_dir: Path,
-):
-    """
-    Load the single committed Terraform plan JSON from a fixture.
-    """
-    plan_files = list(
-        fixture_dir.glob("*.json")
-    )
-
-    if len(plan_files) != 1:
-        raise ValueError(
-            "Expected exactly one committed plan "
-            f"in {fixture_dir}, "
-            f"found {len(plan_files)}"
-        )
-
-    plan_path = plan_files[0]
-
-    plan = json.loads(
-        plan_path.read_text(
-            encoding="utf-8"
-        )
-    )
-
-    return plan_path, plan
-
-
-def main() -> int:
-    args = parse_args()
-
-    relative = Path(
-        args.policy
+    policy_file = (
+        REPO_ROOT
+        / "policies"
+        / target.parent
+        / f"{target.name}.rego"
     )
 
     fixture_dir = (
         REPO_ROOT
         / "inputs"
-        / relative
+        / target
     )
 
-    policy_file = (
-        REPO_ROOT
-        / "policies"
-        / relative.parent
-        / f"{relative.name}.rego"
+    return (
+        policy_file.is_file()
+        and fixture_dir.is_dir()
     )
 
-    if not fixture_dir.is_dir():
+
+def print_policy_result(result: dict) -> None:
+    """
+    Print one policy's mutation results.
+    """
+
+    print()
+    print(f"Policy: {result['policy']}")
+
+    if result.get("error"):
+        print(f"  [ERROR] {result['error']}")
+        return
+
+    if result.get("unsupported"):
         print(
-            "[ERROR] Fixture directory "
-            f"not found: {fixture_dir}"
+            "  [UNSUPPORTED] "
+            "Custom/non-standard PDE policy structure."
         )
-        return 1
 
-    if not policy_file.is_file():
         print(
-            "[ERROR] Policy file "
-            f"not found: {policy_file}"
-        )
-        return 1
-
-    try:
-        plan_path, plan = load_plan(
-            fixture_dir
+            "  Reason: "
+            f"{result.get('unsupported_reason', 'Unknown')}"
         )
 
-    except ValueError as error:
+        return
+
+    for mutant in result["mutants"]:
+        print()
         print(
-            f"[ERROR] {error}"
+            f"  Mutation {mutant['number']}"
         )
-        return 1
 
-    conditions = get_policy_conditions(
-        policy_file,
-        plan_path,
-        REPO_ROOT,
+        print(
+            f"    Policy type : "
+            f"{mutant['policy_type']}"
+        )
+
+        print(
+            f"    Path        : "
+            f"{mutant['attribute_path']}"
+        )
+
+        print(
+            f"    Condition   : "
+            f"{mutant['condition']}"
+        )
+
+        if "original_value" in mutant:
+            print(
+                f"    Before      : "
+                f"{mutant['original_value']}"
+            )
+
+        if "mutated_value" in mutant:
+            print(
+                f"    After       : "
+                f"{mutant['mutated_value']}"
+            )
+
+        if "new_failures" in mutant:
+            print(
+                f"    New failures: "
+                f"{mutant['new_failures']}"
+            )
+
+        print(
+            f"    Result      : "
+            f"{mutant['status']}"
+        )
+
+        if mutant.get("reason"):
+            print(
+                f"    Reason      : "
+                f"{mutant['reason']}"
+            )
+
+    print()
+
+    print(
+        f"  Killed   : {result['killed']}"
     )
 
-    specs = extract_mutation_specs(
-        conditions
+    print(
+        f"  Survived : {result['survived']}"
     )
 
-    if not specs:
+    print(
+        f"  Skipped  : {result['skipped']}"
+    )
+
+    score = result.get("score")
+
+    if score is None:
+        print("  Score    : N/A")
+
+    else:
         print(
-            "[ERROR] No mutation compatible "
-            "policy conditions found."
-        )
-        return 1
-
-    try:
-        resources = (
-            plan
-            ["planned_values"]
-            ["root_module"]
-            ["resources"]
+            f"  Score    : {score:.1f}%"
         )
 
-    except KeyError:
-        print(
-            "[ERROR] Terraform plan does not "
-            "contain planned resources."
-        )
-        return 1
 
-    compliant_index, compliant = (
-        find_resource(
-            resources,
-            "compliant_example_1",
-        )
-    )
+def main() -> int:
+    args = parse_args()
 
-    _, non_compliant = (
-        find_resource(
-            resources,
-            "non_compliant_example_1",
-        )
-    )
-
-    if compliant is None:
-        print(
-            "[ERROR] compliant_example_1 "
-            "was not found."
-        )
-        return 1
-
-    if non_compliant is None:
-        print(
-            "[ERROR] non_compliant_example_1 "
-            "was not found."
-        )
-        return 1
-
-    package = get_package_name(
-        policy_file
-    )
-
-    details_query = (
-        f"data.{package}.details"
-    )
+    target = Path(args.target)
 
     print(
         "PDE Policy Mutation Testing"
     )
 
     print(
-        f"Policy: {args.policy}"
+        f"Target: {args.target}"
     )
 
-    print()
+    if is_policy_target(target):
+        targets = [target]
 
-    killed = 0
-    survived = 0
-    skipped = 0
-
-    for number, spec in enumerate(
-        specs,
-        start=1,
-    ):
         print(
-            f"Mutation {number}"
+            "Mode  : single policy"
         )
 
+    else:
         print(
-            f"  Policy type    : "
-            f"{spec.policy_type}"
-        )
-
-        print(
-            f"  Attribute path : "
-            f"{spec.attribute_path}"
-        )
-
-        print(
-            f"  Policy values  : "
-            f"{spec.values}"
-        )
-
-        print(
-            f"  Condition      : "
-            f"{spec.condition}"
+            "Mode  : resource"
         )
 
         try:
-            original_value = (
-                get_nested_value(
-                    compliant["values"],
-                    spec.attribute_path,
-                )
-            )
-
-            bad_value = (
-                get_nested_value(
-                    non_compliant["values"],
-                    spec.attribute_path,
-                )
-            )
-
-        except (
-            KeyError,
-            IndexError,
-            TypeError,
-        ):
-            print(
-                "  [SKIPPED] Attribute path "
-                "could not be resolved."
-            )
-
-            skipped += 1
-
-            print()
-
-            continue
-
-        if original_value == bad_value:
-            print(
-                "  [SKIPPED] Compliant and "
-                "non compliant fixture values "
-                "are identical."
-            )
-
-            skipped += 1
-
-            print()
-
-            continue
-
-        print(
-            f"  Original value  : "
-            f"{original_value}"
-        )
-
-        print(
-            f"  Mutated value   : "
-            f"{bad_value}"
-        )
-
-        full_path = [
-            "planned_values",
-            "root_module",
-            "resources",
-            compliant_index,
-            "values",
-            *spec.attribute_path,
-        ]
-
-        mutated_plan = (
-            set_nested_value(
-                plan,
-                full_path,
-                bad_value,
-            )
-        )
-
-        baseline_details = (
-            evaluate_plan(
-                plan,
-                policy_file.parent,
-                details_query,
+            targets = discover_policy_targets(
                 REPO_ROOT,
+                target,
             )
-        )
 
-        mutated_details = (
-            evaluate_plan(
-                mutated_plan,
-                policy_file.parent,
-                details_query,
-                REPO_ROOT,
-            )
-        )
-
-        baseline_failures = (
-            extract_non_compliant_resources(
-                baseline_details
-            )
-        )
-
-        mutated_failures = (
-            extract_non_compliant_resources(
-                mutated_details
-            )
-        )
-
-        new_failures = (
-            mutated_failures
-            - baseline_failures
-        )
-
-        print(
-            "  Baseline failures : "
-            f"{sorted(baseline_failures)}"
-        )
-
-        print(
-            "  Mutated failures  : "
-            f"{sorted(mutated_failures)}"
-        )
-
-        print(
-            "  New failures      : "
-            f"{sorted(new_failures)}"
-        )
-
-        if new_failures:
+        except ValueError as error:
             print(
-                "  [KILLED] Policy detected "
-                "the mutation."
+                f"[ERROR] {error}"
             )
 
-            killed += 1
+            return 1
 
-        else:
-            print(
-                "  [SURVIVED] Mutation "
-                "escaped detection."
-            )
+    if not targets:
+        print(
+            "[ERROR] No mutation-testable "
+            "policies were discovered."
+        )
 
-            survived += 1
+        return 1
 
-        print()
+    print(
+        f"Discovered policies: {len(targets)}"
+    )
+
+    policy_results = []
+
+    for policy_target in targets:
+        result = run_single_policy(
+            REPO_ROOT,
+            policy_target,
+        )
+
+        policy_results.append(
+            result
+        )
+
+        print_policy_result(
+            result
+        )
+
+    killed = sum(
+        result.get("killed", 0)
+        for result in policy_results
+    )
+
+    survived = sum(
+        result.get("survived", 0)
+        for result in policy_results
+    )
+
+    skipped = sum(
+        result.get("skipped", 0)
+        for result in policy_results
+    )
+
+    errors = sum(
+        1
+        for result in policy_results
+        if result.get("error")
+    )
+
+    unsupported = sum(
+        1
+        for result in policy_results
+        if result.get("unsupported")
+    )
+
+    compatible = (
+        len(policy_results)
+        - errors
+        - unsupported
+    )
 
     tested = (
         killed
         + survived
     )
 
-    print(
-        "Mutation Summary"
-    )
-
-    print(
-        "----------------"
-    )
-
-    print(
-        f"Killed   : {killed}"
-    )
-
-    print(
-        f"Survived : {survived}"
-    )
-
-    print(
-        f"Skipped  : {skipped}"
-    )
-
     if tested:
-        score = (
-            killed
-            / tested
-        ) * 100
+        overall_score = round(
+            killed / tested * 100,
+            2,
+        )
 
+    else:
+        overall_score = None
+
+    summary = {
+        "target": args.target,
+        "policies_discovered": len(targets),
+        "mutation_compatible_policies": compatible,
+        "unsupported_policies": unsupported,
+        "policies_with_errors": errors,
+        "killed": killed,
+        "survived": survived,
+        "skipped": skipped,
+        "score": overall_score,
+        "policies": policy_results,
+    }
+
+    print()
+    print(
+        "Overall Mutation Summary"
+    )
+
+    print(
+        "========================"
+    )
+
+    print(
+        f"Policies discovered : {len(targets)}"
+    )
+
+    print(
+        f"Compatible          : {compatible}"
+    )
+
+    print(
+        f"Unsupported         : {unsupported}"
+    )
+
+    print(
+        f"Killed              : {killed}"
+    )
+
+    print(
+        f"Survived            : {survived}"
+    )
+
+    print(
+        f"Skipped             : {skipped}"
+    )
+
+    print(
+        f"Errors              : {errors}"
+    )
+
+    if overall_score is None:
         print(
-            f"Score    : {score:.1f}%"
+            "Mutation score      : N/A"
         )
 
     else:
         print(
-            "Score    : N/A"
+            f"Mutation score      : "
+            f"{overall_score:.1f}%"
         )
 
-    if survived:
+    if args.report:
+        report_path = Path(
+            args.report
+        )
+
+        write_json_report(
+            summary,
+            report_path,
+        )
+
+        print()
+
+        print(
+            f"JSON report written to: "
+            f"{report_path}"
+        )
+
+    if survived or errors:
         return 2
 
     return 0
