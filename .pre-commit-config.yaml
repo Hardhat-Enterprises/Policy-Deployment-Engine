@@ -10,23 +10,30 @@
 # - branch-scope-check keeps a Service/ branch to its own resource's files. It
 #   runs with --staged so it sees what you are about to commit, which is where a
 #   stray `git add .` gets caught — before it is ever pushed.
-# - resource-gate runs the checks that only make sense for one resource: doc
-#   completeness, true-arg coverage, and the OPA test. --gate-only because the
-#   three hooks above already cover the rest of scripts/check_resource.py.
+# - resource-gate runs the per-resource checks that make sense at commit time:
+#   doc completeness, and the OPA test when there is something to run it on.
+#   --gate-only because the three hooks above already cover the rest of
+#   scripts/check_resource.py.
+#
+#   --skip-coverage: true-arg coverage is NEVER a commit-time check. Coverage asks
+#   "is this resource finished?" — every security_impact: true argument has a policy
+#   and a fixture — and the workflow is docs first: a student writes the doc and gets
+#   it approved before a single policy exists, so every commit in that phase has
+#   gaps by design. The PR (policy_check_PR.yaml) and the full
+#   `python scripts/check_resource.py` run enforce it. The OPA test is skipped along
+#   with it, since without coverage it would fail on the missing policies and
+#   fixtures rather than on anything the commit did. Deliberately not "skip only on
+#   docs-only commits": guessing intent from which files a commit touches breaks
+#   across real workflows, so the rule is fixed.
 #
 #   --changed-only keeps it off the critical path of a commit that has nothing to
 #   do with the resource: the gate reads the resource's docs JSON, fixtures and
-#   policies, so a commit touching none of them cannot change its verdict. A commit
-#   that touches only the docs JSON still gets doc completeness and coverage — both
-#   are file reads — but skips the OPA test, since no *.tf or *.rego moved and
-#   neither the plan nor the policy verdicts can have.
+#   policies, so a commit touching none of them cannot change its verdict.
 #
-#   --if-cached covers the remaining case. With every plan committed the OPA test is
-#   0.2-0.8s (0.8s is the largest resource in the repo, 34 arguments), cheaper than
-#   the linting above it; but a fixture you just edited has no committed plan, and
-#   building one means running terraform — which on a fresh clone also downloads the
-#   121MB provider mirror. A git hook may not do minutes of network to you, so it
-#   skips instead and says to run the full command before pushing.
+#   --if-cached stays as a guard in case the OPA test is ever re-enabled here: a
+#   fixture you just edited has no committed plan, building one means running
+#   terraform (on a fresh clone, a 121MB provider download), and a git hook may not
+#   do minutes of network to you. With --skip-coverage the OPA test does not run.
 #
 # They all do their own git inspection, so pass_filenames is false and always_run
 # is true (the script decides whether there is anything to check).
@@ -52,8 +59,8 @@ repos:
         pass_filenames: false
         always_run: true
       - id: resource-gate
-        name: Resource gate (docs, coverage, OPA)
-        entry: python scripts/check_resource.py --gate-only --if-cached --changed-only
+        name: Resource gate (doc completeness)
+        entry: python scripts/check_resource.py --gate-only --if-cached --changed-only --skip-coverage
         language: system
         pass_filenames: false
         always_run: true

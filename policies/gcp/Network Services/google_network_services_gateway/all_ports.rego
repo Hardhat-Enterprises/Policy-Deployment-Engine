@@ -1,4 +1,4 @@
-package terraform.gcp.security.network_services.google_network_services_gateway
+package terraform.gcp.security.network_services.google_network_services_gateway.all_ports
 
 import data.terraform.helpers
 import data.terraform.gcp.security.network_services.google_network_services_gateway.vars
