@@ -1,4 +1,5 @@
 from __future__ import annotations
+from scripts.mutation_test.operators import generate_mutations
 
 import json
 from pathlib import Path
@@ -130,7 +131,7 @@ def run_single_policy(
     policy_path: Path,
 ) -> dict[str, Any]:
     """
-    Mutation-test one PDE policy and return structured results.
+    Mutation-test one PDE policy using generated adversarial mutations.
     """
 
     fixture_dir = (
@@ -154,10 +155,6 @@ def run_single_policy(
         "mutants": [],
     }
 
-    # ---------------------------------------------------------
-    # Basic path validation
-    # ---------------------------------------------------------
-
     if not fixture_dir.is_dir():
         result["error"] = (
             f"Fixture directory not found: {fixture_dir}"
@@ -169,10 +166,6 @@ def run_single_policy(
             f"Policy file not found: {policy_file}"
         )
         return result
-
-    # ---------------------------------------------------------
-    # Load committed Terraform plan
-    # ---------------------------------------------------------
 
     try:
         plan_path, plan = load_plan(
@@ -186,10 +179,6 @@ def run_single_policy(
     ) as error:
         result["error"] = str(error)
         return result
-
-    # ---------------------------------------------------------
-    # Discover policy metadata
-    # ---------------------------------------------------------
 
     try:
         conditions = get_policy_conditions(
@@ -209,7 +198,6 @@ def run_single_policy(
         )
         return result
 
-    # Custom/non-standard Rego policy.
     if not specs:
         result["unsupported"] = True
 
@@ -219,12 +207,7 @@ def run_single_policy(
         )
 
         result["score"] = None
-
         return result
-
-    # ---------------------------------------------------------
-    # Read planned resources
-    # ---------------------------------------------------------
 
     try:
         resources = (
@@ -241,22 +224,9 @@ def run_single_policy(
         )
         return result
 
-    # ---------------------------------------------------------
-    # Locate baseline fixtures
-    # ---------------------------------------------------------
-
-    compliant_index, compliant = (
-        find_resource(
-            resources,
-            "compliant_example_1",
-        )
-    )
-
-    _, non_compliant = (
-        find_resource(
-            resources,
-            "non_compliant_example_1",
-        )
+    compliant_index, compliant = find_resource(
+        resources,
+        "compliant_example_1",
     )
 
     if compliant is None:
@@ -264,16 +234,6 @@ def run_single_policy(
             "compliant_example_1 was not found."
         )
         return result
-
-    if non_compliant is None:
-        result["error"] = (
-            "non_compliant_example_1 was not found."
-        )
-        return result
-
-    # ---------------------------------------------------------
-    # Build structured OPA details query
-    # ---------------------------------------------------------
 
     try:
         package = get_package_name(
@@ -288,10 +248,6 @@ def run_single_policy(
         f"data.{package}.details"
     )
 
-    # ---------------------------------------------------------
-    # Evaluate original baseline
-    # ---------------------------------------------------------
-
     baseline_details = evaluate_plan(
         plan,
         policy_file.parent,
@@ -305,35 +261,13 @@ def run_single_policy(
         )
     )
 
-    # ---------------------------------------------------------
-    # Generate and evaluate mutants
-    # ---------------------------------------------------------
+    mutation_number = 1
 
-    for number, spec in enumerate(
-        specs,
-        start=1,
-    ):
-        mutant: dict[str, Any] = {
-            "number": number,
-            "policy_type": spec.policy_type,
-            "attribute_path": spec.attribute_path,
-            "policy_values": spec.values,
-            "condition": spec.condition,
-        }
-
+    for spec in specs:
         try:
-            original_value = (
-                get_nested_value(
-                    compliant["values"],
-                    spec.attribute_path,
-                )
-            )
-
-            mutated_value = (
-                get_nested_value(
-                    non_compliant["values"],
-                    spec.attribute_path,
-                )
+            original_value = get_nested_value(
+                compliant["values"],
+                spec.attribute_path,
             )
 
         except (
@@ -341,108 +275,123 @@ def run_single_policy(
             IndexError,
             TypeError,
         ):
-            mutant["status"] = "SKIPPED"
-
-            mutant["reason"] = (
-                "Attribute path could not be resolved."
+            result["mutants"].append(
+                {
+                    "number": mutation_number,
+                    "policy_type": spec.policy_type,
+                    "attribute_path": spec.attribute_path,
+                    "policy_values": spec.values,
+                    "condition": spec.condition,
+                    "status": "SKIPPED",
+                    "reason": (
+                        "Attribute path could not be resolved "
+                        "in the compliant fixture."
+                    ),
+                }
             )
 
             result["skipped"] += 1
-            result["mutants"].append(
-                mutant
-            )
-
+            mutation_number += 1
             continue
 
-        mutant["original_value"] = (
-            original_value
+        generated = generate_mutations(
+            spec.policy_type,
+            original_value,
+            spec.values,
         )
 
-        mutant["mutated_value"] = (
-            mutated_value
-        )
-
-        if original_value == mutated_value:
-            mutant["status"] = "SKIPPED"
-
-            mutant["reason"] = (
-                "Compliant and non-compliant fixture "
-                "values are identical."
+        if not generated:
+            result["mutants"].append(
+                {
+                    "number": mutation_number,
+                    "policy_type": spec.policy_type,
+                    "attribute_path": spec.attribute_path,
+                    "policy_values": spec.values,
+                    "condition": spec.condition,
+                    "original_value": original_value,
+                    "status": "SKIPPED",
+                    "reason": (
+                        "No generated mutation was available "
+                        "for this value and policy metadata."
+                    ),
+                }
             )
 
             result["skipped"] += 1
-            result["mutants"].append(
-                mutant
-            )
-
+            mutation_number += 1
             continue
 
-        full_path = [
-            "planned_values",
-            "root_module",
-            "resources",
-            compliant_index,
-            "values",
-            *spec.attribute_path,
-        ]
+        for generated_mutation in generated:
+            mutant: dict[str, Any] = {
+                "number": mutation_number,
+                "policy_type": spec.policy_type,
+                "attribute_path": spec.attribute_path,
+                "policy_values": spec.values,
+                "condition": spec.condition,
+                "operator": generated_mutation.operator,
+                "rationale": generated_mutation.rationale,
+                "original_value": original_value,
+                "mutated_value": generated_mutation.value,
+            }
 
-        mutated_plan = (
-            set_nested_value(
+            full_path = [
+                "planned_values",
+                "root_module",
+                "resources",
+                compliant_index,
+                "values",
+                *spec.attribute_path,
+            ]
+
+            mutated_plan = set_nested_value(
                 plan,
                 full_path,
-                mutated_value,
+                generated_mutation.value,
             )
-        )
 
-        mutated_details = (
-            evaluate_plan(
+            mutated_details = evaluate_plan(
                 mutated_plan,
                 policy_file.parent,
                 details_query,
                 repo_root,
             )
-        )
 
-        mutated_failures = (
-            extract_non_compliant_resources(
-                mutated_details
+            mutated_failures = (
+                extract_non_compliant_resources(
+                    mutated_details
+                )
             )
-        )
 
-        new_failures = (
-            mutated_failures
-            - baseline_failures
-        )
+            new_failures = (
+                mutated_failures
+                - baseline_failures
+            )
 
-        mutant["baseline_failures"] = sorted(
-            baseline_failures
-        )
+            mutant["baseline_failures"] = sorted(
+                baseline_failures
+            )
 
-        mutant["mutated_failures"] = sorted(
-            mutated_failures
-        )
+            mutant["mutated_failures"] = sorted(
+                mutated_failures
+            )
 
-        mutant["new_failures"] = sorted(
-            new_failures
-        )
+            mutant["new_failures"] = sorted(
+                new_failures
+            )
 
-        if new_failures:
-            mutant["status"] = "KILLED"
+            if new_failures:
+                mutant["status"] = "KILLED"
+                result["killed"] += 1
 
-            result["killed"] += 1
+            else:
+                mutant["status"] = "SURVIVED"
+                result["survived"] += 1
 
-        else:
-            mutant["status"] = "SURVIVED"
+            result["mutants"].append(
+                mutant
+            )
 
-            result["survived"] += 1
-
-        result["mutants"].append(
-            mutant
-        )
-
-    # ---------------------------------------------------------
-    # Calculate mutation score
-    # ---------------------------------------------------------
+            mutation_number += 1
 
     tested = (
         result["killed"]
@@ -451,10 +400,8 @@ def run_single_policy(
 
     if tested:
         result["score"] = round(
-            (
-                result["killed"]
-                / tested
-            )
+            result["killed"]
+            / tested
             * 100,
             2,
         )

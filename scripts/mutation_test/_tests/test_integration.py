@@ -38,7 +38,18 @@ def test_real_whitelist_policy_mutation_is_killed():
     assert mutant["policy_type"] == "whitelist"
     assert mutant["status"] == "KILLED"
     assert mutant["original_value"] == "PREVENT"
-    assert mutant["mutated_value"] == "DELETE"
+
+    assert mutant["mutated_value"] != "PREVENT"
+
+    assert (
+        mutant["mutated_value"]
+        not in ["PREVENT"]
+    )
+
+    assert (
+        mutant["operator"]
+        == "whitelist-outside-allowlist"
+    )
 
     assert (
         "compliant_example_1"
