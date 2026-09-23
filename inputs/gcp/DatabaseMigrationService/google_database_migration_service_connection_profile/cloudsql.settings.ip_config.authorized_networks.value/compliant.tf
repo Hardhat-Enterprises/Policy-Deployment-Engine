@@ -3,11 +3,11 @@ resource "google_database_migration_service_connection_profile" "compliant_examp
     display_name          = "dbms_mj_compliant"
     location              = "australia-southeast2"
     project               = "gcp-project-id"
-    
+
     cloudsql {
       settings {
         database_version = "MYSQL_5_7"
-        user_labels = { 
+        user_labels = {
           cloudfoo = "cloudbar"
         }
         tier                      = "db-n1-standard-1"
