@@ -6,16 +6,16 @@ import data.terraform.gcp.security.compute_engine.google_compute_backend_service
 conditions := [
     [
         {
-            "situation_description": "Backend Service Signed URL Key may remain unmanaged when deletion_policy is set to ABANDON",
+            "situation_description": "Backend Service Signed URL Key is not protected from Terraform deletion",
             "remedies": [
-                "Use DELETE for intentional teardown or PREVENT when retention is required; do not use ABANDON"
+                "Set deletion_policy to PREVENT to protect the signed URL key from unintended destruction"
             ]
         },
         {
-            "condition": "Deletion policy must not abandon the signed URL key outside Terraform management",
+            "condition": "Deletion policy must prevent Terraform from destroying the signed URL key",
             "attribute_path": ["deletion_policy"],
-            "values": ["ABANDON"],
-            "policy_type": "blacklist"
+            "values": ["PREVENT"],
+            "policy_type": "whitelist"
         }
     ]
 ]
