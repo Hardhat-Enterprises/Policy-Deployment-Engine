@@ -9,7 +9,7 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_cl
     {
         "condition": "Test if the location is within allowed regions",
         "attribute_path" : ["location"],
-        "values" : ["australia_southeast1", "australia_southeast2"],
+        "values" : ["australia-southeast1", "australia-southeast2"],
         "policy_type" : "whitelist" 
     }
     
