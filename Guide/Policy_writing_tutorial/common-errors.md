@@ -35,6 +35,12 @@ git merge origin/dev
 python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
 ```
 
+> If `git merge origin/dev` gives you hundreds of conflicts, including in files you never touched
+> such as `scripts/linters/*.py`, **stop and run `git merge --abort`**. Your branch has a squashed
+> copy of dev from a pull request merged on GitHub, and a normal merge can't fix it. Your card in
+> the YB IT PDE Portal shows the exact repair commands for your branch. Don't resolve the conflicts
+> by hand, and never merge a PR from dev into your own branch on GitHub.
+
 Running the harness is not optional here — it is the step that finishes the job. Committed
 Terraform plans now live inside the fixture folder they belong to, as one `<sha>.json` beside the
 `compliant.tf` / `nonCompliant.tf` it was planned from, and the run moves yours there. It prints
