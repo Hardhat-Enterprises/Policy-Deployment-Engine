@@ -74,7 +74,8 @@ from _service_slug import slug_to_folder  # noqa: E402
 
 # The single definition of which plan belongs to which fixture — imported, never
 # re-derived, so --if-cached asks exactly the question auto_test itself asks.
-from scripts.auto_test.auto_test import plan_cache_path  # noqa: E402
+from scripts.auto_test.auto_test import (  # noqa: E402
+    make_streams_encoding_safe, plan_cache_path)
 
 DOCS, INPUTS, POLICIES = "docs", "inputs", "policies"
 LINTERS = REPO / "scripts" / "linters"
@@ -137,9 +138,15 @@ class Report:
 
 
 def run(cmd, **kwargs):
-    """Run a subprocess from the repo root, capturing its output."""
-    return subprocess.run([sys.executable, *cmd], cwd=REPO,
-                          capture_output=True, text=True, **kwargs)
+    """Run a subprocess from the repo root, capturing its output.
+
+    The child's stdout is a pipe, which on Windows takes the ANSI code page rather
+    than the console's — so the child is told to write UTF-8, and we read UTF-8.
+    """
+    env = {**os.environ, "PYTHONUTF8": "1"}
+    return subprocess.run([sys.executable, *cmd], cwd=REPO, env=env,
+                          capture_output=True, encoding="utf-8", errors="replace",
+                          **kwargs)
 
 
 def show(result):
@@ -350,6 +357,7 @@ COVERAGE_SKIPPED = ("not a commit-time check — checked on the PR and by the fu
 # CLI
 # --------------------------------------------------------------------------- #
 def main(argv=None):
+    make_streams_encoding_safe()
     parser = argparse.ArgumentParser(
         description="Run every check CI runs against your resource branch.")
     parser.add_argument("--branch", default=None,
