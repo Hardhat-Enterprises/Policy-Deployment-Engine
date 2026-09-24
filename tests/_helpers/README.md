@@ -22,15 +22,19 @@ Unit tests for policy helper functions in `policies/_helpers/`.
 
 | File | Tests | Coverage |
 |------|-------|----------|
-| `shared_test.rego` | 12 | Shared utilities (get_resource_attribute, format paths, etc.) |
+| `shared_test.rego` | 18 | Shared utilities (get_resource_attribute, format paths, etc.) |
+| `helpers_test.rego` | 32 | Dispatcher and summary orchestration |
 | `blacklist_test.rego` | 10 | Blacklist policy (forbidden values) |
-| `whitelist_test.rego` | 10 | Whitelist policy (required values) |
+| `whitelist_test.rego` | 11 | Whitelist policy (required values) |
 | `range_test.rego` | 8 | Range policy (numeric bounds, simplified) |
-| `pattern_blacklist_test.rego` | 8 | Pattern blacklist (glob matching forbidden) |
-| `pattern_whitelist_test.rego` | 8 | Pattern whitelist (glob matching required) |
+| `pattern_blacklist_test.rego` | 11 | Pattern blacklist (glob matching forbidden) |
+| `pattern_whitelist_test.rego` | 11 | Pattern whitelist (glob matching required) |
 | `element_blacklist_test.rego` | 8 | Element blacklist (array elements with substrings) |
+| `element_pattern_whitelist_test.rego` | 13 | Element pattern whitelist (array elements must match a shape) |
+| `map_key_blacklist_test.rego` | 13 | Map key blacklist (prohibited map keys) |
+| `map_key_blacklist_integration_test.rego` | 14 | Map key blacklist (dispatcher integration) |
 
-**Total:** 64 tests covering all 7 helper policies
+**Total:** 149 tests covering all 8 helper policies
 
 ## Test Structure
 

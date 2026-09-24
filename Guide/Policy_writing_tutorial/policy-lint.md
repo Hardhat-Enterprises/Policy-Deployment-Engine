@@ -123,6 +123,9 @@ list instead — with which `policy_type` depends on which way round the check g
   array against your `values`, which is almost never what you want, and forbidden things
   usually appear *inside* an element (`"*.googleapis.com"` contains `"*"`) rather than as the
   whole element. `element blacklist` does that substring match per element.
+- **Allowing a list by shape** — use **`element pattern whitelist`**. It requires every element
+  to match one of your wildcard shapes, which is the right check when the list holds resource
+  paths (e.g. `projects/*/locations/*/apps/*/guardrails/*`) rather than a fixed set of values.
 
 Bad:
 

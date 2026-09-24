@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 7 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist
+- Support for 8 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist
 - OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -30,6 +30,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [5. Pattern Whitelist](#5-pattern-whitelist)
   - [6. Element Blacklist](#6-element-blacklist)
   - [7. Map Key Blacklist](#7-map-key-blacklist)
+  - [8. Element Pattern Whitelist](#8-element-pattern-whitelist)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
@@ -89,7 +90,8 @@ policies/_helpers/
     ├── pattern_blacklist.rego
     ├── pattern_whitelist.rego
     ├── element_blacklist.rego
-    └── map_key_blacklist.rego
+    ├── map_key_blacklist.rego
+    └── element_pattern_whitelist.rego
 ```
 
 ### Component Responsibilities
@@ -318,6 +320,30 @@ Run the focused and integration tests from the repository root:
 ```shell
 opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_blacklist_integration_test.rego policies/_helpers -v
 ```
+
+---
+
+### 8. Element Pattern Whitelist
+
+**Module:** `policies/element_pattern_whitelist.rego`
+**Use Case:** Require every element of a list attribute to match a wildcard resource-path shape
+
+**Logic:**
+- `values` is a list of wildcard shapes; an element passes if it matches any one of them
+- A string attribute is checked as a one-item list
+- `*` matches one path segment (one or more non-`/` characters), so it never spans a separator
+- An empty `values` list matches nothing, so every element is flagged
+
+**Example:**
+```json
+{
+  "policy_type": "Element Pattern Whitelist",
+  "attribute_path": ["guardrails"],
+  "values": ["projects/*/locations/*/apps/*/guardrails/*"]
+}
+```
+
+---
 
 ## Usage Guide
 
