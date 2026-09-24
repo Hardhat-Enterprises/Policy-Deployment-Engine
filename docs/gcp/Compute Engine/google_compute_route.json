@@ -41,8 +41,8 @@
       "description": "URL to a gateway that should handle matching packets.\nCurrently, you can only specify the internet gateway, using a full or\npartial valid URL:\n* 'https://www.googleapis.com/compute/v1/projects/project/global/gateways/default-internet-gateway'\n* 'projects/project/global/gateways/default-internet-gateway'\n* 'global/gateways/default-internet-gateway'\n* The string 'default-internet-gateway'.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This argument directs matching traffic to the default internet gateway. Internet gateway routes are legitimate for workloads requiring external connectivity, so a generic policy cannot prohibit or require this next hop for every route."
+      "security_impact": true,
+      "rationale": "This argument selects GCP's fixed default internet gateway as the route next hop, creating a direct internet egress path. Because the accepted gateway is not team-specific, a generic policy can prohibit its use without requiring organisation-specific resource knowledge."
     },
     "next_hop_ilb": {
       "description": "The IP address or URL to a forwarding rule of type\nloadBalancingScheme=INTERNAL that should handle matching\npackets.\n\nWith the GA provider you can only specify the forwarding\nrule as a partial or full URL. For example, the following\nare all valid values:\n* 10.128.0.56\n* https://www.googleapis.com/compute/v1/projects/project/regions/region/forwardingRules/forwardingRule\n* regions/region/forwardingRules/forwardingRule\n\nWhen the beta provider, you can also specify the IP address\nof a forwarding rule from the same VPC or any peered VPC.\n\nNote that this can only be used when the destinationRange is\na public (non-RFC 1918) IP CIDR range.",
