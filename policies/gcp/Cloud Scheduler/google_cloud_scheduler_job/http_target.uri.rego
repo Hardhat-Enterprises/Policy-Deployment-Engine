@@ -6,7 +6,7 @@ import data.terraform.gcp.security.cloud_scheduler.google_cloud_scheduler_job.va
 conditions := [
     [
         {
-            "situation_description": "URI is using http",
+            "situation_description": "The scheduler job calls its target over plain HTTP, so the request body, headers and any OIDC token it carries travel unencrypted and can be read or altered in transit.",
             "remedies": ["URI must be using https"]
         },
         {
