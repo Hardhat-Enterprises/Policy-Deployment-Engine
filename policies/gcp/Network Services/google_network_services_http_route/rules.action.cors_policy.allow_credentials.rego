@@ -6,17 +6,24 @@ import data.terraform.gcp.security.network_services.google_network_services_http
 conditions := [
     [
         {
-            "situation_description": "The HTTP route's CORS policy allows credentials to be included in cross-origin requests. This expands the attack surface for cross-origin credential theft and must be paired with a tightly scoped allow_origins/allow_origin_regexes list, never a wildcard origin.",
+            "situation_description": "The HTTP route's CORS policy allows credentialed cross-origin requests (allow_credentials = true) while also allowing a wildcard origin ('*') in allow_origins. Together these let any website make authenticated cross-origin requests to this route, which can expose user data to cross-origin theft.",
             "remedies": [
-                "Confirm allow_origins/allow_origin_regexes for this route is restricted to specific, trusted origins before allowing credentials.",
-                "If credentials are not required by the client application, set allow_credentials to false."
-            ]
+                "Replace the wildcard '*' in rules.action.cors_policy.allow_origins with the specific, approved origins that need credentialed access.",
+                "If credentialed cross-origin requests are not needed, set rules.action.cors_policy.allow_credentials to false."
+            ],
+            "match": "all"
         },
         {
-            "condition": "Check that allow_credentials is not enabled without review",
+            "condition": "allow_credentials is true",
             "attribute_path": ["rules", 0, "action", 0, "cors_policy", 0, "allow_credentials"],
             "values": [true],
             "policy_type": "blacklist"
+        },
+        {
+            "condition": "allow_origins contains a wildcard",
+            "attribute_path": ["rules", 0, "action", 0, "cors_policy", 0, "allow_origins"],
+            "values": ["*"],
+            "policy_type": "element blacklist"
         }
     ]
 ]

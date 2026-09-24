@@ -6,6 +6,7 @@ resource "google_network_services_http_route" "non_compliant_example_1" {
     action {
       cors_policy {
         allow_credentials = true
+        allow_origins = ["*"]
       }
     }
   }
