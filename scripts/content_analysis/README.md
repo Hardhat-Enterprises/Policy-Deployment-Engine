@@ -43,7 +43,7 @@ python3 scripts/content_analysis/run.py <plan.json>
 
 ## How the Rego side works
 
-`policies/_helpers/policies/content_security.rego` is the 7th policy type. A
+`policies/_helpers/policies/content_security.rego` is the 9th policy type. A
 policy declares `"policy_type": "content security"` with `"values"` = severity
 threshold(s). The runner injects `content_security_findings` into the OPA input,
 and the helper flags any resource with a finding at/above the threshold.
