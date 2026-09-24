@@ -30,7 +30,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [5. Pattern Whitelist](#5-pattern-whitelist)
   - [6. Element Blacklist](#6-element-blacklist)
   - [7. Map Key Blacklist](#7-map-key-blacklist)
-  - [8. Content Security](#8-content-security)
+  - [9. Content Security](#9-content-security)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
@@ -257,26 +257,6 @@ get_violations(tf_variables, attribute_path, values) = results
 }
 ```
 
-### 7. Content Security
-**Module:** `policies/content_security.rego`
-**Use Case:** Flag resources whose embedded content (e.g. Python code) has static-analysis findings at/above a severity threshold.
-
-**Logic:**
-- Reads pre-computed findings from `input.content_security_findings` (produced by `scripts/content_analysis/`).
-- Matches findings to resources by `resource_type` + `resource_name`.
-- Any finding whose `severity` is at/above a threshold in `values` = violation.
-
-**Example:**
-```json
-{
-  "policy_type": "content security",
-  "attribute_path": ["after_agent_callbacks", 0, "python_code"],
-  "values": ["MEDIUM"]
-}
-```
-
----
-
 ### 7. Map Key Blacklist
 
 **Module:** `policies/map_key_blacklist.rego`
@@ -337,6 +317,26 @@ Run the focused and integration tests from the repository root:
 
 ```shell
 opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_blacklist_integration_test.rego policies/_helpers -v
+```
+
+---
+
+### 9. Content Security
+**Module:** `policies/content_security.rego`
+**Use Case:** Flag resources whose embedded content (e.g. Python code) has static-analysis findings at/above a severity threshold.
+
+**Logic:**
+- Reads pre-computed findings from `input.content_security_findings` (produced by `scripts/content_analysis/`).
+- Matches findings to resources by `resource_type` + `resource_name`.
+- Any finding whose `severity` is at/above a threshold in `values` = violation.
+
+**Example:**
+```json
+{
+  "policy_type": "content security",
+  "attribute_path": ["after_agent_callbacks", 0, "python_code"],
+  "values": ["MEDIUM"]
+}
 ```
 
 ## Usage Guide
