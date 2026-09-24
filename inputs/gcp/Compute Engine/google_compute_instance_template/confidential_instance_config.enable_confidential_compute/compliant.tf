@@ -19,6 +19,5 @@ resource "google_compute_instance_template" "compliant_example_1" {
 
   confidential_instance_config {
     enable_confidential_compute = true
-    confidential_instance_type  = "SEV"
   }
 }
