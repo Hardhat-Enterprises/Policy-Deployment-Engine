@@ -6,8 +6,8 @@
       "description": "Indicates whether full syncs are paused for this connector",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether automatic full synchronisation runs. This affects operational behaviour rather than access control, encryption, authentication, or other security properties."
     },
     "collection_display_name": {
       "description": "The display name of the Collection.\nShould be human readable, used to display collections in the Console\nDashboard. UTF-8 encoded string with limit of 1024 characters.",
@@ -27,8 +27,8 @@
       "description": "The modes enabled for this connector. The possible value can be:\n'DATA_INGESTION', 'ACTIONS', 'FEDERATED'\n'EUA', 'FEDERATED_AND_EUA'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which connector capabilities are enabled. DATA_INGESTION imports data, ACTIONS performs connector actions, FEDERATED enables federated search, EUA enables end-user authentication, and FEDERATED_AND_EUA combines federated search with end-user authentication. Because the field may be empty or use an unspecified default, an explicit allowlist prevents accidental activation of privileged workflows and restricts the connector to approved least-privilege modes."
     },
     "data_source": {
       "description": "The identifier for the data source.\nThis is a partial list of supported connectors. Please refer to the\n[documentation](https://docs.cloud.google.com/gemini/enterprise/docs/connectors/introduction-to-connectors-and-data-stores)\nfor the full list of connectors.\n\nSupported first-party connectors include:\n\n*   'bigquery'\n*   'gcp_fhir'\n*   'google_mail'\n*   'google_drive'\n*   'google_calendar'\n*   'google_chat'\n\nSupported third-party connectors include:\nGenerally available (GA) connectors:\n\n*   'onedrive'\n*   'outlook'\n*   'confluence'\n*   'jira'\n*   'servicenow'\n*   'sharepoint'\n\nPreview connectors:\n\n*   'asana'\n*   'azure_active_directory'\n*   'box'\n*   'canva'\n*   'confluence_server'\n*   'custom_connector'\n*   'docusign'\n*   'dropbox'\n*   'dynamics365'\n*   'github'\n*   'gitlab'\n*   'hubspot'\n*   'jira_server'\n*   'linear'\n*   'native_cloud_identity'\n*   'notion'\n*   'okta'\n*   'pagerduty'\n*   'peoplesoft'\n*   'salesforce'\n*   'shopify'\n*   'slack'\n*   'snowflake'\n*   'teams'\n*   'trello'\n*   'workday'\n*   'zendesk'",
@@ -41,29 +41,29 @@
       "description": "The version of the data source. For example, '3' for Jira v3.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the connector API version. Version selection is a compatibility concern rather than a configurable security control."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete or abandon the resource. Preventing accidental deletion is an important governance and security control."
     },
     "incremental_refresh_interval": {
       "description": "The refresh interval specifically for incremental data syncs. If unset,\nincremental syncs will use the default from env, set to 3hrs.\nThe minimum is 30 minutes and maximum is 7 days. Applicable to only 3P\nconnectors. When the refresh interval is\nset to the same value as the incremental refresh interval, incremental\nsync will be disabled.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines how frequently incremental synchronisation occurs. This is an operational scheduling setting rather than a security control."
     },
     "incremental_sync_disabled": {
       "description": "Indicates whether incremental syncs are paused for this connector.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables or disables incremental synchronisation. This affects data freshness rather than security."
     },
     "json_params": {
       "description": "Params needed to access the source in the format of json string.",
@@ -76,8 +76,8 @@
       "description": "The KMS key to be used to protect the DataStores managed by this connector.\nMust be set for requests that need to comply with CMEK Org Policy\nprotections.\nIf this field is set and processed successfully, the DataStores created by\nthis connector will be protected by the KMS key.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the customer-managed encryption key used to protect managed data stores. Requiring a valid, non-empty key reference ensures that CMEK protection is configured without constraining any specific project, region, key ring, or key identifier."
     },
     "location": {
       "description": "The geographic location where the data store should reside. The value can\nonly be one of \"global\", \"us\" and \"eu\".",
@@ -111,15 +111,15 @@
       "description": "Whether customer has enabled static IP addresses for this connector.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether static IP addresses are used for connector communication. Network exposure and firewall allow-listing make this security relevant."
     },
     "sync_mode": {
       "description": "The data synchronization mode supported by the data connector. The possible value can be:\n'PERIODIC', 'STREAMING'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the synchronisation method (periodic or streaming). This is an operational configuration rather than a security control."
     },
     "action_config": {
       "type": "block",
@@ -130,15 +130,15 @@
       "description": "Params needed to configure the actions in the format of\nString-to-String (Key, Value) pairs. Contains connection\ncredentials and configuration for the action connector.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains connector-specific free-form action parameters that may include operational or credential values. A generic platform policy cannot meaningfully interpret or validate this arbitrary configuration."
     },
     "action_config.create_bap_connection": {
       "description": "Whether to create a BAP (Business Application Platform) connection\nfor this action connector.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines whether a Business Application Platform connection is provisioned. This is an architectural integration choice rather than a generic platform security control."
     },
     "bap_config": {
       "type": "block",
@@ -149,15 +149,15 @@
       "description": "The list of enabled actions for this connector. Supported\nvalues include: 'create_issue', 'update_issue',\n'change_issue_status', 'create_comment', 'update_comment',\n'upload_attachment'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the application-specific integration actions enabled for the connector. This is feature configuration determined by the application team rather than a generic platform security policy target."
     },
     "bap_config.supported_connector_modes": {
       "description": "The connector modes supported by the BAP configuration.\nThe possible values include: 'ACTIONS'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists supported connector modes. This is descriptive metadata rather than an enforceable security setting."
     },
     "destination_configs": {
       "type": "block",
@@ -168,15 +168,15 @@
       "description": "The key of the destination configuration, for example 'url'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the destination configuration entry. It is metadata and does not directly affect security."
     },
     "destination_configs.params": {
       "description": "Additional parameters for this destination config in structured json format.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains destination-specific configuration. The values are connector-specific and cannot be validated through a generic platform security policy."
     },
     "destination_configs.destinations": {
       "type": "block",
@@ -187,15 +187,15 @@
       "description": "The host of the destination, for example\n'https://example.atlassian.net'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the external destination host used by the connector. Destination endpoints are application-specific references, and a generic platform policy does not pin particular hosts or destinations."
     },
     "destination_configs.destinations.port": {
       "description": "Target port number accepted by the destination.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the destination network port. Restricting ports reduces unnecessary network exposure."
     },
     "entities": {
       "type": "block",
@@ -206,22 +206,22 @@
       "description": "The name of the entity. Supported values by data source:\n* Salesforce: 'Lead', 'Opportunity', 'Contact', 'Account', 'Case', 'Contract', 'Campaign'\n* Jira: project, issue, attachment, comment, worklog\n* Confluence: 'Content', 'Space'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which entity type is synchronised. This is an application configuration choice rather than a security control."
     },
     "entities.key_property_mappings": {
       "description": "Attributes for indexing.\nKey: Field name.\nValue: The key property to map a field to, such as 'title', and\n'description'. Supported key properties:\n* 'title': The title for data record. This would be displayed on search\n  results.\n* 'description': The description for data record. This would be displayed\n  on search results.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Maps source fields to index properties. This affects indexing behaviour but not security."
     },
     "entities.params": {
       "description": "The parameters for the entity to facilitate data ingestion.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains entity-specific configuration parameters. These are application-specific and outside the scope of generic security policy."
     }
   }
 }

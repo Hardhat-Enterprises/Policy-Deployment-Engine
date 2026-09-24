@@ -4,13 +4,15 @@ import data.terraform.gcp.security.cloud_run_v2_api.google_cloud_run_v2_service.
 
 conditions := [
     [
-    {"situation_description": "Cloud Run multi-region service must only use approved Australian regions to ensure data residency compliance.",
-    "remedies": ["Change regions to australia-southeast1 or australia-southeast2 only"]},
-    {
-        "condition": "Multi-region setting includes disallowed region",
-        "attribute_path": ["multi_region_settings", 0, "regions"],
-        "values": ["australia-southeast1", "australia-southeast2"],
-        "policy_type": "whitelist"
+        {
+            "situation_description": "Multi-region service is replicated to regions outside the approved set, risking data residency or sovereignty violations.",
+            "remedies": ["Restrict multi_region_settings.regions to approved Australian regions (e.g. australia-southeast1, australia-southeast2)."]
+        },
+        {
+            "condition": "Regions must match approved Australian locations",
+            "attribute_path": ["multi_region_settings",0,"regions"],
+            "values": ["australia-southeast1","australia-southeast2"],
+            "policy_type": "whitelist"
         }
     ]
 ]

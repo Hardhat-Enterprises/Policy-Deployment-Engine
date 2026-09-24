@@ -13,13 +13,15 @@ conditions := [
     },
     {
         "condition": "Check that api_targets.methods does not contain a wildcard.",
-        # restrictions[0].api_targets[0].methods[0]
-        "attribute_path" : ["restrictions", 0, "api_targets", 0, "methods", 0],
+        # restrictions[0].api_targets[0].methods
+        "attribute_path" : ["restrictions", 0, "api_targets", 0, "methods"],
         "values" : ["*"],
         "policy_type" : "blacklist"
     }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details
