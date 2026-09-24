@@ -6,14 +6,11 @@ import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orche
 conditions := [
     [
         {
-            "situation_description": "os_policies.mode is not set to ENFORCEMENT, meaning the OS policies are only validated (compliance-reported) but never actually applied, creating a false sense of security",
-            "remedies": [
-                "Set os_policies.mode to ENFORCEMENT so the OS policies are actually applied to target VMs",
-                "Use VALIDATION mode only temporarily during testing, not as a long-term configuration"
-            ]
+            "situation_description": "The OS policy mode must be ENFORCEMENT to ensure configured security policies are actively applied to target virtual machines.",
+            "remedies": ["Set the OS policy mode to ENFORCEMENT"]
         },
         {
-            "condition": "os_policies.mode must be ENFORCEMENT",
+            "condition": "Only ENFORCEMENT mode is allowed",
             "attribute_path": ["orchestrated_resource", 0, "os_policy_assignment_v1_payload", 0, "os_policies", 0, "mode"],
             "values": ["ENFORCEMENT"],
             "policy_type": "whitelist"
@@ -21,5 +18,7 @@ conditions := [
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+
+message := result.message
+details := result.details

@@ -6,20 +6,26 @@ import data.terraform.gcp.security.os_config_v2.google_os_config_v2_policy_orche
 conditions := [
     [
         {
-            "situation_description": "instance_filter.all is true, meaning the OS policy assignment applies to every VM instance in scope with no filtering",
-            "remedies": [
-                "Set instance_filter.all to false",
-                "Use inclusion_labels, exclusion_labels, or inventories to explicitly scope which VMs the OS policies apply to"
-            ]
+            "situation_description": "The policy must not target all instances indiscriminately",
+            "remedies": ["Set the instance filter all attribute to false"]
         },
         {
-            "condition": "instance_filter.all must not be true (unrestricted VM targeting)",
-            "attribute_path": ["orchestrated_resource", 0, "os_policy_assignment_v1_payload", 0, "instance_filter", 0, "all"],
-            "values": [true],
-            "policy_type": "blacklist"
+            "condition": "Check that all instances are not selected",
+            "attribute_path": [
+                "orchestrated_resource",
+                0,
+                "os_policy_assignment_v1_payload",
+                0,
+                "instance_filter",
+                0,
+                "all"
+            ],
+            "values": [false],
+            "policy_type": "whitelist"
         }
     ]
 ]
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details

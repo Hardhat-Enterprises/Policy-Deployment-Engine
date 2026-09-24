@@ -9,6 +9,6 @@ resource "google_database_migration_service_migration_job" "non_compliant_exampl
     vpc = "dummy-vpc"
     }
     
-    source      = "projects/proj-id/locations/us-central1/connectionProfiles/source"
-    destination = "projects/proj-id/locations/us-central1/connectionProfiles/destination"
+    source      = "projects/proj-id/locations/australia-southeast2/connectionProfiles/source"
+    destination = "projects/proj-id/locations/australia-southeast2/connectionProfiles/destination"
 }

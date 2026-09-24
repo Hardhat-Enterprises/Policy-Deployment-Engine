@@ -9,8 +9,8 @@ resource "google_discovery_engine_chat_engine" "non_compliant_example_1" {
     agent_creation_config {
     business = "test_business"
     default_language_code = "en"
+    location = "eu"
     time_zone = "Australia/Sydney"
-    location = "us-East3"
     }
     allow_cross_region = false
    }
