@@ -21,28 +21,28 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "This is a second, independent deletion-blocking flag on this resource. Unless explicitly set to false, it prevents terraform destroy or apply from removing the instance, leaving it at its default protects against accidental data loss."
+      "rationale": "This is a second, independent deletion-blocking flag on this resource; leaving it unset or false removes a safeguard against accidental destruction of an active database cluster."
     },
     "display_name": {
       "description": "The display name for the ExadbVmCluster. The name does not have to\nbe unique within your project. The name must be 1-255 characters long and\ncan only contain alphanumeric characters.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "display_name is a free-text label field with no functional effect on resource behaviour, so it carries no security impact."
+      "rationale": "display_name is a cosmetic, human-readable label with no bearing on access, exposure, or data controls."
     },
     "exadb_vm_cluster_id": {
       "description": "The ID of the ExadbVmCluster to create. This value is\nrestricted to (^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$) and must be a maximum of\n63 characters in length. The value must start with a letter and end with a\nletter or a number.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "exadb_vm_cluster_id is a resource identifier constrained by naming convention, not a control affecting access, exposure, or data protection."
+      "rationale": "exadb_vm_cluster_id is an identifier used to name the resource, not a security control."
     },
     "labels": {
       "description": "The labels or tags associated with the ExadbVmCluster.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
       "security_impact": false,
-      "rationale": "labels is non-authoritative organizational metadata with no functional effect on resource behaviour."
+      "rationale": "labels are non-authoritative metadata used for organization and billing, not a security or access control."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -70,7 +70,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "project is an identifier/reference to the parent project, not a control itself."
+      "rationale": "project is an identifier/reference to which GCP project the resource belongs to, not itself a security control."
     },
     "properties": {
       "type": "block",
@@ -82,77 +82,77 @@
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "additional_ecpu_count_per_node is a compute capacity sizing value, not a control affecting access, exposure, or data protection."
+      "rationale": "This is a capacity-sizing/performance field with no universal safe value; it does not control access, exposure, or data."
     },
     "properties.cluster_name": {
       "description": "The cluster name for Exascale vm cluster. The cluster name must begin with\nan alphabetic character and may contain hyphens(-) but can not contain\nunderscores(_). It should be not more than 11 characters and is not case\nsensitive.\nOCI Cluster name.",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "properties.cluster_name is an internal naming value constrained by naming convention, not a control affecting access, exposure, or data protection."
+      "rationale": "cluster_name is an internal naming convention with no security implication."
     },
     "properties.enabled_ecpu_count_per_node": {
       "description": "The number of ECPUs enabled per node for an exadata vm cluster on\nexascale infrastructure.",
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "enabled_ecpu_count_per_node is a compute capacity sizing value, not a control affecting access, exposure, or data protection."
+      "rationale": "This is a capacity-sizing field with no universal safe value; it does not control access, exposure, or data."
     },
     "properties.exascale_db_storage_vault": {
       "description": "The name of ExascaleDbStorageVault associated with the ExadbVmCluster.\nIt can refer to an existing ExascaleDbStorageVault. Or a new one can be\ncreated during the ExadbVmCluster creation (requires\nstorage_vault_properties to be set).\nFormat:\nprojects/{project}/locations/{location}/exascaleDbStorageVaults/{exascale_db_storage_vault}",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "exascale_db_storage_vault is a reference/identifier to the storage vault resource, an architectural choice rather than a control itself."
+      "rationale": "This is a reference/identifier to which storage vault backs the cluster, an architectural choice rather than a control itself."
     },
     "properties.grid_image_id": {
       "description": "Grid Infrastructure Version.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "grid_image_id selects the Grid Infrastructure version; a version-choice field with no single universally unsafe value for a platform policy to block."
+      "rationale": "This selects a software/version choice for the Grid Infrastructure, not an access or exposure control."
     },
     "properties.hostname_prefix": {
       "description": "Prefix for VM cluster host names.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "hostname_prefix is a naming convention value with no functional effect on access, exposure, or data protection."
+      "rationale": "hostname_prefix is a naming convention with no security implication."
     },
     "properties.license_model": {
       "description": "The license type of the ExadbVmCluster.\nPossible values:\nLICENSE_INCLUDED\nBRING_YOUR_OWN_LICENSE",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "license_model is a licensing/billing choice between LICENSE_INCLUDED and BRING_YOUR_OWN_LICENSE, not a security control."
+      "rationale": "license_model is a licensing/billing choice, not a security control."
     },
     "properties.node_count": {
       "description": "The number of nodes/VMs in the ExadbVmCluster.",
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "node_count is a capacity sizing value, not a control affecting access, exposure, or data protection."
+      "rationale": "This is a capacity-sizing field with no universal safe value; it does not control access, exposure, or data."
     },
     "properties.scan_listener_port_tcp": {
       "description": "SCAN listener port - TCP",
       "required": false,
       "type": "number",
       "security_impact": false,
-      "rationale": "scan_listener_port_tcp is a port configuration value; no single value is inherently unsafe for a generic platform policy to block."
+      "rationale": "This configures a listener port number with no inherently unsafe value; it is not itself an access-control mechanism."
     },
     "properties.shape_attribute": {
       "description": "The shape attribute of the VM cluster. The type of Exascale storage used\nfor Exadata VM cluster. The default is SMART_STORAGE which supports Oracle\nDatabase 23ai and later\nPossible values:\nSMART_STORAGE\nBLOCK_STORAGE",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "shape_attribute is a hardware/storage shape choice, an architectural decision rather than a control itself."
+      "rationale": "This is a hardware/storage shape choice, not a security control."
     },
     "properties.ssh_public_keys": {
       "description": "The SSH public keys for the ExadbVmCluster.",
       "required": true,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "SSH public keys directly control who can authenticate to the VM cluster, this is a direct access-control mechanism, not merely configuration."
+      "rationale": "SSH public keys directly control who can authenticate to the VM cluster; this is a direct access-control mechanism and must be policed."
     },
     "properties.data_collection_options": {
       "type": "block",
@@ -171,7 +171,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "is_health_monitoring_enabled controls operational/availability health monitoring, not an audit or access-control mechanism."
+      "rationale": "This controls operational/availability health monitoring, not an audit or access-control mechanism."
     },
     "properties.data_collection_options.is_incident_logs_enabled": {
       "description": "Indicates whether to enable incident logs and trace collection.",
@@ -190,14 +190,14 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "time_zone.id is an operational configuration value with no functional effect on access, exposure, or data protection."
+      "rationale": "This is an operational configuration field with no security implication."
     },
     "properties.time_zone.version": {
       "description": "IANA Time Zone Database version number. For example \"2019a\".",
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "time_zone.version is an operational configuration value with no functional effect on access, exposure, or data protection."
+      "rationale": "This is an operational configuration field with no security implication."
     },
     "properties.vm_file_system_storage": {
       "type": "block",
@@ -209,7 +209,7 @@
       "required": true,
       "type": "number",
       "security_impact": false,
-      "rationale": "size_in_gbs_per_node is a storage capacity sizing value, not a control affecting access, exposure, or data protection."
+      "rationale": "This is a storage-capacity sizing field with no universal safe value; it does not control access, exposure, or data."
     }
   }
 }
