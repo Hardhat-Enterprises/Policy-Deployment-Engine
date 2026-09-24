@@ -264,6 +264,11 @@ jobs:
       - name: Set up plugin cache config
         run: bash scripts/auto_test/cache_setup.sh
 
+      # Content-security policies (e.g. after_agent_callbacks.python_code) need
+      # Bandit to inject static-analysis findings before OPA evaluation.
+      - name: Install Bandit (content-security analysis)
+        run: python3 -m pip install --quiet bandit
+
       # Every policy in the tree against its own fixtures. The engine decides
       # what all of them flag, so all of them are the blast radius.
       - name: Evaluate every policy
@@ -299,6 +304,11 @@ jobs:
 
       - name: Set up plugin cache config
         run: bash scripts/auto_test/cache_setup.sh
+
+      # Content-security policies (e.g. after_agent_callbacks.python_code) need
+      # Bandit to inject static-analysis findings before OPA evaluation.
+      - name: Install Bandit (content-security analysis)
+        run: python3 -m pip install --quiet bandit
 
       # Doc completeness compares the resource doc with the base branch's copy.
       - name: Fetch base branch

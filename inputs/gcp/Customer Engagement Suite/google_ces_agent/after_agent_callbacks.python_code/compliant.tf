@@ -1,7 +1,7 @@
 resource "google_ces_agent" "compliant_example_1" {
-  app          = "my-app"
-  display_name = "Compliant Example"
-  location     = "us"
+  app          = "agent-1"
+  display_name = "example-agent"
+  location     = "australia-southeast1"
 
   after_agent_callbacks {
     description = "secure callback"
