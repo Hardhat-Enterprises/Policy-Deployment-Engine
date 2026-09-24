@@ -1,6 +1,6 @@
 resource "google_clouddeploy_deploy_policy" "non_compliant_example_1" {
   name            = "non_compliant_example_1"
-  location        = "australia-southeast1"
+  location        = "us-central1"
   project         = "my-project-name"
   deletion_policy = "PREVENT"
 
@@ -13,7 +13,7 @@ resource "google_clouddeploy_deploy_policy" "non_compliant_example_1" {
     }
   }
 
-  suspended = true
+  suspended = false
 
   rules {
     rollout_restriction {
