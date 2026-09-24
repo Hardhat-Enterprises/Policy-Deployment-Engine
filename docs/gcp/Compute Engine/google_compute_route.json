@@ -6,99 +6,99 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This argument controls whether Terraform can delete or abandon the route. Enforcing deletion protection can prevent unintended removal of routing configuration that network traffic may depend on, reducing the risk of connectivity disruption."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property\nwhen you create the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument only provides descriptive metadata for the route. Restricting its contents would not change traffic flow, access, or the security behaviour of the route."
     },
     "dest_range": {
       "description": "The destination range of outgoing packets that this route applies to.\nOnly IPv4 is supported.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument defines the destination CIDR range to which the route applies. The appropriate range depends on the organisation's network architecture, and broad ranges such as default routes can be legitimate, so no single generic destination range can be enforced securely."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035.  Specifically, the name must be 1-63 characters long and\nmatch the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means\nthe first character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the\nlast character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the route, and GCP already enforces the required naming format. Restricting the actual route name would not generically improve its security posture."
     },
     "network": {
       "description": "The network that this route applies to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument selects the VPC network to which the route belongs. The correct network depends on the deployment architecture, so enforcing a particular network would require organisation-specific knowledge."
     },
     "next_hop_gateway": {
       "description": "URL to a gateway that should handle matching packets.\nCurrently, you can only specify the internet gateway, using a full or\npartial valid URL:\n* 'https://www.googleapis.com/compute/v1/projects/project/global/gateways/default-internet-gateway'\n* 'projects/project/global/gateways/default-internet-gateway'\n* 'global/gateways/default-internet-gateway'\n* The string 'default-internet-gateway'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument directs matching traffic to the default internet gateway. Internet gateway routes are legitimate for workloads requiring external connectivity, so a generic policy cannot prohibit or require this next hop for every route."
     },
     "next_hop_ilb": {
       "description": "The IP address or URL to a forwarding rule of type\nloadBalancingScheme=INTERNAL that should handle matching\npackets.\n\nWith the GA provider you can only specify the forwarding\nrule as a partial or full URL. For example, the following\nare all valid values:\n* 10.128.0.56\n* https://www.googleapis.com/compute/v1/projects/project/regions/region/forwardingRules/forwardingRule\n* regions/region/forwardingRules/forwardingRule\n\nWhen the beta provider, you can also specify the IP address\nof a forwarding rule from the same VPC or any peered VPC.\n\nNote that this can only be used when the destinationRange is\na public (non-RFC 1918) IP CIDR range.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument selects an internal load balancer forwarding rule as the next hop. The appropriate forwarding rule depends on the workload and network design, so there is no generic value that PDE can enforce."
     },
     "next_hop_instance": {
       "description": "URL to an instance that should handle matching packets.\nYou can specify this as a full or partial URL. For example:\n* 'https://www.googleapis.com/compute/v1/projects/project/zones/zone/instances/instance'\n* 'projects/project/zones/zone/instances/instance'\n* 'zones/zone/instances/instance'\n* Just the instance name, with the zone in 'next_hop_instance_zone'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument selects a VM instance to receive matching traffic. The appropriate instance is deployment-specific, and using an instance as a next hop is a supported routing architecture, so no generic instance value can be required."
     },
     "next_hop_instance_zone": {
       "description": "The zone of the instance specified in next_hop_instance. Omit if next_hop_instance is specified as a URL.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the zone of the selected next-hop instance. The correct zone depends on where that instance is deployed and does not provide a generic security control by itself."
     },
     "next_hop_ip": {
       "description": "Network IP address of an instance that should handle matching packets.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument specifies the IP address of the instance that should receive matching traffic. The correct address depends on the network topology, so enforcing a particular IP address or range would require deployment-specific knowledge."
     },
     "next_hop_vpn_tunnel": {
       "description": "URL to a VpnTunnel that should handle matching packets.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument selects the VPN tunnel that should receive matching traffic. VPN tunnel selection depends on the organisation's connectivity design, so a generic policy cannot require a particular tunnel."
     },
     "priority": {
       "description": "The priority of this route. Priority is used to break ties in cases\nwhere there is more than one matching route of equal prefix length.\n\nIn the case of two routes with equal prefix length, the one with the\nlowest-numbered priority value wins.\n\nDefault value is 1000. Valid range is 0 through 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument determines route precedence when routes with equal prefix lengths compete. The appropriate priority depends on the intended routing architecture, and there is no universally secure priority value or threshold."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument determines which GCP project owns the route. The correct project depends on the deployment context, so enforcing a specific project would require organisation-specific knowledge."
     },
     "tags": {
       "description": "A list of instance tags to which this route applies.",
       "required": false,
       "type": "set(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument limits the route to instances with matching network tags. Both routes that apply broadly and routes scoped by tags have legitimate uses, so a generic policy cannot require a particular tag set for every route."
     },
     "params": {
       "type": "block",
@@ -109,8 +109,8 @@
       "description": "Resource manager tags to be bound to the route. Tag keys and values have the\nsame definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id},\nand values are in the format tagValues/456. The field is ignored when empty.\nThe field is immutable and causes resource replacement when mutated. This field is only\nset at create time and modifying this field after creation will trigger recreation.\nTo apply tags to an existing resource, see the google_tags_tag_binding resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument binds Resource Manager tags to the route for organisation and governance purposes. The appropriate tag keys and values are organisation-specific, so a generic PDE policy cannot require particular tags."
     }
   }
 }
