@@ -6,16 +6,17 @@ import data.terraform.gcp.security.network_services.google_network_services_http
 conditions := [
     [
         {
-            "situation_description": "The HTTP route's redirect action does not enforce HTTPS. Without https_redirect enabled, matched requests can be redirected over plain HTTP, exposing traffic to interception or downgrade attacks.",
+            "situation_description": "The HTTP route's redirect action explicitly sets https_redirect to false, so redirected requests can be sent over plain HTTP. This allows redirected traffic to be downgraded and exposed to interception.",
             "remedies": [
-                "Set rules.action.redirect.https_redirect to true so redirected requests are always upgraded to HTTPS."
+                "Set rules.action.redirect.https_redirect to true on redirect actions so redirected requests use HTTPS.",
+                "Routes that do not configure a redirect action are not affected by this check."
             ]
         },
         {
-            "condition": "Check that https_redirect is enabled",
+            "condition": "Check that https_redirect is not explicitly false",
             "attribute_path": ["rules", 0, "action", 0, "redirect", 0, "https_redirect"],
-            "values": [true],
-            "policy_type": "whitelist"
+            "values": [false],
+            "policy_type": "blacklist"
         }
     ]
 ]
