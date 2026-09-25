@@ -2,10 +2,10 @@ resource "google_netapp_active_directory" "non_compliant_example_1" {
   project         = "deakin-lab-123"
   name = "non_compliant_example_1"
   location = "us-central1"
-  domain = ""
-  dns = ""
+  domain = "deakin.internal"
+  dns = "172.30.64.3"
   net_bios_prefix = "smbserver"
-  username = ""
+  username = "svc_netapp_joiner"
   password = ""
 }
 

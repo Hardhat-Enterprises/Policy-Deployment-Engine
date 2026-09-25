@@ -9,7 +9,7 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_no
     {
         "condition": "Test if the location is australia-southeast1",
         "attribute_path" : ["location"],
-        "values" : ["australia_southeast1", "australia_southeast2"],
+        "values" : ["australia-southeast1", "australia-southeast2"],
         "policy_type" : "whitelist" 
     }
     
@@ -40,6 +40,8 @@ import data.terraform.gcp.security.anthos_on_prem.google_gkeonprem_bare_metal_no
 
  ]
 
- message := helpers.get_multi_summary(conditions, vars.variables).message
+ result := helpers.get_multi_summary(conditions, vars.variables)
 
- details := helpers.get_multi_summary(conditions, vars.variables).details
+ message := result.message
+
+ details := result.details

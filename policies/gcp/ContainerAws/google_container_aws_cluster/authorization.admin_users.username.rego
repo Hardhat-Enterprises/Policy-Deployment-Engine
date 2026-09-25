@@ -11,8 +11,8 @@ conditions := [[
   {
     "condition": "admin_users username must use an approved organisation-managed email address",
     "attribute_path": ["authorization", 0, "admin_users", 0, "username"],
-    "values": ["user@deakin.edu.au"],
-    "policy_type": "whitelist",
+    "values": ["*@*", [["user"], ["deakin.edu.au"]]],
+    "policy_type": "pattern whitelist",
   },
 ]]
 
