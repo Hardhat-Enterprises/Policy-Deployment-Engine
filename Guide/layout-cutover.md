@@ -55,8 +55,14 @@ private to comparison with a pre-cutover baseline.
    cutover; the migration refuses to rebuild or guess. Repeat dry-run after fixes.
 4. Apply the reviewed migration:
    `python scripts/migration/restructure_gcp.py --apply`.
-5. Verify every source identity maps once and effective fixture hashes remain
-   unchanged. A second dry-run must report a verified no-op. The migration never
+5. Review the migration's retained-plan and rebuild reports. Every source identity
+   must map once; policy/fixture bytes and meaningful local configs are preserved.
+   Base-only config consolidation can change effective hashes. The migration
+   removes those invalidated plans and reports each old/new hash; it does not
+   rebuild plans or rename them to imply validity. Run
+   `python scripts/auto_test/auto_test.py gcp` to regenerate missing plans, then
+   `python scripts/auto_test/auto_test.py gcp --verify-plan-cache`. After regeneration,
+   a second migration dry-run must report a verified no-op. The migration never
    stages, commits, merges or pushes.
 6. Run the full Python and Rego suites, structural/content lint, read-only plan
    verification and complete GCP evaluation with `--report`. Compare identities and
@@ -64,11 +70,43 @@ private to comparison with a pre-cutover baseline.
 7. Complete portal integration checks and require passing CI before submitting the
    restructuring branch for merge into `dev`.
 
-The migration chooses the most common normalized source config, using source-path
-order to break ties. It retains all differing local overrides and moves valid
-committed plans with their fixtures. Only provably equivalent historical
-line-ending hash names may be renamed. It rejects partial or ambiguous layouts,
-collisions, missing plans and genuinely stale hashes before mutation.
+The migration chooses the most common normalized **base-only** source config,
+using source-path order to break ties. Base-only means the standard Google
+`required_providers` source declaration and empty `provider "google" {}` block.
+Token comparison ignores whitespace and comments outside strings. Extra or
+different declarations, provider settings, version constraints and uncertain
+matches remain exact local overrides; the migration does not attempt general
+Terraform semantic equivalence. If no base-only source config exists, preflight
+fails rather than making a fixture-specific configuration global.
+
+All base-only variants use the shared config after migration. Configs containing
+locals or supporting resources remain local, including the certificate public
+key, gRPC location helper and multicast dependencies. Local configuration replaces
+the shared default entirely. Future local overrides survive migration reruns.
+
+Every source plan must be present and valid for its original fixture before
+migration. Only provably equivalent historical line-ending hash names may be
+adopted. Unchanged effective hashes retain their plans; changed hashes require
+regeneration. Counts are recalculated from the tree at execution time. Dry-run
+returns 0 for a valid proposed migration, even if it lists future rebuilds.
+Application or verification of a migrated tree returns 2 while plans are missing,
+and prints regeneration instructions instead of claiming a verified no-op.
+Stale/invalid plans, collisions and mixed or incomplete layouts abort with exit 1.
+
+The entire `inputs/` tree is inventoried before mutation. Only migration sources,
+empty directories and zero-byte `.gitkeep` placeholders are allowed; unexpected
+files, nonempty placeholders, unmigrated platform data and links abort with paths.
+Sources and cleanup targets are rechecked before application. After verifying the
+moved content, identities, retained plans and expected missing plans, the migration
+rechecks cleanup targets, deletes empty placeholders and removes empty directories
+bottom-up, including `inputs/` and AWS/Azure placeholders. It never recursively
+deletes unverified contents. An already migrated tree can receive cleanup-only
+application for leftover empty input directories/placeholders, using the same
+clean-checkout requirement. Missing plans still require regeneration afterward.
+
+These tooling changes are tested on synthetic repositories only. Do not run
+production migration during preparation. Before committing migrated data, complete
+plan regeneration, read-only cache verification and full policy evaluation.
 
 ## Portal integration contract
 
