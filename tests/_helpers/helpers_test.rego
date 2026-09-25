@@ -60,6 +60,7 @@ test_valid_policy_types_matches_supported_set if {
 		"pattern blacklist", "pattern whitelist", "element blacklist",
 		"element pattern whitelist",
 		"map key blacklist",
+		"content security",
 	}
 }
 
