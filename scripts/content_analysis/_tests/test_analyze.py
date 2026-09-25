@@ -4,13 +4,18 @@ Run with Bandit on PATH, e.g.:
     PATH="$PWD/.venv/bin:$PATH" python -m pytest scripts/content_analysis/
 """
 
+import shutil
 import sys
 from pathlib import Path
+
+import pytest
 
 project_root = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(project_root))
 
 from scripts.content_analysis import analyze
+
+pytestmark = pytest.mark.skipif(shutil.which("bandit") is None, reason="bandit not installed")
 
 
 REGISTRY = {"content_types": [
