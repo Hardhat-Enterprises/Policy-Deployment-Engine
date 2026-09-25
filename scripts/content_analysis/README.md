@@ -24,28 +24,25 @@ Terraform config → terraform plan (plan.json)
 | `analyze.py` | run Bandit on each snippet (static, never executes) |
 | `normalize.py` | map Bandit output to the standard findings schema |
 | `run.py` | standalone: plan.json → severity verdict (Python, no Rego) |
-| `run_pde.py` | full runner: terraform → extract → analyze → normalize → inject → OPA → PASS/FAIL |
 
 ## Usage
 
 ```bash
-# Full end-to-end (terraform + bandit + opa):
-python3 scripts/content_analysis/run_pde.py \
-    --fixtures 'inputs/gcp/Customer Engagement Suite/google_ces_agent/after_agent_callbacks.python_code' \
-    --policy  'policies/gcp/Customer Engagement Suite/google_ces_agent/after_agent_callbacks.python_code.rego'
+# Full end-to-end via the test harness (terraform + bandit + opa):
+python3 scripts/auto_test/auto_test.py 'gcp/Customer Engagement Suite/google_ces_agent'
 
 # Standalone severity check on an existing plan.json (no terraform/rego):
 python3 scripts/content_analysis/run.py <plan.json>
 ```
 
-`run_pde.py` shells out to `terraform`, `bandit`, and `opa` (all on PATH; see
-`requirements.txt` for bandit).
+The harness (`auto_test.py`) runs `terraform`, `bandit`, and `opa` for
+content-security fixtures (install bandit with `pip install bandit`).
 
 ## How the Rego side works
 
 `policies/_helpers/policies/content_security.rego` is the 9th policy type. A
 policy declares `"policy_type": "content security"` with `"values"` = severity
-threshold(s). The runner injects `content_security_findings` into the OPA input,
+threshold(s). `auto_test.py` injects `content_security_findings` into the OPA input,
 and the helper flags any resource with a finding at/above the threshold.
 
 ## Extending to other content types
