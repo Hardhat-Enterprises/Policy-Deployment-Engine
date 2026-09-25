@@ -21,6 +21,7 @@ import data.terraform.helpers.policies.pattern_whitelist
 import data.terraform.helpers.policies.element_blacklist
 import data.terraform.helpers.policies.element_pattern_whitelist
 import data.terraform.helpers.policies.map_key_blacklist
+import data.terraform.helpers.policies.content_security
 
 ################################################################################
 # Public API
@@ -308,6 +309,7 @@ valid_policy_types := [
     "element blacklist",
     "element pattern whitelist",
     "map key blacklist",
+    "content security",
 ]
 
 # Every reason `conditions` cannot be dispatched, as human-readable phrases. Two
@@ -495,6 +497,10 @@ select_policy_logic(tf_variables, attribute_path, values_formatted, "element bla
 
 select_policy_logic(tf_variables, attribute_path, values_formatted, "element pattern whitelist") = results if {
     results := element_pattern_whitelist.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "content security") = results if {
+    results := content_security.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
 select_policy_logic(tf_variables, attribute_path, values_formatted, "map key blacklist") = results if {

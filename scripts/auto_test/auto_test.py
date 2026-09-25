@@ -774,6 +774,52 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     return make_success(attribute, service, resource)
 
 
+def needs_content_analysis(policy_file: Path) -> bool:
+    """True when the policy declares the ``content security`` policy type.
+
+    Content-security policies read Bandit findings that must be injected into the
+    OPA input before evaluation. The policy-type string is the single, stable
+    marker shared with ``helpers.rego`` and ``policy_lint.py``, so this is a cheap,
+    precise gate: every other policy type skips the analysis entirely.
+    """
+    return "content security" in policy_file.read_text(encoding="utf-8")
+
+
+def inject_content_security_findings(plan_path: Path) -> Path | None:
+    """Run content analysis and return a plan augmented with findings.
+
+    Runs the ``extract -> analyze -> normalize`` pipeline and adds the result under
+    the top-level ``content_security_findings`` key the content-security Rego policy
+    reads. The committed ``<sha>.json`` plan is left untouched; a temp copy is
+    written and returned instead. Returns None (with a printed reason) when the
+    analyzer cannot run, so a missing ``bandit`` affects only this fixture and never
+    the rest of the tree.
+    """
+    if shutil.which("bandit") is None:
+        thread_safe_print("⚠️  `bandit` not installed — cannot run content-security analysis")
+        return None
+    try:
+        content_dir = REPO_ROOT / "scripts" / "content_analysis"
+        if str(content_dir) not in sys.path:
+            sys.path.insert(0, str(content_dir))
+        import extract
+        import analyze
+        import normalize
+        registry = extract.load_registry(content_dir / "registry.json")
+        plan = json.loads(plan_path.read_text(encoding="utf-8"))
+        key_map = extract.attribute_key_map(registry)
+        plan["content_security_findings"] = normalize.normalize_all(
+            analyze.analyze_snippets(extract.extract(plan, key_map), registry))
+    except Exception as exc:
+        thread_safe_print(f"⚠️  content-security analysis failed: {exc}")
+        return None
+
+    fd, tmp_path = tempfile.mkstemp(suffix=".json", prefix="csa-augmented-")
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        json.dump(plan, fh)
+    return Path(tmp_path)
+
+
 def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Path,
                           cache_path: Path, verbose: bool = False):
     # Extract data about services and filesystem paths
@@ -786,6 +832,19 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
     if plan_path is None:
         res = make_failure(attribute, "Terraform failed to compile!", service, resource)
         return res
+
+    # Content-security policies need Bandit findings in the OPA input. Only these
+    # policies take this branch; every other fixture is untouched. The augmented
+    # plan is a temp file (never the committed <sha>.json) and is removed below.
+    augmented_plan = None
+    if needs_content_analysis(policy_file):
+        augmented_plan = inject_content_security_findings(plan_path)
+        if augmented_plan is None:
+            return make_failure(
+                attribute,
+                "content-security fixture requires `bandit` (install: pip install bandit)",
+                service, resource)
+        plan_path = augmented_plan
 
     # plan_path is the fixture's committed <sha>.json — never delete it here.
     message_query, vars_query = get_policy_metadata(
@@ -823,8 +882,14 @@ def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Pat
         for m in messages:
             thread_safe_print(m)
 
-    return validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource,
-                                  resource_value_name)
+    result = validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource,
+                                    resource_value_name)
+    if augmented_plan is not None:
+        try:
+            augmented_plan.unlink(missing_ok=True)
+        except OSError:
+            pass
+    return result
 
 def cleanup_workspace(workdir: Path, verbose: bool = False):
     # Remove transient terraform artifacts from the input dir. NOT the plan JSON:

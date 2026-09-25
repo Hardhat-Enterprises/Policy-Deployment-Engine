@@ -104,6 +104,7 @@ The engine dispatches on `policy_type`, using these supported values:
 | `element blacklist` | No element of an array may **contain** one of these substrings |
 | `element pattern whitelist` | Every element of an array must match one of the wildcard shapes |
 | `map key blacklist` | No map key may match a prohibited name, ignoring capitalisation, with a non-empty value |
+| `content security` | Embedded code (e.g. Python callbacks) has no static-analysis findings at or above a severity threshold |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
