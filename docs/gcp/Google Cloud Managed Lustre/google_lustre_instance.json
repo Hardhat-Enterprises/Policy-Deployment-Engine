@@ -34,8 +34,8 @@
       "description": "Indicates whether you want to enable support for GKE clients. By default,\nGKE clients are not supported.",
       "required": false,
       "type": "bool",
-      "security_impact": false,
-      "rationale": "Enables GKE clients to discover and mount the filesystem — this is an architectural feature toggle for enabling specific container workloads, not a security control. It doesn't close public exposure, mandate encryption, or block static authentication, so it doesn't fit any security policy archetype and is out of scope for platform policy."
+      "security_impact": true,
+      "rationale": "Toggles whether GKE clients can discover and mount the Lustre instance. Enabling it broadens which workloads can reach the filesystem, so a policy can govern this exposure toggle to ensure GKE access is only enabled deliberately and disabled when not needed."
     },
     "instance_id": {
       "description": "The name of the Managed Lustre instance.\n\n* Must contain only lowercase letters, numbers, and hyphens.\n* Must start with a letter.\n* Must be between 1-63 characters.\n* Must end with a number or a letter.",
@@ -70,7 +70,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "References the VPC network the Lustre instance attaches to. This is an identifier/reference to another resource and a team architectural choice; we do not constrain which network a resource references, so there is no generic secure value to apply."
+      "rationale": "References the VPC network the Lustre instance attaches to. This is a pointer to a team-owned network resource; we do not constrain which network a resource references, and the full-resource-name format is provider-enforced, so there is no generic secure value to apply."
     },
     "per_unit_storage_throughput": {
       "description": "The throughput of the instance in MBps per TiB. Valid values are 125, 250,\n500, 1000.\nSee [Performance tiers and maximum storage\ncapacities](https://cloud.google.com/managed-lustre/docs/create-instance#performance-tiers)\nfor more information.\n\nIf the instance is using the Dynamic tier, this field must not be set or\nmust be set to zero.",
