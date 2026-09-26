@@ -2,8 +2,9 @@
 <h1 align="center">Terraform inputs</h1>
 
 > You generate a plan here mainly to **inspect it and find your attribute path**. You do
-> **not** commit `plan.json` — when you run the test harness (`auto_test.py`), it produces and
-> caches the plan for you under `inputs/plan_cache/`.
+> **not** commit the `plan` / `plan.json` you make by hand below — they are gitignored. The
+> test harness (`auto_test.py`) writes the plan that *is* committed: a `<sha>.json` in this
+> same directory, named for the hash of your `*.tf`. Commit that one, and nothing else.
 
 ### 1. terraform init
 

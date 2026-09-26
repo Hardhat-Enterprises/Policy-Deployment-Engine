@@ -1,0 +1,89 @@
+name: PR Target
+
+# Only `dev` and `main` are merge targets in this repo.
+#
+# There are no long-lived feature branches here. A
+# Service/<platform>/<service_slug>/<resource_type> branch belongs to ONE resource type and is
+# merged into dev exactly once, by the pull request the portal raises for it. Contributors were
+# doing two other things instead, and both leave a permanent trail of merges in the history that
+# says nothing about what actually reached dev — which is the only question the history is read
+# for:
+#
+#   * opening a sub-feature branch (feature/foo -> Service/.../bar) and merging it into their own
+#     service branch, several times per resource type;
+#   * opening a dev -> Service/... pull request to catch a branch up.
+#
+# Neither needs a pull request at all. Work goes straight onto the Service branch; catching up is
+# `git merge origin/dev` locally. So anything not targeting dev or main is closed here, with the
+# alternative spelled out on the pull request itself.
+#
+# `pull_request_target`, NOT `pull_request`: this needs `pull-requests: write` to comment and
+# close, and a `pull_request` run originating from a fork is handed a read-only token. The usual
+# hazard of pull_request_target does not apply — nothing from the contributor's branch is checked
+# out, built or executed here. The job reads the event payload and calls the API, so the elevated
+# token never meets contributor-controlled code.
+on:
+  pull_request_target:
+    types: [opened, reopened, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-target-${{ github.event.pull_request.number }}
+  # NOT cancel-in-progress: a superseded run here is one that was about to close a pull request.
+  cancel-in-progress: false
+
+jobs:
+  check_base:
+    name: PR target
+    runs-on: ubuntu-latest
+    # `edited` also fires for title and body edits; only a change of base is interesting here.
+    # Anything else would re-close a pull request every time someone fixed a typo.
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    permissions:
+      pull-requests: write
+    steps:
+      # A pull request targeting dev or main skips this step, so the check still reports green on
+      # every legitimate pull request rather than being silently absent from the list.
+      - name: Close pull requests that do not target dev or main
+        if: ${{ !contains(fromJSON('["dev", "main"]'), github.event.pull_request.base.ref) }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          # The message lives in a YAML block scalar, NOT a shell heredoc: a heredoc inside
+          # `run: |` carries this file's indentation into its output, and four leading spaces turn
+          # every line of Markdown into a code block. YAML strips block-scalar indentation, so what
+          # lands here starts at column zero.
+          #
+          # The branch names are interpolated HERE, into an env value, and never inside `run:`.
+          # That is the documented-safe place for it: Actions substitutes the expression into the
+          # variable's VALUE, so a contributor-controlled branch name never reaches a shell command
+          # line as syntax. Substituting them in bash instead would be worse than it looks — a
+          # pattern-substitution replacement treats `&` as "the text that matched" (bash 5.2+), so
+          # a branch containing `&` would quietly corrupt this message.
+          BODY: |
+            Closing this automatically — pull requests in this repository may only target `dev` or `main`, and this one targets `${{ github.event.pull_request.base.ref }}`.
+
+            **Nothing has been deleted.** Your commits are still on `${{ github.event.pull_request.head.ref }}`.
+
+            There are no long-lived feature branches in this repository. Your `Service/<platform>/<service>/<resource_type>` branch is where your work lives, and it is merged into `dev` once, by the pull request raised for you from the portal.
+
+            **If you were adding more work to your resource type**, commit straight to your `Service/...` branch. You do not need a second branch, and you do not need a pull request to get your own work onto your own branch.
+
+            **If you were catching your branch up with `dev`**, do that locally — no pull request needed:
+
+            ```
+            git checkout ${{ github.event.pull_request.head.ref }}
+            git fetch origin
+            git merge origin/dev
+            git push
+            ```
+
+            If this work really is ready for `dev`, change this pull request's target to `dev` and reopen it. Reopening it against `${{ github.event.pull_request.base.ref }}` will just close it again.
+        run: |
+          set -euo pipefail
+          printf '%s' "$BODY" > comment.md
+          gh pr comment "$PR" --repo "$REPO" --body-file comment.md
+          gh pr close "$PR" --repo "$REPO"

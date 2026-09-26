@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how Terraform handles resource destruction. Requiring PREVENT protects API Hub curations from accidental deletion, which could interrupt API metadata processing and curation workflows."
     },
     "description": {
       "description": "The description of the curation.",
@@ -27,8 +27,8 @@
       "description": "The display name of the curation.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable label only; it does not control access, authentication, encryption, network exposure, or resource lifecycle."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -65,8 +65,8 @@
       "description": "The endpoint URI should be a valid REST URI for triggering an Application\nIntegration.\nFormat:\n'https://integrations.googleapis.com/v1/{name=projects/*/locations/*/integrations/*}:execute'\nor\n'https://{location}-integrations.googleapis.com/v1/{name=projects/*/locations/*/integrations/*}:execute'",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "References the Application Integration endpoint URI the curation calls. This is a pointer to another resource/endpoint chosen by the team; we do not constrain references, and a generic policy could not enumerate approved URIs without hardcoding team-specific values."
+      "security_impact": true,
+      "rationale": "Controls the protocol used to deliver API metadata to the curation endpoint. A policy must require HTTPS to protect data in transit without restricting the endpoint host."
     }
   }
 }

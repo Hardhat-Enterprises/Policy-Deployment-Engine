@@ -7,7 +7,7 @@ resource "google_workstations_workstation_config" "non_compliant_example_1" {
   idle_timeout    = "600s"
   running_timeout = "21600s"
 
-  replica_zones = ["us-east1-a", "us-east1-b"]
+  replica_zones = ["us-central1-a", "us-central1-b"]
   annotations = {
     label-one = "value-one"
   }

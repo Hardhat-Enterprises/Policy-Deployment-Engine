@@ -3,6 +3,12 @@ package terraform.gcp.security.cloud_asset_inventory.google_cloud_asset_folder_f
 import data.terraform.helpers
 import data.terraform.gcp.security.cloud_asset_inventory.google_cloud_asset_folder_feed.vars
 
+# policy_lint reports hard-coded-value on the value below, and the finding stands.
+# A pattern whitelist only judges values that MATCH its target: one that does not
+# match the shape is never flagged at all. This argument's non-compliant example
+# is a bare topic name with no "projects/.../topics/" path, so converting would make the fixture pass for the wrong
+# reason. Either _helpers needs a pattern whitelist that fails a non-matching
+# value, or the fixture needs a wrongly-scoped (not malformed) example.
 conditions := [
     [
         {

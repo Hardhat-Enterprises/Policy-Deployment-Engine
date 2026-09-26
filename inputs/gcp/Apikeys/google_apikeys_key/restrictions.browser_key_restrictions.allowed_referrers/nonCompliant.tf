@@ -2,7 +2,7 @@
 
 resource "google_apikeys_key" "non_compliant_example_1" {
   name         = "non_compliant_example_1"
-  display_name = "Non-compliant browser key (public referrers)"
+  display_name = "Compliant browser key (no public referrers)"
   project = "my-gcp-project"
   
   restrictions {

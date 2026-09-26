@@ -2,7 +2,7 @@ resource "google_container_attached_cluster" "non_compliant_example_1" {
   name         = "non_compliant_example_1"
   location     = "us-west1"
   project      = "fake-project-id"
-  description  = "Non-compliant cluster with empty JWKS"
+  description  = "Compliant cluster with valid JWKS"
   distribution = "aks"
 
   oidc_config {

@@ -2,7 +2,7 @@
 resource "google_logging_project_sink" "non_compliant_example_1" {
   name                   = "non_compliant_example_1"
   project                = "my-project"
-  destination            = "storage.googleapis.com/logs-bucket"
+  destination            = "storage.googleapis.com/audit-logs-bucket"
   unique_writer_identity = false
   filter                 = "logName = \"projects/my-project/logs/cloudaudit.googleapis.com%2Factivity\""
 }
@@ -11,7 +11,7 @@ resource "google_logging_project_sink" "non_compliant_example_1" {
 resource "google_logging_project_sink" "non_compliant_example_2" {
   name                   = "non_compliant_example_2"
   project                = "my-project"
-  destination            = "pubsub.googleapis.com/projects/my-project/topics/logs"
+  destination            = "bigquery.googleapis.com/projects/security-project/datasets/audit_logs"
   unique_writer_identity = false
   filter                 = "logName = \"projects/my-project/logs/cloudaudit.googleapis.com%2Factivity\""
 }
