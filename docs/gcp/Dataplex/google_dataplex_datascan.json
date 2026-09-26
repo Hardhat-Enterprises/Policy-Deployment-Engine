@@ -48,8 +48,8 @@
       "description": "N/A",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the project that owns the scan and its inherited IAM and organisation-policy context. Policy should restrict the effective project to an approved set, accounting for the provider project when this argument is omitted."
+      "security_impact": false,
+      "rationale": "Identifies the project that owns the DataScan. This is a team-owned project identifier/reference, and platform policy does not constrain which specific project a team uses; security controls should instead be applied to the referenced project's own configuration."
     },
     "data": {
       "type": "block",
@@ -60,15 +60,15 @@
       "description": "The Dataplex entity that represents the data source(e.g. BigQuery table) for Datascan.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the Dataplex entity whose underlying data will be scanned. Policy should allow only approved entity references to keep processing within the authorised data scope; the execution identity's IAM permissions remain necessary."
+      "security_impact": false,
+      "rationale": "References a Dataplex entity used as the scan data source. This is a pointer to another team-owned resource, so its security should be enforced on the referenced entity and underlying resource rather than by restricting specific entity identifiers here."
     },
     "data.resource": {
       "description": "The service-qualified full resource name of the cloud resource for a DataScan job to scan against. The field could be:\nCloud Storage bucket (//storage.googleapis.com/projects/PROJECT_ID/buckets/BUCKET_ID) for DataDiscoveryScan OR BigQuery table of type \"TABLE\" (/bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID) for DataProfileScan/DataQualityScan.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines the source bucket or table processed by the scan. Policy should validate the full resource reference against approved source projects and resources, rather than accepting any syntactically valid data source."
+      "security_impact": false,
+      "rationale": "References the Cloud Storage bucket or BigQuery table used as the scan data source. This field is a pointer to another team-owned resource, whose IAM and security configuration should be enforced on that resource rather than by restricting specific resource names here."
     },
     "data_discovery_spec": {
       "type": "block",
@@ -84,8 +84,8 @@
       "description": "The BigQuery connection used to create BigLake tables. Must be in the form 'projects/{projectId}/locations/{locationId}/connections/{connection_id}'.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the connection whose credentials provide access to data through published BigLake tables. Policy should restrict the connection to approved full resource names; its service account permissions must be checked separately for least privilege."
+      "security_impact": false,
+      "rationale": "References the BigQuery connection used when publishing BigLake tables. This is a pointer to another resource, and its IAM and credential permissions should be secured on the referenced connection rather than by restricting specific connection names here."
     },
     "data_discovery_spec.bigquery_publishing_config.location": {
       "description": "The location of the BigQuery dataset to publish BigLake external or non-BigLake external tables to.",
@@ -98,15 +98,15 @@
       "description": "The project of the BigQuery dataset to publish BigLake external or non-BigLake external tables to. If not specified, the project of the Cloud Storage bucket will be used. The format is \"projects/{project_id_or_number}\".",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the project receiving discovered table metadata and its associated access-control context. Policy should restrict the effective publishing project to approved destinations, including the source bucket project used when this value is omitted."
+      "security_impact": false,
+      "rationale": "Identifies the project containing the BigQuery dataset used for publishing. This is a team-owned project identifier/reference, and platform policy cannot generically constrain which specific project a team uses."
     },
     "data_discovery_spec.bigquery_publishing_config.table_type": {
       "description": "Determines whether to publish discovered tables as BigLake external tables or non-BigLake external tables. Possible values: [\"TABLE_TYPE_UNSPECIFIED\", \"EXTERNAL\", \"BIGLAKE\"]",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Changes the data-access model: EXTERNAL uses the querying user's credentials, while BIGLAKE uses the associated connection's credentials. Policy should enforce the approved model for the data source and account for the default EXTERNAL behaviour."
+      "rationale": "The accepted values include TABLE_TYPE_UNSPECIFIED, which is an unspecified sentinel value. Policy should forbid TABLE_TYPE_UNSPECIFIED and require an explicit supported value, while leaving the choice between EXTERNAL and BIGLAKE to the team."
     },
     "data_discovery_spec.storage_config": {
       "type": "block",
@@ -117,15 +117,15 @@
       "description": "Defines the data to exclude during discovery. Provide a list of patterns that identify the data to exclude. For Cloud Storage bucket assets, these patterns are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these patterns are interpreted as patterns to match table names.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Can keep sensitive source paths out of discovery and subsequent table publication. Policy should enforce the approved exclusions for each source where exclusions are required, considering their effect together with include_patterns."
+      "security_impact": false,
+      "rationale": "Defines source paths or tables excluded from discovery. Which paths should be excluded depends on each team's data and discovery requirements, so there is no generic insecure value that platform policy can enforce."
     },
     "data_discovery_spec.storage_config.include_patterns": {
       "description": "Defines the data to include during discovery when only a subset of the data should be considered. Provide a list of patterns that identify the data to include. For Cloud Storage bucket assets, these patterns are interpreted as glob patterns used to match object names. For BigQuery dataset assets, these patterns are interpreted as patterns to match table names.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines the source paths eligible for discovery and table publication. Policy should restrict patterns to the approved discovery scope and allow unrestricted selection only for sources approved for whole-source discovery."
+      "security_impact": false,
+      "rationale": "Defines source paths or tables included in discovery. The appropriate discovery scope is specific to each team's data and requirements, so there is no generic insecure value that platform policy can enforce."
     },
     "data_discovery_spec.storage_config.csv_options": {
       "type": "block",
@@ -201,14 +201,14 @@
       "required": false,
       "type": "bool",
       "security_impact": true,
-      "rationale": "Controls publication of profile results, which can include common field values, into catalog metadata. Policy should enforce the approved publication setting for the data classification, allowing publication only where the catalog audience is authorised for those results."
+      "rationale": "Enabling this setting publishes DataProfileScan results to Dataplex Catalog, potentially exposing derived profile information such as common field values more broadly. Policy should require catalog publishing to remain disabled or unset."
     },
     "data_profile_spec.row_filter": {
       "description": "A filter applied to all rows in a single DataScan job. The filter needs to be a valid SQL expression for a WHERE clause in BigQuery standard SQL syntax. Example: col1 >= 0 AND col2 < 10",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Contains SQL that selects the rows processed for profiling and can help exclude sensitive records. Policy should permit only reviewed filter expressions for restricted scans, with omission allowed when the entire source is approved for profiling; IAM remains the access boundary."
+      "security_impact": false,
+      "rationale": "Contains a free-form SQL WHERE expression that determines which rows are profiled. The appropriate expression depends on the team's schema and profiling requirements, and arbitrary SQL cannot be generically constrained without assuming team-specific content."
     },
     "data_profile_spec.sampling_percent": {
       "description": "The percentage of the records to be selected from the dataset for DataScan.\nValue can range between 0.0 and 100.0 with up to 3 significant decimal digits.\nSampling is not applied if 'sampling_percent' is not specified, 0 or 100.",
@@ -226,8 +226,8 @@
       "description": "Expected input is a list of fully qualified names of fields as in the schema.\nOnly top-level field names for nested fields are supported.\nFor instance, if 'x' is of nested field type, listing 'x' is supported but 'x.y.z' is not supported. Here 'y' and 'y.z' are nested fields of 'x'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Excludes columns from profiling, reducing the risk of sensitive values appearing in profile results. Policy should enforce required sensitive-field exclusions for each source and use the supported top-level field names for nested data."
+      "security_impact": false,
+      "rationale": "Specifies fields excluded from profiling. Which fields should be excluded depends on the team's schema and data classification, so a generic platform policy cannot determine specific field names that must be excluded."
     },
     "data_profile_spec.include_fields": {
       "type": "block",
@@ -238,8 +238,8 @@
       "description": "Expected input is a list of fully qualified names of fields as in the schema.\nOnly top-level field names for nested fields are supported.\nFor instance, if 'x' is of nested field type, listing 'x' is supported but 'x.y.z' is not supported. Here 'y' and 'y.z' are nested fields of 'x'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Selects columns eligible for profiling and inclusion in result statistics. Policy should restrict the effective selection to approved fields, considering exclusions and the default inclusion of all fields when no selection is specified."
+      "security_impact": false,
+      "rationale": "Specifies fields included in profiling. Field selection depends on each team's schema and profiling requirements, so there is no schema-independent insecure field list that platform policy can generically forbid."
     },
     "data_profile_spec.post_scan_actions": {
       "type": "block",
@@ -255,8 +255,8 @@
       "description": "The BigQuery table to export DataProfileScan results to.\nFormat://bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Determines where potentially sensitive profiling results are copied. When export is configured, policy should allow only approved destination tables; destination IAM, encryption, and retention protections must be assessed on the BigQuery resources separately."
+      "security_impact": false,
+      "rationale": "References the BigQuery table receiving exported profile results. This is a pointer to another team-owned resource, whose IAM, encryption, and other protections should be enforced on the referenced table rather than by restricting specific table names here."
     },
     "data_quality_spec": {
       "type": "block",
@@ -267,15 +267,15 @@
       "description": "If set, the latest DataScan job result will be published to Dataplex Catalog.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether quality results are copied into catalog metadata, creating another place where dataset and rule information can be viewed. Policy should enforce the approved publication setting for the source's classification and intended catalog audience."
+      "security_impact": false,
+      "rationale": "Controls whether DataQualityScan results are published to Dataplex Catalog. This is an internal discoverability and governance choice, while access to catalog information is controlled through the catalog's own IAM configuration."
     },
     "data_quality_spec.enable_catalog_based_rules": {
       "description": "If set to true, the scan will retrieve rules defined in Data Catalog for the resource.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Allows catalog-maintained rules, potentially containing SQL, to determine what the scan executes. Policy should enable this mode only for sources approved to use centrally controlled rules; reviewed inline rules remain a valid alternative. Catalog edit permissions require separate review."
+      "security_impact": false,
+      "rationale": "Controls whether quality rules are obtained from Data Catalog rather than defined inline. Choosing where rule definitions are maintained is an architectural and governance decision, and neither boolean value is generically insecure."
     },
     "data_quality_spec.filter": {
       "description": "A filter to selectively run a subset of rules.",
@@ -288,8 +288,8 @@
       "description": "A filter applied to all rows in a single DataScan job. The filter needs to be a valid SQL expression for a WHERE clause in BigQuery standard SQL syntax. Example: col1 >= 0 AND col2 < 10",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Supplies SQL used to select records processed by the quality scan. Policy should restrict configured expressions to reviewed filters and approved references, allowing an omitted filter for approved full-source processing; the filter does not replace row-level access policies."
+      "security_impact": false,
+      "rationale": "Contains a free-form SQL WHERE expression that scopes rows processed by the quality scan. The appropriate expression depends on team-specific data and requirements, and no generic platform rule can meaningfully constrain arbitrary filter content."
     },
     "data_quality_spec.sampling_percent": {
       "description": "The percentage of the records to be selected from the dataset for DataScan.\nValue can range between 0.0 and 100.0 with up to 3 significant decimal digits.\nSampling is not applied if 'sampling_percent' is not specified, 0 or 100.",
@@ -312,8 +312,8 @@
       "description": "The BigQuery table to export DataQualityScan results to.\nFormat://bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects the destination receiving quality results and associated source and rule metadata. When export is configured, policy should restrict the full table reference to approved destinations, with destination access and retention checked separately."
+      "security_impact": false,
+      "rationale": "References the BigQuery table receiving exported quality results. This is a pointer to another team-owned resource, whose IAM and other security controls should be enforced on the referenced table rather than by restricting specific table identifiers here."
     },
     "data_quality_spec.post_scan_actions.notification_report": {
       "type": "block",
@@ -339,8 +339,8 @@
       "description": "The email recipients who will receive the DataQualityScan results report.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Determines who receives emailed scan reports. Policy should validate every recipient against approved addresses or precisely matched domains to prevent disclosure of quality results and dataset information to unintended recipients."
+      "security_impact": false,
+      "rationale": "Specifies email addresses that receive DataQualityScan reports. Valid recipients and domains are team-specific, so platform policy cannot generically determine or whitelist the appropriate addresses without hardcoding team-owned identifiers."
     },
     "data_quality_spec.post_scan_actions.notification_report.score_threshold_trigger": {
       "type": "block",
@@ -474,8 +474,8 @@
       "description": "The SQL expression.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Supplies executable SQL that can include subqueries or routine calls. Policy should allow only reviewed expressions and approved referenced resources to constrain query scope within the execution identity's permissions."
+      "security_impact": false,
+      "rationale": "Contains a free-form SQL expression used by the quality rule. The expression depends on team-specific schemas and requirements, and arbitrary SQL content cannot be generically constrained without hardcoding specific approved expressions or resources."
     },
     "data_quality_spec.rules.set_expectation": {
       "type": "block",
@@ -498,8 +498,8 @@
       "description": "The SQL statement.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Provides the SQL query executed for an assertion and can reference data beyond the declared source. Policy should allow only reviewed query statements and approved references, preserving required source filters where applicable; keyword checks alone cannot establish query safety."
+      "security_impact": false,
+      "rationale": "Contains a free-form SQL statement used by the quality assertion. Its valid contents depend on team-specific data and requirements, so a generic platform policy cannot meaningfully constrain the statement without hardcoding specific queries or resources."
     },
     "data_quality_spec.rules.statistic_range_expectation": {
       "type": "block",
@@ -524,8 +524,8 @@
       "description": "column statistics. Possible values: [\"STATISTIC_UNDEFINED\", \"MEAN\", \"MIN\", \"MAX\"]",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Selects the aggregate metric evaluated by the rule. Choosing a mean, minimum, or maximum is an analytical decision and does not configure resource security."
+      "security_impact": true,
+      "rationale": "The accepted values include STATISTIC_UNDEFINED, which is an unspecified sentinel value. Policy should forbid STATISTIC_UNDEFINED and require an explicit statistic, while leaving the choice among MEAN, MIN, and MAX to the team."
     },
     "data_quality_spec.rules.statistic_range_expectation.strict_max_enabled": {
       "description": "Whether column statistic needs to be strictly lesser than ('<') the maximum, or if equality is allowed.\nOnly relevant if a maxValue has been defined. Default = false.",
@@ -550,8 +550,8 @@
       "description": "The SQL expression.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Provides executable SQL for a table-level check, including possible references to other tables or routines. Policy should restrict it to reviewed expressions and approved references, with execution permissions independently limited through IAM."
+      "security_impact": false,
+      "rationale": "Contains a free-form SQL expression used for a table-level quality condition. The valid expression depends on team-specific schemas and requirements, so arbitrary SQL cannot be generically constrained without hardcoding specific approved expressions or resources."
     },
     "data_quality_spec.rules.template_reference": {
       "type": "block",
@@ -562,8 +562,8 @@
       "description": "The resource name of the template entry.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Selects an external catalog template that supplies SQL for execution. Policy should allow only approved full template references, with template contents and editing permissions reviewed separately to prevent unreviewed query changes."
+      "security_impact": false,
+      "rationale": "References an external rule template entry. This is a pointer to another team-owned resource, so security should be enforced on the referenced template and its permissions rather than by restricting specific template names here."
     },
     "data_quality_spec.rules.template_reference.values": {
       "type": "block",
@@ -581,8 +581,8 @@
       "description": "The string representation of the parameter value.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Provides text substituted into an executable SQL template. Policy should validate each name-value pair against the approved template's parameter constraints, including permitted resource references, so substitution cannot expand the reviewed query scope."
+      "security_impact": false,
+      "rationale": "Provides a free-form parameter value substituted into a rule template. Valid values depend on the selected team-specific template and its parameters, so they cannot be generically constrained without assuming specific template contents."
     },
     "data_quality_spec.rules.uniqueness_expectation": {
       "type": "block",
@@ -609,7 +609,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "Determines the service account whose credentials execute the scan. Policy should restrict supplied addresses to approved scan identities; least-privilege IAM grants and impersonation permissions require separate validation, and an approved email alone does not prove minimal privileges."
+      "rationale": "Determines the service account used to execute the DataScan. Policy should require an explicit non-default service account and prevent use of the default Compute Engine service account, without requiring a hardcoded allowlist of specific service account addresses."
     },
     "execution_identity.user_credential": {
       "type": "block",
@@ -647,8 +647,8 @@
       "description": "Time to live for the DataScan and its results after the one-time run completes. Accepts a string with a unit suffix 's' (e.g., '7200s'). Default is 24 hours. Ranges between 0 and 31536000 seconds (1 year).",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls retention of the one-time scan and its results. Policy should enforce approved minimum and maximum retention periods to preserve required evidence without retaining sensitive results unnecessarily, accounting for the default duration and immediate deletion at zero."
+      "security_impact": false,
+      "rationale": "Controls how long a one-time DataScan and its results are retained after completion. Retention duration is a team-specific data-management and operational choice rather than a generic platform security control."
     },
     "execution_spec.trigger.schedule": {
       "type": "block",
