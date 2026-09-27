@@ -55,15 +55,15 @@
       "description": "Metadata key/value pairs to make available from within instances created from this template.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Free-form instance metadata can contain plaintext secrets, credentials, tokens, or other sensitive values. A platform policy can restrict unsafe metadata usage to reduce credential exposure and improve credential hygiene."
+      "security_impact": false,
+      "rationale": "This is a free-form metadata map whose keys are chosen by users or teams. A generic platform policy cannot reliably identify arbitrary secret-bearing keys, and blocking the map as a whole would also prevent legitimate reserved metadata keys."
     },
     "metadata_startup_script": {
       "description": "An alternative to using the startup-script metadata key, mostly to match the compute_instance resource. This replaces the startup-script metadata key on the created instance and thus the two mechanisms are not allowed to be used simultaneously.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Startup scripts execute commands when instances initialise and can embed secrets or run unverified commands. A platform policy can restrict inline startup scripts to reduce script-injection and credential-exposure risks."
+      "security_impact": false,
+      "rationale": "This field contains arbitrary free-form startup script content. There is no single concrete insecure value or structure that a generic platform policy can reliably forbid, so it is not treated as a viable generic policy target."
     },
     "min_cpu_platform": {
       "description": "Specifies a minimum CPU platform. Applicable values are the friendly names of CPU platforms, such as Intel Haswell or Intel Skylake.",
@@ -104,8 +104,8 @@
       "description": "A map of resource manager tags.\n\t\t\t\tResource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Resource Manager tags can support attribute-based access control and security baselines. A platform policy can require mandatory security tags to be present without hardcoding organisation-specific tag values."
+      "security_impact": false,
+      "rationale": "This field is a map of organisation-defined Resource Manager tag keys and values. Because the keys are organisation-specific and cannot be named generically, a reusable platform policy cannot enforce a specific mandatory security tag here."
     },
     "resource_policies": {
       "description": "A list of self_links of resource policies to attach to the instance. Currently a max of 1 resource policy is supported.",
@@ -118,8 +118,8 @@
       "description": "Tags to attach to the instance.",
       "required": false,
       "type": "set(string)",
-      "security_impact": true,
-      "rationale": "Instance network tags can act as firewall targets. Unconstrained or overly broad tags can expose instances to unintended traffic or bypass security boundaries, so a platform policy can restrict their use."
+      "security_impact": false,
+      "rationale": "Network tags are labels consumed by firewall rules rather than security controls by themselves. The actual exposure decision is enforced by firewall resources, and there is no universally insecure tag value that can be forbidden generically."
     },
     "advanced_machine_features": {
       "type": "block",
@@ -151,8 +151,8 @@
       "description": "The number of threads per physical core. To disable simultaneous multithreading (SMT) set this to 1. If unset, the maximum number of threads supported per core by the underlying processor is assumed.",
       "required": false,
       "type": "number",
-      "security_impact": false,
-      "rationale": "Controls CPU threading and performance characteristics. It is an operational tuning choice rather than a generic security control."
+      "security_impact": true,
+      "rationale": "This setting controls simultaneous multithreading. Requiring threads_per_core=1 disables SMT and can reduce exposure to cross-thread side-channel risks, giving this field a concrete enforceable security configuration."
     },
     "advanced_machine_features.turbo_mode": {
       "description": "Turbo frequency mode to use for the instance. Currently supported modes is \"ALL_CORE_MAX\".",
@@ -177,8 +177,8 @@
       "description": "\n\t\t\t\t\t\t\t\tThe confidential computing technology the instance uses.\n\t\t\t\t\t\t\t\tSEV is an AMD feature. TDX is an Intel feature. One of the following\n\t\t\t\t\t\t\t\tvalues is required: SEV, SEV_SNP, TDX. If SEV_SNP, min_cpu_platform =\n\t\t\t\t\t\t\t\t\"AMD Milan\" is currently required.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Chooses among supported confidential-computing technologies. The security control is whether confidential compute is enabled; the specific technology is a compatibility and workload choice."
+      "security_impact": true,
+      "rationale": "The available confidential-computing technologies provide different security properties. A policy can exclude weaker confidential-instance options and require a stronger supported technology where the security requirements demand it."
     },
     "confidential_instance_config.enable_confidential_compute": {
       "description": "Defines whether the instance should have confidential compute enabled. Field will be deprecated in a future release.",
@@ -287,8 +287,8 @@
       "description": "A map of resource manager tags. Resource manager tag keys and values have the same definition as resource manager tags. Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456. The field is ignored (both PUT & PATCH) when empty.",
       "required": false,
       "type": "map(string)",
-      "security_impact": true,
-      "rationale": "Disk Resource Manager tags can support data classification and compliance controls. A platform policy can require mandatory security-tag presence while leaving organisation-specific tag keys and values configurable."
+      "security_impact": false,
+      "rationale": "This field is a free-form map of organisation-specific Resource Manager tag key IDs and values. Because those identifiers are organisation-defined, a generic reusable policy cannot name a universally required security tag."
     },
     "disk.resource_policies": {
       "description": "A list (short name or id) of resource policies to attach to this disk. Currently a max of 1 resource policy is supported.",
@@ -393,8 +393,8 @@
       "description": "The self link of the encryption key that is stored in\nGoogle Cloud KMS. Only one of kms_key_self_link, rsa_encrypted_key and raw_key may be set.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the Cloud KMS key used with the encrypted source snapshot. A platform policy can require a non-blank customer-managed key reference without pinning a specific key name."
+      "security_impact": false,
+      "rationale": "This field identifies the KMS key used to decrypt a source snapshot that was already customer-key encrypted. Leaving it unset is valid for snapshots that do not require that key, so there is no universal insecure value to forbid."
     },
     "disk.source_snapshot_encryption_key.kms_key_service_account": {
       "description": "The service account being used for the encryption\nrequest for the given KMS key. If absent, the Compute\nEngine default service account is used.",
@@ -494,16 +494,15 @@
       "description": "The name of the subnetwork to attach this interface to. The subnetwork must exist in the same region this instance will be created in. Either network or subnetwork must be provided.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls which subnetwork the instance joins. Restricting deployment to approved, compliant subnets is a core network-exposure and isolation control. A platform policy can enforce approved subnet paths or patterns without pinning a specific subnet."
-    
+      "security_impact": false,
+      "rationale": "This field is a reference to another subnetwork resource rather than a security control on the instance template itself. Network exposure is determined by properties and controls on the referenced network and related resources."
     },
     "network_interface.subnetwork_project": {
       "description": "The ID of the project in which the subnetwork belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls the project from which the attached subnetwork is selected. Cross-project network attachment can cross security boundaries, so a platform policy can restrict subnet projects to approved environments without pinning a specific project identifier."
+      "security_impact": false,
+      "rationale": "This field identifies the project that owns the referenced subnetwork. It is a cross-resource reference rather than a direct security control, and a generic policy cannot name universally approved project identifiers."
     },
     "network_interface.vlan": {
       "description": "VLAN tag of a dynamic network interface, must be an integer in the range from 2 to 255 inclusively.",
@@ -521,8 +520,8 @@
       "description": "The IP address that will be 1:1 mapped to the instance's network ip. If not given, one will be generated.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Assigns an external IPv4 address to the instance through an access configuration, increasing Internet exposure. A policy can restrict or prohibit explicit public IP assignment."
+      "security_impact": false,
+      "rationale": "This field identifies a NAT IP address, but leaving it unset can still result in an automatically assigned external address. Exposure is therefore controlled by the presence of the access_config block rather than by this specific address value."
     },
     "network_interface.access_config.network_tier": {
       "description": "The networking tier used for configuring this instance template. This field can take the following values: PREMIUM, STANDARD, FIXED_STANDARD. If this field is not specified, it is assumed to be PREMIUM.",
@@ -559,8 +558,8 @@
       "description": "The service-level to be provided for IPv6 traffic when the subnet has an external subnet. Only PREMIUM tier is valid for IPv6",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This leaf exists inside an IPv6 access configuration that provides external IPv6 Internet access. A policy can reject this configuration where instances must remain privately addressed."
+      "security_impact": false,
+      "rationale": "This field does not provide a meaningful insecure alternative that can be forbidden generically. External IPv6 exposure is determined by the presence of the IPv6 access configuration rather than by this network-tier value."
     },
     "network_performance_config": {
       "type": "block",
