@@ -1,7 +1,7 @@
 package terraform.gcp.security.beyondcorp.google_beyondcorp_security_gateway_application_iam_binding.vars
 
 variables := {
-  "friendly_resource_name": "BeyondCorp GCP managed IAM Binding",
+  "friendly_resource_name": "BeyondCorp Security Gateway Application IAM Binding",
   "resource_type":  "google_beyondcorp_security_gateway_application_iam_binding",
   "resource_value_name" : "security_gateway_id"
 }

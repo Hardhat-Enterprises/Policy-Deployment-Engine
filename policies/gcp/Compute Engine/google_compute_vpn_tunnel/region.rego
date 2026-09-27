@@ -1,0 +1,25 @@
+package terraform.gcp.security.compute_engine.google_compute_vpn_tunnel.region 
+import data.terraform.helpers
+import data.terraform.gcp.security.compute_engine.google_compute_vpn_tunnel.vars
+
+conditions := [
+    [
+        {
+            "situation_description": "Resource region is outside approved Australian regions",
+            "remedies": [
+                "Set region to australia-southeast1 (Sydney)",
+                "Set region to australia-southeast2 (Melbourne)"
+            ]
+        },
+        {
+            "condition": "region must be an approved Australian region",
+            "attribute_path": ["region"],
+            "values": [ "australia-southeast1",  "australia-southeast2"],
+            "policy_type": "whitelist"
+        }
+    ]
+]
+
+result  := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details

@@ -9,7 +9,7 @@ conditions := [
     {
         "condition": "Ensure the encryption key is from an approved KMS key ring and location",
         "attribute_path" : ["template",0,"encryption_key"], 
-        "values" : ["projects/my-project/locations/*/keyRings/*/cryptoKeys/*", [["australia-southeast1","australia-southeast2"],["my-keyring"],["my-key"]]], 
+        "values" : ["projects/*/locations/*/keyRings/*/cryptoKeys/*", [["my-project"],["australia-southeast1","australia-southeast2"],["my-keyring"],["my-key"]]], 
         "policy_type" : "pattern whitelist" 
     }
     ]

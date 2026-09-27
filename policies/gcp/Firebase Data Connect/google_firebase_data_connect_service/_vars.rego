@@ -1,4 +1,4 @@
-package terraform.gcp.security.Firebase_Data_Connect.google_firebase_data_connect_service.vars
+package terraform.gcp.security.firebase_data_connect.google_firebase_data_connect_service.vars
 
 
 variables := {

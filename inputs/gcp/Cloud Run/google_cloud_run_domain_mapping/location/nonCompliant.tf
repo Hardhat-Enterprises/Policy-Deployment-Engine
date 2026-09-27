@@ -9,6 +9,6 @@ resource "google_cloud_run_domain_mapping" "non_compliant_example_1" {
   }
 
   spec {
-    route_name = "nc"
+    route_name = "c"
   }
 }

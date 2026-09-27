@@ -1,8 +1,8 @@
 resource "google_cloudbuildv2_connection" "non_compliant_example_1" {
   project  = "non_compliant_example_1"
-  location = "us-central1"
-  name     = "my-connection"
-  disabled = true
+  location = "australia-southeast2"
+  name     = "non_compliant_example_1"
+  disabled = false
 
   github_enterprise_config {
     host_uri                      = "https://ghe.example.com"

@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform may delete the generator or abandon it outside Terraform management. A platform policy can require PREVENT to reduce accidental destructive loss and avoid unmanaged resources."
     },
     "description": {
       "description": "Optional. Human readable description of the generator.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable description only. Constraining descriptive text would not improve the generator's security."
     },
     "generator_id": {
       "description": "Optional. The ID to use for the generator, which will become the final component of the generator's resource name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the generator's resource identifier. Platform policy should not constrain team-specific resource names or IDs."
     },
     "location": {
       "description": "desc",
@@ -34,22 +34,22 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the project that owns the generator. Platform policy should not constrain team-specific project identifiers or references."
     },
     "published_model": {
       "description": "Optional. The published Large Language Model name. * To use the latest model version, specify the model name without version number. Example: text-bison * To use a stable model version, specify the version number as well. Example: text-bison@002.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the published LLM and optional model version used by the generator. This is a functional model choice, and enforcing particular model names would require team-specific values rather than a generic security rule."
     },
     "trigger_event": {
       "description": "Optional. The trigger event of the generator. It defines when the generator is triggered in a conversation. Possible values: [\"END_OF_UTTERANCE\", \"MANUAL_CALL\", \"CUSTOMER_MESSAGE\", \"AGENT_MESSAGE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines when the generator is triggered during a conversation. The available values represent functional behaviour, and none is inherently insecure enough to justify a generic platform-level restriction."
     },
     "inference_parameter": {
       "type": "block",
@@ -60,29 +60,29 @@
       "description": "Optional. Maximum number of the output tokens for the generator.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Limits the maximum generated output size. This primarily affects cost, latency, and response length rather than a platform security control."
     },
     "inference_parameter.temperature": {
       "description": "Optional. Controls the randomness of LLM predictions. Low temperature = less random. High temperature = more random. If unset (or 0), uses a default value of 0.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the randomness of generated responses. It affects model behaviour and output quality, not access, exposure, encryption, or another enforceable security boundary."
     },
     "inference_parameter.top_k": {
       "description": "Optional. Top-k changes how the model selects tokens for output. A top-k of 1 means the selected token is the most probable among all tokens in the model's vocabulary (also called greedy decoding), while a top-k of 3 means that the next token is selected from among the 3 most probable tokens (using temperature). For each token selection step, the top K tokens with the highest probabilities are sampled. Then tokens are further filtered based on topP with the final token selected using temperature sampling. Specify a lower value for less random responses and a higher value for more random responses. Acceptable value is [1, 40], default to 40.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls token sampling during generation. It is a model-quality setting and does not provide a generic platform-level security control."
     },
     "inference_parameter.top_p": {
       "description": "Optional. Top-p changes how the model selects tokens for output. Tokens are selected from most K (see topK parameter) probable to least until the sum of their probabilities equals the top-p value. For example, if tokens A, B, and C have a probability of 0.3, 0.2, and 0.1 and the top-p value is 0.5, then the model will select either A or B as the next token (using temperature) and doesn't consider C. The default top-p value is 0.95. Specify a lower value for less random responses and a higher value for more random responses. Acceptable value is [0.0, 1.0], default to 0.95.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls probability-based token sampling during generation. It affects response behaviour rather than the security of the resource."
     },
     "summarization_context": {
       "type": "block",
@@ -93,15 +93,15 @@
       "description": "Optional. The target language of the generated summary. The language code for conversation will be used if this field is empty. Supported 2.0 and later versions.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the language of generated summaries. This is a functional output preference and does not improve security when constrained."
     },
     "summarization_context.version": {
       "description": "Optional. Version of the feature. If not set, default to latest version. Current candidates are [\"1.0\"].",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the summarization feature version. Version selection is a functional compatibility choice, and the documented values do not expose a clear insecure configuration requiring platform policy."
     },
     "summarization_context.few_shot_examples": {
       "type": "block",
@@ -112,8 +112,8 @@
       "description": "Optional. Key is the placeholder field name in input, value is the value of the placeholder. E.g. instruction contains \"@price\", and ingested data has <\"price\", \"10\">",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Stores free-form placeholder values used by few-shot examples. A generic policy cannot meaningfully determine which arbitrary values are sensitive without overreaching into team-owned example content."
     },
     "summarization_context.few_shot_examples.conversation_context": {
       "type": "block",
@@ -129,29 +129,29 @@
       "description": "Optional. Create time of the message entry.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Records the creation time of an example message. It is example metadata and does not control the security of the generator."
     },
     "summarization_context.few_shot_examples.conversation_context.message_entries.language_code": {
       "description": "Optional. The language of the text.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the language of an example message. This is functional metadata and is not a useful security policy target."
     },
     "summarization_context.few_shot_examples.conversation_context.message_entries.role": {
       "description": "Optional. Participant role of the message. Possible values: [\"HUMAN_AGENT\", \"AUTOMATED_AGENT\", \"END_USER\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the participant role represented by an example message. The allowed roles are functional values and do not create a platform-level security control."
     },
     "summarization_context.few_shot_examples.conversation_context.message_entries.text": {
       "description": "Optional. Transcript content of the message.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains free-form example transcript text. Although teams should avoid sensitive production data, a generic platform policy cannot reliably inspect or constrain arbitrary conversation content."
     },
     "summarization_context.few_shot_examples.output": {
       "type": "block",
@@ -172,15 +172,15 @@
       "description": "Required. Name of the section.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the name of an example summary section. It is descriptive structure and does not affect resource security."
     },
     "summarization_context.few_shot_examples.output.summary_suggestion.summary_sections.summary": {
       "description": "Required. Summary text for the section.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains free-form example summary text. A generic policy cannot reliably determine whether arbitrary summary content is sensitive, so constraining it would be impractical and overreaching."
     },
     "summarization_context.few_shot_examples.summarization_section_list": {
       "type": "block",
@@ -196,22 +196,22 @@
       "description": "Optional. Definition of the section, for example, \"what the customer needs help with or has question about.\"",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Describes what an example summarization section should contain. It is free-form model guidance rather than a platform security control."
     },
     "summarization_context.few_shot_examples.summarization_section_list.summarization_sections.key": {
       "description": "Optional. Name of the section, for example, \"situation\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the key or name of an example summarization section. It is an identifier within the generator configuration and not a security policy target."
     },
     "summarization_context.few_shot_examples.summarization_section_list.summarization_sections.type": {
       "description": "Optional. Type of the summarization section. Possible values: [\"SITUATION\", \"ACTION\", \"RESOLUTION\", \"REASON_FOR_CANCELLATION\", \"CUSTOMER_SATISFACTION\", \"ENTITIES\", \"CUSTOMER_DEFINED\", \"SITUATION_CONCISE\", \"ACTION_CONCISE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the functional type of an example summarization section. The available values do not represent secure versus insecure configurations."
     },
     "summarization_context.summarization_sections": {
       "type": "block",
@@ -222,22 +222,22 @@
       "description": "Optional. Definition of the section, for example, \"what the customer needs help with or has question about.\"",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Describes the content expected in a summary section. It is free-form functional guidance and cannot be meaningfully constrained by a generic security policy."
     },
     "summarization_context.summarization_sections.key": {
       "description": "Optional. Name of the section, for example, \"situation\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the name or key of a summary section. Platform policy should not constrain descriptive or team-defined identifiers."
     },
     "summarization_context.summarization_sections.type": {
       "description": "Optional. Type of the summarization section. Possible values: [\"SITUATION\", \"ACTION\", \"RESOLUTION\", \"REASON_FOR_CANCELLATION\", \"CUSTOMER_SATISFACTION\", \"ENTITIES\", \"CUSTOMER_DEFINED\", \"SITUATION_CONCISE\", \"ACTION_CONCISE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the functional type of the summary section. The available types do not create a clear security weakness that a platform policy should restrict."
     }
   }
 }

@@ -1,6 +1,6 @@
 resource "google_model_armor_template" "non_compliant_example_1" {
    template_id = "non_compliant_example_1"
-   project = "nc project"
+   project = "c project"
   location    = "global"
 
   filter_config {

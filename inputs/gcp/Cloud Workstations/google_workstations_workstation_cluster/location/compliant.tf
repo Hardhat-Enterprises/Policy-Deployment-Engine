@@ -1,6 +1,6 @@
 resource "google_workstations_workstation_cluster" "compliant_example_1" {
   project                = "925810350503"
-  workstation_cluster_id = "workstation-cluster"
+  workstation_cluster_id = "compliant_example_1"
   network                = "c"
   subnetwork             = "c"
   location               = "us-central1"

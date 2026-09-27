@@ -48,8 +48,8 @@ conditions := [
         {
             "condition": "grantees must not contain direct user principals",
             "attribute_path": ["grantees"],
-            "values": ["principal://iam.googleapis.com/users/alice@example.com"],
-            "policy_type": "blacklist"
+            "values": ["principal://iam.googleapis.com/users/"],
+            "policy_type": "element blacklist"
         }
     ]
 ]

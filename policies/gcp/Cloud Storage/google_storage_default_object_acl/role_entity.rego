@@ -14,14 +14,17 @@ conditions := [
 
     {
       "condition": "Public access to objects should be prohibited.",
-      "attribute_path": ["role_entity",0],
-      "values": ["*:*",[[],["allUsers","allAuthenticatedUsers"]]],
-      "policy_type": "pattern blacklist"
+      # Every entry in role_entity, not just the first. "element blacklist"
+      # matches by substring, so it catches the public entity in any
+      # "<ROLE>:<entity>" pair without having to enumerate the roles.
+      "attribute_path": ["role_entity"],
+      "values": ["allUsers","allAuthenticatedUsers"],
+      "policy_type": "element blacklist"
     }
   ]
 ]
 
 summary := helpers.get_multi_summary(conditions, vars.variables)
 
-message := helpers.get_multi_summary(conditions, vars.variables).message
-details := helpers.get_multi_summary(conditions, vars.variables).details
+message := summary.message
+details := summary.details
