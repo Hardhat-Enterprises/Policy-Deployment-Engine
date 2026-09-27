@@ -1,20 +1,16 @@
 package terraform.gcp.security.bigquery.google_bigquery_routine.security_mode
-
 import data.terraform.helpers
 import data.terraform.gcp.security.bigquery.google_bigquery_routine.vars
 
-
 conditions := [
     [
+        {"situation_description" : "Check for valid security_mode",
+         "remedies": ["Add valid security_mode"]},
         {
-            "situation_description": "Check for valid security_mode",
-            "remedies": ["Set security_mode to INVOKER"]
-        },
-        {
-            "condition": "Check for valid security_mode",
+            "condition": "Check for valid_security_mode",
             "attribute_path": ["security_mode"],
-            "values": "INVOKER",
-            "policy_type": "whitelist"
+            "values" : "DEFINER", 
+            "policy_type" : "whitelist"
         }
     ]
 ]
