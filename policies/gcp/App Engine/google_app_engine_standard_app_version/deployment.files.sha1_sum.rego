@@ -12,7 +12,7 @@ conditions := [
         {
             "condition": "Deployment file SHA1 checksum must be present and non-empty",
             "attribute_path": ["deployment", 0, "files", 0, "sha1_sum"],
-            "values": [""],
+            "values": [null, ""],
             "policy_type": "blacklist"
         }
     ]
