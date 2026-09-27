@@ -6,85 +6,85 @@
       "description": "Domain user accounts to be added to the local Administrators group of the SMB service. Comma-separated list of domain users or groups. The Domain Admin group is automatically added when the service joins your domain as a hidden group.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Accepts a list of administrator principals or accounts. Platform policy can reject wildcards, overly broad groups, or other principal patterns that could grant excessive administrative access."
     },
     "aes_encryption": {
       "description": "Enables AES-128 and AES-256 encryption for Kerberos-based communication with Active Directory.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls the use of AES encryption for Active Directory communication and supports enforcement of strong cryptographic standards."
     },
     "backup_operators": {
       "description": "Domain user/group accounts to be added to the Backup Operators group of the SMB service. The Backup Operators group allows members to backup and restore files regardless of whether they have read or write access to the files. Comma-separated list.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Accepts a list of principals or accounts assigned the Backup Operators role. Platform policy can restrict overly broad or wildcard principal assignments to reduce unnecessary privileged access."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the Active Directory resource can be deleted. Preventing accidental deletion helps protect important resources."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive information about the resource and does not affect its security configuration."
     },
     "dns": {
       "description": "Comma separated list of DNS server IP addresses for the Active Directory domain.",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Forces lookups to approved internal resolvers; prevents leakage to public DNS."
+      "security_impact": false,
+      "rationale": "Specifies DNS server IP addresses used by the deployment. These are network endpoint references to infrastructure resources and are not direct platform security policy targets."
     },
     "domain": {
       "description": "Fully qualified domain name for the Active Directory domain.",
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Fully qualified domain name of the Active Directory domain to join. Enforcing a 'trusted' value would require hardcoding a specific team/org domain name, which we cannot know at platform level; constraining this identifier is overreaching."
+      "rationale": "Specifies the Active Directory domain name used by the deployment. It is an enterprise-specific identifier and architectural reference rather than a platform security policy target."
     },
     "encrypt_dc_connections": {
       "description": "If enabled, traffic between the SMB server to Domain Controller (DC) will be encrypted.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls encryption of domain controller traffic and supports enforcement of secure encrypted communication for domain controller connections."
     },
     "kdc_hostname": {
       "description": "Hostname of the Active Directory server used as Kerberos Key Distribution Center. Only required for volumes using kerberized NFSv4.1",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the hostname of the Kerberos Key Distribution Center. It is a network endpoint reference to external authentication infrastructure rather than a direct platform security policy target."
     },
     "kdc_ip": {
       "description": "IP address of the Active Directory server used as Kerberos Key Distribution Center.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the IP address of an external Key Distribution Center. It is an external network identifier and is not a platform security policy target."
     },
     "labels": {
       "description": "Labels as key value pairs. Example: '{ \"owner\": \"Bob\", \"department\": \"finance\", \"purpose\": \"testing\" }'.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Helps organise resources using tags. It does not affect security."
     },
     "ldap_signing": {
       "description": "Specifies whether or not the LDAP traffic needs to be signed.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether LDAP communication is protected from tampering. Enabling it helps keep user information secure."
     },
     "location": {
       "description": "Name of the region for the policy to apply to.",
@@ -97,29 +97,29 @@
       "description": "The resource name of the Active Directory pool. Needs to be unique per location.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the resource name and is an identifier that does not directly affect its security posture."
     },
     "net_bios_prefix": {
       "description": "NetBIOS name prefix of the server to be created.\nA five-character random ID is generated automatically, for example, -6f9a, and appended to the prefix. The full UNC share path will have the following format:\n'\\\\NetBIOS_PREFIX-ABCD.DOMAIN_NAME\\SHARE_NAME'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the server name used on the network. It helps identify the server but does not control security."
     },
     "nfs_users_with_ldap": {
       "description": "Local UNIX users on clients without valid user information in Active Directory are blocked from access to LDAP enabled volumes.\nThis option can be used to temporarily switch such volumes to AUTH_SYS authentication (user ID + 1-16 groups).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls how users are checked before they can access LDAP-enabled storage. Keeping LDAP checks enabled helps prevent unauthorised access."
     },
     "organizational_unit": {
       "description": "Name of the Organizational Unit where you intend to create the computer account for NetApp Volumes.\nDefaults to 'CN=Computers' if left empty.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies a location within the Active Directory structure and is a team-specific organizational reference rather than a platform security policy target."
     },
     "password": {
       "description": "Password for specified username. Note - Manual changes done to the password will not be detected. Terraform will not re-apply the password, unless you use a new password in Terraform.",
@@ -132,22 +132,22 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Google Cloud project containing the resource. It is a resource identifier/reference and is not a platform security policy target."
     },
     "security_operators": {
       "description": "Domain accounts that require elevated privileges such as 'SeSecurityPrivilege' to manage security logs. Comma-separated list.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls who can manage security logs and other security settings. Only trusted users should have these permissions."
     },
     "site": {
       "description": "Specifies an Active Directory site to manage domain controller selection.\nUse when Active Directory domain controllers in multiple regions are configured. Defaults to 'Default-First-Site-Name' if left empty.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References an Active Directory site used for deployment topology. It is a topology reference rather than a security control."
     },
     "username": {
       "description": "Username for the Active Directory account with permissions to create the compute account within the specified organizational unit.",

@@ -73,6 +73,55 @@ def test_block_arguments_are_not_assessed():
 
 
 # --------------------------------------------------------------------------- #
+# Lost arguments: in the base branch's doc, gone from this branch's
+# --------------------------------------------------------------------------- #
+LEAF = {"security_impact": False, "rationale": "r"}
+BASE = {"arguments": {"name": LEAF, "fleet": {"type": "block"}, "fleet.project": LEAF}}
+
+
+def test_an_unchanged_doc_loses_nothing():
+    assert cr.check_no_lost_args(BASE, BASE) == []
+
+
+def test_a_deleted_leaf_is_named():
+    # A clean deletion passes the linter and check_doc_completeness alike: what is
+    # left in `arguments` is complete. Only the base branch knows it was there.
+    doc = {"arguments": {"name": LEAF, "fleet": {"type": "block"}}}
+    assert cr.check_doc_completeness(doc) == []
+    findings = cr.check_no_lost_args(doc, BASE)
+    assert len(findings) == 1
+    assert "fleet.project" in findings[0]
+
+
+def test_a_new_doc_is_not_compared():
+    assert cr.check_no_lost_args({"arguments": {"name": LEAF}}, None) == []
+
+
+def test_step_4_fails_naming_a_leaf_the_branch_deleted(monkeypatch, capsys):
+    # End to end through main(): the real doc on this checkout, against a base copy
+    # that still has one more leaf — the same as the branch having deleted it.
+    rel = Path("docs/gcp/API Hub/google_apihub_plugin.json")
+    real = json.loads((project_root / rel).read_text(encoding="utf-8"))
+    base = {**real, "arguments": {**real["arguments"], "deleted_leaf": LEAF}}
+    monkeypatch.setattr(cr, "load_base_doc", lambda ref, path: base)
+    assert cr.main(["--branch", "Service/gcp/api_hub/google_apihub_plugin",
+                    "--gate-only"]) == 1
+    out = capsys.readouterr().out
+    assert "[FAIL] Doc completeness" in out
+    assert "deleted_leaf" in out
+
+
+def test_the_base_doc_is_read_from_git():
+    base = cr.base_ref()
+    if base is None:
+        pytest.skip("no origin/dev locally")
+    rel = "docs/gcp/API Hub/google_apihub_plugin.json"
+    assert "arguments" in cr.load_base_doc(base, rel)
+    assert cr.load_base_doc(base, "docs/gcp/nope/nope.json") is None
+    assert cr.load_base_doc(None, rel) is None
+
+
+# --------------------------------------------------------------------------- #
 # True-arg coverage
 # --------------------------------------------------------------------------- #
 def _resource_tree(tmp_path, *, policy=None, fixture=None):
@@ -259,3 +308,61 @@ def test_the_real_repo_passes_its_own_gate(capsys):
     assert cr.main(["--branch", "Service/gcp/api_hub/google_apihub_plugin", "--gate-only"]) == 0
     out = capsys.readouterr().out
     assert "Doc completeness" in out and "True-arg coverage" in out and "OPA test" in out
+
+
+# --------------------------------------------------------------------------- #
+# --skip-coverage: docs-first commits are never blocked on coverage
+# --------------------------------------------------------------------------- #
+GAPPED = ["Service/gcp/api_hub/google_apihub_plugin", "--gate-only"]
+
+
+@pytest.fixture
+def coverage_gaps(monkeypatch):
+    """A complete doc whose true arguments have no policies or fixtures yet — the
+    state of every resource between docs approval and its first policy."""
+    monkeypatch.setattr(cr, "check_true_arg_coverage",
+                        lambda *a: ["x: missing policy", "x: missing input fixture"])
+
+    def no_opa(*a, **k):
+        raise AssertionError("the OPA test must not run")
+    monkeypatch.setattr(cr, "step_opa", no_opa)
+
+
+def test_skip_coverage_passes_a_complete_doc_with_gaps(coverage_gaps, capsys):
+    assert cr.main(["--branch", *GAPPED, "--skip-coverage"]) == 0
+    out = capsys.readouterr().out
+    assert "[OK]   Doc completeness" in out
+    assert "[skip] True-arg coverage" in out
+    assert "checked on the PR" in out
+    assert "[skip] OPA test" in out
+    assert "[FAIL]" not in out
+
+
+def test_skip_coverage_still_fails_an_incomplete_doc(coverage_gaps, monkeypatch, capsys):
+    monkeypatch.setattr(cr, "check_doc_completeness", lambda doc: ["x: no rationale"])
+    assert cr.main(["--branch", *GAPPED, "--skip-coverage"]) == 1
+    assert "[FAIL] Doc completeness" in capsys.readouterr().out
+
+
+def test_without_the_flag_the_same_gaps_still_fail(coverage_gaps, capsys):
+    # The full run and CI: nothing about the hook's exemption weakens them.
+    assert cr.main(["--branch", *GAPPED]) == 1
+    out = capsys.readouterr().out
+    assert "[FAIL] True-arg coverage" in out
+    assert "block merging the PR, not your commits" in out
+    assert "[skip] OPA test" in out
+
+
+def test_the_commit_hook_skips_coverage_and_ci_does_not():
+    import yaml  # pre-commit itself depends on PyYAML; CI installs it for this test
+    config = yaml.safe_load((project_root / ".pre-commit-config.yaml").read_text())
+    hooks = {h["id"]: h for repo in config["repos"] for h in repo["hooks"]}
+    assert "--skip-coverage" in hooks["resource-gate"]["entry"].split()
+
+    workflow = yaml.safe_load(
+        (project_root / ".github/workflows/policy_check_PR.yaml").read_text())
+    calls = [step["run"] for job in workflow["jobs"].values()
+             for step in job.get("steps", [])
+             if "check_resource.py" in step.get("run", "")]
+    assert calls, "policy_check_PR.yaml no longer calls check_resource.py"
+    assert all("--skip-coverage" not in c for c in calls)
