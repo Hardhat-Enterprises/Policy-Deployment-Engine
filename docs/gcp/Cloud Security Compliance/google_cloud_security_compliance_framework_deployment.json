@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy or abandon the framework deployment. Requiring deletion prevention protects the compliance deployment from accidental or unauthorised removal."
     },
     "description": {
       "description": "User provided description of the Framework deployment",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive metadata only and does not change the security or compliance behaviour of the framework deployment."
     },
     "framework_deployment_id": {
       "description": "User provided identifier. It should be unique in scope of a parent.\nThis is optional and if not provided, a random UUID will be generated.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the framework deployment. The identifier itself does not control security behaviour and is primarily used for resource naming and uniqueness."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -34,15 +34,15 @@
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies an organization associated with the resource. Organization IDs are external resource references and should not be constrained by this policy."
     },
     "parent": {
       "description": "The parent resource in which to create the resource.\nMust be in one of the following formats:\n* 'projects/{{project}}'\n* 'organizations/{{organization}}'",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the project or organization in which the deployment is created. The identifier is an external resource reference and is outside the scope of policy enforcement."
     },
     "cloud_control_metadata": {
       "type": "block",
@@ -53,8 +53,8 @@
       "description": "Enforcement mode for the framework deployment.\nPossible values:\nPREVENTIVE\nDETECTIVE\nAUDIT",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines how the Cloud Control is enforced. Restricting the enforcement mode can prevent security controls from being deployed in a weaker detection or audit-only mode where preventive enforcement is required."
     },
     "cloud_control_metadata.cloud_control_details": {
       "type": "block",
@@ -65,15 +65,15 @@
       "description": "Major revision of cloudcontrol",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the revision of the referenced Cloud Control. Revision selection is version management rather than a direct security policy target unless a specific revision is documented as insecure."
     },
     "cloud_control_metadata.cloud_control_details.name": {
       "description": "The name of the CloudControl in the format:\n\"{parent}/locations/{location}/cloudControls/{cloud-control}\"",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a Cloud Control by resource name. It is an external resource reference and should not be constrained by this resource policy."
     },
     "cloud_control_metadata.cloud_control_details.parameters": {
       "type": "block",
@@ -84,8 +84,8 @@
       "description": "The name of the parameter.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the name of a Cloud Control parameter. Security behaviour depends on the parameter being configured rather than the parameter name itself."
     },
     "cloud_control_metadata.cloud_control_details.parameters.parameter_value": {
       "type": "block",
@@ -96,22 +96,22 @@
       "description": "Represents a boolean value.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Represents a generic parameter value whose security meaning depends on the specific Cloud Control parameter. No universal secure boolean value can be enforced at this level."
     },
     "cloud_control_metadata.cloud_control_details.parameters.parameter_value.number_value": {
       "description": "Represents a double value.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Represents a generic numeric parameter value. Its security significance depends on the associated Cloud Control, so no universal secure numeric value can be defined here."
     },
     "cloud_control_metadata.cloud_control_details.parameters.parameter_value.string_value": {
       "description": "Represents a string value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Represents a generic string parameter value whose security meaning depends on the associated Cloud Control. It cannot be safely constrained without parameter-specific context."
     },
     "cloud_control_metadata.cloud_control_details.parameters.parameter_value.oneof_value": {
       "type": "block",
@@ -122,8 +122,8 @@
       "description": "The name of the parameter.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a nested Cloud Control parameter and does not itself determine whether the resulting configuration is secure."
     },
     "cloud_control_metadata.cloud_control_details.parameters.parameter_value.oneof_value.parameter_value": {
       "type": "block",
@@ -134,22 +134,22 @@
       "description": "Represents a boolean value.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Represents a generic nested boolean parameter value. The secure value depends on the specific Cloud Control parameter and cannot be determined universally."
     },
     "cloud_control_metadata.cloud_control_details.parameters.parameter_value.oneof_value.parameter_value.number_value": {
       "description": "Represents a double value.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Represents a generic nested numeric parameter value whose security significance depends on the specific Cloud Control parameter."
     },
     "cloud_control_metadata.cloud_control_details.parameters.parameter_value.oneof_value.parameter_value.string_value": {
       "description": "Represents a string value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Represents a generic nested string parameter value whose security significance depends on the specific Cloud Control parameter."
     },
     "cloud_control_metadata.cloud_control_details.parameters.parameter_value.oneof_value.parameter_value.string_list_value": {
       "type": "block",
@@ -160,8 +160,8 @@
       "description": "The strings in the list.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains generic values supplied to a nested Cloud Control parameter. The permitted values depend on the particular control and cannot be universally constrained here."
     },
     "cloud_control_metadata.cloud_control_details.parameters.parameter_value.string_list_value": {
       "type": "block",
@@ -172,8 +172,8 @@
       "description": "The strings in the list.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains generic string values for a Cloud Control parameter. Security requirements depend on the parameter being configured, so no universal whitelist can be applied."
     },
     "framework": {
       "type": "block",
@@ -184,15 +184,15 @@
       "description": "In the format:\n{parent}/locations/{location}/frameworks/{framework}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the framework resource to deploy. Framework names are external resource references and should not be constrained by this policy."
     },
     "framework.major_revision_id": {
       "description": "Major revision id of the framework.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a framework revision. Revision selection is version management and is not inherently security-relevant unless a particular revision is documented as insecure."
     },
     "target_resource_config": {
       "type": "block",
@@ -203,8 +203,8 @@
       "description": "CRM node in format organizations/{organization}, folders/{folder},\nor projects/{project}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References an existing organization, folder or project that will receive the framework deployment. Resource identifiers are external references and are outside the scope of this policy."
     },
     "target_resource_config.target_resource_creation_config": {
       "type": "block",
@@ -220,15 +220,15 @@
       "description": "Display name of the folder to be created",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the display name of a newly created folder. The display name is descriptive and does not determine its security configuration."
     },
     "target_resource_config.target_resource_creation_config.folder_creation_config.parent": {
       "description": "The parent of the folder to be created. It can be an organizations/{org} or\nfolders/{folder}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the organization or folder under which the new folder is created. Parent resource identifiers are external references and should not be constrained here."
     },
     "target_resource_config.target_resource_creation_config.project_creation_config": {
       "type": "block",
@@ -239,22 +239,22 @@
       "description": "Billing account id to be used for the project.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the billing account associated with a newly created project. Billing account selection is an external resource and financial configuration rather than a security control."
     },
     "target_resource_config.target_resource_creation_config.project_creation_config.parent": {
       "description": "organizations/{org} or folders/{folder}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the organization or folder under which the project is created. The parent identifier is an external resource reference and is outside the scope of this policy."
     },
     "target_resource_config.target_resource_creation_config.project_creation_config.project_display_name": {
       "description": "Display name of the project to be created.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the project's display name. Naming is descriptive metadata and does not directly affect the security configuration of the project."
     }
   }
 }

@@ -6,36 +6,36 @@
       "description": "connectorVersion of the Connector.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+         "security_impact": false,
+      "rationale": "Identifies the connector version the connection runs against. The version determines which build of the connector executes and which config variables it accepts, but selecting a version is an architectural and compatibility decision belonging to the team operating the integration, not a configuration that weakens or strengthens the connection's security posture. No version is inherently less secure than another from the platform's point of view, so there is no generic constraint to apply."
+     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+          "security_impact": true,
+      "rationale": "Controls what Terraform does when the connection would be destroyed: DELETE removes it, PREVENT blocks the operation, and ABANDON drops it from state while leaving it in the API. With the default DELETE, a configuration change that removes the resource block destroys a running integration and everything depending on it, with no barrier in the pipeline. Setting PREVENT forces the destruction to be an explicit, deliberate configuration change rather than a side effect. A generic policy can require PREVENT without knowing anything about a team's resources."
+     },
     "description": {
       "description": "An arbitrary description for the Connection.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Free-text description attached to the connection. It carries no configuration and changes nothing about the resource's behaviour, so there is no rule a policy could enforce that would alter the security of the connection."
     },
     "eventing_enablement_type": {
       "description": "Eventing enablement type. Will be nil if eventing is not enabled. Possible values: [\"EVENTING_AND_CONNECTION\", \"ONLY_EVENTING\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the connection serves both eventing and connection traffic or eventing alone. The choice follows how the team intends to use the connector in its integration architecture, and neither mode is inherently more exposed than the other: the security of the eventing path is governed by its own auth_config and destination settings rather than by which mode is selected here."
     },
     "labels": {
       "description": "Resource labels to represent user provided metadata.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Applies user-defined key/value metadata to the connection. Labels support cost allocation, ownership tracking and filtering, and are explicitly non-authoritative here, meaning they do not govern access or configuration. Requiring particular labels would enforce a tagging standard rather than a security control."
     },
     "location": {
       "description": "Location in which Connection needs to be created.",
@@ -48,29 +48,29 @@
       "description": "Name of Connection needs to be created.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the connection within its project and location. The name is an identifier used to address the resource and does not affect how it authenticates, encrypts traffic or logs. Naming conventions are an organisational convenience rather than a control over the connection's security posture."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the project the connection is created in, falling back to the provider's project when unset. Which project a team deploys into is determined by that team's own structure, and the security boundaries around a project are established by IAM and organisation policy rather than by this field. A platform policy cannot name permitted projects without team-specific knowledge."
     },
     "service_account": {
       "description": "Service account needed for runtime plane to access Google Cloud resources.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+         "security_impact": true,
+      "rationale": "Names the identity the runtime plane uses to reach Google Cloud resources on behalf of the connection. When left unset, the connection falls back to the project's default compute service account, which is broadly permissioned and shared across workloads, so a compromised connection inherits far more access than the integration needs. Requiring an explicit, purpose-built account is the least-privilege control here, and a generic policy can require the field to be set without naming any team's account."
+     },
     "suspended": {
       "description": "Suspended indicates if a user has suspended a connection or not.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Marks whether a user has suspended the connection. Suspending stops the connection from serving traffic and resuming restores it; neither state is the secure one, since a suspended connection is simply not running and an active one is doing the job it was created for. This is an operational availability control rather than a property of how securely the connection is configured."
     },
     "auth_config": {
       "type": "block",
@@ -81,15 +81,15 @@
       "description": "The type of authentication configured.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The provider documentation describes this only as 'the type of authentication configured', which duplicates the wording of auth_type without stating how the two differ, and no set of accepted values is published for it. The Google Cloud documentation does not clarify it either; in the official examples it carries an arbitrary connector-supplied string. Without establishing what the field actually changes in the running connection, there is no defensible basis for constraining it, and the documented ambiguity is itself the reason for the verdict rather than an assumption that it is harmless."
     },
     "auth_config.auth_type": {
       "description": "authType of the Connection Possible values: [\"AUTH_TYPE_UNSPECIFIED\", \"USER_PASSWORD\", \"OAUTH2_JWT_BEARER\", \"OAUTH2_CLIENT_CREDENTIALS\", \"SSH_PUBLIC_KEY\", \"OAUTH2_AUTH_CODE_FLOW\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the authentication mechanism the connection uses against the target endpoint. The concrete values (USER_PASSWORD, the OAuth2 grants, SSH_PUBLIC_KEY) each establish authenticated access, and which one is correct depends on what the connector supports, so no single mechanism can be mandated. AUTH_TYPE_UNSPECIFIED, however, leaves the mechanism undeclared rather than choosing one, which is not a configuration any team should be deploying deliberately. A generic policy can blacklist that value while leaving the real mechanisms to the team."
     },
     "auth_config.additional_variable": {
       "type": "block",
@@ -100,29 +100,29 @@
       "description": "Boolean Value of configVariable.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the boolean value of the configuration variable named by key. Neither true nor false is inherently the secure setting: for one connector the flag may enable a proxy, for another it may toggle a security feature in the opposite direction. A generic policy cannot fix a value without knowing which connector's variable is being set."
     },
     "auth_config.additional_variable.integer_value": {
       "description": "Integer Value of configVariable.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the integer value of the configuration variable named by key. Depending on the connector this may be a timeout, a port, a batch size or a retry limit, and no single bound is meaningful across all of them. Whether a particular number is safe is a property of the key, not of this field."
     },
     "auth_config.additional_variable.key": {
       "description": "Key for the configVariable",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a configuration variable defined by the connector being used, such as project_id for the Pub/Sub connector or proxy_enabled for Zendesk. The set of valid keys and what each one controls is determined entirely by the connector, so a platform policy cannot know from the key name alone whether a given setting is security-relevant or purely operational. Any meaningful rule here would have to be written per connector and per key, which puts it outside the scope of a generic policy."
     },
     "auth_config.additional_variable.string_value": {
       "description": "String Value of configVariabley.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the string value of whichever configuration variable the accompanying key names. The same field carries a harmless identifier for one connector and a security-relevant setting for another, so there is no value or pattern that is correct across all connections. Constraining it generically would require assuming a specific connector's schema."
     },
     "auth_config.additional_variable.encryption_key_value": {
       "type": "block",
@@ -133,15 +133,15 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+        "security_impact": true,
+      "rationale":  "Names the KMS key the config variable is encrypted under, in the documented form projects/*/locations/*/keyRings/*/cryptoKeys/*, and is an empty string when the key is Google-managed. The enforceable control here is presence: a non-empty value means the team has nominated a customer-managed key rather than accepting the Google-managed default, which is what puts rotation and revocation in the organisation's hands. The policy does not validate the shape of the path, because a value that does not match the target shape is never flagged by the pattern helpers, so a shape check cannot be expressed here without also flagging every compliant value. Whether a nominated key exists and is correctly scoped is a property of the KMS resource rather than of this reference."
+     },
     "auth_config.additional_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the config variable is encrypted with a Google-managed key or a customer-managed KMS key. GOOGLE_MANAGED is not an unencrypted option: the value is still encrypted at rest, the difference is who controls the key material and its rotation. Requiring CUSTOMER_MANAGED org-wide would force every team to stand up and manage KMS keys for connections that may not fall under a regulatory requirement for it, so key ownership is a decision for the team and its compliance obligations rather than a platform default."
     },
     "auth_config.additional_variable.secret_value": {
       "type": "block",
@@ -152,8 +152,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the credential this connection authenticates with, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the credential the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "auth_config.oauth2_auth_code_flow": {
       "type": "block",
@@ -164,29 +164,29 @@
       "description": "Auth URL for Authorization Code Flow.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the authorization endpoint the connection directs the OAuth2 code flow to. The endpoint itself is provider-specific and cannot be constrained to a fixed list, but the scheme can be: an http:// authorization URL exposes the authorization request and the returned code to anyone on the network path. A generic policy can require the value to begin with https:// without knowing which identity provider a team uses."
     },
     "auth_config.oauth2_auth_code_flow.client_id": {
       "description": "Client ID for user-provided OAuth app.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the user-provided OAuth application used in the authorization code flow. As with the client-credentials grant, the client identifier is not confidential and the security of the flow depends on the client secret and on PKCE rather than on this value. Its content is particular to each team's app registration."
     },
     "auth_config.oauth2_auth_code_flow.enable_pkce": {
       "description": "Whether to enable PKCE when the user performs the auth code flow.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Proof Key for Code Exchange is applied during the OAuth2 authorization code flow. Without PKCE, an authorization code intercepted in transit or via a redirect can be exchanged for a token by a party that never initiated the flow; PKCE binds the code to the original request so an intercepted code is useless on its own. The field is optional, so a connection can run the flow without it by omission. A generic policy can require the value to be true wherever auth_type is OAUTH2_AUTH_CODE_FLOW, which needs no team-specific knowledge."
     },
     "auth_config.oauth2_auth_code_flow.scopes": {
       "description": "Scopes the connection will request when the user performs the auth code flow.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Lists the OAuth2 scopes the connection requests when a user completes the authorization code flow. Least privilege genuinely applies here, but scope strings are defined by each identity provider and share no common vocabulary, so a platform-wide allowlist or deny list cannot be expressed without naming the provider a given team integrates with. Deciding which scopes a connection legitimately needs depends on the connector and the integration, not on a rule that holds across the organisation."
     },
     "auth_config.oauth2_auth_code_flow.client_secret": {
       "type": "block",
@@ -197,8 +197,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the OAuth2 client secret used in the authorization code flow, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the credential the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "auth_config.oauth2_client_credentials": {
       "type": "block",
@@ -209,8 +209,8 @@
       "description": "Secret version of Password for Authentication.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the OAuth application the connection authenticates as. In OAuth2 the client identifier is a public value by design; confidentiality rests on the paired client secret, which is handled separately through a Secret Manager reference. The value is specific to each team's registered application, so there is no generic constraint to apply."
     },
     "auth_config.oauth2_client_credentials.client_secret": {
       "type": "block",
@@ -221,8 +221,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the OAuth2 client secret used in the client-credentials grant, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the credential the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "auth_config.oauth2_jwt_bearer": {
       "type": "block",
@@ -238,8 +238,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the PKCS#8 private key used to sign JWTs for the jwt-bearer grant, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the signing key the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated key visible."
     },
     "auth_config.oauth2_jwt_bearer.jwt_claims": {
       "type": "block",
@@ -250,22 +250,22 @@
       "description": "Value for the \"aud\" claim.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the 'aud' claim naming the intended recipient of the JWT. This claim does carry real security weight, since an audience that is too broad lets a token issued for one endpoint be replayed at another. Enforcing it, however, requires knowing the exact audience string each provider expects, which is per-provider and per-integration knowledge. Without a provider-specific allowlist, no generic rule can distinguish a correctly scoped audience from an overly broad one."
     },
     "auth_config.oauth2_jwt_bearer.jwt_claims.issuer": {
       "description": "Value for the \"iss\" claim.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the 'iss' claim identifying who issued the JWT used in the jwt-bearer grant. The value that the token endpoint will accept is defined by the identity provider, so a platform policy cannot state a correct issuer without knowing which provider a team integrates with, and an incorrect constraint would simply break the grant rather than harden it."
     },
     "auth_config.oauth2_jwt_bearer.jwt_claims.subject": {
       "description": "Value for the \"sub\" claim.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the 'sub' claim identifying the principal the JWT asserts. As with the issuer, the acceptable value is determined by the provider and the account the team is authenticating as. The integrity of the assertion rests on the signing key referenced elsewhere in this block, not on the claim's text."
     },
     "auth_config.ssh_public_key": {
       "type": "block",
@@ -276,15 +276,15 @@
       "description": "Format of SSH Client cert.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Declares the format of the SSH client certificate. The provider documentation states only 'Format of SSH Client cert' and publishes no list of accepted values, so it cannot be established which formats are available or whether any of them is weaker than another. Constraining a field whose value space is undocumented would risk rejecting valid configurations while enforcing nothing verifiable."
     },
     "auth_config.ssh_public_key.username": {
       "description": "The user account used to authenticate.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the user account used for SSH public-key authentication to the target host. The security of this mechanism rests on the client certificate and its passphrase rather than on the account name, and the appropriate account depends on the remote host's configuration. A platform policy cannot judge a username without knowing the target system."
     },
     "auth_config.ssh_public_key.ssh_client_cert": {
       "type": "block",
@@ -295,8 +295,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the SSH client certificate presented to the target host, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the certificate the connection authenticates with and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated certificate visible."
     },
     "auth_config.ssh_public_key.ssh_client_cert_pass": {
       "type": "block",
@@ -307,8 +307,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the passphrase protecting the SSH client certificate, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the passphrase the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "auth_config.user_password": {
       "type": "block",
@@ -319,8 +319,8 @@
       "description": "Username for Authentication.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the account the connection authenticates as against the target endpoint. Which account is appropriate is a property of the system being connected to and of the team's own access model, and the credential protecting that account is carried separately as a Secret Manager reference. No username value is more or less secure across all connections, so there is nothing generic to enforce."
     },
     "auth_config.user_password.password": {
       "type": "block",
@@ -331,8 +331,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the password used for USER_PASSWORD authentication, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the credential the connection authenticates with and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "config_variable": {
       "type": "block",
@@ -343,29 +343,29 @@
       "description": "Boolean Value of configVariable",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the boolean value of the configuration variable named by key. Neither true nor false is inherently the secure setting: for one connector the flag may enable a proxy, for another it may toggle a security feature in the opposite direction. A generic policy cannot fix a value without knowing which connector's variable is being set."
     },
     "config_variable.integer_value": {
       "description": "Integer Value of configVariable",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the integer value of the configuration variable named by key. Depending on the connector this may be a timeout, a port, a batch size or a retry limit, and no single bound is meaningful across all of them. Whether a particular number is safe is a property of the key, not of this field."
     },
     "config_variable.key": {
       "description": "Key for the configVariable",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a configuration variable defined by the connector being used, such as project_id for the Pub/Sub connector or proxy_enabled for Zendesk. The set of valid keys and what each one controls is determined entirely by the connector, so a platform policy cannot know from the key name alone whether a given setting is security-relevant or purely operational. Any meaningful rule here would have to be written per connector and per key, which puts it outside the scope of a generic policy."
     },
     "config_variable.string_value": {
       "description": "String Value of configVariabley",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the string value of whichever configuration variable the accompanying key names. The same field carries a harmless identifier for one connector and a security-relevant setting for another, so there is no value or pattern that is correct across all connections. Constraining it generically would require assuming a specific connector's schema."
     },
     "config_variable.encryption_key_value": {
       "type": "block",
@@ -376,15 +376,15 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+          "security_impact": true,
+      "rationale":  "Names the KMS key the config variable is encrypted under, in the documented form projects/*/locations/*/keyRings/*/cryptoKeys/*, and is an empty string when the key is Google-managed. The enforceable control here is presence: a non-empty value means the team has nominated a customer-managed key rather than accepting the Google-managed default, which is what puts rotation and revocation in the organisation's hands. The policy does not validate the shape of the path, because a value that does not match the target shape is never flagged by the pattern helpers, so a shape check cannot be expressed here without also flagging every compliant value. Whether a nominated key exists and is correctly scoped is a property of the KMS resource rather than of this reference."
     },
     "config_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the config variable is encrypted with a Google-managed key or a customer-managed KMS key. GOOGLE_MANAGED is not an unencrypted option: the value is still encrypted at rest, the difference is who controls the key material and its rotation. Requiring CUSTOMER_MANAGED org-wide would force every team to stand up and manage KMS keys for connections that may not fall under a regulatory requirement for it, so key ownership is a decision for the team and its compliance obligations rather than a platform default."
     },
     "config_variable.secret_value": {
       "type": "block",
@@ -395,8 +395,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying a secret-typed config variable passed to the connector, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the value the connector receives with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "destination_config": {
       "type": "block",
@@ -407,8 +407,8 @@
       "description": "The key is the destination identifier that is supported by the Connector.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which destination slot the accompanying block configures, using an identifier the connector defines (the provider example uses 'url'). The valid keys and their meaning come from the connector, so a platform policy cannot judge from the key alone whether a destination is sensitive. The security-relevant configuration sits in the destination block itself rather than in its label."
     },
     "destination_config.destination": {
       "type": "block",
@@ -419,22 +419,22 @@
       "description": "For publicly routable host.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the publicly routable target endpoint. The endpoint itself is specific to whichever SaaS or service a team integrates with, so it cannot be constrained to a list. A scheme check of the kind applied to auth_uri is not reliable here either: the provider describes the field as a host, yet its own example supplies a full URL including https://, so the accepted format is inconsistent between the documentation and the published example and a rule keyed on the scheme would not hold across valid configurations."
     },
     "destination_config.destination.port": {
       "description": "The port is the target port number that is accepted by the destination.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+          "security_impact": false,
+      "rationale": "Sets the port the connection opens on the target endpoint. A port number is a functional address rather than a transport-security control: TLS can be negotiated on any port and plaintext can be served on 443, so excluding conventionally unencrypted ports would not establish that a connection is encrypted, only that it avoids a convention. Whether this connection's traffic is protected is determined by ssl_config.use_ssl and ssl_config.trust_model on this same resource, which are the enforceable targets. The port itself follows whatever the upstream service listens on and is a team integration choice."
+     },
     "destination_config.destination.service_attachment": {
       "description": "PSC service attachments. Format: projects/*/regions/*/serviceAttachments/*",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Points at a Private Service Connect service attachment, routing the connection over private networking rather than the public internet. Using PSC genuinely reduces exposure, but it can only be used where the target service publishes a service attachment, which public SaaS connectors such as Zendesk or Salesforce do not. Mandating it would make those connectors unusable, and the attachment path is specific to each team's project in any case."
     },
     "eventing_config": {
       "type": "block",
@@ -445,8 +445,8 @@
       "description": "Enrichment Enabled.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether events are enriched with additional context before delivery. Enabling it changes how much detail accompanies each event, which is a function of what the downstream integration needs rather than a control over how the connection authenticates, encrypts or logs. Neither state is the secure one, and whether the added context matters depends on the connector and the data it handles."
     },
     "eventing_config.additional_variable": {
       "type": "block",
@@ -457,29 +457,29 @@
       "description": "Boolean Value of configVariable.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the boolean value of the configuration variable named by key. Neither true nor false is inherently the secure setting: for one connector the flag may enable a proxy, for another it may toggle a security feature in the opposite direction. A generic policy cannot fix a value without knowing which connector's variable is being set."
     },
     "eventing_config.additional_variable.integer_value": {
       "description": "Integer Value of configVariable.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the integer value of the configuration variable named by key. Depending on the connector this may be a timeout, a port, a batch size or a retry limit, and no single bound is meaningful across all of them. Whether a particular number is safe is a property of the key, not of this field."
     },
     "eventing_config.additional_variable.key": {
       "description": "Key for the configVariable",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a configuration variable defined by the connector being used. The set of valid keys and what each one controls is determined entirely by the connector, so a platform policy cannot know from the key name alone whether a given setting is security-relevant or purely operational. Any meaningful rule here would have to be written per connector and per key, which puts it outside the scope of a generic policy."
     },
     "eventing_config.additional_variable.string_value": {
       "description": "String Value of configVariabley.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the string value of whichever configuration variable the accompanying key names. The same field carries a harmless identifier for one connector and a security-relevant setting for another, so there is no value or pattern that is correct across all connections. Constraining it generically would require assuming a specific connector's schema."
     },
     "eventing_config.additional_variable.encryption_key_value": {
       "type": "block",
@@ -490,15 +490,15 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+         "security_impact": true,
+      "rationale":  "Names the KMS key the config variable is encrypted under, in the documented form projects/*/locations/*/keyRings/*/cryptoKeys/*, and is an empty string when the key is Google-managed. The enforceable control here is presence: a non-empty value means the team has nominated a customer-managed key rather than accepting the Google-managed default, which is what puts rotation and revocation in the organisation's hands. The policy does not validate the shape of the path, because a value that does not match the target shape is never flagged by the pattern helpers, so a shape check cannot be expressed here without also flagging every compliant value. Whether a nominated key exists and is correctly scoped is a property of the KMS resource rather than of this reference."
     },
     "eventing_config.additional_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the config variable is encrypted with a Google-managed key or a customer-managed KMS key. GOOGLE_MANAGED is not an unencrypted option: the value is still encrypted at rest, the difference is who controls the key material and its rotation. Requiring CUSTOMER_MANAGED org-wide would force every team to stand up and manage KMS keys for connections that may not fall under a regulatory requirement for it, so key ownership is a decision for the team and its compliance obligations rather than a platform default."
     },
     "eventing_config.additional_variable.secret_value": {
       "type": "block",
@@ -509,8 +509,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying a secret-typed variable in the eventing configuration, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the value the eventing path uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "eventing_config.auth_config": {
       "type": "block",
@@ -521,15 +521,15 @@
       "description": "The type of authentication configured.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Mirrors the connection-level auth_key and is documented no more clearly here: the provider describes it only as 'the type of authentication configured' and publishes no accepted values, while the official example supplies an arbitrary connector-defined string. Without establishing what it changes in the running connection, there is no defensible basis for a constraint."
     },
     "eventing_config.auth_config.auth_type": {
       "description": "authType of the Connection Possible values: [\"USER_PASSWORD\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the authentication mechanism for the eventing configuration. Unlike the connection's own auth_config, this field accepts only USER_PASSWORD, so there is no unspecified or weaker alternative available to exclude. With a single permitted value, a policy would pin the only choice the provider allows and enforce nothing."
     },
     "eventing_config.auth_config.additional_variable": {
       "type": "block",
@@ -540,29 +540,29 @@
       "description": "Boolean Value of configVariable.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the boolean value of the configuration variable named by key. Neither true nor false is inherently the secure setting: for one connector the flag may enable a proxy, for another it may toggle a security feature in the opposite direction. A generic policy cannot fix a value without knowing which connector's variable is being set."
     },
     "eventing_config.auth_config.additional_variable.integer_value": {
       "description": "Integer Value of configVariable.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the integer value of the configuration variable named by key. Depending on the connector this may be a timeout, a port, a batch size or a retry limit, and no single bound is meaningful across all of them. Whether a particular number is safe is a property of the key, not of this field."
     },
     "eventing_config.auth_config.additional_variable.key": {
       "description": "Key for the configVariable",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a configuration variable defined by the connector being used. The set of valid keys and what each one controls is determined entirely by the connector, so a platform policy cannot know from the key name alone whether a given setting is security-relevant or purely operational. Any meaningful rule here would have to be written per connector and per key, which puts it outside the scope of a generic policy."
     },
     "eventing_config.auth_config.additional_variable.string_value": {
       "description": "String Value of configVariabley.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the string value of whichever configuration variable the accompanying key names. The same field carries a harmless identifier for one connector and a security-relevant setting for another, so there is no value or pattern that is correct across all connections. Constraining it generically would require assuming a specific connector's schema."
     },
     "eventing_config.auth_config.additional_variable.encryption_key_value": {
       "type": "block",
@@ -573,15 +573,16 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+         "security_impact": true,
+      "rationale": "Names the KMS key the config variable is encrypted under, in the documented form projects/*/locations/*/keyRings/*/cryptoKeys/*, and is an empty string when the key is Google-managed. The enforceable control here is presence: a non-empty value means the team has nominated a customer-managed key rather than accepting the Google-managed default, which is what puts rotation and revocation in the organisation's hands. The policy does not validate the shape of the path, because a value that does not match the target shape is never flagged by the pattern helpers, so a shape check cannot be expressed here without also flagging every compliant value. Whether a nominated key exists and is correctly scoped is a property of the KMS resource rather than of this reference."
+
+     },
     "eventing_config.auth_config.additional_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the config variable is encrypted with a Google-managed key or a customer-managed KMS key. GOOGLE_MANAGED is not an unencrypted option: the value is still encrypted at rest, the difference is who controls the key material and its rotation. Requiring CUSTOMER_MANAGED org-wide would force every team to stand up and manage KMS keys for connections that may not fall under a regulatory requirement for it, so key ownership is a decision for the team and its compliance obligations rather than a platform default."
     },
     "eventing_config.auth_config.additional_variable.secret_value": {
       "type": "block",
@@ -592,8 +593,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying a secret-typed variable in the eventing auth configuration, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the value used to authenticate the eventing path with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "eventing_config.auth_config.user_password": {
       "type": "block",
@@ -604,8 +605,8 @@
       "description": "Username for Authentication.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the account used to authenticate the eventing path to the target endpoint. Which account is appropriate depends on the remote system and the team's access model, and the credential protecting it is carried separately as a Secret Manager reference."
     },
     "eventing_config.auth_config.user_password.password": {
       "type": "block",
@@ -616,8 +617,8 @@
       "description": "The resource name of the secret version in the format,\nformat as: projects/*/secrets/*/versions/*.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the password used for USER_PASSWORD authentication on the eventing path, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the credential the eventing registration authenticates with and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "eventing_config.registration_destination_config": {
       "type": "block",
@@ -628,8 +629,8 @@
       "description": "Key for the connection",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels the destination used for eventing registration, again with a connector-defined identifier. As with the connection's destination key, it names a slot rather than configuring one, leaving nothing generic to enforce."
     },
     "eventing_config.registration_destination_config.destination": {
       "type": "block",
@@ -640,22 +641,22 @@
       "description": "Host",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the endpoint the eventing registration targets. As with the connection's own destination host, the value is determined by the service a team integrates with and the field's accepted format is inconsistently documented, leaving no invariant a platform policy could enforce."
     },
     "eventing_config.registration_destination_config.destination.port": {
       "description": "port number",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets the port used for the eventing registration endpoint. Eventing traffic carries the same authentication material and event payloads as the main connection, so an unencrypted port exposes them identically. The same generic blacklist of well-known cleartext ports (80, 21, 23, 110, 143) applies here without any team-specific knowledge."
     },
     "eventing_config.registration_destination_config.destination.service_attachment": {
       "description": "Service Attachment",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Points at a PSC service attachment for the eventing registration endpoint. Private connectivity is preferable where available, but availability depends on the target service supporting it, so it cannot be required across all connectors."
     },
     "lock_config": {
       "type": "block",
@@ -666,15 +667,15 @@
       "description": "Indicates whether or not the connection is locked.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+          "security_impact": true,
+      "rationale": "Indicates whether the connection is locked against modification. When unlocked, any pipeline run can alter the connection's authentication, destination or TLS settings, so the protections configured elsewhere in this resource can be undone without a separate barrier. Locking makes such a change require an explicit unlock first, which is a control against destructive or unintended modification rather than a scheduling convenience. A generic policy can require the flag to be true without any team-specific knowledge."
+     },
     "lock_config.reason": {
       "description": "Describes why a connection is locked.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds free-text explaining why a connection was locked. It is descriptive metadata that accompanies the locked flag and does not itself change any behaviour of the connection. With no effect on configuration, there is nothing for a policy to enforce beyond requiring text to be present, which would add documentation discipline rather than security."
     },
     "log_config": {
       "type": "block",
@@ -685,15 +686,15 @@
       "description": "Enabled represents whether logging is enabled or not for a connection.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines whether the connection emits logs to Cloud Logging. With logging off, there is no record of what the connection did, which removes the evidence needed to investigate misuse, credential abuse or unexpected data movement through the connector, and leaves no audit trail for the integration. The log_config block is itself optional, so a policy must treat an absent block the same as an explicit false; a generic rule can require logging to be on for every connection without any team-specific knowledge."
     },
     "log_config.level": {
       "description": "Log configuration level. Possible values: [\"LOG_LEVEL_UNSPECIFIED\", \"ERROR\", \"INFO\", \"DEBUG\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets the verbosity of the connection's logs. ERROR and INFO record operational events, but DEBUG causes the connector to log request and response detail, which for an integration carrying business data means headers, parameters and payload content can be written into Cloud Logging where a much wider set of readers can reach them. That turns the logging control into a disclosure path. A generic policy can blacklist DEBUG while leaving the remaining levels to the team."
     },
     "node_config": {
       "type": "block",
@@ -704,15 +705,15 @@
       "description": "Minimum number of nodes in the runtime nodes.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the upper bound on runtime nodes the connection may scale to. Like the minimum, it governs throughput and spend rather than the security posture of the connection. An exhausted ceiling degrades performance under load, which is a capacity concern rather than a control a security policy would constrain."
     },
     "node_config.min_node_count": {
       "description": "Minimum number of nodes in the runtime nodes.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the lower bound on runtime nodes backing the connection. This is a capacity and cost lever: the correct floor depends on the throughput the integration needs and how much idle capacity the team is willing to pay for. It does not change how the connection authenticates, encrypts or logs."
     },
     "ssl_config": {
       "type": "block",
@@ -723,36 +724,36 @@
       "description": "Type of Client Cert (PEM/JKS/.. etc.) Possible values: [\"PEM\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Declares the encoding format of the client certificate supplied to the connection. The provider accepts only PEM, so there is no weaker alternative a policy could exclude. Constraining the field would pin the single permitted value and add no security control."
     },
     "ssl_config.server_cert_type": {
       "description": "Type of Server Cert (PEM/JKS/.. etc.) Possible values: [\"PEM\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Declares the encoding format of the server certificate used when validating the endpoint. As with the client certificate type, PEM is the only accepted value, so the argument offers no insecure configuration for a policy to prevent."
     },
     "ssl_config.trust_model": {
       "description": "Enum for Trust Model Possible values: [\"PUBLIC\", \"PRIVATE\", \"INSECURE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects how the connection establishes trust in the server certificate presented by the target endpoint. PUBLIC trusts certificates chaining to a public CA and PRIVATE trusts an operator-supplied server certificate; both are legitimate depending on whether the endpoint is internet-facing or internal. INSECURE performs no meaningful trust validation, so the connection cannot verify it is talking to the intended endpoint and becomes vulnerable to interception. A generic policy can blacklist INSECURE without knowing any team's CA or endpoint, leaving the choice between the two valid trust models with the team."
     },
     "ssl_config.type": {
       "description": "Enum for controlling the SSL Type (TLS/MTLS) Possible values: [\"TLS\", \"MTLS\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects between TLS and MTLS. Both are encrypted transports and the only difference is whether the connection also presents a client certificate to authenticate itself to the endpoint. MTLS is stronger where supported, but it depends entirely on the target endpoint accepting client certificates, which many SaaS connectors do not, so it cannot be mandated org-wide. With no insecure value available to exclude, a policy on this field would restrict a legitimate choice without improving transport security."
     },
     "ssl_config.use_ssl": {
       "description": "Bool for enabling SSL",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the connection negotiates SSL/TLS to the target endpoint at all. The field is optional and the service treats an unset value as false, so a connection can be created with the ssl_config block present but transport encryption silently off, leaving credentials and payloads to the endpoint in cleartext. A generic policy can require use_ssl to be explicitly true for every connection regardless of which connector or endpoint a team is using."
     },
     "ssl_config.additional_variable": {
       "type": "block",
@@ -763,29 +764,29 @@
       "description": "Boolean Value of configVariable.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the boolean value of the configuration variable named by key. Neither true nor false is inherently the secure setting: for one connector the flag may enable a proxy, for another it may toggle a security feature in the opposite direction. A generic policy cannot fix a value without knowing which connector's variable is being set."
     },
     "ssl_config.additional_variable.integer_value": {
       "description": "Integer Value of configVariable.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the integer value of the configuration variable named by key. Depending on the connector this may be a timeout, a port, a batch size or a retry limit, and no single bound is meaningful across all of them. Whether a particular number is safe is a property of the key, not of this field."
     },
     "ssl_config.additional_variable.key": {
       "description": "Key for the configVariable",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names an SSL-related configuration variable defined by the connector being used. The set of valid keys and what each one controls is determined entirely by the connector, so a platform policy cannot know from the key name alone whether a given setting is security-relevant or purely operational. Any meaningful rule here would have to be written per connector and per key."
     },
     "ssl_config.additional_variable.string_value": {
       "description": "String Value of configVariabley.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Holds the string value of whichever configuration variable the accompanying key names. The same field carries a harmless identifier for one connector and a security-relevant setting for another, so there is no value or pattern that is correct across all connections. Constraining it generically would require assuming a specific connector's schema."
     },
     "ssl_config.additional_variable.encryption_key_value": {
       "type": "block",
@@ -796,15 +797,15 @@
       "description": "The [KMS key name] with which the content of the Operation is encrypted. The\nexpected format: projects/*/locations/*/keyRings/*/cryptoKeys/*.\nWill be empty string if google managed.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
-    },
+        "security_impact": true,
+      "rationale":   "Names the KMS key the config variable is encrypted under, in the documented form projects/*/locations/*/keyRings/*/cryptoKeys/*, and is an empty string when the key is Google-managed. The enforceable control here is presence: a non-empty value means the team has nominated a customer-managed key rather than accepting the Google-managed default, which is what puts rotation and revocation in the organisation's hands. The policy does not validate the shape of the path, because a value that does not match the target shape is never flagged by the pattern helpers, so a shape check cannot be expressed here without also flagging every compliant value. Whether a nominated key exists and is correctly scoped is a property of the KMS resource rather than of this reference."
+     },
     "ssl_config.additional_variable.encryption_key_value.type": {
       "description": "Type of Encryption Key Possible values: [\"GOOGLE_MANAGED\", \"CUSTOMER_MANAGED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the config variable is encrypted with a Google-managed key or a customer-managed KMS key. GOOGLE_MANAGED is not an unencrypted option: the value is still encrypted at rest, the difference is who controls the key material and its rotation. Requiring CUSTOMER_MANAGED org-wide would force every team to stand up and manage KMS keys for connections that may not fall under a regulatory requirement for it, so key ownership is a decision for the team and its compliance obligations rather than a platform default."
     },
     "ssl_config.additional_variable.secret_value": {
       "type": "block",
@@ -815,8 +816,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying a secret-typed SSL-related variable, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the value the TLS configuration uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "ssl_config.client_certificate": {
       "type": "block",
@@ -827,8 +828,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the client certificate presented during mTLS, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the certificate the connection identifies itself with and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated certificate visible."
     },
     "ssl_config.client_private_key": {
       "type": "block",
@@ -839,8 +840,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the client private key used in mTLS, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the key material backing the connection's identity with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated key visible."
     },
     "ssl_config.client_private_key_pass": {
       "type": "block",
@@ -851,8 +852,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the passphrase protecting the client private key, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes the passphrase the connection uses with no corresponding change in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated secret visible."
     },
     "ssl_config.private_server_certificate": {
       "type": "block",
@@ -863,8 +864,8 @@
       "description": "Secret version of Secret Value for Config variable.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "References the Secret Manager version supplying the private server certificate required when trust_model is PRIVATE, in the form projects/*/secrets/*/versions/*. The reference accepts either a pinned version number or the 'latest' alias; with 'latest', a new secret version silently changes which server certificate the connection trusts and no corresponding change appears in the Terraform configuration, so the swap never passes through code review or the deployment pipeline. The value is present under planned_values in the Terraform plan (the provider marks it sensitive, which hides it from plan output but does not remove it from the JSON), so a generic policy can blacklist the 'latest' alias without knowing any team's secret name. This does not prevent rotation in Secret Manager; it makes the connection's adoption of a rotated certificate visible."
     }
   }
 }
