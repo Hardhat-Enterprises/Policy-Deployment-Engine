@@ -400,8 +400,8 @@
       "description": "The egress setting for the connector, controlling what traffic is diverted through it.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls whether only private-address traffic or all outbound traffic is routed through the VPC connector. Both modes are supported security architectures and the appropriate choice depends on the organisation's routing, firewall, inspection, and internet-egress design, so a generic policy cannot mandate one mode."
+      "security_impact": true,
+      "rationale": "Controls which outbound traffic is routed through the Serverless VPC Access connector. With PRIVATE_RANGES_ONLY, internet-bound traffic can bypass the VPC connector and therefore bypass network-level controls such as firewall enforcement, NAT logging, and centralised egress inspection. A policy should require ALL_TRAFFIC so outbound traffic is routed through the VPC connector and remains subject to the organisation's network security controls."
     },
     "vpc_access_connector.name": {
       "description": "Full Serverless VPC Access Connector name e.g. /projects/my-project/locations/us-central1/connectors/c1.",
