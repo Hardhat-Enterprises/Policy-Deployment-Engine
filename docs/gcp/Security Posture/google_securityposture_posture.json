@@ -6,8 +6,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls deletion behaviour; deletion and cleanup handling is operational hygiene, not a security control."
+      "security_impact": true,
+      "rationale": "Sets whether Terraform can delete the posture. It can be set to PREVENT, so a policy should require PREVENT to stop accidental deletion."
     },
     "description": {
       "description": "Description of the posture.",
@@ -28,7 +28,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
+      "rationale": "Points to the organization that owns the posture. We do not control which org a resource sits under, so it has no security impact."
     },
     "posture_id": {
       "description": "Id of the posture. It is an immutable field.",
@@ -42,7 +42,7 @@
       "required": true,
       "type": "string",
       "security_impact": false,
-      "rationale": "A read-only lifecycle state of the posture, not a configurable security control."
+      "rationale": "A lifecycle value (DRAFT, ACTIVE, DEPRECATED). There is no unsafe option here, so a policy is not needed."
     },
     "policy_sets": {
       "type": "block",
@@ -134,8 +134,8 @@
       "description": "Setting this to true means that all values are denied. This field can be set only in policies for list constraints.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Sets whether the constraint denies all values; it defines the enforcement stance of the policy."
+      "security_impact": false,
+      "rationale": "deny_all=true just blocks everything, and false is normal. Neither value is unsafe, so there is nothing for a policy to stop."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.enforce": {
       "description": "If 'true', then the policy is enforced. If 'false', then any configuration is acceptable.\nThis field can be set only in policies for boolean constraints.",
@@ -168,7 +168,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
+      "rationale": "Points to where an error is in the expression text (like a line number). It is for debugging, not a real location or security setting."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.condition.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.",
@@ -186,15 +186,15 @@
       "description": "List of values allowed at this resource.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines the values the constraint permits; a policy should keep this from being overly broad."
+      "security_impact": false,
+      "rationale": "This list can hold anything depending on the constraint being written (regions, images, roles). There is no single bad value to check for."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.values.denied_values": {
       "description": "List of values denied at this resource.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines the values the constraint blocks; it directly sets what the control prevents."
+      "security_impact": false,
+      "rationale": "The denied list changes with each constraint, so there is no fixed value a policy could check."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom": {
       "type": "block",
@@ -210,8 +210,8 @@
       "description": "The action to take if the condition is met. Possible values: [\"ALLOW\", \"DENY\"]",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Sets whether the custom constraint allows or denies matching requests; it decides the direction of enforcement."
+      "security_impact": false,
+      "rationale": "ALLOW or DENY can both be correct depending on the condition, so a policy cannot force one direction."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.custom_constraint.condition": {
       "description": "A CEL condition that refers to a supported service resource, for example 'resource.management.autoUpgrade == false'. For details about CEL usage, see [Common Expression Language](https://docs.cloud.google.com/resource-manager/docs/organization-policy/creating-managing-custom-constraints#common_expression_language).",
@@ -271,8 +271,8 @@
       "description": "Setting this to true means that all values are denied. This field can be set only in policies for list constraints.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Sets whether the custom constraint denies all values; it defines the enforcement stance."
+      "security_impact": false,
+      "rationale": "deny_all=true just blocks everything, and false is normal. Neither value is unsafe, so there is nothing for a policy to stop."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.enforce": {
       "description": "If 'true', then the policy is enforced. If 'false', then any configuration is acceptable.\nThis field can be set only in policies for boolean constraints.",
@@ -305,7 +305,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
+      "rationale": "Points to where an error is in the expression text (like a line number). It is for debugging, not a real location or security setting."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.condition.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.",
@@ -323,15 +323,15 @@
       "description": "List of values allowed at this resource.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines the values the custom constraint permits; a policy should keep this from being overly broad."
+      "security_impact": false,
+      "rationale": "This list is set by the team for their own custom constraint. Its meaning changes each time, so no fixed rule fits it."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.values.denied_values": {
       "description": "List of values denied at this resource.",
       "required": false,
       "type": "list(string)",
-      "security_impact": true,
-      "rationale": "Defines the values the custom constraint blocks; it directly sets what the control prevents."
+      "security_impact": false,
+      "rationale": "A team-defined list that changes per constraint, so a policy cannot check it without knowing the specific case."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module": {
       "type": "block",
@@ -375,8 +375,8 @@
       "description": "The severity to assign to findings generated by the module. Possible values: [\"SEVERITY_UNSPECIFIED\", \"CRITICAL\", \"HIGH\", \"MEDIUM\", \"LOW\"]",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Sets the finding severity label; it classifies findings and does not change enforcement."
+      "security_impact": true,
+      "rationale": "Severity can be left as SEVERITY_UNSPECIFIED. A policy should block that default and make the team set a real severity."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.custom_output": {
       "type": "block",
@@ -419,7 +419,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
+      "rationale": "Points to where an error is in the expression text (like a line number). It is for debugging, not a real location or security setting."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.custom_output.properties.value_expression.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.",
@@ -452,7 +452,7 @@
       "required": false,
       "type": "string",
       "security_impact": false,
-      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
+      "rationale": "Points to where an error is in the expression text (like a line number). It is for debugging, not a real location or security setting."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.predicate.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.",
