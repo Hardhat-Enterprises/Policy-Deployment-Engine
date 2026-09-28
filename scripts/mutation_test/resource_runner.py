@@ -4,7 +4,7 @@ from scripts.mutation_test.operators import generate_mutations
 import json
 from pathlib import Path
 from typing import Any
-import os 
+import os
 
 from scripts.mutation_test.evaluator import (
     evaluate_plan,
@@ -187,7 +187,7 @@ def _read_text(
         "r",
         encoding="utf-8",
     ) as file:
-        
+
         return file.read()
 
 def load_plan(
@@ -220,7 +220,7 @@ def load_plan(
 
 
 def run_single_policy(
-    repo_root: Path, 
+    repo_root: Path,
     policy_path: Path,
 ) -> dict[str, Any]:
     """

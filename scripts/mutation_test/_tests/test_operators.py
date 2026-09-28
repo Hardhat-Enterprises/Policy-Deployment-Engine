@@ -170,7 +170,7 @@ def test_unknown_policy_type_returns_no_mutations():
         == []
     )
 
-    
+
 def test_whitelist_array_injects_outside_value():
     mutations = generate_mutations(
         "whitelist",
