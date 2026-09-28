@@ -163,6 +163,12 @@ POLICY_VARS_FILE = "_vars.rego"                          # per-resource shared v
                                                          # underscore-prefixed so it is never mistaken
                                                          # for an <argument>.rego policy file
 POLICY_REGO_EXT = ".rego"
+POLICY_DRIFT_EXEMPTIONS_FILE = "drift_exemptions.json"   # optional, per resource: the mutually
+                                                         # exclusive argument sets its fixtures
+                                                         # cannot avoid differing on. Content is
+                                                         # policy_lint's to validate (rules
+                                                         # drift-exemption-invalid / -stale); here
+                                                         # it only has to be an allowed name.
 
 # --------------------------------------------------------------------------- #
 # GCP doc JSON schema constants (learned from the existing docs).
@@ -702,11 +708,12 @@ class PoliciesValidator:
                 self.logger.log(f"{entry_rel}: directories not allowed in a resource dir "
                                 f"(flatten its policy.rego into '{entry}{POLICY_REGO_EXT}')")
                 continue
-            if entry == POLICY_VARS_FILE:
+            if entry in (POLICY_VARS_FILE, POLICY_DRIFT_EXEMPTIONS_FILE):
                 continue
             if not entry.endswith(POLICY_REGO_EXT):
-                self.logger.log(f"{entry_rel}: unexpected file "
-                                f"(only '{POLICY_VARS_FILE}' and '<argument>{POLICY_REGO_EXT}' allowed)")
+                self.logger.log(f"{entry_rel}: unexpected file (only '{POLICY_VARS_FILE}', "
+                                f"'{POLICY_DRIFT_EXEMPTIONS_FILE}' and "
+                                f"'<argument>{POLICY_REGO_EXT}' allowed)")
                 continue
             arg = entry[: -len(POLICY_REGO_EXT)]
             if docargs is not None:

@@ -1,0 +1,19 @@
+resource "google_privateca_ca_pool" "non_compliant_example_1" {
+  name     = "non_compliant_example_1"
+  location = "australia-southeast1"
+  tier     = "ENTERPRISE"
+
+  issuance_policy {
+    allowed_key_types {
+      elliptic_curve {
+        signature_algorithm = "ECDSA_P256"
+      }
+    }
+
+    allowed_key_types {
+      rsa {
+        min_modulus_size = 2048
+      }
+    }
+  }
+}
