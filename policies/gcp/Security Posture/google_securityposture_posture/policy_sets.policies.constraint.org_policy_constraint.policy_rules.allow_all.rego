@@ -10,10 +10,10 @@ conditions := [
             "remedies": ["Set allow_all to false so the constraint still applies."]
         },
         {
-            "condition": "allow_all must be false",
+            "condition": "allow_all must not be true",
             "attribute_path": ["policy_sets", 0, "policies", 0, "constraint", 0, "org_policy_constraint", 0, "policy_rules", 0, "allow_all"],
-            "values": [false],
-            "policy_type": "whitelist"
+            "values": [true],
+            "policy_type": "blacklist"
         }
     ]
 ]

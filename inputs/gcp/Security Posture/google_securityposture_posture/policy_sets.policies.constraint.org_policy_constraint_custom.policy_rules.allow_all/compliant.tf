@@ -19,7 +19,6 @@ resource "google_securityposture_posture" "compliant_example_1" {
             resource_types = ["compute.googleapis.com/Instance"]
           }
           policy_rules {
-            enforce = true
             allow_all = false
           }
         }

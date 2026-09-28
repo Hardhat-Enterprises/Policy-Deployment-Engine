@@ -10,10 +10,10 @@ conditions := [
             "remedies": ["Set enforce to true so the constraint is applied."]
         },
         {
-            "condition": "enforce must be true",
+            "condition": "enforce must not be false",
             "attribute_path": ["policy_sets", 0, "policies", 0, "constraint", 0, "org_policy_constraint", 0, "policy_rules", 0, "enforce"],
-            "values": [true],
-            "policy_type": "whitelist"
+            "values": [false],
+            "policy_type": "blacklist"
         }
     ]
 ]
