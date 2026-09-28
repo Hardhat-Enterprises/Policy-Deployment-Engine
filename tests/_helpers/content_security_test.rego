@@ -88,3 +88,67 @@ test_no_findings_not_flagged if {
 
     count(violations) == 0
 }
+
+test_finding_only_matches_the_targeted_setting if {
+    # One agent, two callbacks in the same list: index 0 is secure (no finding),
+    # index 1 is vulnerable. The finding is recorded against index 1, so the
+    # policy for THIS setting must flag it, and a policy for another setting
+    # must not.
+    two_callbacks_input := {
+        "planned_values": {"root_module": {"resources": [
+            {"type": "google_ces_agent", "name": "agent_1",
+             "values": {"display_name": "Agent One"}},
+        ]}},
+        "content_security_findings": [
+            {"resource_type": "google_ces_agent", "resource_name": "agent_1",
+             "attribute_path": ["after_agent_callbacks", 1, "python_code"],
+             "language": "python", "tool": "bandit",
+             "findings": [
+                 {"severity": "HIGH", "confidence": "HIGH", "rule_id": "B602",
+                  "test_name": "subprocess_popen_with_shell_equals_true",
+                  "message": "subprocess call with shell=True", "line": 5},
+             ]},
+        ],
+    }
+
+    after_violations := content_security.get_violations(
+        tf_variables, ["after_agent_callbacks", "python_code"], ["MEDIUM"]
+    ) with input as two_callbacks_input
+    count(after_violations) == 1
+
+    before_violations := content_security.get_violations(
+        tf_variables, ["before_tool_callbacks", "python_code"], ["MEDIUM"]
+    ) with input as two_callbacks_input
+    count(before_violations) == 0
+}
+
+test_message_lists_only_at_or_above_threshold_rule_ids if {
+    # One setting with a HIGH finding (violation) and a LOW finding (not). The
+    # message must name only the finding that crossed the threshold.
+    mixed_input := {
+        "planned_values": {"root_module": {"resources": [
+            {"type": "google_ces_agent", "name": "non_compliant_example_1",
+             "values": {"display_name": "Non Compliant Example"}},
+        ]}},
+        "content_security_findings": [
+            {"resource_type": "google_ces_agent", "resource_name": "non_compliant_example_1",
+             "attribute_path": ["after_agent_callbacks", 0, "python_code"],
+             "language": "python", "tool": "bandit",
+             "findings": [
+                 {"severity": "HIGH", "confidence": "HIGH", "rule_id": "B602",
+                  "test_name": "subprocess_popen_with_shell_equals_true",
+                  "message": "subprocess call with shell=True", "line": 5},
+                 {"severity": "LOW", "confidence": "HIGH", "rule_id": "B404",
+                  "test_name": "blacklist", "message": "subprocess imported", "line": 1},
+             ]},
+        ],
+    }
+    violations := content_security.get_violations(
+        tf_variables, ["after_agent_callbacks", "python_code"], ["MEDIUM"]
+    ) with input as mixed_input
+
+    count(violations) == 1
+    some v in violations
+    contains(v.message, "B602")
+    not contains(v.message, "B404")
+}

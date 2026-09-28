@@ -108,6 +108,12 @@ run_test_suite "Map Key Blacklist Policy" \
     "policies/_helpers/policies/map_key_blacklist.rego" \
     "false" "false"
 
+# Mock-only: findings are injected directly, no plan fixtures or assertion helpers.
+run_test_suite "Content Security Policy" \
+    "tests/_helpers/content_security_test.rego" \
+    "policies/_helpers/policies/content_security.rego" \
+    "false" "false"
+
 # This suite exercises conditions through the complete dispatcher and summary.
 run_test_suite "Map Key Blacklist Integration" \
     "tests/_helpers/map_key_blacklist_integration_test.rego" \

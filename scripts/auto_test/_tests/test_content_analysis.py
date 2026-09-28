@@ -26,6 +26,14 @@ def test_needs_content_analysis_false_for_other_types(tmp_path, policy_type):
     assert auto_test.needs_content_analysis(policy) is False
 
 
+def test_needs_content_analysis_ignores_bare_phrase_elsewhere(tmp_path):
+    # The gate keys on the exact policy_type field, not the phrase: a mention of
+    # "content security" in a description must not trigger the analysis.
+    policy = tmp_path / "p.rego"
+    policy.write_text('"situation_description": "checks content security"\n', encoding="utf-8")
+    assert auto_test.needs_content_analysis(policy) is False
+
+
 def test_inject_content_security_findings_returns_none_without_bandit(tmp_path, monkeypatch):
     plan = tmp_path / "plan.json"
     plan.write_text("{}", encoding="utf-8")

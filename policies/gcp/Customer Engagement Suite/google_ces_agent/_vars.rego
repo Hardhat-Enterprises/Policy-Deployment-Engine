@@ -5,4 +5,3 @@ variables := {
     "resource_type": "google_ces_agent",
     "resource_value_name": "name"
 }
-

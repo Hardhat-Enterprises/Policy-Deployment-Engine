@@ -93,6 +93,17 @@ get_multi_summary(conditions, tf_variables) = summary if {
         "details": []
     }
 } else = summary if {
+    # A content security threshold (`values`) must name a severity the helper
+    # knows, or the severity_order lookup is undefined and the policy silently
+    # passes everything — the same broken-permissive failure an unknown
+    # policy_type causes.
+    problems := content_security_severity_problems(conditions)
+    count(problems) > 0
+    summary := {
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Valid severities are: %s.", [concat("; ", sort(problems)), concat(", ", sort(content_security.valid_severities))])],
+        "details": []
+    }
+} else = summary if {
     # Count resources without storing them
     resource_count := count([r |
         r := input.planned_values.root_module.resources[_]
@@ -399,6 +410,22 @@ _valid_map_key_blacklist_values(values) if {
         is_string(name)
         name != ""
         name == trim_space(name)
+    }
+}
+
+# A content security threshold must be a severity the helper knows. An unknown
+# one makes severity_order[threshold] undefined, which silently drops the finding
+# and turns the policy permissive — refused for the same reason as an unknown
+# policy_type.
+content_security_severity_problems(conditions) := problems if {
+    problems := {sprintf("unknown severity '%v' on the content security condition reading '%s'",
+                         [value, shared.format_attribute_path(entry.attribute_path)]) |
+        some group in conditions
+        some entry in group
+        lower(object.get(entry, "policy_type", "")) == "content security"
+        values := shared.ensure_array(object.get(entry, "values", null))
+        value := values[_]
+        not value in content_security.valid_severities
     }
 }
 

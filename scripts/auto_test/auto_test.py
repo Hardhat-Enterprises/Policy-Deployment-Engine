@@ -778,11 +778,15 @@ def needs_content_analysis(policy_file: Path) -> bool:
     """True when the policy declares the ``content security`` policy type.
 
     Content-security policies read Bandit findings that must be injected into the
-    OPA input before evaluation. The policy-type string is the single, stable
+    OPA input before evaluation. The policy-type field is the single, stable
     marker shared with ``helpers.rego`` and ``policy_lint.py``, so this is a cheap,
-    precise gate: every other policy type skips the analysis entirely.
+    precise gate: every other policy type skips the analysis entirely. The match is
+    against the exact ``"policy_type": "content security"`` field, not the bare
+    phrase, so a mention of "content security" in a comment or description cannot
+    trigger the analysis.
     """
-    return "content security" in policy_file.read_text(encoding="utf-8")
+    text = policy_file.read_text(encoding="utf-8")
+    return '"policy_type": "content security"' in text
 
 
 def inject_content_security_findings(plan_path: Path) -> Path | None:
@@ -799,12 +803,12 @@ def inject_content_security_findings(plan_path: Path) -> Path | None:
         thread_safe_print("⚠️  `bandit` not installed — cannot run content-security analysis")
         return None
     try:
+        # Import via the package path (as the tests do), so REPO_ROOT must be on
+        # sys.path for `scripts` to be importable.
+        if str(REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(REPO_ROOT))
+        from scripts.content_analysis import extract, analyze, normalize
         content_dir = REPO_ROOT / "scripts" / "content_analysis"
-        if str(content_dir) not in sys.path:
-            sys.path.insert(0, str(content_dir))
-        import extract
-        import analyze
-        import normalize
         registry = extract.load_registry(content_dir / "registry.json")
         plan = json.loads(plan_path.read_text(encoding="utf-8"))
         key_map = extract.attribute_key_map(registry)
