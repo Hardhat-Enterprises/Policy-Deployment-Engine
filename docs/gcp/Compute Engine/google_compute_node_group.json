@@ -6,50 +6,50 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting controls whether the node group can be deleted. Preventing deletion helps protect important infrastructure from accidental or destructive loss."
     },
     "description": {
       "description": "An optional textual description of the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field is only used to describe the node group. Changing the description does not affect how the resource works or how secure it is."
     },
     "initial_size": {
       "description": "The initial number of nodes in the node group. One of 'initial_size' or 'autoscaling_policy' must be configured on resource creation.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field sets how many nodes are created when the group is first set up. The right number depends on the workload, so there is no single secure value for every environment."
     },
     "maintenance_policy": {
       "description": "Specifies how to handle instances when a node in the group undergoes maintenance. Set to one of: DEFAULT, RESTART_IN_PLACE, or MIGRATE_WITHIN_NODE_GROUP. The default value is DEFAULT.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field decides how the node group handles planned maintenance. Different options suit different workloads, so there is no single security setting that is right for everyone."
     },
     "name": {
       "description": "Name of the resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field is only used to identify the node group. Changing its name does not change how the resource is protected."
     },
     "node_template": {
       "description": "The URL of the node template to which this node group belongs.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies the node template used by the group. The correct template depends on the organisation's infrastructure, so there is no single security value that applies to everyone."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies which Google Cloud project the node group belongs to. It does not change the security settings of the node group by itself."
     },
     "zone": {
       "description": "Zone where this node group is located",
@@ -67,22 +67,22 @@
       "description": "Maximum size of the node group. Set to a value less than or equal\nto 100 and greater than or equal to min-nodes.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field controls the maximum size of the node group. It is an operational capacity and cost setting rather than a platform security policy target."
     },
     "autoscaling_policy.min_nodes": {
       "description": "Minimum size of the node group. Must be less\nthan or equal to max-nodes. The default value is 0.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field controls the minimum size of the node group. It is an operational availability and performance setting rather than a security policy target."
     },
     "autoscaling_policy.mode": {
       "description": "The autoscaling mode. Set to one of the following:\n  - OFF: Disables the autoscaler.\n  - ON: Enables scaling in and scaling out.\n  - ONLY_SCALE_OUT: Enables only scaling out.\n  You must use this mode if your node groups are configured to\n  restart their hosted VMs on minimal servers. Possible values: [\"OFF\", \"ON\", \"ONLY_SCALE_OUT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field controls how the node group scales, such as whether autoscaling is enabled or disabled. The correct mode depends on workload and operational requirements rather than security policy."
     },
     "maintenance_window": {
       "type": "block",
@@ -93,8 +93,8 @@
       "description": "instances.start time of the window. This must be in UTC format that resolves to one of 00:00, 04:00, 08:00, 12:00, 16:00, or 20:00. For example, both 13:00-5 and 08:00 are valid.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field controls when maintenance begins. It is an operational scheduling preference rather than a platform security policy target."
     },
     "share_settings": {
       "type": "block",
@@ -105,8 +105,8 @@
       "description": "Node group sharing type. Possible values: [\"ORGANIZATION\", \"SPECIFIC_PROJECTS\", \"LOCAL\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting controls how widely the node group is shared. Sharing it too broadly could allow more projects to use the infrastructure than intended."
     },
     "share_settings.project_map": {
       "type": "block",
@@ -117,15 +117,15 @@
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field is an identifier for an entry in the sharing configuration. It is a map key or reference rather than a security control."
     },
     "share_settings.project_map.project_id": {
       "description": "The project id/number should be the same as the key of this project config in the project map.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field references a specific project that can use the shared resource. Project identifiers are environment-specific references and are not suitable for a generic platform security policy."
     }
   }
 }

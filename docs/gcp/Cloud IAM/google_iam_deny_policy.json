@@ -6,29 +6,29 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform may destroy the IAM deny policy. Requiring 'PREVENT' reduces the risk of accidentally removing an access-control guardrail and restoring access that the policy was intended to deny."
     },
     "display_name": {
       "description": "The display name of the rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a human-readable display name for the policy and does not alter its access-control behaviour."
     },
     "name": {
       "description": "The name of the policy.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the policy resource identifier. Platform policy should not constrain team-specific resource names."
     },
     "parent": {
       "description": "The attachment point is identified by its URL-encoded full resource name.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the organization, folder, or project where the deny policy is attached. This is a team-specific resource reference and should not be prescribed by a generic platform policy."
     },
     "rules": {
       "type": "block",
@@ -39,8 +39,8 @@
       "description": "The description of the rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive text for a deny rule and does not change its enforcement behaviour."
     },
     "rules.deny_rule": {
       "type": "block",
@@ -51,29 +51,29 @@
       "description": "The permissions that are explicitly denied by this rule. Each permission uses the format '{service-fqdn}/{resource}.{verb}',\nwhere '{service-fqdn}' is the fully qualified domain name for the service. For example, 'iam.googleapis.com/roles.list'.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which permissions the rule denies. Selecting denied permissions is part of the team's access-control design, and a generic platform policy should not prescribe a fixed permission set."
     },
     "rules.deny_rule.denied_principals": {
       "description": "The identities that are prevented from using one or more permissions on Google Cloud resources.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies which identities are subject to the deny rule. Selecting these principals is team-specific IAM policy design and cannot be generically constrained without overreaching."
     },
     "rules.deny_rule.exception_permissions": {
       "description": "Specifies the permissions that this rule excludes from the set of denied permissions given by deniedPermissions.\nIf a permission appears in deniedPermissions and in exceptionPermissions then it will not be denied.\nThe excluded permissions can be specified using the same syntax as deniedPermissions.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies permissions excluded from the deny rule. Appropriate exceptions depend on operational and access requirements, so enforcing their contents would overreach into team IAM design."
     },
     "rules.deny_rule.exception_principals": {
       "description": "The identities that are excluded from the deny rule, even if they are listed in the deniedPrincipals.\nFor example, you could add a Google group to the deniedPrincipals, then exclude specific users who belong to that group.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies identities exempted from the deny rule. Such exceptions may be required for legitimate users, groups, or service agents, so a generic platform policy should not prohibit or prescribe them."
     },
     "rules.deny_rule.denial_condition": {
       "type": "block",
@@ -84,29 +84,29 @@
       "description": "Description of the expression. This is a longer text which describes the expression,\ne.g. when hovered over it in a UI.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides explanatory text for the denial condition and does not affect whether the rule is enforced."
     },
     "rules.deny_rule.denial_condition.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains the team-defined CEL expression controlling when the deny rule applies. The correct expression depends on the organisation's access model, and generic constraints would overreach into free-form policy logic."
     },
     "rules.deny_rule.denial_condition.location": {
       "description": "String indicating the location of the expression for error reporting,\ne.g. a file name and a position in the file.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides source-location information for expression error reporting. It is not the deployment location of the resource and has no security effect."
     },
     "rules.deny_rule.denial_condition.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.\nThis can be used e.g. in UIs which allow to enter the expression.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides a short descriptive title for the condition and does not affect access-control enforcement."
     }
   }
 }

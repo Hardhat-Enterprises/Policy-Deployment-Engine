@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete or abandon the resource. Preventing unintended destruction can help preserve infrastructure and associated security controls."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is descriptive metadata only and does not directly affect the security behaviour or configuration of the resource."
     },
     "instance": {
       "description": "The Compute instance VM handling traffic for this target instance.\nAccepts the instance self-link, relative path\n(e.g. 'projects/project/zones/zone/instances/instance') or name. If\nname is given, the zone will default to the given zone or\nthe provider-default zone and the project will default to the\nprovider-level project.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies or references the specific Compute instance used by the target instance. Resource references are team-specific and should not be constrained by a general platform-wide security policy."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is\ncreated. The name must be 1-63 characters long, and comply with\nRFC1035. Specifically, the name must be 1-63 characters long and match\nthe regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the\nfirst character must be a lowercase letter, and all following\ncharacters must be a dash, lowercase letter, or digit, except the last\ncharacter, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource name is an identifier and does not directly control the security behaviour of the target instance."
     },
     "nat_policy": {
       "description": "NAT option controlling how IPs are NAT'ed to the instance.\nCurrently only NO_NAT (default value) is supported. Default value: \"NO_NAT\" Possible values: [\"NO_NAT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Although this describes NAT behaviour, the only supported value is NO_NAT. There is therefore no configurable security choice that can be meaningfully constrained by a platform-wide policy."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This identifies the project containing the resource. Project identifiers are team-specific scope references and cannot be generalised into a platform-wide security policy."
     },
     "zone": {
       "description": "URL of the zone where the target instance resides.",

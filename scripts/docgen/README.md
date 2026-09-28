@@ -80,11 +80,57 @@ uv run python scripts/docgen/generator.py --csp gcp --mode refresh-existing \
   (≠ `""`) matched by dotted key. Bumps `last_updated` and `provider_version`. Does not
   create new resource files.
 
+## apply_canonical.py
+
+Some arguments mean the same thing on every resource — data residency
+(`location` / `region` / `zone`) and the common IAM keys — so their assessment is
+locked in one place, `lib/canonical.py`, rather than re-decided per resource. New
+resources pick those values up from the generator automatically.
+
+`apply_canonical.py` is for the files that already exist: it walks
+`docs/gcp/**/*.json` and overwrites those canonical keys with the locked values.
+
+```bash
+# See what would change — this is the default, nothing is written:
+uv run python scripts/docgen/apply_canonical.py
+
+# Write it:
+uv run python scripts/docgen/apply_canonical.py --apply
+```
+
+It **overwrites** `security_impact` and `rationale` on the keys it owns, so a
+hand-written assessment of a canonical key is replaced. That is the intent — one
+answer for `location` across the tree — but it is why the dry run is the default.
+Run it from the repo root, and review the diff before committing.
+
+### When the generic answer is wrong
+
+Not every residency key is a residency *decision*. `google_iam_folders_policy_binding`
+only accepts the global IAM location, and `google_compute_per_instance_config.zone` has
+to match the instance group manager it references — marking either "restrict this to an
+approved region" would send a contributor looking for a control that cannot exist.
+
+`EXEMPTIONS` in `lib/canonical.py` records those, and it records the **correct answer**,
+not permission to write anything: an exempt key is still locked, just to a different
+value. So `apply_canonical.py` leaves it alone, the generator writes the right thing into
+a new resource, and the linter still checks it.
+
+Adding one is deliberate — the resource, the key, and a rationale saying why this one
+differs. Everything not listed stays canonical.
+
+### The linter enforces it
+
+`linter.py`'s docs content checks report any canonical key whose assessment has been
+changed, naming both the fix (`apply_canonical.py --apply`) and the way out
+(`EXEMPTIONS`). It is a content check rather than a structural one so that one drifted
+file cannot turn every contributor's pull request red.
+
 ## Layout
 
 ```
 scripts/docgen/
   generator.py            # CLI + orchestration + the two re-run modes
+  apply_canonical.py      # re-apply the locked cross-cutting assessments (above)
   lib/
     schema_source.py      # terraform/tofu init + `providers schema -json` (cached)
     service_map.py        # resource -> verbatim subcategory (reuses docgen clone)

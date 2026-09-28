@@ -6,29 +6,29 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform may destroy this cross-site network, defaulting to DELETE. Because the resource groups the Interconnect attachments carrying traffic between an organisation's own sites and Google Cloud, allowing it to be removed by a routine apply takes down a trusted network path, while ABANDON leaves that path live in the project but outside Terraform's control where it can drift unreviewed. A policy should constrain this value so connectivity infrastructure cannot be dropped or orphaned as a side effect of ordinary changes."
     },
     "description": {
       "description": "An optional description of this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A free-text note describing the cross-site network for human readers. It plays no part in how the resource groups Interconnect attachments or carries traffic, so its value cannot affect the security of the connection, and constraining it would enforce documentation practice rather than a security outcome."
     },
     "name": {
       "description": "Name of the resource. Provided by the client when the resource is created. The name must be\n1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression '[a-z]([-a-z0-9]*[a-z0-9])?' which means the first\ncharacter must be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a dash.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The identifier assigned to the cross-site network, constrained by GCP to the RFC1035 format. It is used to reference the resource when attaching Interconnect resources to it and takes no part in how traffic is carried, so any rule about its value would enforce a naming convention rather than a security outcome."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines which GCP project the cross-site network is created in, defaulting to the provider's configured project. It selects where the resource lives rather than how the connection behaves, and any rule constraining it would have to name project IDs belonging to individual teams, so it cannot be expressed as a generic platform policy."
     }
   }
 }
