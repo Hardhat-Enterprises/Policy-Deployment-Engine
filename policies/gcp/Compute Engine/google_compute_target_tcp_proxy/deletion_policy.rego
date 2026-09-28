@@ -6,16 +6,16 @@ import data.terraform.gcp.security.compute_engine.google_compute_target_tcp_prox
 conditions := [
     [
         {
-            "situation_description": "Target TCP Proxy uses the ABANDON deletion policy",
+            "situation_description": "Target TCP Proxy is not protected from unintended Terraform deletion",
             "remedies": [
-                "Set deletion_policy to DELETE or PREVENT"
+                "Set deletion_policy to PREVENT to protect the resource from unintended destruction"
             ]
         },
         {
-            "condition": "Deletion policy must not abandon the resource",
+            "condition": "Deletion policy must be set to the approved PREVENT value",
             "attribute_path": ["deletion_policy"],
-            "values": ["ABANDON"],
-            "policy_type": "blacklist"
+            "values": ["PREVENT"],
+            "policy_type": "whitelist"
         }
     ]
 ]
