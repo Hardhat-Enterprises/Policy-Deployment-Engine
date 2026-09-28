@@ -1,0 +1,12 @@
+resource "google_compute_storage_pool" "non_compliant_example_1" {
+  name = "non_compliant_example_1"
+
+  project = "pde-project-vindya"
+
+  pool_provisioned_capacity_gb = "10240"
+  pool_provisioned_throughput  = "100"
+
+  storage_pool_type = "hyperdisk-throughput"
+
+  zone = "us-central1-a"
+}
