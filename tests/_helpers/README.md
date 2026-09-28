@@ -171,7 +171,7 @@ rm plan.json plan.tfplan
 ## Adding New Tests
 
 1. Create `<helper_name>_test.rego` in `tests/_helpers/`
-2. Follow 8-test pattern (6 unit + 1 integration + 1 reality check)
+2. Write unit tests plus a reality check against a real Terraform fixture
 3. Use fixtures for reality checks: `data.<fixture_name>_plan`
 4. Update `unit_test_helpers.sh` to include new test file
 5. Run tests to verify: `./tests/_helpers/unit_test_helpers.sh`
