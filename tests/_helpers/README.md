@@ -38,15 +38,13 @@ Unit tests for policy helper functions in `policies/_helpers/`.
 
 ## Test Structure
 
-Each test file follows an 8-test pattern:
-- **Unit tests (6):** Test individual helper functions with boundary cases
-- **Integration test (1):** Realistic mocks with multiple resources
-- **Reality check (1):** Uses real Terraform fixtures
+Test files combine unit tests, integration checks, and reality checks against real
+Terraform fixtures. Exact per-file counts are in the table above.
 
 ## Test Scripts
 
 ### unit_test_helpers.sh
-Runs all 7 test suites with fixtures. Use for comprehensive validation.
+Runs all 11 test suites with fixtures. Use for comprehensive validation.
 
 ### smoke_test_helpers.sh
 Fast integration tests (5 policies at policy level). Use for quick feedback during development.

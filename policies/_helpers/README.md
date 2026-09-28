@@ -227,6 +227,10 @@ get_violations(tf_variables, attribute_path, values) = results
 - Check each position against position-specific whitelists
 - ANY non-match = violation
 
+A value that does not fit the target shape at all extracts nothing, so the resource
+passes silently. To require a value to match a shape rather than extract parts from
+it, use **Element Pattern Whitelist** (section 8).
+
 **Example:**
 ```json
 {
@@ -333,11 +337,12 @@ opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_black
 - A string attribute is checked as a one-item list
 - `*` matches one path segment (one or more non-`/` characters), so it never spans a separator
 - An empty `values` list matches nothing, so every element is flagged
+- A missing attribute or an empty list produces no violations; the attribute is not required to exist
 
 **Example:**
 ```json
 {
-  "policy_type": "Element Pattern Whitelist",
+  "policy_type": "element pattern whitelist",
   "attribute_path": ["guardrails"],
   "values": ["projects/*/locations/*/apps/*/guardrails/*"]
 }
