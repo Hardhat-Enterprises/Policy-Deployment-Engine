@@ -11,6 +11,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.mutation_test.report import write_json_report
 from scripts.mutation_test.resource_runner import (
+    discover_all_policy_targets,
     discover_policy_targets,
     run_single_policy,
 )
@@ -19,31 +20,51 @@ from scripts.mutation_test.resource_runner import (
 def parse_args():
     parser = argparse.ArgumentParser(
         description=(
-            "Mutation-test PDE Rego policies using "
+            "Mutation test PDE Rego policies using "
             "committed Terraform plan fixtures."
         )
     )
 
     parser.add_argument(
         "target",
+        nargs="?",
         help=(
             "Resource or individual policy path. "
-            "Examples: "
-            "'gcp/API Hub/google_apihub_curation' "
-            "or "
-            "'gcp/API Hub/google_apihub_curation/deletion_policy'"
+            "Not required when --all is used."
+        ),
+    )
+
+    parser.add_argument(
+        "--all",
+        dest="all_policies",
+        action="store_true",
+        help=(
+            "Run mutation testing across every PDE policy "
+            "that has a matching committed plan fixture."
         ),
     )
 
     parser.add_argument(
         "--report",
         help=(
-            "Optional path for a machine-readable "
+            "Optional path for a machine readable "
             "JSON mutation report."
         ),
     )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    if args.all_policies and args.target:
+        parser.error(
+            "target cannot be used together with --all"
+        )
+
+    if not args.all_policies and not args.target:
+        parser.error(
+            "target is required unless --all is used"
+        )
+
+    return args
 
 
 def is_policy_target(target: Path) -> bool:
@@ -80,13 +101,15 @@ def print_policy_result(result: dict) -> None:
     print(f"Policy: {result['policy']}")
 
     if result.get("error"):
-        print(f"  [ERROR] {result['error']}")
+        print(
+            f"  [ERROR] {result['error']}"
+        )
         return
 
     if result.get("unsupported"):
         print(
             "  [UNSUPPORTED] "
-            "Custom/non-standard PDE policy structure."
+            "Custom or non standard PDE policy structure."
         )
 
         print(
@@ -98,6 +121,7 @@ def print_policy_result(result: dict) -> None:
 
     for mutant in result["mutants"]:
         print()
+
         print(
             f"  Mutation {mutant['number']}"
         )
@@ -116,6 +140,12 @@ def print_policy_result(result: dict) -> None:
             f"    Condition   : "
             f"{mutant['condition']}"
         )
+
+        if "operator" in mutant:
+            print(
+                f"    Operator    : "
+                f"{mutant['operator']}"
+            )
 
         if "original_value" in mutant:
             print(
@@ -163,7 +193,9 @@ def print_policy_result(result: dict) -> None:
     score = result.get("score")
 
     if score is None:
-        print("  Score    : N/A")
+        print(
+            "  Score    : N/A"
+        )
 
     else:
         print(
@@ -174,32 +206,24 @@ def print_policy_result(result: dict) -> None:
 def main() -> int:
     args = parse_args()
 
-    target = Path(args.target)
-
     print(
         "PDE Policy Mutation Testing"
     )
 
-    print(
-        f"Target: {args.target}"
-    )
-
-    if is_policy_target(target):
-        targets = [target]
+    if args.all_policies:
+        target_label = "ALL"
 
         print(
-            "Mode  : single policy"
+            "Target: ALL"
         )
 
-    else:
         print(
-            "Mode  : resource"
+            "Mode  : repository"
         )
 
         try:
-            targets = discover_policy_targets(
+            targets = discover_all_policy_targets(
                 REPO_ROOT,
-                target,
             )
 
         except ValueError as error:
@@ -209,9 +233,45 @@ def main() -> int:
 
             return 1
 
+    else:
+        target = Path(
+            args.target
+        )
+
+        target_label = args.target
+
+        print(
+            f"Target: {args.target}"
+        )
+
+        if is_policy_target(target):
+            targets = [target]
+
+            print(
+                "Mode  : single policy"
+            )
+
+        else:
+            print(
+                "Mode  : resource"
+            )
+
+            try:
+                targets = discover_policy_targets(
+                    REPO_ROOT,
+                    target,
+                )
+
+            except ValueError as error:
+                print(
+                    f"[ERROR] {error}"
+                )
+
+                return 1
+
     if not targets:
         print(
-            "[ERROR] No mutation-testable "
+            "[ERROR] No mutation testable "
             "policies were discovered."
         )
 
@@ -223,7 +283,17 @@ def main() -> int:
 
     policy_results = []
 
-    for policy_target in targets:
+    for number, policy_target in enumerate(
+        targets,
+        start=1,
+    ):
+        if args.all_policies:
+            print()
+            print(
+                f"Running policy "
+                f"{number} of {len(targets)}"
+            )
+
         result = run_single_policy(
             REPO_ROOT,
             policy_target,
@@ -238,17 +308,26 @@ def main() -> int:
         )
 
     killed = sum(
-        result.get("killed", 0)
+        result.get(
+            "killed",
+            0,
+        )
         for result in policy_results
     )
 
     survived = sum(
-        result.get("survived", 0)
+        result.get(
+            "survived",
+            0,
+        )
         for result in policy_results
     )
 
     skipped = sum(
-        result.get("skipped", 0)
+        result.get(
+            "skipped",
+            0,
+        )
         for result in policy_results
     )
 
@@ -285,7 +364,12 @@ def main() -> int:
         overall_score = None
 
     summary = {
-        "target": args.target,
+        "target": target_label,
+        "mode": (
+            "repository"
+            if args.all_policies
+            else "target"
+        ),
         "policies_discovered": len(targets),
         "mutation_compatible_policies": compatible,
         "unsupported_policies": unsupported,
@@ -298,40 +382,58 @@ def main() -> int:
     }
 
     print()
+
+    if args.all_policies:
+        print(
+            "Repository Mutation Summary"
+        )
+
+        print(
+            "==========================="
+        )
+
+    else:
+        print(
+            "Overall Mutation Summary"
+        )
+
+        print(
+            "========================"
+        )
+
     print(
-        "Overall Mutation Summary"
+        f"Policies discovered : "
+        f"{len(targets)}"
     )
 
     print(
-        "========================"
+        f"Compatible          : "
+        f"{compatible}"
     )
 
     print(
-        f"Policies discovered : {len(targets)}"
+        f"Unsupported         : "
+        f"{unsupported}"
     )
 
     print(
-        f"Compatible          : {compatible}"
+        f"Killed              : "
+        f"{killed}"
     )
 
     print(
-        f"Unsupported         : {unsupported}"
+        f"Survived            : "
+        f"{survived}"
     )
 
     print(
-        f"Killed              : {killed}"
+        f"Skipped             : "
+        f"{skipped}"
     )
 
     print(
-        f"Survived            : {survived}"
-    )
-
-    print(
-        f"Skipped             : {skipped}"
-    )
-
-    print(
-        f"Errors              : {errors}"
+        f"Errors              : "
+        f"{errors}"
     )
 
     if overall_score is None:

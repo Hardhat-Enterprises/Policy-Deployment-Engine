@@ -169,3 +169,31 @@ def test_unknown_policy_type_returns_no_mutations():
         )
         == []
     )
+
+    
+def test_whitelist_array_injects_outside_value():
+    mutations = generate_mutations(
+        "whitelist",
+        ["AU"],
+        ["AU", "NZ"],
+    )
+
+    assert len(mutations) == 1
+
+    mutation = mutations[0]
+
+    assert (
+        mutation.operator
+        == "whitelist-inject-outside-allowlist"
+    )
+
+    assert mutation.value[0] == "AU"
+
+    assert len(
+        mutation.value
+    ) == 2
+
+    assert (
+        mutation.value[1]
+        not in ["AU", "NZ"]
+    )

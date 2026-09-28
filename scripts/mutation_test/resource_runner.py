@@ -4,6 +4,7 @@ from scripts.mutation_test.operators import generate_mutations
 import json
 from pathlib import Path
 from typing import Any
+import os 
 
 from scripts.mutation_test.evaluator import (
     evaluate_plan,
@@ -79,6 +80,67 @@ def discover_policy_targets(
 
     return targets
 
+def discover_all_policy_targets(
+    repo_root: Path,
+) -> list[Path]:
+    """
+    Discover every PDE policy that has a matching
+    committed Terraform plan fixture.
+    """
+
+    input_root = (
+        repo_root
+        / "inputs"
+    )
+
+    policy_root = (
+        repo_root
+        / "policies"
+    )
+
+    if not input_root.is_dir():
+        raise ValueError(
+            f"Input directory not found: {input_root}"
+        )
+
+    if not policy_root.is_dir():
+        raise ValueError(
+            f"Policy directory not found: {policy_root}"
+        )
+
+    targets: list[Path] = []
+
+    for policy_file in sorted(
+        policy_root.rglob("*.rego")
+    ):
+        relative_policy = (
+            policy_file.relative_to(
+                policy_root
+            )
+        )
+
+        target = (
+            relative_policy.with_suffix("")
+        )
+
+        fixture_dir = (
+            input_root
+            / target
+        )
+
+        if not fixture_dir.is_dir():
+            continue
+
+        if not list(
+            fixture_dir.glob("*.json")
+        ):
+            continue
+
+        targets.append(
+            target
+        )
+
+    return targets
 
 def find_resource(
     resources: list[dict[str, Any]],
@@ -96,6 +158,37 @@ def find_resource(
 
     return None, None
 
+def _read_text(
+    path: Path,
+) -> str:
+    """
+    Read a file while supporting long Windows paths.
+    """
+
+    resolved = str(
+        path.resolve()
+    )
+
+    if os.name == "nt":
+        if resolved.startswith("\\\\"):
+            resolved = (
+                "\\\\?\\UNC\\"
+                + resolved.lstrip("\\")
+            )
+
+        elif not resolved.startswith("\\\\?\\"):
+            resolved = (
+                "\\\\?\\"
+                + resolved
+            )
+
+    with open(
+        resolved,
+        "r",
+        encoding="utf-8",
+    ) as file:
+        
+        return file.read()
 
 def load_plan(
     fixture_dir: Path,
@@ -118,8 +211,8 @@ def load_plan(
     plan_path = plan_files[0]
 
     plan = json.loads(
-        plan_path.read_text(
-            encoding="utf-8"
+        _read_text(
+            plan_path
         )
     )
 
@@ -127,7 +220,7 @@ def load_plan(
 
 
 def run_single_policy(
-    repo_root: Path,
+    repo_root: Path, 
     policy_path: Path,
 ) -> dict[str, Any]:
     """

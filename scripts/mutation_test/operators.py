@@ -101,32 +101,43 @@ def _generate_whitelist(
 ) -> list[GeneratedMutation]:
 
     if isinstance(current_value, list):
-        # PDE's array whitelist requires every configured allowed
-        # value to be present. Remove one allowed member.
-        for allowed_value in allowed:
-            if allowed_value in current_value:
-                mutated = copy.deepcopy(
-                    current_value
-                )
+        if current_value:
+            example_value = current_value[0]
 
-                mutated.remove(
-                    allowed_value
-                )
+        elif allowed:
+            example_value = allowed[0]
 
-                return [
-                    GeneratedMutation(
-                        operator=(
-                            "whitelist-remove-allowed-value"
-                        ),
-                        value=mutated,
-                        rationale=(
-                            "Remove a required whitelisted "
-                            "array element."
-                        ),
-                    )
-                ]
+        else:
+            return []
 
-        return []
+        candidate = _outside_allowed_value(
+            example_value,
+            allowed,
+        )
+
+        if candidate is None:
+            return []
+
+        mutated = copy.deepcopy(
+            current_value
+        )
+
+        mutated.append(
+            candidate
+        )
+
+        return [
+            GeneratedMutation(
+                operator=(
+                    "whitelist-inject-outside-allowlist"
+                ),
+                value=mutated,
+                rationale=(
+                    "Inject a value outside the whitelist "
+                    "into the compliant array."
+                ),
+            )
+        ]
 
     candidate = _outside_allowed_value(
         current_value,
@@ -138,7 +149,9 @@ def _generate_whitelist(
 
     return [
         GeneratedMutation(
-            operator="whitelist-outside-allowlist",
+            operator=(
+                "whitelist-outside-allowlist"
+            ),
             value=candidate,
             rationale=(
                 "Replace the compliant value with a value "
