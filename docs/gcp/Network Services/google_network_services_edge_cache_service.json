@@ -95,8 +95,8 @@
       "description": "Configures the sampling rate of requests, where 1.0 means all logged requests are reported and 0.0 means no logged requests are reported. The default value is 1.0, and the value of the field must be in [0, 1].\n\nThis field can only be specified if logging is enabled for this service.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "This controls how much service traffic is included in the logs. A rate of zero removes traffic visibility, so a policy can require a useful minimum sampling rate."
+      "security_impact": false,
+      "rationale": "This sets the proportion of requests included when logging is enabled. It tunes log volume and cost; log_config.enable is the separate logging switch. There is no non-arbitrary sample rate that a generic policy can require for every team, so this field is operational tuning rather than a security control."
     },
     "routing": {
       "type": "block",
@@ -490,15 +490,15 @@
       "description": "If true, requests to different hosts will be cached separately.\n\nNote: this should only be enabled if hosts share the same origin and content. Removing the host from the cache key may inadvertently result in different objects being cached than intended, depending on which route the first user matched.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "This can remove the request host from the cache key. That may mix cached objects between different hosts, so a policy should keep the host separated."
+      "security_impact": false,
+      "rationale": "This decides whether the request host is part of the cache key. The right value depends on whether a team intentionally shares the same origin content across hostnames. It is a cache-key correctness and architecture choice, not a generic security boundary that can be enforced for every service."
     },
     "routing.path_matcher.route_rule.route_action.cdn_policy.cache_key_policy.exclude_query_string": {
       "description": "If true, exclude query string parameters from the cache key\n\nIf false (the default), include the query string parameters in\nthe cache key according to includeQueryParameters and\nexcludeQueryParameters. If neither includeQueryParameters nor\nexcludeQueryParameters is set, the entire query string will be\nincluded.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "This can remove the complete query string from the cache key. If query values change the response, removing them may serve one user's response to another request."
+      "security_impact": false,
+      "rationale": "This decides whether query parameters contribute to the cache key. Some applications vary content by query values and others do not, so the correct setting depends on the team's content design. A platform-wide rule cannot choose it without that context; it is cache behaviour rather than a generic security control."
     },
     "routing.path_matcher.route_rule.route_action.cdn_policy.cache_key_policy.excluded_query_parameters": {
       "description": "Names of query string parameters to exclude from cache keys. All other parameters will be included.\n\nEither specify includedQueryParameters or excludedQueryParameters, not both. '&' and '=' will be percent encoded and not treated as delimiters.",
@@ -511,8 +511,8 @@
       "description": "If true, http and https requests will be cached separately.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "This decides whether HTTP and HTTPS requests use separate cache entries. Keeping the protocol in the cache key prevents content from different schemes being mixed."
+      "security_impact": false,
+      "rationale": "This decides whether HTTP and HTTPS requests get separate cache entries. That choice affects cache behaviour for the team's content; TLS enforcement is controlled separately by require_tls. It is not itself a generic encryption or access-control boundary."
     },
     "routing.path_matcher.route_rule.route_action.cdn_policy.cache_key_policy.included_cookie_names": {
       "description": "Names of Cookies to include in cache keys.  The cookie name and cookie value of each cookie named will be used as part of the cache key.\n\nCookie names:\n  - must be valid RFC 6265 \"cookie-name\" tokens\n  - are case sensitive\n  - cannot start with \"Edge-Cache-\" (case insensitive)\n\n  Note that specifying several cookies, and/or cookies that have a large range of values (e.g., per-user) will dramatically impact the cache hit rate, and may result in a higher eviction rate and reduced performance.\n\n  You may specify up to three cookie names.",
@@ -605,8 +605,8 @@
       "description": "Specifies how long results of a preflight request can be cached by a client in seconds. Note that many browser clients enforce a maximum TTL of 600s (10 minutes).\n\n- Setting the value to -1 forces a pre-flight check for all requests (not recommended)\n- A maximum TTL of 86400s can be set, but note that (as above) some clients may force pre-flight checks at a more regular interval.\n- This translates to the Access-Control-Max-Age header.\n\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
       "required": true,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This controls how long a browser caches a CORS preflight decision. A reasonable maximum reduces how long an old permission remains active after a policy change."
+      "security_impact": false,
+      "rationale": "This required field sets how long a browser may cache a CORS preflight result. A value must always be supplied, and choosing a particular duration is an application performance and update-timing decision. There is no non-arbitrary platform-wide maximum that turns this into a structural security control."
     },
     "routing.path_matcher.route_rule.route_action.url_rewrite": {
       "type": "block",
@@ -690,8 +690,8 @@
       "description": "If set to true, any accompanying query portion of the original URL is removed prior to redirecting the request. If set to false, the query portion of the original URL is retained.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "This decides whether query values are removed from the redirected URL. Requiring removal helps prevent tokens or other sensitive query data being forwarded to another location."
+      "security_impact": false,
+      "rationale": "This decides whether a redirect preserves query parameters. Some applications need those parameters to reach the destination, while others may choose to remove them. A generic policy cannot safely require either value without the team's routing requirements; this is application behaviour rather than a platform security control."
     }
   }
 }
