@@ -6,15 +6,15 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls deletion behaviour; deletion and cleanup handling is operational hygiene, not a security control."
     },
     "description": {
       "description": "Description of the posture.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "location": {
       "description": "Location of the resource, eg: global.",
@@ -27,22 +27,22 @@
       "description": "The parent of the resource, an organization. Format should be 'organizations/{organization_id}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
     },
     "posture_id": {
       "description": "Id of the posture. It is an immutable field.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier or reference; it names the item and has no security impact on its own."
     },
     "state": {
       "description": "State of the posture. Update to state field should not be triggered along with\nwith other field updates. Possible values: [\"DEPRECATED\", \"DRAFT\", \"ACTIVE\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A read-only lifecycle state of the posture, not a configurable security control."
     },
     "policy_sets": {
       "type": "block",
@@ -53,15 +53,15 @@
       "description": "Description of the policy set.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policy_set_id": {
       "description": "ID of the policy set.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier or reference; it names the item and has no security impact on its own."
     },
     "policy_sets.policies": {
       "type": "block",
@@ -72,15 +72,15 @@
       "description": "Description of the policy.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.policy_id": {
       "description": "ID of the policy.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier or reference; it names the item and has no security impact on its own."
     },
     "policy_sets.policies.compliance_standards": {
       "type": "block",
@@ -91,15 +91,15 @@
       "description": "Mapping of security controls for the policy.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Maps the policy to a compliance standard or control; a label, not an enforced setting."
     },
     "policy_sets.policies.compliance_standards.standard": {
       "description": "Mapping of compliance standards for the policy.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Maps the policy to a compliance standard or control; a label, not an enforced setting."
     },
     "policy_sets.policies.constraint": {
       "type": "block",
@@ -115,8 +115,8 @@
       "description": "Organization policy canned constraint Id",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier or reference; it names the item and has no security impact on its own."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules": {
       "type": "block",
@@ -127,22 +127,22 @@
       "description": "Setting this to true means that all values are allowed. This field can be set only in policies for list constraints.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Setting allow_all to true permits all values, which disables the constraint and removes the control it enforces."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.deny_all": {
       "description": "Setting this to true means that all values are denied. This field can be set only in policies for list constraints.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets whether the constraint denies all values; it defines the enforcement stance of the policy."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.enforce": {
       "description": "If 'true', then the policy is enforced. If 'false', then any configuration is acceptable.\nThis field can be set only in policies for boolean constraints.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "If false, any configuration is acceptable, so this turns the control on or off."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.condition": {
       "type": "block",
@@ -153,29 +153,29 @@
       "description": "Description of the expression",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.condition.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A CEL expression holding the rule logic; it is team-authored content that a generic policy cannot constrain."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.condition.location": {
       "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.condition.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.values": {
       "type": "block",
@@ -186,15 +186,15 @@
       "description": "List of values allowed at this resource.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the values the constraint permits; a policy should keep this from being overly broad."
     },
     "policy_sets.policies.constraint.org_policy_constraint.policy_rules.values.denied_values": {
       "description": "List of values denied at this resource.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the values the constraint blocks; it directly sets what the control prevents."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom": {
       "type": "block",
@@ -210,50 +210,50 @@
       "description": "The action to take if the condition is met. Possible values: [\"ALLOW\", \"DENY\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets whether the custom constraint allows or denies matching requests; it decides the direction of enforcement."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.custom_constraint.condition": {
       "description": "A CEL condition that refers to a supported service resource, for example 'resource.management.autoUpgrade == false'. For details about CEL usage, see [Common Expression Language](https://docs.cloud.google.com/resource-manager/docs/organization-policy/creating-managing-custom-constraints#common_expression_language).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A CEL condition holding the rule logic; it is team-authored content that a generic policy cannot constrain."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.custom_constraint.description": {
       "description": "A human-friendly description of the constraint to display as an error message when the policy is violated.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.custom_constraint.display_name": {
       "description": "A human-friendly name for the constraint.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.custom_constraint.method_types": {
       "description": "A list of RESTful methods for which to enforce the constraint. Can be 'CREATE', 'UPDATE', or both. Not all Google Cloud services support both methods. To see supported methods for each service, find the service in [Supported services](https://docs.cloud.google.com/resource-manager/docs/organization-policy/custom-constraint-supported-services).",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Scopes which API methods the constraint applies to; a functional selector, not the enforcement itself."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.custom_constraint.name": {
       "description": "Immutable. The name of the custom constraint. This is unique within the organization.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier or reference; it names the item and has no security impact on its own."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.custom_constraint.resource_types": {
       "description": "Immutable. The fully qualified name of the Google Cloud REST resource containing the object and field you want to restrict. For example, 'container.googleapis.com/NodePool'.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Scopes which resource types the constraint or module applies to; a functional selector, not a security boundary."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules": {
       "type": "block",
@@ -264,22 +264,22 @@
       "description": "Setting this to true means that all values are allowed. This field can be set only in policies for list constraints.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Setting allow_all to true permits all values, which disables the custom constraint and removes its control."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.deny_all": {
       "description": "Setting this to true means that all values are denied. This field can be set only in policies for list constraints.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Sets whether the custom constraint denies all values; it defines the enforcement stance."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.enforce": {
       "description": "If 'true', then the policy is enforced. If 'false', then any configuration is acceptable.\nThis field can be set only in policies for boolean constraints.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "If false, any configuration is acceptable, so this turns the custom control on or off."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.condition": {
       "type": "block",
@@ -290,29 +290,29 @@
       "description": "Description of the expression",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.condition.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A CEL expression holding the rule logic; it is team-authored content that a generic policy cannot constrain."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.condition.location": {
       "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.condition.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.values": {
       "type": "block",
@@ -323,15 +323,15 @@
       "description": "List of values allowed at this resource.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the values the custom constraint permits; a policy should keep this from being overly broad."
     },
     "policy_sets.policies.constraint.org_policy_constraint_custom.policy_rules.values.denied_values": {
       "description": "List of values denied at this resource.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines the values the custom constraint blocks; it directly sets what the control prevents."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module": {
       "type": "block",
@@ -342,15 +342,15 @@
       "description": "The display name of the Security Health Analytics custom module. This\ndisplay name becomes the finding category for all findings that are\nreturned by this custom module.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.module_enablement_state": {
       "description": "The state of enablement for the module at its level of the resource hierarchy. Possible values: [\"ENABLEMENT_STATE_UNSPECIFIED\", \"ENABLED\", \"DISABLED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables or disables the Security Health Analytics custom module; if disabled the detection does not run."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config": {
       "type": "block",
@@ -361,22 +361,22 @@
       "description": "Text that describes the vulnerability or misconfiguration that the custom\nmodule detects.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.recommendation": {
       "description": "An explanation of the recommended steps that security teams can take to\nresolve the detected issue",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.severity": {
       "description": "The severity to assign to findings generated by the module. Possible values: [\"SEVERITY_UNSPECIFIED\", \"CRITICAL\", \"HIGH\", \"MEDIUM\", \"LOW\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the finding severity label; it classifies findings and does not change enforcement."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.custom_output": {
       "type": "block",
@@ -392,8 +392,8 @@
       "description": "Name of the property for the custom output.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier or reference; it names the item and has no security impact on its own."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.custom_output.properties.value_expression": {
       "type": "block",
@@ -404,29 +404,29 @@
       "description": "Description of the expression",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.custom_output.properties.value_expression.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A CEL expression holding the rule logic; it is team-authored content that a generic policy cannot constrain."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.custom_output.properties.value_expression.location": {
       "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.custom_output.properties.value_expression.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.predicate": {
       "type": "block",
@@ -437,29 +437,29 @@
       "description": "Description of the expression",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.predicate.expression": {
       "description": "Textual representation of an expression in Common Expression Language syntax.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A CEL expression holding the rule logic; it is team-authored content that a generic policy cannot constrain."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.predicate.location": {
       "description": "String indicating the location of the expression for error reporting, e.g. a file name and a position in the file",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Placement or ownership metadata; residency is handled elsewhere, not by this field."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.predicate.title": {
       "description": "Title for the expression, i.e. a short string describing its purpose.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A human-readable description or label with no security impact."
     },
     "policy_sets.policies.constraint.security_health_analytics_custom_module.config.resource_selector": {
       "type": "block",
@@ -470,8 +470,8 @@
       "description": "The resource types to run the detector on.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Scopes which resource types the constraint or module applies to; a functional selector, not a security boundary."
     },
     "policy_sets.policies.constraint.security_health_analytics_module": {
       "type": "block",
@@ -482,15 +482,15 @@
       "description": "The state of enablement for the module at its level of the resource hierarchy. Possible values: [\"ENABLEMENT_STATE_UNSPECIFIED\", \"ENABLED\", \"DISABLED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables or disables the Security Health Analytics module; if disabled the detection does not run."
     },
     "policy_sets.policies.constraint.security_health_analytics_module.module_name": {
       "description": "The name of the module eg: BIGQUERY_TABLE_CMEK_DISABLED.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An identifier or reference; it names the item and has no security impact on its own."
     }
   }
 }
