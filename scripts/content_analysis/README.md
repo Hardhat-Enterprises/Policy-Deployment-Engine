@@ -23,16 +23,12 @@ Terraform config → terraform plan (plan.json)
 | `extract.py` | walk plan JSON, collect code snippets |
 | `analyze.py` | run Bandit on each snippet (static, never executes) |
 | `normalize.py` | map Bandit output to the standard findings schema |
-| `run.py` | standalone: plan.json → severity verdict (Python, no Rego) |
 
 ## Usage
 
 ```bash
 # Full end-to-end via the test harness (terraform + bandit + opa):
 python3 scripts/auto_test/auto_test.py 'gcp/Customer Engagement Suite/google_ces_agent'
-
-# Standalone severity check on an existing plan.json (no terraform/rego):
-python3 scripts/content_analysis/run.py <plan.json>
 ```
 
 The harness (`auto_test.py`) runs `terraform`, `bandit`, and `opa` for
