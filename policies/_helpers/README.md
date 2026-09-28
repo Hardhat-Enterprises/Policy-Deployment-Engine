@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 9 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Element Pattern Whitelist, Map Key Blacklist, Content Security
+- Support for 9 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Content Security
 - OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -30,6 +30,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [5. Pattern Whitelist](#5-pattern-whitelist)
   - [6. Element Blacklist](#6-element-blacklist)
   - [7. Map Key Blacklist](#7-map-key-blacklist)
+  - [8. Element Pattern Whitelist](#8-element-pattern-whitelist)
   - [9. Content Security](#9-content-security)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
@@ -90,8 +91,7 @@ policies/_helpers/
     ├── pattern_blacklist.rego
     ├── pattern_whitelist.rego
     ├── element_blacklist.rego
-    ├── map_key_blacklist.rego
-    └── content_security.rego
+    └── map_key_blacklist.rego
 ```
 
 ### Component Responsibilities
@@ -227,6 +227,10 @@ get_violations(tf_variables, attribute_path, values) = results
 - Check each position against position-specific whitelists
 - ANY non-match = violation
 
+A value that does not fit the target shape at all extracts nothing, so the resource
+passes silently. To require a value to match a shape rather than extract parts from
+it, use **Element Pattern Whitelist** (section 8).
+
 **Example:**
 ```json
 {
@@ -321,6 +325,29 @@ opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_black
 
 ---
 
+### 8. Element Pattern Whitelist
+
+**Module:** `policies/element_pattern_whitelist.rego`
+**Use Case:** Require every element of a list attribute to match a wildcard resource-path shape
+
+**Logic:**
+- `values` is a list of wildcard shapes; an element passes if it matches any one of them
+- A string attribute is checked as a one-item list
+- `*` matches one path segment (one or more non-`/` characters), so it never spans a separator
+- An empty `values` list matches nothing, so every element is flagged
+- A missing attribute or an empty list produces no violations; the attribute is not required to exist
+
+**Example:**
+```json
+{
+  "policy_type": "element pattern whitelist",
+  "attribute_path": ["guardrails"],
+  "values": ["projects/*/locations/*/apps/*/guardrails/*"]
+}
+```
+
+---
+
 ### 9. Content Security
 **Module:** `policies/content_security.rego`
 **Use Case:** Flag resources whose embedded content (e.g. Python code) has static-analysis findings at/above a severity threshold.
@@ -338,6 +365,8 @@ opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_black
   "values": ["MEDIUM"]
 }
 ```
+
+---
 
 ## Usage Guide
 
