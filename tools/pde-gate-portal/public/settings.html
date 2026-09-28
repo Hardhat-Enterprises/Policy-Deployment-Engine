@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDE Gate — Organisation Settings</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 520px; margin: 2rem auto; padding: 0 1rem; }
+    label { display: block; margin-top: 1rem; font-weight: 600; }
+    input, select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+    button { margin-top: 1.5rem; padding: 0.6rem 1.2rem; background: #1a56db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    .result { margin-top: 2rem; padding: 1rem; background: #f0fdf4; border: 1px solid #86efac; border-radius: 4px; display: none; }
+    .error { background: #fef2f2; border-color: #fca5a5; }
+    nav a { margin-right: 1rem; }
+    .muted { color: #4b5563; font-size: 0.95rem; }
+  </style>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <nav>
+    <a href="/register">Register</a>
+    <a href="/settings">Settings</a>
+  </nav>
+
+  <h1>Organisation settings</h1>
+  <p class="muted">Update approved regions and policy profile. Changes apply on the next <code>pde-gate check</code> run.</p>
+
+  <form id="form">
+    <label for="org_id">org_id</label>
+    <input id="org_id" name="org_id" required />
+
+    <label for="token">API token</label>
+    <input id="token" name="token" type="password" required />
+
+    <label for="approved_regions">Approved regions (comma-separated)</label>
+    <input id="approved_regions" name="approved_regions" required />
+
+    <label for="approved_zones">Approved zones (comma-separated, optional)</label>
+    <input id="approved_zones" name="approved_zones" />
+
+    <label for="policy_profile">Policy profile</label>
+    <select id="policy_profile" name="policy_profile">
+      <option value="full">full</option>
+      <option value="baseline">baseline</option>
+      <option value="custom">custom</option>
+    </select>
+
+    <div id="custom_policies" style="display:none">
+      <label for="enabled_policies">Enabled policies</label>
+      <textarea id="enabled_policies" name="enabled_policies" rows="5" placeholder="google_vpc_access_connector: region, network"></textarea>
+      <p class="muted">Enter one Terraform resource type per line, followed by policy filenames without <code>.rego</code>.</p>
+    </div>
+
+    <button type="submit" formnovalidate>Load current settings</button>
+    <button type="button" id="save_btn" style="margin-left: 0.5rem; display:none;">Save changes</button>
+  </form>
+
+  <div id="result" class="result"></div>
+
+  <script>
+    const form = document.getElementById("form");
+    const saveBtn = document.getElementById("save_btn");
+    const result = document.getElementById("result");
+    let loaded = false;
+    const profile = document.getElementById("policy_profile");
+    const customPolicies = document.getElementById("custom_policies");
+
+    function toggleCustomPolicies() {
+      customPolicies.style.display = profile.value === "custom" ? "block" : "none";
+    }
+
+    profile.addEventListener("change", toggleCustomPolicies);
+
+    function authHeaders(orgId, token) {
+      return {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      };
+    }
+
+    function parseList(raw) {
+      return String(raw).split(",").map(s => s.trim()).filter(Boolean);
+    }
+
+    function parseEnabledPolicies(raw) {
+      const output = {};
+      for (const line of String(raw).split("\n").map(s => s.trim()).filter(Boolean)) {
+        const separator = line.indexOf(":");
+        if (separator < 1) throw new Error("Each custom policy line must use resource_type: policy1, policy2");
+        const resourceType = line.slice(0, separator).trim();
+        const policies = line.slice(separator + 1).split(",").map(s => s.trim()).filter(Boolean);
+        if (!policies.length) throw new Error("Add at least one policy for " + resourceType);
+        output[resourceType] = policies;
+      }
+      if (!Object.keys(output).length) throw new Error("Add at least one custom policy selection");
+      return output;
+    }
+
+    function formatEnabledPolicies(enabled) {
+      return Object.entries(enabled || {}).map(([resourceType, policies]) =>
+        resourceType + ": " + policies.join(", ")
+      ).join("\n");
+    }
+
+    async function loadConfig(orgId, token) {
+      const res = await fetch("/v1/orgs/" + encodeURIComponent(orgId) + "/config", {
+        headers: authHeaders(orgId, token),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.statusText);
+      document.getElementById("approved_regions").value = (data.approved_regions || []).join(", ");
+      document.getElementById("approved_zones").value = (data.approved_zones || []).join(", ");
+      document.getElementById("policy_profile").value = data.policy_profile || "baseline";
+      document.getElementById("enabled_policies").value = formatEnabledPolicies(data.enabled_policies);
+      toggleCustomPolicies();
+      loaded = true;
+      saveBtn.style.display = "inline-block";
+      result.className = "result";
+      result.innerHTML = "<p>Loaded settings for <strong>" + data.org_name + "</strong>.</p>";
+      result.style.display = "block";
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      result.style.display = "none";
+      try {
+        const orgId = document.getElementById("org_id").value.trim();
+        const token = document.getElementById("token").value.trim();
+        await loadConfig(orgId, token);
+      } catch (err) {
+        result.className = "result error";
+        result.innerHTML = "<p>" + err.message + "</p>";
+        result.style.display = "block";
+      }
+    });
+
+    saveBtn.addEventListener("click", async () => {
+      if (!loaded) return;
+      const orgId = document.getElementById("org_id").value.trim();
+      const token = document.getElementById("token").value.trim();
+      const body = {
+        approved_regions: parseList(document.getElementById("approved_regions").value),
+        approved_zones: parseList(document.getElementById("approved_zones").value),
+        policy_profile: document.getElementById("policy_profile").value,
+      };
+      try {
+        if (body.policy_profile === "custom") {
+          body.enabled_policies = parseEnabledPolicies(document.getElementById("enabled_policies").value);
+        }
+        const res = await fetch("/v1/orgs/" + encodeURIComponent(orgId) + "/config", {
+          method: "PATCH",
+          headers: authHeaders(orgId, token),
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || res.statusText);
+        result.className = "result";
+        result.innerHTML = "<p>Settings saved. CI will pick these up on the next check.</p>";
+        result.style.display = "block";
+      } catch (err) {
+        result.className = "result error";
+        result.innerHTML = "<p>" + err.message + "</p>";
+        result.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
