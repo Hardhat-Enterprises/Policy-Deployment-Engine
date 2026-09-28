@@ -22,27 +22,29 @@ Unit tests for policy helper functions in `policies/_helpers/`.
 
 | File | Tests | Coverage |
 |------|-------|----------|
-| `shared_test.rego` | 12 | Shared utilities (get_resource_attribute, format paths, etc.) |
+| `shared_test.rego` | 18 | Shared utilities (get_resource_attribute, format paths, etc.) |
+| `helpers_test.rego` | 32 | Dispatcher and summary orchestration |
 | `blacklist_test.rego` | 10 | Blacklist policy (forbidden values) |
-| `whitelist_test.rego` | 10 | Whitelist policy (required values) |
+| `whitelist_test.rego` | 11 | Whitelist policy (required values) |
 | `range_test.rego` | 8 | Range policy (numeric bounds, simplified) |
-| `pattern_blacklist_test.rego` | 8 | Pattern blacklist (glob matching forbidden) |
-| `pattern_whitelist_test.rego` | 8 | Pattern whitelist (glob matching required) |
+| `pattern_blacklist_test.rego` | 11 | Pattern blacklist (glob matching forbidden) |
+| `pattern_whitelist_test.rego` | 11 | Pattern whitelist (glob matching required) |
 | `element_blacklist_test.rego` | 8 | Element blacklist (array elements with substrings) |
+| `element_pattern_whitelist_test.rego` | 13 | Element pattern whitelist (array elements must match a shape) |
+| `map_key_blacklist_test.rego` | 13 | Map key blacklist (prohibited map keys) |
+| `map_key_blacklist_integration_test.rego` | 14 | Map key blacklist (dispatcher integration) |
 
-**Total:** 64 tests covering all 7 helper policies
+**Total:** 149 tests covering all 8 helper policies
 
 ## Test Structure
 
-Each test file follows an 8-test pattern:
-- **Unit tests (6):** Test individual helper functions with boundary cases
-- **Integration test (1):** Realistic mocks with multiple resources
-- **Reality check (1):** Uses real Terraform fixtures
+Test files combine unit tests, integration checks, and reality checks against real
+Terraform fixtures. Exact per-file counts are in the table above.
 
 ## Test Scripts
 
 ### unit_test_helpers.sh
-Runs all 7 test suites with fixtures. Use for comprehensive validation.
+Runs all 11 test suites with fixtures. Use for comprehensive validation.
 
 ### smoke_test_helpers.sh
 Fast integration tests (5 policies at policy level). Use for quick feedback during development.
@@ -169,7 +171,7 @@ rm plan.json plan.tfplan
 ## Adding New Tests
 
 1. Create `<helper_name>_test.rego` in `tests/_helpers/`
-2. Follow 8-test pattern (6 unit + 1 integration + 1 reality check)
+2. Write unit tests plus a reality check against a real Terraform fixture
 3. Use fixtures for reality checks: `data.<fixture_name>_plan`
 4. Update `unit_test_helpers.sh` to include new test file
 5. Run tests to verify: `./tests/_helpers/unit_test_helpers.sh`
