@@ -1,7 +1,7 @@
 resource "google_gkeonprem_bare_metal_cluster" "compliant_example_1" {
   name                       = "compliant_example_1"
   project                    = "PDE"
-  location                   = "australia_southeast1"
+  location                   = "australia-southeast1"
   admin_cluster_membership   = "projects/870316890899/locations/global/memberships/gkeonprem-terraform-test"
   bare_metal_version         = "1.12.3"
 
