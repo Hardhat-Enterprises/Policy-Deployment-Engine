@@ -6,43 +6,43 @@
       "description": "The resource that the security policy is attached to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to the resource where the policy is attached. Resource identifiers are not considered security-impacting because the analysis does not restrict which specific resources teams may reference."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the security policy association. Setting deletion_policy to PREVENT blocks destructive removal of the association and helps prevent accidental loss of security policy enforcement, so this argument falls under the prevent-destructive-loss security archetype."
     },
     "excluded_folders": {
       "description": "A list of folders to exclude from the security policy.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies particular folder identifiers to exclude. Such team-specific folder references cannot be generalised into a platform-wide security policy."
     },
     "excluded_projects": {
       "description": "A list of projects to exclude from the security policy.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies particular project identifiers to exclude. Such team-specific project references cannot be generalised into a platform-wide security policy."
     },
     "name": {
       "description": "The name for an association.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides an identifier for the association and does not directly control the policy rules, attachment target, exclusions, or security enforcement."
     },
     "policy_id": {
       "description": "The security policy ID of the association.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to a security policy resource. Resource references are not considered security-impacting because the analysis does not restrict which specific policies teams may reference."
     }
   }
 }
