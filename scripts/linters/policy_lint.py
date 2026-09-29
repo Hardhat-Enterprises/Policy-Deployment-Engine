@@ -90,6 +90,10 @@ RULES = {
         "Element required `values` must list at least one non-empty value the "
         "attribute must contain. An empty list, or null/blank entries, would "
         "require nothing and pass every resource. Invalid configuration is an error."),
+    "invalid-map-key-pattern-whitelist": (
+        "Map key pattern whitelist `values` must list at least one non-empty string "
+        "key shape without leading or trailing whitespace. An empty list would flag "
+        "every key. Invalid configuration is an error."),
     "presence-only": (
         "`values` is only null/\"\": presence is the whole check. Acceptable when the "
         "rationale says presence is the control — the reviewer decides; pair with a "
@@ -440,6 +444,7 @@ VALID_POLICY_TYPES = (
     "element pattern whitelist",
     "map key blacklist",
     "element required",
+    "map key pattern whitelist",
 )
 
 # Blacklist/whitelist only — a pattern or range policy with empty values means
@@ -1062,6 +1067,18 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                              "List at least one non-empty value the attribute "
                              "must contain; an empty list or null/blank entries "
                              "would require nothing and pass every resource.")
+
+            # Allowed key shapes, matched like element pattern whitelist.
+            if policy_type == "map key pattern whitelist":
+                shapes = values if isinstance(values, list) else [values]
+                if not shapes or any(
+                        not isinstance(s, str) or not s or s != s.strip()
+                        for s in shapes):
+                    add_once("invalid-map-key-pattern-whitelist", path_text,
+                             f"'{path_text}' has invalid map key pattern whitelist "
+                             "values. List at least one non-empty string key shape "
+                             "with no leading or trailing whitespace; an empty list "
+                             "would flag every key.")
 
             # --- index-path ------------------------------------------------ #
             if attribute_path and _is_index(attribute_path[-1]):

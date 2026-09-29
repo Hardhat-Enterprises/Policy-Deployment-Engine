@@ -56,7 +56,7 @@ is *absent*, and the policy passes every resource you point it at.
 
 The supported values, exactly as the engine spells them:
 
-    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist, element required
+    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist, element required, map key pattern whitelist
 
 They are **lowercase**, and multi-word names use **spaces, not underscores**. Writing
 `pattern_whitelist` is the mistake this rule exists to catch. `element whitelist` is not a type
@@ -184,6 +184,30 @@ Good:
       "attribute_path": ["disk", 0, "guest_os_features"],
       "values": ["UEFI_COMPATIBLE", "SEV_CAPABLE"],
       "policy_type": "element required"
+    }
+
+## invalid-map-key-pattern-whitelist
+
+For `map key pattern whitelist`, `values` lists the allowed key shapes. It must hold at
+least one non-empty string shape with no leading or trailing whitespace. An empty list
+would flag every key, and `"tagKeys/* "` would silently fail to match anything, so these
+are **errors**. The normal runtime summary also returns `POLICY ERROR:` for this
+configuration and checks nothing.
+
+Bad:
+
+    {
+      "attribute_path": ["resource_manager_tags"],
+      "values": [],
+      "policy_type": "map key pattern whitelist"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["resource_manager_tags"],
+      "values": ["tagKeys/*"],
+      "policy_type": "map key pattern whitelist"
     }
 
 ## presence-only

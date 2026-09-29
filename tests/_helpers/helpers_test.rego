@@ -61,6 +61,7 @@ test_valid_policy_types_matches_supported_set if {
 		"element pattern whitelist",
 		"map key blacklist",
 		"element required",
+		"map key pattern whitelist",
 	}
 }
 

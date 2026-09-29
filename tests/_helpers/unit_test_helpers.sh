@@ -137,6 +137,17 @@ run_test_suite "Element Required Integration" \
     "policies/_helpers" \
     "false" "false"
 
+run_test_suite "Map Key Pattern Whitelist Policy" \
+    "tests/_helpers/map_key_pattern_whitelist_test.rego" \
+    "policies/_helpers/policies/map_key_pattern_whitelist.rego" \
+    "false" "false"
+
+# This suite exercises conditions through the complete dispatcher and summary.
+run_test_suite "Map Key Pattern Whitelist Integration" \
+    "tests/_helpers/map_key_pattern_whitelist_integration_test.rego" \
+    "policies/_helpers" \
+    "false" "false"
+
 echo ""
 echo "================================"
 echo "Test Suites: $PASSED passed, $FAILED failed"

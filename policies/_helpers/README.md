@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 9 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Element Required
+- Support for 10 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Element Required, Map Key Pattern Whitelist
 - OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -32,6 +32,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [7. Map Key Blacklist](#7-map-key-blacklist)
   - [8. Element Pattern Whitelist](#8-element-pattern-whitelist)
   - [9. Element Required](#9-element-required)
+  - [10. Map Key Pattern Whitelist](#10-map-key-pattern-whitelist)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
@@ -93,7 +94,8 @@ policies/_helpers/
     ├── element_blacklist.rego
     ├── map_key_blacklist.rego
     ├── element_pattern_whitelist.rego
-    └── element_required.rego
+    ├── element_required.rego
+    └── map_key_pattern_whitelist.rego
 ```
 
 ### Component Responsibilities
@@ -380,6 +382,39 @@ Run the focused and integration tests from the repository root:
 
 ```shell
 opa test tests/_helpers/element_required_test.rego tests/_helpers/element_required_integration_test.rego policies/_helpers -v
+```
+
+---
+
+### 10. Map Key Pattern Whitelist
+
+**Module:** `policies/map_key_pattern_whitelist.rego`
+**Use Case:** Require every key of a map attribute to match an allowed wildcard shape
+
+**Logic:**
+- `values` is a flat list of allowed key shapes; a key passes if it matches any one of them
+- Matching ignores capitalisation, and `*` matches one path segment (one or more non-`/` characters), the same as `element pattern whitelist`
+- Every key is checked whatever its value, including empty values
+- A missing or null map, or an empty map, produces no violations
+- Violation messages name the offending keys, never the map values
+- An empty `values` list would flag every key, and a blank or whitespace-padded shape is almost always a typo. Through `get_multi_summary` both return `POLICY ERROR:`, and the linter reports `invalid-map-key-pattern-whitelist` as an error
+- A path that resolves to a present value that is not a map also returns `POLICY ERROR:`, as for `map key blacklist`
+
+This is the allowlist counterpart to `map key blacklist`. Use it when the good keys share one known shape but the bad ones cannot be listed in advance, for example Resource Manager tags that must use permanent tag key IDs.
+
+**Example:**
+```json
+{
+  "policy_type": "map key pattern whitelist",
+  "attribute_path": ["resource_manager_tags"],
+  "values": ["tagKeys/*"]
+}
+```
+
+Run the focused and integration tests from the repository root:
+
+```shell
+opa test tests/_helpers/map_key_pattern_whitelist_test.rego tests/_helpers/map_key_pattern_whitelist_integration_test.rego policies/_helpers -v
 ```
 
 ---

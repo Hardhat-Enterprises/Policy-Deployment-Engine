@@ -22,6 +22,7 @@ import data.terraform.helpers.policies.element_blacklist
 import data.terraform.helpers.policies.element_pattern_whitelist
 import data.terraform.helpers.policies.map_key_blacklist
 import data.terraform.helpers.policies.element_required
+import data.terraform.helpers.policies.map_key_pattern_whitelist
 
 ################################################################################
 # Public API
@@ -99,6 +100,15 @@ get_multi_summary(conditions, tf_variables) = summary if {
     count(problems) > 0
     summary := {
         "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Give element required at least one non-empty value that the list must contain.", [concat("; ", sort(problems))])],
+        "details": []
+    }
+} else = summary if {
+    # Preflight: a map key pattern whitelist with no usable shapes would flag
+    # every key, and one that resolves to a non-map would check nothing.
+    problems := map_key_pattern_whitelist_problems(conditions) | map_key_pattern_whitelist_path_problems(conditions, tf_variables)
+    count(problems) > 0
+    summary := {
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Give map key pattern whitelist at least one non-empty key shape with no leading or trailing whitespace, and point attribute_path at a map (include numeric indexes for list blocks).", [concat("; ", sort(problems))])],
         "details": []
     }
 } else = summary if {
@@ -319,6 +329,7 @@ valid_policy_types := [
     "element pattern whitelist",
     "map key blacklist",
     "element required",
+    "map key pattern whitelist",
 ]
 
 # Every reason `conditions` cannot be dispatched, as human-readable phrases. Two
@@ -430,6 +441,33 @@ _valid_element_required_values(values) if {
         value != ""
     }
 }
+# `values` lists the allowed key shapes. An empty list would flag every key and
+# a blank or whitespace-padded shape is almost certainly a typo, so refuse both.
+map_key_pattern_whitelist_problems(conditions) := problems if {
+    problems := {sprintf("invalid map key pattern whitelist values on '%s'", [shared.format_attribute_path(object.get(entry, "attribute_path", []))]) |
+        some group in conditions
+        some entry in group
+        lower(object.get(entry, "policy_type", "")) == "map key pattern whitelist"
+        values := shared.ensure_array(object.get(entry, "values", null))
+        not _valid_map_key_blacklist_values(values)
+    }
+}
+
+# Missing/null optional maps are allowed; present non-map values are not, for
+# the same reason as map key blacklist. Values are never included in the message.
+map_key_pattern_whitelist_path_problems(conditions, tf_variables) := problems if {
+    problems := {sprintf("map key pattern whitelist path '%s' resolved to %s; expected a map", [shared.format_attribute_path(entry.attribute_path), type_name(value)]) |
+        some group in conditions
+        some entry in group
+        lower(object.get(entry, "policy_type", "")) == "map key pattern whitelist"
+        some resource in input.planned_values.root_module.resources
+        resource.type == tf_variables.resource_type
+        value := shared.get_attribute_value(resource, entry.attribute_path)
+        value != null
+        not is_object(value)
+    }
+}
+
 # Missing/null optional maps are allowed; present non-map values are not. Limit
 # this check to the selected resource type and never include resource values in
 # the error message. Other helper types keep their existing path semantics.
@@ -533,6 +571,10 @@ select_policy_logic(tf_variables, attribute_path, values_formatted, "map key bla
 
 select_policy_logic(tf_variables, attribute_path, values_formatted, "element required") = results if {
     results := element_required.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "map key pattern whitelist") = results if {
+    results := map_key_pattern_whitelist.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
 # There is deliberately NO fallback rule for an unknown policy_type. One used to

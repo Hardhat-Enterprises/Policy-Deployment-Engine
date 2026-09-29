@@ -105,6 +105,7 @@ The engine dispatches on `policy_type`, using these supported values:
 | `element pattern whitelist` | Every element of an array must match one of the wildcard shapes |
 | `map key blacklist` | No map key may match a prohibited name, ignoring capitalisation, with a non-empty value |
 | `element required` | An array must **contain** every one of these values (unset counts as empty) |
+| `map key pattern whitelist` | Every map key must match one of these wildcard shapes, ignoring capitalisation |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
@@ -410,6 +411,32 @@ detects that setting. An empty `values` list would require nothing, so it is ref
 ```
 The violation message names the missing values. See the
 [helper documentation](../../policies/_helpers/README.md#9-element-required) for the test command.
+
+### Map Key Pattern Whitelist
+
+Requires every **key of a map** to match one of the allowed wildcard shapes in
+`values`. It is the allowlist counterpart to `map key blacklist`: use it when the good
+keys share one known shape but the bad ones cannot be named in advance. Matching ignores
+capitalisation, and each `*` matches one path segment, as in `element pattern whitelist`.
+Every key is checked whatever its value. A missing or empty map passes. An empty
+`values` list or a blank shape is refused with `POLICY ERROR:`, and `policy_lint` reports
+[`invalid-map-key-pattern-whitelist`](policy-lint.md#invalid-map-key-pattern-whitelist).
+```rego
+    [
+      {
+        "situation_description": "Resource Manager tags use ambiguous short-name keys instead of permanent tag key IDs",
+        "remedies": ["Use permanent tag key IDs (tagKeys/<id>) as resource_manager_tags keys."]
+      },
+      {
+        "condition": "Every resource_manager_tags key uses the permanent-ID form",
+        "attribute_path": ["resource_manager_tags"],
+        "values": ["tagKeys/*"],
+        "policy_type": "map key pattern whitelist"
+      }
+    ]
+```
+Violation messages name the offending keys without printing their values. See the
+[helper documentation](../../policies/_helpers/README.md#10-map-key-pattern-whitelist) for the test command.
 
 ---
 
