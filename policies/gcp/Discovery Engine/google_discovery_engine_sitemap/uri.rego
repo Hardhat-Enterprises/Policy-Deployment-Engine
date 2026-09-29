@@ -1,27 +1,25 @@
 package terraform.gcp.security.discovery_engine.google_discovery_engine_sitemap.uri
+
 import data.terraform.helpers
 import data.terraform.gcp.security.discovery_engine.google_discovery_engine_sitemap.vars
 
-#engine_sitemap_uri
-
 conditions := [
     [
-    {
-        "situation_description": "Is engine_sitemap_uri set to correct uri?",
-        "remedies": ["Ensure that it is set to valid"]
+        {
+            "situation_description": "Sitemap URI must use HTTPS to prevent indexing of unauthorised content",
+            "remedies": [
+                "Set uri to a valid https:// URL e.g. https://www.example.com/sitemap.xml"
+            ]
         },
-      {
-        "condition": "engine_sitemap_uri is mis-configured",
-        "attribute_path": ["uri"],
-        "values": ["https://www.valid.com/sitemap.xml"],
-        "policy_type": "whitelist"
-      }
+        {
+            "condition": "uri must use the https scheme",
+            "attribute_path": ["uri"],
+            "values": ["*://", [["https"]]],
+            "policy_type": "pattern whitelist"
+        }
     ]
 ]
 
-
 result := helpers.get_multi_summary(conditions, vars.variables)
-
 message := result.message
-
 details := result.details

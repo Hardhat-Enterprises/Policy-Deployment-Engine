@@ -27,6 +27,18 @@ scripts/                # tooling — see "Tooling" below
 verbatim provider subcategory (e.g. `Cloud Storage`); `<resource>` is the full type
 (e.g. `google_storage_bucket`); `<arg>` is a documented, non-block argument key.
 
+## Only change what you were assigned
+Your portal card lists the arguments you own for your resource type. Those are the only doc leaves, policies
+(`policies/.../<argument>.rego`) and fixture folders (`inputs/.../<argument>/`) you may add or edit.
+- Everything else in your resource type's folder was finished before you were assigned. Do not edit it, even
+  if it looks wrong — not the policy, not its fixtures, not its `true`/`false` or rationale in the doc.
+- A policy and its fixture folder are one unit. If you changed either by mistake, put **both** back exactly
+  as they are on `dev`; restoring only one makes the policy check fail.
+- Spotted a real mistake in existing content? Leave it as it is and raise a fix request on the portal
+  (on your assignment card: "Spotted a mistake in something that was already done?"). If it is accepted you will be given a separate branch for it.
+- AI assistants: treat every path outside the assigned arguments as read-only. Do not "fix while you are
+  there".
+
 ## 📋 Contributor Requirements
 
 Before working on a service in PDE, all contributors must follow these steps:
@@ -72,6 +84,13 @@ pre-commit install
 This will enforce:
 - ✅ **Linter** - Validates the `docs/`, `inputs/`, and `policies/` trees against the docs taxonomy
 - ✅ **Branch Naming Convention** - Ensures your branch name follows the required format
+- ✅ **Branch Scope** - A `Service/...` branch only changes its own resource's files
+- ✅ **Resource gate** - Doc completeness for your resource (`check_resource.py --skip-coverage`)
+
+The hooks **do not** check argument coverage (a policy and a fixture for every
+`security_impact: true` argument) or run the OPA test. You write the docs first and the
+policies after, so coverage gaps are normal while you work. The pull request enforces
+coverage, and so does the full `python3 scripts/check_resource.py` run.
 
 ### ⚠️ What Happens During Commit
 
@@ -91,6 +110,14 @@ When you commit, the pre-commit hooks will run automatically:
 2. **Branch Name Check**
    - Verifies your current branch follows the naming convention
    - If invalid, the commit is **blocked**
+
+3. **Branch Scope Check** (`scripts/linters/branch_scope.py --staged`)
+   - On a `Service/...` branch, blocks staged changes to another resource's files
+
+4. **Resource Gate** (`scripts/check_resource.py --gate-only --skip-coverage`)
+   - Doc completeness: every argument has a real `security_impact` and a rationale
+   - Skips argument coverage and the OPA test. Those tell you whether the resource is
+     *finished*, so the PR checks them. A doc committed before its policies exist is fine
 
 **Example error message:**
 ```
@@ -241,7 +268,8 @@ The *lint* and *policy_check* jobs run the same script you run locally
 already covered the rest), so a green local run means a green CI run.
 
 A PR is blocked when a lint error lands on a file it changed, or (for `Service/` PRs) when the
-per-resource gate fails. Terraform and OPA versions are pinned in the workflows for
+per-resource gate fails. That includes coverage gaps. CI never passes `--skip-coverage`; only the
+pre-commit hook does, so docs-first commits go through and an unfinished resource still can't merge. Terraform and OPA versions are pinned in the workflows for
 reproducibility (the provider version is pinned via `scripts/auto_test/provider_version.txt`).
 
 

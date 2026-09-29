@@ -1,41 +1,41 @@
 {
-  "last_updated": "2026-06-23T08:26:44Z",
+  "last_updated": "2026-08-14T18:04:34Z",
   "provider_version": "7.37.0",
   "arguments": {
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Deletion-blocking flag. Setting PREVENT stops the inspect template itself being destroyed, which is the prevent-destructive-loss archetype, so the destroy-blocking value is enforced."
     },
     "description": {
       "description": "A description of the inspect template.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is just a description for people reading the template. Changing it does not change how the scanner is protected."
     },
     "display_name": {
       "description": "User set display name of the inspect template.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is only the name shown to users. A naming rule can help with organisation, but it does not make the scanner safer."
     },
     "parent": {
       "description": "The parent of the inspect template in any of the following formats:\n\n* 'projects/{{project}}'\n* 'projects/{{project}}/locations/{{location}}'\n* 'organizations/{{organization_id}}'\n* 'organizations/{{organization_id}}/locations/{{location}}'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the container reference for the project or organisation that holds the template. Which project a team should use depends on its setup, so a generic policy cannot choose the right value."
     },
     "template_id": {
       "description": "The template id can contain uppercase and lowercase letters, numbers, and hyphens;\nthat is, it must match the regular expression: [a-zA-Z\\d-_]+. The maximum length is\n100 characters. Can be empty to allow the system to generate one.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is just the template identifier. A naming standard can be useful, but the ID itself does not make the scanner more secure."
     },
     "inspect_config": {
       "type": "block",
@@ -46,29 +46,29 @@
       "description": "List of options defining data content to scan. If empty, text, images, and other content will be included. Possible values: [\"CONTENT_TEXT\", \"CONTENT_IMAGE\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This decides whether text, images, or both are scanned. The right choice depends on what the team actually needs to inspect."
     },
     "inspect_config.exclude_info_types": {
       "description": "When true, excludes type information of the findings.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This hides the type label in the result, but it does not remove the finding itself. It does not create a platform security control."
     },
     "inspect_config.include_quote": {
       "description": "When true, a contextual quote from the data that triggered a finding is included in the response.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Turning this on can return the actual sensitive text that was found. Keeping it off reduces unnecessary exposure of sensitive data."
     },
     "inspect_config.min_likelihood": {
       "description": "Only returns findings equal or above this threshold. See https://cloud.google.com/dlp/docs/likelihood for more info Default value: \"POSSIBLE\" Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls how confident a match must be before it is returned. The right threshold depends on how much false-positive noise the team can accept, so there is no single value that works as a general policy."
     },
     "inspect_config.custom_info_types": {
       "type": "block",
@@ -79,15 +79,15 @@
       "description": "If set to EXCLUSION_TYPE_EXCLUDE this infoType will not cause a finding to be returned. It still can be used for rules matching. Possible values: [\"EXCLUSION_TYPE_EXCLUDE\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is part of how a custom detector is designed. Excluding a custom InfoType can be intentional, and whether that is correct depends on what the team is trying to detect."
     },
     "inspect_config.custom_info_types.likelihood": {
       "description": "Likelihood to return for this CustomInfoType. This base value can be altered by a detection rule if the finding meets the criteria\nspecified by the rule. Default value: \"VERY_LIKELY\" Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is the confidence assigned to the custom detector. The right value depends on how reliable that detector is, so it is part of detection tuning rather than a platform security control."
     },
     "inspect_config.custom_info_types.dictionary": {
       "type": "block",
@@ -103,8 +103,8 @@
       "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This only points to the dictionary file the team chose. The file path will vary by workload, and the file itself should be protected in Cloud Storage."
     },
     "inspect_config.custom_info_types.dictionary.word_list": {
       "type": "block",
@@ -115,8 +115,8 @@
       "description": "Words or phrases defining the dictionary. The dictionary must contain at least one\nphrase and every phrase must contain at least 2 characters that are letters or digits.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "These are the actual words the team wants to detect. There is no common list that would make sense for every use case."
     },
     "inspect_config.custom_info_types.info_type": {
       "type": "block",
@@ -127,15 +127,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names\nlisted at https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This says which InfoType is being created or extended. The right name depends on what the team is trying to detect."
     },
     "inspect_config.custom_info_types.info_type.version": {
       "description": "Version name for this InfoType.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This chooses the InfoType version. Version choice depends on the team's detector setup and compatibility needs rather than a platform security requirement."
     },
     "inspect_config.custom_info_types.info_type.sensitivity_score": {
       "type": "block",
@@ -146,8 +146,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a profiling label for the InfoType. Whether it should be low, moderate, or high depends on what the data represents."
     },
     "inspect_config.custom_info_types.regex": {
       "type": "block",
@@ -158,15 +158,15 @@
       "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects which capture groups from the custom regex are returned. The indexes only make sense with the regex the team has written."
     },
     "inspect_config.custom_info_types.regex.pattern": {
       "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This pattern defines what the custom detector looks for. Whether it is correct depends on the data the team is trying to find."
     },
     "inspect_config.custom_info_types.sensitivity_score": {
       "type": "block",
@@ -177,8 +177,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a profiling sensitivity label. The right value depends on the meaning of the custom InfoType."
     },
     "inspect_config.custom_info_types.stored_type": {
       "type": "block",
@@ -189,8 +189,8 @@
       "description": "Resource name of the requested StoredInfoType, for example 'organizations/433245324/storedInfoTypes/432452342'\nor 'projects/project-id/storedInfoTypes/432452342'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to an existing StoredInfoType used by the scan. Which resource a team uses depends on its detection setup, so there is no general value to enforce."
     },
     "inspect_config.custom_info_types.surrogate_type": {
       "type": "block",
@@ -206,15 +206,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This chooses which kinds of sensitive data to scan for. Different systems need different detectors, so there is no single list that fits everyone."
     },
     "inspect_config.info_types.version": {
       "description": "Version of the information type to use. By default, the version is set to stable",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This chooses the detector version. Version choice is part of the team's scanner setup rather than a general platform security control."
     },
     "inspect_config.info_types.sensitivity_score": {
       "type": "block",
@@ -225,8 +225,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a profiling sensitivity label. The correct label depends on the type of data being classified."
     },
     "inspect_config.limits": {
       "type": "block",
@@ -237,15 +237,15 @@
       "description": "Max number of findings that will be returned for each item scanned. The maximum returned is 2000.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls how many findings are returned for each item. The useful limit depends on the size of the scan and how the results will be used."
     },
     "inspect_config.limits.max_findings_per_request": {
       "description": "Max number of findings that will be returned per request/job. The maximum returned is 2000.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a result-volume limit for the request or job. There is no meaningful minimum that would suit every workload."
     },
     "inspect_config.limits.max_findings_per_info_type": {
       "type": "block",
@@ -256,8 +256,8 @@
       "description": "Max findings limit for the given infoType.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This caps how many results are returned for one InfoType. The right number depends on the scan and reporting needs rather than a common security standard."
     },
     "inspect_config.limits.max_findings_per_info_type.info_type": {
       "type": "block",
@@ -268,15 +268,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to the InfoType that the findings limit applies to. Which InfoType a team uses depends on its scan, so there is no general value for security to enforce."
     },
     "inspect_config.limits.max_findings_per_info_type.info_type.version": {
       "description": "Version name for this InfoType.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This chooses the version of the InfoType that the limit applies to. Version choice is part of the team's scan configuration rather than a security control."
     },
     "inspect_config.limits.max_findings_per_info_type.info_type.sensitivity_score": {
       "type": "block",
@@ -287,8 +287,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a profiling classification for the InfoType. The right score depends on how the team classifies its data, not on a platform security rule."
     },
     "inspect_config.rule_set": {
       "type": "block",
@@ -304,15 +304,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This says which InfoTypes the rule set applies to. That choice depends on what the rule is meant to do."
     },
     "inspect_config.rule_set.info_types.version": {
       "description": "Version name for this InfoType.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This chooses the InfoType version used by the rule set. Software version choice is part of the team's detector setup rather than a platform security control."
     },
     "inspect_config.rule_set.info_types.sensitivity_score": {
       "type": "block",
@@ -323,8 +323,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a profiling sensitivity label for the InfoType. The right value depends on how the team classifies the data."
     },
     "inspect_config.rule_set.rules": {
       "type": "block",
@@ -340,8 +340,8 @@
       "description": "How the rule is applied. See the documentation for more information: https://cloud.google.com/dlp/docs/reference/rest/v2/InspectConfig#MatchingType Possible values: [\"MATCHING_TYPE_FULL_MATCH\", \"MATCHING_TYPE_PARTIAL_MATCH\", \"MATCHING_TYPE_INVERSE_MATCH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This defines how the team's exclusion rule matches. Full, partial, and inverse matching all have valid uses, so the right choice depends on the rule being built."
     },
     "inspect_config.rule_set.rules.exclusion_rule.dictionary": {
       "type": "block",
@@ -357,8 +357,8 @@
       "description": "A url representing a file or path (no wildcards) in Cloud Storage. Example: 'gs://[BUCKET_NAME]/dictionary.txt'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This points to the dictionary file used by the exclusion rule. The right file is specific to the team's rule, and the file's security should be handled in Cloud Storage."
     },
     "inspect_config.rule_set.rules.exclusion_rule.dictionary.word_list": {
       "type": "block",
@@ -369,8 +369,8 @@
       "description": "Words or phrases defining the dictionary. The dictionary must contain at least one\nphrase and every phrase must contain at least 2 characters that are letters or digits.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "These are the words the team has chosen for its exclusion rule. Whether those exclusions are correct depends on the data and the reason for the rule."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword": {
       "type": "block",
@@ -386,15 +386,15 @@
       "description": "The index of the submatch to extract as findings. When not specified,\nthe entire match is returned. No more than 3 may be included.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "These select capture groups from the hotword regex. The indexes are implementation details of the team's regex and have no useful organisation-wide security value."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.hotword_regex.pattern": {
       "description": "Pattern defining the regular expression. Its syntax\n(https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This pattern defines the context where the team's hotword exclusion applies. The correct pattern depends on the data and the false positives the team is trying to remove."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.proximity": {
       "type": "block",
@@ -405,15 +405,15 @@
       "description": "Number of characters after the finding to consider.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls how far after a finding DLP looks for the exclusion hotword. It is a text-scanning distance, and the useful value depends on the layout of the team's data."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_by_hotword.proximity.window_before": {
       "description": "Number of characters before the finding to consider.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls how far before a finding DLP looks for the hotword. The window affects how the rule matches context, but the right distance depends on the data being scanned rather than a security requirement."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types": {
       "type": "block",
@@ -429,15 +429,15 @@
       "description": "Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed\nat https://cloud.google.com/dlp/docs/infotypes-reference when specifying a built-in type.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to the InfoType used by the exclusion rule. The value identifies a detector chosen by the team, so there is no common InfoType name that a platform policy should require."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.version": {
       "description": "Version name for this InfoType.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This chooses the version of the InfoType used by the exclusion rule. Software versions are team choices based on detector setup and compatibility, not platform security controls."
     },
     "inspect_config.rule_set.rules.exclusion_rule.exclude_info_types.info_types.sensitivity_score": {
       "type": "block",
@@ -448,8 +448,8 @@
       "description": "The sensitivity score applied to the resource. Possible values: [\"SENSITIVITY_LOW\", \"SENSITIVITY_MODERATE\", \"SENSITIVITY_HIGH\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets a sensitivity score used for data profiling. The score is part of how the team classifies its data, so a platform policy should not decide that operational classification for them."
     },
     "inspect_config.rule_set.rules.exclusion_rule.regex": {
       "type": "block",
@@ -460,15 +460,15 @@
       "description": "The index of the submatch to extract as findings. When not specified, the entire match is returned. No more than 3 may be included.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects which capture groups from the exclusion regex are used. The indexes only make sense with the regex the team has written, so they are part of the rule's implementation."
     },
     "inspect_config.rule_set.rules.exclusion_rule.regex.pattern": {
       "description": "Pattern defining the regular expression.\nIts syntax (https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This regex defines when the team's exclusion rule matches. The correct pattern depends on the data and the false positives the team is trying to remove, so it cannot be set by a general security policy."
     },
     "inspect_config.rule_set.rules.hotword_rule": {
       "type": "block",
@@ -484,15 +484,15 @@
       "description": "The index of the submatch to extract as findings. When not specified,\nthe entire match is returned. No more than 3 may be included.",
       "required": false,
       "type": "list(number)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This selects capture groups from the hotword regex. The indexes are internal details of the team's regex and do not have a useful organisation-wide security value."
     },
     "inspect_config.rule_set.rules.hotword_rule.hotword_regex.pattern": {
       "description": "Pattern defining the regular expression. Its syntax\n(https://github.com/google/re2/wiki/Syntax) can be found under the google/re2 repository on GitHub.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This defines what context counts as a hotword. The pattern depends on the team's detection logic and the type of data being scanned, so there is no general pattern for security to enforce."
     },
     "inspect_config.rule_set.rules.hotword_rule.likelihood_adjustment": {
       "type": "block",
@@ -503,15 +503,15 @@
       "description": "Set the likelihood of a finding to a fixed value. Either this or relative_likelihood can be set. Possible values: [\"VERY_UNLIKELY\", \"UNLIKELY\", \"POSSIBLE\", \"LIKELY\", \"VERY_LIKELY\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets the confidence score used when a hotword matches. It is an operational tuning setting for the scanner, not a platform security boundary."
     },
     "inspect_config.rule_set.rules.hotword_rule.likelihood_adjustment.relative_likelihood": {
       "description": "Increase or decrease the likelihood by the specified number of levels. For example,\nif a finding would be POSSIBLE without the detection rule and relativeLikelihood is 1,\nthen it is upgraded to LIKELY, while a value of -1 would downgrade it to UNLIKELY.\nLikelihood may never drop below VERY_UNLIKELY or exceed VERY_LIKELY, so applying an\nadjustment of 1 followed by an adjustment of -1 when base likelihood is VERY_LIKELY\nwill result in a final likelihood of LIKELY. Either this or fixed_likelihood can be set.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This raises or lowers the confidence score when a hotword matches. It tunes the scanner's detection behaviour rather than enforcing a platform security control."
     },
     "inspect_config.rule_set.rules.hotword_rule.proximity": {
       "type": "block",
@@ -522,15 +522,15 @@
       "description": "Number of characters after the finding to consider. Either this or window_before must be specified",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls how far after a possible finding DLP looks for the hotword. The right search distance depends on the format of the data and how the team's rule is designed."
     },
     "inspect_config.rule_set.rules.hotword_rule.proximity.window_before": {
       "description": "Number of characters before the finding to consider. Either this or window_after must be specified",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls how far before a possible finding DLP looks for the hotword. It is a text-scanning distance used to tune the rule, and the right value depends on the team's data."
     }
   }
 }
