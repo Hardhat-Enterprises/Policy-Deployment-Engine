@@ -75,7 +75,13 @@ os.unlink(f.name)
 # 8. load_map on a missing file returns empty, not an error
 check("missing map file loads as empty", load_map("does_not_exist_12345.json") == {})
 
-print()
-failed = [r for r in results if not r[1]]
-print(f"{len(results) - len(failed)}/{len(results)} passed")
-raise SystemExit(1 if failed else 0)
+def test_suite():
+    """pytest entry point: fail if any check above did not pass."""
+    _failed = [name for name, ok in results if not ok]
+    assert not _failed, f"{len(_failed)} check(s) failed: {_failed}"
+
+
+if __name__ == "__main__":
+    _failed = [r for r in results if not r[1]]
+    print(f"\n{len(results) - len(_failed)}/{len(results)} passed")
+    raise SystemExit(1 if _failed else 0)

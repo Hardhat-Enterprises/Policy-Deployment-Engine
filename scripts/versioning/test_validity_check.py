@@ -73,7 +73,13 @@ check("a real valid result is preserved on a later run without results",
 check("run_validity returns a summary dict",
       set(stats.keys()) == {"not_applicable", "valid", "failed", "pending"})
 
-print()
-failed = [r for r in results if not r[1]]
-print(f"{len(results) - len(failed)}/{len(results)} passed")
-raise SystemExit(1 if failed else 0)
+def test_suite():
+    """pytest entry point: fail if any check above did not pass."""
+    _failed = [name for name, ok in results if not ok]
+    assert not _failed, f"{len(_failed)} check(s) failed: {_failed}"
+
+
+if __name__ == "__main__":
+    _failed = [r for r in results if not r[1]]
+    print(f"\n{len(results) - len(_failed)}/{len(results)} passed")
+    raise SystemExit(1 if _failed else 0)

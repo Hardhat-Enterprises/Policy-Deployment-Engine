@@ -81,7 +81,13 @@ cs = build_changeset(o, n, "a", "b", TH, RB); an = analyse_migration(cs, o, n)
 check("a rename is migrated, not retired",
       an["carried_forward_via_rename"] == 1 and an["retired"] == 0, f"retired={an['retired']}")
 
-print()
-failed = [r for r in results if not r[1]]
-print(f"{len(results) - len(failed)}/{len(results)} passed")
-sys.exit(1 if failed else 0)
+def test_suite():
+    """pytest entry point: fail if any check above did not pass."""
+    _failed = [r[0] for r in results if not r[1]]
+    assert not _failed, f"{len(_failed)} check(s) failed: {_failed}"
+
+
+if __name__ == "__main__":
+    _failed = [r for r in results if not r[1]]
+    print(f"\n{len(results) - len(_failed)}/{len(results)} passed")
+    sys.exit(1 if _failed else 0)
