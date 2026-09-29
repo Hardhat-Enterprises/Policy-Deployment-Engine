@@ -88,7 +88,7 @@ get_multi_summary(conditions, tf_variables) = summary if {
 } else = summary if {
     # The shared extractor can return an array when an index is omitted. Refuse
     # non-map results before the helper's is_object guard can silently skip them.
-    problems := map_key_blacklist_path_problems(conditions, tf_variables)
+    problems := map_path_problems(conditions, tf_variables, "map key blacklist")
     count(problems) > 0
     summary := {
         "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Check attribute_path and include numeric indexes for list blocks when selecting a map.", [concat("; ", sort(problems))])],
@@ -100,16 +100,16 @@ get_multi_summary(conditions, tf_variables) = summary if {
     problems := element_required_problems(conditions)
     count(problems) > 0
     summary := {
-        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Give element required at least one non-empty value that the list must contain.", [concat("; ", sort(problems))])],
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Give element required at least one value that the list must contain, with no blank or whitespace-padded entries.", [concat("; ", sort(problems))])],
         "details": []
     }
 } else = summary if {
     # Preflight: a map key pattern whitelist with no usable shapes would flag
     # every key, and one that resolves to a non-map would check nothing.
-    problems := map_key_pattern_whitelist_problems(conditions) | map_key_pattern_whitelist_path_problems(conditions, tf_variables)
+    problems := map_key_pattern_whitelist_problems(conditions) | map_path_problems(conditions, tf_variables, "map key pattern whitelist")
     count(problems) > 0
     summary := {
-        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Give map key pattern whitelist at least one non-empty key shape with no leading or trailing whitespace, and point attribute_path at a map (include numeric indexes for list blocks).", [concat("; ", sort(problems))])],
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Give map key pattern whitelist at least one non-empty key shape with no leading or trailing whitespace, and point attribute_path at a map.", [concat("; ", sort(problems))])],
         "details": []
     }
 } else = summary if {
@@ -420,11 +420,13 @@ map_key_blacklist_problems(conditions) := problems if {
         some entry in group
         lower(object.get(entry, "policy_type", "")) == "map key blacklist"
         values := shared.ensure_array(object.get(entry, "values", null))
-        not _valid_map_key_blacklist_values(values)
+        not _valid_key_names(values)
     }
 }
 
-_valid_map_key_blacklist_values(values) if {
+# Shared by map key blacklist (prohibited key names) and map key pattern
+# whitelist (allowed key shapes): at least one non-empty string, none padded.
+_valid_key_names(values) if {
     count(values) > 0
     every name in values {
         is_string(name)
@@ -450,8 +452,19 @@ _valid_element_required_values(values) if {
     every value in values {
         value != null
         value != ""
+        _not_padded(value)
     }
 }
+
+# A padded string such as "UEFI_COMPATIBLE " can never match a provider value,
+# so it is refused like a padded key name.
+_not_padded(value) if not is_string(value)
+
+_not_padded(value) if {
+    is_string(value)
+    value == trim_space(value)
+}
+
 # `values` lists the allowed key shapes. An empty list would flag every key and
 # a blank or whitespace-padded shape is almost certainly a typo, so refuse both.
 map_key_pattern_whitelist_problems(conditions) := problems if {
@@ -460,7 +473,7 @@ map_key_pattern_whitelist_problems(conditions) := problems if {
         some entry in group
         lower(object.get(entry, "policy_type", "")) == "map key pattern whitelist"
         values := shared.ensure_array(object.get(entry, "values", null))
-        not _valid_map_key_blacklist_values(values)
+        not _valid_key_names(values)
     }
 }
 
@@ -481,35 +494,29 @@ _valid_presence_values(values) if {
     lower(values[0]) in {"set", "unset"}
 }
 
-# Missing/null optional maps are allowed; present non-map values are not, for
-# the same reason as map key blacklist. Values are never included in the message.
-map_key_pattern_whitelist_path_problems(conditions, tf_variables) := problems if {
-    problems := {sprintf("map key pattern whitelist path '%s' resolved to %s; expected a map", [shared.format_attribute_path(entry.attribute_path), type_name(value)]) |
+# Missing/null optional maps are allowed; present non-map values are not, since
+# the helper's is_object guard would otherwise skip them silently. Shared by both
+# map key types so a fix here reaches both. Limited to the selected resource
+# type, and resource values are never included in the error message.
+map_path_problems(conditions, tf_variables, policy_type) := problems if {
+    problems := {sprintf("%s path '%s' resolved to %s; expected a map", [policy_type, shared.format_attribute_path(entry.attribute_path), type_name(value)]) |
         some group in conditions
         some entry in group
-        lower(object.get(entry, "policy_type", "")) == "map key pattern whitelist"
+        lower(object.get(entry, "policy_type", "")) == policy_type
         some resource in input.planned_values.root_module.resources
         resource.type == tf_variables.resource_type
-        value := shared.get_attribute_value(resource, entry.attribute_path)
+        some value in _map_path_values(policy_type, resource, entry.attribute_path)
         value != null
         not is_object(value)
     }
 }
 
-# Missing/null optional maps are allowed; present non-map values are not. Limit
-# this check to the selected resource type and never include resource values in
-# the error message. Other helper types keep their existing path semantics.
-map_key_blacklist_path_problems(conditions, tf_variables) := problems if {
-    problems := {sprintf("map key blacklist path '%s' resolved to %s; expected a map", [shared.format_attribute_path(entry.attribute_path), type_name(value)]) |
-        some group in conditions
-        some entry in group
-        lower(object.get(entry, "policy_type", "")) == "map key blacklist"
-        some resource in input.planned_values.root_module.resources
-        resource.type == tf_variables.resource_type
-        value := shared.get_attribute_value(resource, entry.attribute_path)
-        value != null
-        not is_object(value)
-    }
+# map key blacklist keeps its existing single-value path semantics; map key
+# pattern whitelist checks every element the path reaches.
+_map_path_values("map key blacklist", resource, path) := {shared.get_attribute_value(resource, path)}
+
+_map_path_values("map key pattern whitelist", resource, path) := {entry.value |
+    some entry in shared.attribute_entries(resource, path)
 }
 
 # Normalised the same way evaluate_conditions normalises it (lowercased), so

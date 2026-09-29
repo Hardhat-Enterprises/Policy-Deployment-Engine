@@ -162,9 +162,11 @@ map are still allowed by the helper.
 ## invalid-element-required
 
 For `element required`, `values` lists the items the attribute must contain. It must
-hold at least one value, and no entry may be `null` or `""`. An empty list, missing
-`values`, or a blank entry would require nothing, so the condition would pass every
-resource. These are **errors**, not warnings.
+hold at least one value, and no entry may be `null`, `""` or a whitespace-padded string.
+An empty list, missing `values` or a blank entry would require nothing, and a padded
+string such as `"UEFI_COMPATIBLE "` would never match, so the condition would pass every
+resource or flag every one. These are **errors**, not warnings. Matching is exact,
+including capitalisation, so write provider enum values exactly as the provider does.
 
 The normal runtime summary also returns `POLICY ERROR:` for this configuration and
 checks nothing. This is not a `presence-only` warning: `values` here names what must be
@@ -218,9 +220,11 @@ anything else such as `["present"]` or `[true]` would check nothing, so these ar
 **errors**. The normal runtime summary also returns `POLICY ERROR:` for this
 configuration and checks nothing.
 
-`presence` is also the answer when you meet `presence-only` below and presence really
-is the control: `["unset"]` says "this must not be configured at all" directly, where a
-`blacklist` cannot flag every possible value.
+`presence` is also worth reaching for when you meet `presence-only` below and presence
+really is the control. On a single element, `["unset"]` gives the same results as
+`whitelist [null, "", [], {}]` and `["set"]` the same as `blacklist [null, "", [], {}]`, so
+it adds no new power there. It checks every element of every repeated block, and it is
+harder to get wrong: the list forms are easy to write without `[]` or `{}`.
 
 Bad:
 

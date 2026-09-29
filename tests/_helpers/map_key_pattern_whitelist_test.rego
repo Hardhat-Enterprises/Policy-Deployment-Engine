@@ -120,3 +120,30 @@ test_bad_keys_are_sorted if {
 	some v in violations
 	contains(v.message, "a-org/a, z-org/b")
 }
+
+# 13. Maps inside a repeated block are all checked: only the second element has
+# a bad key and it is flagged by its own path.
+test_second_element_map_is_flagged if {
+	resource := {
+		"type": "google_compute_instance_template",
+		"name": "nested",
+		"values": {"name": "nested", "params": [
+			{"resource_manager_tags": {"tagKeys/1": "tagValues/1"}},
+			{"resource_manager_tags": {"my-org/env": "prod"}},
+		]},
+	}
+	violations := violations_for_path([resource], ["params", "resource_manager_tags"])
+	count(violations) == 1
+	some v in violations
+	contains(v.message, "params.[1].resource_manager_tags' has my-org/env")
+	not contains(v.message, "params.[0]")
+}
+
+violations_for_path(resources, path) := violations if {
+	violations := map_key_pattern_whitelist.get_violations(
+		mock_variables,
+		path,
+		allowed_shapes,
+	) with input as make_plan(resources)
+}
+

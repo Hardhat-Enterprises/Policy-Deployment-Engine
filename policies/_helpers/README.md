@@ -364,21 +364,32 @@ opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_black
 **Logic:**
 - `values` is a flat list of items the attribute must contain; every one must be present
 - Extra items in the attribute are allowed
-- A string attribute is checked as a one-item list
-- A missing (unset) attribute counts as an empty list, so every required value is missing and the resource is flagged
-- The violation message names exactly which required values are missing
-- An empty `values` list, missing `values`, or a `null` or `""` entry would require nothing. Through `get_multi_summary` this returns `POLICY ERROR:` and refuses the whole policy, and the linter reports `invalid-element-required` as an error
+- A single value (string, boolean or number) is checked as a one-item list, so `values: [true]` means "must be true"
+- A missing (unset) attribute in an element that exists counts as an empty list, so every required value is missing and that element is flagged
+- Matching is **exact, including capitalisation**. Provider enum values such as `UEFI_COMPATIBLE` must be written exactly as the provider does: a disk with `uefi_compatible` is reported as missing `UEFI_COMPATIBLE`
+- The violation message names each failing element and exactly which required values it is missing
+- An empty `values` list, missing `values`, or a `null`, `""` or whitespace-padded entry (such as `"UEFI_COMPATIBLE "`) would require nothing or never match. Through `get_multi_summary` this returns `POLICY ERROR:` and refuses the whole policy, and the linter reports `invalid-element-required` as an error
 
-Because an unset list is flagged, use a `"match": "all"` situation when the requirement should only apply while another setting is present.
+The path is followed through **every element of every repeated block**, so a policy covers all of them. Leave out the list indexes to check every element, for example `["disk", "guest_os_features"]` checks every disk. A numeric index still selects one element, for example `["disk", 0, "guest_os_features"]` checks the first disk only. Violation messages name the concrete path of each failing element, such as `disk.[1].guest_os_features`. When a parent block is not configured (missing or an empty list) there is no element and nothing is checked. The walk is done by `shared.attribute_entries`.
 
-**Example:**
+**Example (every disk must enable the Shielded VM and Confidential VM features):**
 ```json
 {
   "policy_type": "element required",
-  "attribute_path": ["disk", 0, "guest_os_features"],
+  "attribute_path": ["disk", "guest_os_features"],
   "values": ["UEFI_COMPATIBLE", "SEV_CAPABLE"]
 }
 ```
+
+**Example (every configured redirect must force HTTPS):**
+```json
+{
+  "policy_type": "element required",
+  "attribute_path": ["rules", "action", "redirect", "https_redirect"],
+  "values": [true]
+}
+```
+Rules without a redirect produce no element, so they pass. A redirect that sets `https_redirect = false` or leaves it out is flagged. Because the path follows each rule, no `"match": "all"` pairing is needed, and none should be used: `"match"` combines results per resource, so pairing "a redirect is configured" with "https_redirect is true" would combine one rule's redirect with another rule's missing value.
 
 Run the focused and integration tests from the repository root:
 
@@ -395,12 +406,14 @@ opa test tests/_helpers/element_required_test.rego tests/_helpers/element_requir
 
 **Logic:**
 - `values` is a flat list of allowed key shapes; a key passes if it matches any one of them
-- Matching ignores capitalisation, and `*` matches one path segment (one or more non-`/` characters), the same as `element pattern whitelist`
+- Matching ignores capitalisation, because map keys such as header or tag names are compared case-insensitively by the existing `map key blacklist` too. `*` matches one path segment (one or more non-`/` characters). Matching is done by `shared.wildcard_match`, the same function `element pattern whitelist` uses
 - Every key is checked whatever its value, including empty values
 - A missing or null map, or an empty map, produces no violations
-- Violation messages name the offending keys, never the map values
+- Violation messages name each failing element's path and its offending keys, never the map values
 - An empty `values` list would flag every key, and a blank or whitespace-padded shape is almost always a typo. Through `get_multi_summary` both return `POLICY ERROR:`, and the linter reports `invalid-map-key-pattern-whitelist` as an error
-- A path that resolves to a present value that is not a map also returns `POLICY ERROR:`, as for `map key blacklist`
+- A path that reaches a present value that is not a map also returns `POLICY ERROR:`. This check is shared with `map key blacklist` (`map_path_problems` in `helpers.rego`)
+
+The path is followed through **every element of every repeated block**, so a policy covers all of them. Leave out the list indexes to check every element, for example `["disk", "guest_os_features"]` checks every disk. A numeric index still selects one element, for example `["disk", 0, "guest_os_features"]` checks the first disk only. Violation messages name the concrete path of each failing element, such as `disk.[1].guest_os_features`. When a parent block is not configured (missing or an empty list) there is no element and nothing is checked. The walk is done by `shared.attribute_entries`.
 
 This is the allowlist counterpart to `map key blacklist`. Use it when the good keys share one known shape but the bad ones cannot be listed in advance, for example Resource Manager tags that must use permanent tag key IDs.
 
@@ -424,49 +437,29 @@ opa test tests/_helpers/map_key_pattern_whitelist_test.rego tests/_helpers/map_k
 ### 11. Presence
 
 **Module:** `policies/presence.rego`
-**Use Case:** Require an attribute or nested block to be set, or to not be set, whatever its value
+**Use Case:** Require an attribute or nested block to be set, or to not be set, in every element, whatever its value
 
 **Logic:**
 - `values` is exactly one of `["unset"]` or `["set"]` (any capitalisation)
-- `["unset"]` flags a resource when the attribute **is** set; `["set"]` flags it when the attribute is **not** set
-- An attribute counts as unset when it is missing, `null`, `""`, `[]` or `{}`. Terraform writes an absent nested block as `[]` in the plan, so `["unset"]` on a block path detects whether the block was configured
+- `["unset"]` flags an element whose attribute **is** set; `["set"]` flags an element whose attribute is **not** set
+- An attribute counts as unset when it is missing, `null`, `""`, `[]` or `{}`. Terraform writes an absent nested block as `[]`, so `["unset"]` on a block path detects whether the block was configured
 - `false` and `0` are real values, so they count as set
-- Violation messages name the attribute path, never its value
+- Violation messages name the failing paths, never the values
 - Any other `values` would check nothing. Through `get_multi_summary` this returns `POLICY ERROR:`, and the linter reports `invalid-presence` as an error
-- Include the numeric indexes for list blocks, for example `["network_interface", 0, "access_config"]`. Without them the shared extractor returns a list of values, which is never empty for a configured parent block
 
-**Conditional checks:** combine a `presence ["unset"]` condition on an optional block with another condition in a `"match": "all"` situation. The resource is flagged only when it fails both, which reads as "when this block exists, the other condition must hold".
+The path is followed through **every element of every repeated block**, so a policy covers all of them. Leave out the list indexes to check every element, for example `["disk", "guest_os_features"]` checks every disk. A numeric index still selects one element, for example `["disk", 0, "guest_os_features"]` checks the first disk only. Violation messages name the concrete path of each failing element, such as `disk.[1].guest_os_features`. When a parent block is not configured (missing or an empty list) there is no element and nothing is checked. The walk is done by `shared.attribute_entries`.
 
-**Example (no external IP):**
+Because unconfigured parents produce no element, `["set"]` on `["service_account", "email"]` applies only to templates that configure a `service_account` block, and flags any such block without an email.
+
+**How it relates to whitelist and blacklist:** on a single element, `presence ["unset"]` gives the same results as `whitelist [null, "", [], {}]`, and `presence ["set"]` the same as `blacklist [null, "", [], {}]`. `presence` adds no new power for one element. It exists because it checks every element, and because it is harder to get wrong: the list form is easy to write without `[]` or `{}`, and it draws a `presence-only` lint warning.
+
+**Example (no network interface may have an external IP):**
 ```json
 {
   "policy_type": "presence",
-  "attribute_path": ["network_interface", 0, "access_config"],
+  "attribute_path": ["network_interface", "access_config"],
   "values": ["unset"]
 }
-```
-
-**Example (a redirect must force HTTPS, routes without a redirect pass):**
-```rego
-conditions := [[
-    {
-        "situation_description": "A redirect action does not force HTTPS",
-        "remedies": ["Set rules.action.redirect.https_redirect to true on redirect actions."],
-        "match": "all",
-    },
-    {
-        "condition": "The rule configures a redirect",
-        "attribute_path": ["rules", 0, "action", 0, "redirect"],
-        "values": ["unset"],
-        "policy_type": "presence",
-    },
-    {
-        "condition": "The redirect forces HTTPS",
-        "attribute_path": ["rules", 0, "action", 0, "redirect", 0, "https_redirect"],
-        "values": [true],
-        "policy_type": "whitelist",
-    },
-]]
 ```
 
 Run the focused and integration tests from the repository root:

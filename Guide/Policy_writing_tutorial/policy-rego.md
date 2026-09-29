@@ -388,29 +388,34 @@ paths.
 Requires an **array** attribute to **contain** every value in `values`. This is the
 opposite direction to `whitelist`: a `whitelist` checks that every element present is
 allowed, while `element required` checks that every required value is present. Extra
-elements are fine. A string attribute is checked as a one-item list.
+elements are fine. A single value (string, boolean or number) is checked as a one-item
+list, so `values: [true]` means "must be true". Matching is exact, including
+capitalisation, so write provider enum values exactly as the provider does.
 
-An **unset** attribute counts as an empty list, so every required value is missing and
-the resource is flagged. If the requirement should only apply while some other setting
-is present, put this condition in a `"match": "all"` situation with a condition that
-detects that setting. An empty `values` list would require nothing, so it is refused:
-`get_multi_summary` returns `POLICY ERROR:` and `policy_lint` reports
-[`invalid-element-required`](policy-lint.md#invalid-element-required).
+The path is followed through **every element of every repeated block**: leave out the
+list indexes to check them all, or give an index to check one. An **unset** attribute in
+an element that exists counts as an empty list and is flagged. When a parent block is not
+configured there is nothing to check. An empty `values` list, or a blank or
+whitespace-padded entry, is refused: `get_multi_summary` returns `POLICY ERROR:` and
+`policy_lint` reports [`invalid-element-required`](policy-lint.md#invalid-element-required).
 ```rego
     [
       {
-        "situation_description": "The boot disk does not enable the guest OS features required for Shielded VM and Confidential VM support",
-        "remedies": ["Add UEFI_COMPATIBLE and SEV_CAPABLE to disk.guest_os_features."]
+        "situation_description": "A boot disk does not enable the guest OS features required for Shielded VM and Confidential VM support",
+        "remedies": ["Add UEFI_COMPATIBLE and SEV_CAPABLE to disk.guest_os_features on every disk."]
       },
       {
-        "condition": "disk.guest_os_features contains every required feature",
-        "attribute_path": ["disk", 0, "guest_os_features"],
+        "condition": "Every disk's guest_os_features contains every required feature",
+        "attribute_path": ["disk", "guest_os_features"],
         "values": ["UEFI_COMPATIBLE", "SEV_CAPABLE"],
         "policy_type": "element required"
       }
     ]
 ```
-The violation message names the missing values. See the
+Because the path follows each element, a per-rule check needs no `"match"`. For example
+`["rules", "action", "redirect", "https_redirect"]` with `values: [true]` flags every
+configured redirect that does not force HTTPS, and routes without a redirect pass. The
+violation message names each failing element and what it is missing. See the
 [helper documentation](../../policies/_helpers/README.md#9-element-required) for the test command.
 
 ### Map Key Pattern Whitelist
@@ -418,9 +423,10 @@ The violation message names the missing values. See the
 Requires every **key of a map** to match one of the allowed wildcard shapes in
 `values`. It is the allowlist counterpart to `map key blacklist`: use it when the good
 keys share one known shape but the bad ones cannot be named in advance. Matching ignores
-capitalisation, and each `*` matches one path segment, as in `element pattern whitelist`.
-Every key is checked whatever its value. A missing or empty map passes. An empty
-`values` list or a blank shape is refused with `POLICY ERROR:`, and `policy_lint` reports
+capitalisation, and each `*` matches one path segment, the same matcher as
+`element pattern whitelist`. Every key is checked whatever its value, and the path is
+followed through every element of every repeated block. A missing or empty map passes.
+An empty `values` list or a blank shape is refused with `POLICY ERROR:`, and `policy_lint` reports
 [`invalid-map-key-pattern-whitelist`](policy-lint.md#invalid-map-key-pattern-whitelist).
 ```rego
     [
@@ -442,39 +448,33 @@ Violation messages name the offending keys without printing their values. See th
 ### Presence
 
 Checks whether an attribute or nested block is **set at all**, whatever its value.
-`values` is exactly `["unset"]` (flag the resource when it is set) or `["set"]` (flag it
-when it is not). Missing, `null`, `""`, `[]` and `{}` all count as unset, and an absent
-nested block appears as `[]` in the plan, so `["unset"]` on a block path tells you
-whether the block was configured. `false` and `0` count as set. Keep the numeric
-indexes in list-block paths. Anything other than one of the two modes is refused with
-`POLICY ERROR:`, and `policy_lint` reports [`invalid-presence`](policy-lint.md#invalid-presence).
+`values` is exactly `["unset"]` (flag an element where it is set) or `["set"]` (flag an
+element where it is not). Missing, `null`, `""`, `[]` and `{}` all count as unset, and an
+absent nested block appears as `[]` in the plan, so `["unset"]` on a block path tells you
+whether the block was configured. `false` and `0` count as set. The path is followed
+through every element of every repeated block. Anything other than one of the two modes
+is refused with `POLICY ERROR:`, and `policy_lint` reports
+[`invalid-presence`](policy-lint.md#invalid-presence).
 
-Its main use is making a check conditional on an optional block. Put a
-`presence ["unset"]` condition on the block in a `"match": "all"` situation with the
-real check, and only resources that have the block and fail the check are flagged:
+On a single element, `["unset"]` gives the same results as `whitelist [null, "", [], {}]`
+and `["set"]` the same as `blacklist [null, "", [], {}]`. Use `presence` because it checks
+every element and is harder to get wrong.
 ```rego
     [
       {
-        "situation_description": "A redirect action does not force HTTPS, so redirected requests can be downgraded to plain HTTP",
-        "remedies": ["Set rules.action.redirect.https_redirect to true on redirect actions."],
-        "match": "all"
+        "situation_description": "The instance template gives a network interface an external IP address",
+        "remedies": ["Remove network_interface.access_config so instances have no external IP."]
       },
       {
-        "condition": "The rule configures a redirect",
-        "attribute_path": ["rules", 0, "action", 0, "redirect"],
+        "condition": "No network interface configures access_config",
+        "attribute_path": ["network_interface", "access_config"],
         "values": ["unset"],
         "policy_type": "presence"
-      },
-      {
-        "condition": "The redirect forces HTTPS",
-        "attribute_path": ["rules", 0, "action", 0, "redirect", 0, "https_redirect"],
-        "values": [true],
-        "policy_type": "whitelist"
       }
     ]
 ```
-A route without a redirect passes, and a redirect that sets `https_redirect = false` or
-leaves it out is flagged. See the
+A template whose second interface has an external IP is flagged, with the message naming
+`network_interface.[1].access_config`. See the
 [helper documentation](../../policies/_helpers/README.md#11-presence) for the test command.
 
 ---

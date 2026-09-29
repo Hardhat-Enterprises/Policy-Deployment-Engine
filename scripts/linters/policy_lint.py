@@ -87,9 +87,10 @@ RULES = {
         "key name without leading or trailing whitespace. A single string is "
         "also accepted, as in the dispatcher. Invalid configuration is an error."),
     "invalid-element-required": (
-        "Element required `values` must list at least one non-empty value the "
-        "attribute must contain. An empty list, or null/blank entries, would "
-        "require nothing and pass every resource. Invalid configuration is an error."),
+        "Element required `values` must list at least one value the attribute "
+        "must contain. An empty list, null/blank entries, or whitespace-padded "
+        "strings would require nothing or never match. Invalid configuration is "
+        "an error."),
     "invalid-map-key-pattern-whitelist": (
         "Map key pattern whitelist `values` must list at least one non-empty string "
         "key shape without leading or trailing whitespace. An empty list would flag "
@@ -1065,12 +1066,15 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
             # Required values, not a presence check: an empty list requires nothing.
             if policy_type == "element required":
                 required = values if isinstance(values, list) else [values]
-                if not required or any(v is None or v == "" for v in required):
+                if not required or any(
+                        v is None or v == ""
+                        or (isinstance(v, str) and v != v.strip())
+                        for v in required):
                     add_once("invalid-element-required", path_text,
                              f"'{path_text}' has invalid element required values. "
-                             "List at least one non-empty value the attribute "
-                             "must contain; an empty list or null/blank entries "
-                             "would require nothing and pass every resource.")
+                             "List at least one value the attribute must "
+                             "contain, with no null, blank or whitespace-padded "
+                             "entries; those would require nothing or never match.")
 
             # Allowed key shapes, matched like element pattern whitelist.
             if policy_type == "map key pattern whitelist":

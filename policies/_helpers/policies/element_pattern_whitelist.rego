@@ -5,8 +5,8 @@ package terraform.helpers.policies.element_pattern_whitelist
 # Detects array attributes where any element does NOT match a required
 # wildcard resource-path shape, e.g. projects/*/locations/*/apps/*/guardrails/*.
 # Each '*' matches one or more non-'/' characters (a single path segment), and
-# every other character is matched literally (regex metacharacters such as '.'
-# and '(' are escaped before building the regex).
+# every other character is matched literally. Matching is done by
+# shared.wildcard_match, the same matcher map key pattern whitelist uses.
 #
 # values is a list of wildcard shapes; an element is compliant if it matches
 # any one of them (OR). A string value is checked as a one-item list. A missing
@@ -59,25 +59,11 @@ _build_violation(tf_variables, attribute_path, patterns, resource) = violation i
     }
 }
 
-# An element matches when it fits the wildcard shape. '*' is the only special
-# character and becomes one or more non-'/' characters, so a '*' never spans a
-# path segment ('/'). Every other character is matched literally: regex
-# metacharacters such as '.' and '(' are escaped before building the regex.
-_matches(pattern, value) if {
-    parts := split(pattern, "*")
-    escaped := [_escape(part) | part := parts[_]]
-    p := concat("[^/]+", escaped)
-    regex.match(sprintf("^%s$", [p]), value)
-}
-
 # An element is compliant if it matches any one of the required shapes.
 _matches_any(patterns, value) if {
     some pattern in patterns
-    _matches(pattern, value)
+    shared.wildcard_match(pattern, value)
 }
-
-# Escapes regex metacharacters in a pattern segment so the rest matches literally.
-_escape(segment) := regex.replace(segment, "([.+?()\\[\\]{}\\^$|\\\\])", "\\$1")
 
 # Normalises the attribute value to a list: a string is checked as a one-item
 # list; anything that is neither a list nor a string (e.g. a missing attribute)

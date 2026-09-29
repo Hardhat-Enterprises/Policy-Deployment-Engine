@@ -4,16 +4,24 @@ package terraform.helpers.policies.presence
 #
 # Checks whether an attribute or nested block is set at all, whatever its value.
 # `values` is exactly one of:
-#   "unset" - the attribute must NOT be set; a resource is non-compliant when it is
-#   "set"   - the attribute MUST be set; a resource is non-compliant when it is not
+#   "unset" - the attribute must NOT be set; an element is non-compliant when it is
+#   "set"   - the attribute MUST be set; an element is non-compliant when it is not
+#
+# The path is followed through every element of every repeated block, so
+# ["network_interface", "access_config"] checks every network interface. A
+# numeric index, as in ["network_interface", 0, "access_config"], checks only
+# that element. When a parent block is not configured there is no element to
+# check, so ["service_account", "email"] with "set" only applies to templates
+# that configure a service_account block.
 #
 # An attribute counts as unset when it is missing, null, "", [] or {}. Terraform
-# writes an absent nested block as [] in the plan, so "unset" on a block path
-# (for example ["network_interface", 0, "access_config"]) detects whether the
-# block was configured. false and 0 are real values, so they count as set.
+# writes an absent nested block as [], so "unset" on a block path detects
+# whether the block was configured. false and 0 are real values, so they count
+# as set.
 #
-# Combine a "unset" condition on an optional block with another condition in a
-# "match": "all" situation to write "when this block exists, X must hold".
+# The same checks can be written as whitelist [null, "", [], {}] ("unset") and
+# blacklist [null, "", [], {}] ("set") on a single element. This type exists
+# because it checks every element and is harder to get wrong.
 
 import data.terraform.helpers.shared
 
@@ -23,10 +31,14 @@ import data.terraform.helpers.shared
 get_violations(tf_variables, attribute_path, values) := results if {
 	mode := _mode(values)
 	results := {
-	_build_violation(tf_variables, attribute_path, mode, resource) |
+	_build_violation(tf_variables, mode, paths, resource) |
 		resource := input.planned_values.root_module.resources[_]
 		resource.type == tf_variables.resource_type
-		_violates(resource, attribute_path, mode)
+		paths := {entry.path |
+			some entry in shared.attribute_entries(resource, attribute_path)
+			_violates(entry.value, mode)
+		}
+		count(paths) > 0
 	}
 }
 
@@ -39,13 +51,9 @@ _mode(values) := mode if {
 	mode in {"set", "unset"}
 }
 
-_violates(resource, attribute_path, "unset") if {
-	_is_set(shared.get_attribute_value(resource, attribute_path))
-}
+_violates(value, "unset") if _is_set(value)
 
-_violates(resource, attribute_path, "set") if {
-	not _is_set(shared.get_attribute_value(resource, attribute_path))
-}
+_violates(value, "set") if not _is_set(value)
 
 # A value is set unless it is null, an empty string, an empty list or an empty object.
 _is_set(value) if {
@@ -56,12 +64,14 @@ _is_set(value) if {
 }
 
 # Build the violation object expected by helpers.get_multi_summary. The message
-# never includes the attribute's value.
-_build_violation(tf_variables, attribute_path, mode, resource) := violation if {
+# names the paths, never the attribute's value.
+_build_violation(tf_variables, mode, paths, resource) := violation if {
 	resource_name := shared.get_resource_attribute(
 		resource,
 		tf_variables.resource_value_name,
 	)
+
+	formatted := sort([sprintf("'%s'", [shared.format_attribute_path(path)]) | some path in paths])
 
 	violation := {
 		"name": resource_name,
@@ -70,12 +80,12 @@ _build_violation(tf_variables, attribute_path, mode, resource) := violation if {
 			[
 				tf_variables.friendly_resource_name,
 				resource_name,
-				_describe(mode, shared.format_attribute_path(attribute_path)),
+				_describe(mode, concat(", ", formatted)),
 			],
 		),
 	}
 }
 
-_describe("unset", path) := sprintf("has '%s' set, but it must not be set", [path])
+_describe("unset", paths) := sprintf("sets %s, which must not be set", [paths])
 
-_describe("set", path) := sprintf("does not set '%s', but it must be set", [path])
+_describe("set", paths) := sprintf("does not set %s, which must be set", [paths])

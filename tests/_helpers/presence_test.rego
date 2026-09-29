@@ -118,3 +118,56 @@ test_only_non_compliant_resource_is_flagged if {
 	some v in violations
 	v.name == "public-template"
 }
+
+every_nic_path := ["network_interface", "access_config"]
+
+two_nics := {"network_interface": [
+	{"network": "default", "access_config": []},
+	{"network": "default", "access_config": [{"nat_ip": ""}]},
+]}
+
+# 12. Without an index, every interface is checked: only the second has an
+# external IP and it is flagged by its own path.
+test_second_interface_is_flagged if {
+	violations := violations_for([make_template("two-nics", two_nics)], every_nic_path, "unset")
+	count(violations) == 1
+	some v in violations
+	contains(v.message, "network_interface.[1].access_config")
+	not contains(v.message, "network_interface.[0]")
+}
+
+# 13. An explicit index checks only that interface.
+test_explicit_index_checks_only_that_interface if {
+	count(violations_for([make_template("two-nics", two_nics)], ["network_interface", 0, "access_config"], "unset")) == 0
+	count(violations_for([make_template("two-nics", two_nics)], ["network_interface", 1, "access_config"], "unset")) == 1
+}
+
+# 14. The path is followed through two repeated blocks (rules, then action).
+test_path_through_two_repeated_blocks if {
+	route := {
+		"type": "google_compute_instance_template",
+		"name": "route",
+		"values": {"name": "route", "rules": [
+			{"action": [{"redirect": []}]},
+			{"action": [{"redirect": [{"host_redirect": "example.com"}]}]},
+		]},
+	}
+	violations := violations_for([route], ["rules", "action", "redirect"], "unset")
+	some v in violations
+	contains(v.message, "rules.[1].action.[0].redirect")
+	not contains(v.message, "rules.[0]")
+}
+
+# 15. "set" applies only to blocks that exist: a second service_account block
+# without an email is flagged, and a template with no block is not.
+test_set_checks_only_configured_blocks if {
+	two_accounts := make_template("two-accounts", {"service_account": [
+		{"email": "sa@p.iam.gserviceaccount.com"},
+		{"scopes": ["cloud-platform"]},
+	]})
+	violations := violations_for([two_accounts], ["service_account", "email"], "set")
+	some v in violations
+	contains(v.message, "service_account.[1].email")
+	count(violations_for([make_template("none", {"service_account": []})], ["service_account", "email"], "set")) == 0
+}
+

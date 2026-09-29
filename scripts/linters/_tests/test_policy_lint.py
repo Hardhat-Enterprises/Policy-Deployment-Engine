@@ -1395,6 +1395,7 @@ def _element_required_findings(tmp_path, values):
     [None],
     [""],
     ["UEFI_COMPATIBLE", ""],
+    ["UEFI_COMPATIBLE "],
 ])
 def test_invalid_element_required_is_an_error(tmp_path, values):
     own = _element_required_findings(tmp_path, values)
@@ -1405,8 +1406,9 @@ def test_invalid_element_required_is_an_error(tmp_path, values):
     assert not [f for f in own if f.rule == "presence-only"]
 
 
-def test_valid_element_required_is_accepted(tmp_path):
-    own = _element_required_findings(tmp_path, ["UEFI_COMPATIBLE", "SEV_CAPABLE"])
+@pytest.mark.parametrize("values", [["UEFI_COMPATIBLE", "SEV_CAPABLE"], [True]])
+def test_valid_element_required_is_accepted(tmp_path, values):
+    own = _element_required_findings(tmp_path, values)
     assert not [f for f in own if f.rule == "invalid-element-required"]
     assert not [f for f in own if f.rule == "unknown-policy-type"]
 
