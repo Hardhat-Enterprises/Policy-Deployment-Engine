@@ -6,16 +6,16 @@ import data.terraform.gcp.security.lustre.google_lustre_instance.vars
 conditions := [
     [
         {
-            "situation_description": "The Lustre instance uses an invalid default squash UID.",
+            "situation_description": "The Lustre instance uses a default squash UID that leaves root users unsafely unmapped.",
             "remedies": [
-                "Set 'default_squash_uid' to a valid non-zero user ID.",
-                "Use a positive numeric UID value such as 1000."
+                "Set 'default_squash_uid' to a non-zero UID.",
+                "Use an explicitly configured UID such as 1000."
             ]
         },
         {
-            "condition": "'default_squash_uid' must not be 0.",
+            "condition": "'default_squash_uid' must not be 0 or unset.",
             "attribute_path": ["access_rules_options", 0, "default_squash_uid"],
-            "values": [0],
+            "values": [0, null],
             "policy_type": "blacklist"
         }
     ]

@@ -13,9 +13,9 @@ conditions := [
             ]
         },
         {
-            "condition": "'default_squash_gid' must be greater than 0.",
+            "condition": "'default_squash_gid' must not be 0 or unset.",
             "attribute_path": ["access_rules_options", 0, "default_squash_gid"],
-            "values": [0],
+            "values": [0, null],
             "policy_type": "blacklist"
         }
     ]

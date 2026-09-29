@@ -8,13 +8,13 @@ conditions := [
         {
             "situation_description": "The Lustre instance deletion policy does not prevent destructive deletion.",
             "remedies": [
-                "Set 'deletion_policy' = \"PREVENT\" to protect the Lustre instance from Terraform destruction."
+                "Set 'deletion_policy' to \"PREVENT\" or \"ABANDON\" to protect the Lustre instance from destructive deletion."
             ]
         },
         {
-            "condition": "'deletion_policy' is not set to PREVENT.",
+            "condition": "'deletion_policy' must be set to PREVENT or ABANDON.",
             "attribute_path": ["deletion_policy"],
-            "values": ["PREVENT"],
+            "values": ["PREVENT", "ABANDON"],
             "policy_type": "whitelist"
         }
     ]
