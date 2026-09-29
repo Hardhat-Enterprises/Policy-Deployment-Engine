@@ -19,14 +19,8 @@ conditions := [
         {
             "condition": "Check service_account follows GCP service account format",
             "attribute_path": ["service_account"],
-            "values": [
-                "*@*.iam.gserviceaccount.com",
-                [
-                    ["apigee-sa"],
-                    ["example-project"]
-                ]
-            ],
-            "policy_type": "pattern whitelist"
+            "values": ["*@*.iam.gserviceaccount.com"],
+            "policy_type": "element pattern whitelist"
         }
     ]
 ]
