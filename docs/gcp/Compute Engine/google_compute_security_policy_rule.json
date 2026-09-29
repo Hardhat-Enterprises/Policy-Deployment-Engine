@@ -14,7 +14,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "This setting controls whether the security rule can be deleted. An incorrect setting could remove important protection and leave the service exposed to harmful traffic."
+      "rationale": "This setting controls whether the security rule can be destroyed or removed from Terraform management. A policy should require PREVENT so the rule cannot be silently deleted or abandoned, which could remove important protection and expose the service to harmful traffic."
     },
     "description": {
       "description": "An optional description of this resource. Provide this property when you create the resource.",
@@ -150,7 +150,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "This setting decides which WAF protection rules are excluded. Incorrect exclusions could prevent important security checks from protecting the application."
+      "rationale": "If this field is omitted, the exclusion applies to all rule IDs in the selected WAF rule set, which can disable a broad set of protections. A policy should require this field to be set to a non-empty list so exclusions are limited to specific rule IDs."
     },
     "preconfigured_waf_config.exclusion.target_rule_set": {
       "description": "Target WAF rule set to apply the preconfigured WAF exclusion.",
@@ -169,7 +169,7 @@
       "required": true,
       "type": "string",
       "security_impact": true,
-      "rationale": "This setting controls how broadly a request cookie is excluded from security inspection. A broad option could allow all values of that cookie to bypass important checks."
+      "rationale": "The EQUALS_ANY operator excludes the cookie from WAF inspection regardless of its value, creating a broad bypass of inspection. A policy should forbid EQUALS_ANY and require a more narrowly scoped matching operator."
     },
     "preconfigured_waf_config.exclusion.request_cookie.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
@@ -187,8 +187,8 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field defines how a request header is matched for an exclusion. It controls matching logic rather than a security level, so the correct operator depends on the application's requirements."
+      "security_impact": true,
+      "rationale": "The EQUALS_ANY operator excludes the header from WAF inspection regardless of its value, creating a broad bypass of inspection. A policy should forbid EQUALS_ANY and require a more narrowly scoped matching operator."
     },
     "preconfigured_waf_config.exclusion.request_header.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
@@ -206,8 +206,8 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field defines how a query parameter is matched for an exclusion. It is a functional matching option rather than a generic security control."
+      "security_impact": true,
+      "rationale": "The EQUALS_ANY operator excludes the query parameter from WAF inspection regardless of its value, creating a broad bypass of inspection. A policy should forbid EQUALS_ANY and require a more narrowly scoped matching operator."
     },
     "preconfigured_waf_config.exclusion.request_query_param.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
@@ -225,8 +225,8 @@
       "description": "You can specify an exact match or a partial match by using a field operator and a field value.\nAvailable options:\nEQUALS: The operator matches if the field value equals the specified value.\nSTARTS_WITH: The operator matches if the field value starts with the specified value.\nENDS_WITH: The operator matches if the field value ends with the specified value.\nCONTAINS: The operator matches if the field value contains the specified value.\nEQUALS_ANY: The operator matches if the field value is any value.",
       "required": true,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field defines how a request URI is matched for an exclusion. It controls matching behaviour rather than security posture, so the correct operator depends on application requirements."
+      "security_impact": true,
+      "rationale": "The EQUALS_ANY operator excludes the URI from WAF inspection regardless of its value, creating a broad bypass of inspection. A policy should forbid EQUALS_ANY and require a more narrowly scoped matching operator."
     },
     "preconfigured_waf_config.exclusion.request_uri.value": {
       "description": "A request field matching the specified value will be excluded from inspection during preconfigured WAF evaluation.\nThe field value must be given if the field operator is not EQUALS_ANY, and cannot be given if the field operator is EQUALS_ANY.",
@@ -272,8 +272,8 @@
       "description": "Action to take for requests that are above the configured rate limit threshold, to either deny with a specified HTTP response code, or redirect to a different endpoint.\nValid options are deny(STATUS), where valid values for STATUS are 403, 404, 429, and 502.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "This field determines the action applied when requests exceed the configured rate limit. Because this forms part of DDoS and abuse-mitigation enforcement, a platform policy should require an approved response."
+      "security_impact": false,
+      "rationale": "The schema only permits deny-type actions for requests that exceed the rate limit, so every accepted value already blocks the excess traffic. Because there is no accepted allow or bypass value to forbid, an additional PDE policy would not provide a meaningful security improvement."
     },
     "rate_limit_options.ban_threshold": {
       "type": "block",
@@ -322,8 +322,8 @@
       "description": "Target for the redirect action. This is required if the type is EXTERNAL_302 and cannot be specified for GOOGLE_RECAPTCHA.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field identifies the redirect destination used when traffic exceeds the rate limit. The correct destination depends on application design, so no generic target can be enforced."
+      "security_impact": true,
+      "rationale": "When an external redirect target is configured, it can use an insecure plaintext http:// URL. A policy should require the target to use https:// whenever this field is set, while still allowing the application to choose the destination host."
     },
     "rate_limit_options.exceed_redirect_options.type": {
       "description": "Type of the redirect action.",
@@ -360,8 +360,8 @@
       "description": "Target for the redirect action. This is required if the type is EXTERNAL_302 and cannot be specified for GOOGLE_RECAPTCHA.",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "This field identifies the destination for a redirect action. The correct target is application-specific, so there is no generic redirect destination PDE can securely require."
+      "security_impact": true,
+      "rationale": "When an external redirect target is configured, it can use an insecure plaintext http:// URL. A policy should require the target to use https:// whenever this field is set, while still allowing the application to choose the destination host."
     },
     "redirect_options.type": {
       "description": "Type of the redirect action.",
