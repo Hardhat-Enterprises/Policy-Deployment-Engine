@@ -4,6 +4,7 @@ import data.terraform.gcp.security.apigee.google_apigee_sharedflow_deployment.va
 conditions := [
     [
         {
+            "match": "any",
             "situation_description": "Sharedflow deployment does not specify a dedicated service account in the required GCP format, allowing it to operate without a properly scoped identity.",
             "remedies": [
                 "Set service_account to a dedicated service account in the format {ACCOUNT_ID}@{PROJECT}.iam.gserviceaccount.com"
