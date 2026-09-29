@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>PDE Gate — Organisation Settings</title>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 620px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.6rem 1.2rem;
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button + button {
+      margin-left: 0.5rem;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .error {
+      background: #fef2f2;
+      border-color: #fca5a5;
+    }
+
+    .muted {
+      color: #4b5563;
+      font-size: 0.95rem;
+    }
+
+    .package-fields {
+      display: none;
+      margin-top: 1.5rem;
+    }
+
+    .import-message {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 4px;
+    }
+
+    .import-error {
+      background: #fef2f2;
+      border-color: #fca5a5;
+    }
+
+    nav a {
+      margin-right: 1rem;
+    }
+
+    code {
+      word-break: break-all;
+    }
+  </style>
+
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+  <nav>
+    <a href="/register">Register</a>
+    <a href="/settings">Settings</a>
+  </nav>
+
+  <h1>Organisation settings</h1>
+
+  <p class="muted">
+    Authenticate using the organisation ID and API key, load an existing
+    policy package, and update its policy configuration.
+  </p>
+
+  <form id="credentials_form">
+    <label for="org_id">Organisation ID</label>
+    <input
+      id="org_id"
+      name="org_id"
+      autocomplete="off"
+      required
+    />
+
+    <label for="api_key">API key</label>
+    <input
+      id="api_key"
+      name="api_key"
+      type="password"
+      autocomplete="off"
+      required
+    />
+
+    <button id="load_button" type="submit">
+      Load policy packages
+    </button>
+  </form>
+
+  <form id="package_fields" class="package-fields">
+    <label for="package_select">Policy package</label>
+    <select id="package_select"></select>
+
+    <label for="package_file">
+      Import package.json (optional)
+    </label>
+    <input
+      id="package_file"
+      name="package_file"
+      type="file"
+      accept=".json,application/json"
+    />
+
+    <p class="muted">
+      Import an existing PDE Gate package.json to populate the fields below.
+      Review the imported configuration before saving.
+    </p>
+
+    <div
+      id="import_message"
+      class="import-message"
+      aria-live="polite"
+    ></div>
+
+    <label for="package_name">Package name</label>
+    <input
+      id="package_name"
+      name="package_name"
+      required
+    />
+
+    <label for="package_description">Package description</label>
+    <textarea
+      id="package_description"
+      name="package_description"
+      rows="3"
+    ></textarea>
+
+    <label for="platforms">
+      Platforms (comma-separated)
+    </label>
+    <input
+      id="platforms"
+      name="platforms"
+      value="gcp"
+      required
+    />
+
+    <label for="approved_regions">
+      Approved regions (comma-separated)
+    </label>
+    <input
+      id="approved_regions"
+      name="approved_regions"
+      required
+    />
+
+    <label for="approved_zones">
+      Approved zones (comma-separated, optional)
+    </label>
+    <input
+      id="approved_zones"
+      name="approved_zones"
+    />
+
+    <label for="google_provider_version">
+      Google provider version
+    </label>
+    <input
+      id="google_provider_version"
+      name="google_provider_version"
+      placeholder="7.37.0"
+    />
+
+    <label for="policy_profile">Policy profile</label>
+    <select id="policy_profile" name="policy_profile">
+      <option value="full">
+        full — all policies per resource
+      </option>
+      <option value="baseline">
+        baseline — standard policy subset
+      </option>
+      <option value="custom">
+        custom — select policies by resource type
+      </option>
+    </select>
+
+    <div id="custom_policies">
+      <label for="enabled_policies">Enabled policies</label>
+
+      <textarea
+        id="enabled_policies"
+        name="enabled_policies"
+        rows="6"
+        placeholder="google_vpc_access_connector: region, network"
+      ></textarea>
+
+      <p class="muted">
+        Enter one Terraform resource type per line, followed by policy
+        filenames without <code>.rego</code>.
+      </p>
+    </div>
+
+    <button id="save_button" type="submit">
+      Save changes
+    </button>
+  </form>
+
+  <div id="result" class="result" aria-live="polite"></div>
+
+  <script>
+    const credentialsForm =
+      document.getElementById("credentials_form");
+
+    const packageForm =
+      document.getElementById("package_fields");
+
+    const loadButton =
+      document.getElementById("load_button");
+
+    const saveButton =
+      document.getElementById("save_button");
+
+    const packageSelect =
+      document.getElementById("package_select");
+
+    const packageFile =
+      document.getElementById("package_file");
+
+    const importMessage =
+      document.getElementById("import_message");
+
+    const profile =
+      document.getElementById("policy_profile");
+
+    const customPolicies =
+      document.getElementById("custom_policies");
+
+    const result =
+      document.getElementById("result");
+
+    let loadedPackages = [];
+    let loadedPackage = null;
+    let importedPolicyGroups = null;
+
+    function getCredentials() {
+      return {
+        orgId:
+          document.getElementById("org_id").value.trim(),
+
+        apiKey:
+          document.getElementById("api_key").value.trim()
+      };
+    }
+
+    function authHeaders(apiKey) {
+      return {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      };
+    }
+
+    function getPackageId(policyPackage) {
+      if (!policyPackage) {
+        return "";
+      }
+
+      return String(
+        policyPackage.package_id ||
+        policyPackage.id ||
+        ""
+      );
+    }
+
+    function parseList(raw) {
+      return String(raw)
+        .split(",")
+        .map(value => value.trim())
+        .filter(Boolean);
+    }
+
+    function getObject(value) {
+      if (
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value)
+      ) {
+        return value;
+      }
+
+      return {};
+    }
+
+    function getPolicyGroups(policyPackage) {
+      const groups =
+        getObject(policyPackage?.policy_groups);
+
+      const nestedEnabledPolicies =
+        getObject(groups.enabled_policies);
+
+      if (Object.keys(nestedEnabledPolicies).length) {
+        return nestedEnabledPolicies;
+      }
+
+      const directPolicyGroups = {};
+
+      for (const [resourceType, policies] of
+        Object.entries(groups)) {
+        if (
+          resourceType !== "profile" &&
+          resourceType !== "enabled_policies" &&
+          Array.isArray(policies)
+        ) {
+          directPolicyGroups[resourceType] = policies;
+        }
+      }
+
+      return directPolicyGroups;
+    }
+
+    function getVariables(policyPackage) {
+      return getObject(policyPackage?.variables);
+    }
+
+    function parseEnabledPolicies(raw) {
+      const output = {};
+
+      const lines = String(raw)
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
+
+      for (const line of lines) {
+        const separator = line.indexOf(":");
+
+        if (separator < 1) {
+          throw new Error(
+            "Each policy line must use: resource_type: policy1, policy2"
+          );
+        }
+
+        const resourceType =
+          line.slice(0, separator).trim();
+
+        const policies =
+          line
+            .slice(separator + 1)
+            .split(",")
+            .map(policy => policy.trim())
+            .filter(Boolean);
+
+        if (!resourceType) {
+          throw new Error(
+            "Each policy line requires a Terraform resource type"
+          );
+        }
+
+        if (!policies.length) {
+          throw new Error(
+            "Add at least one policy for " + resourceType
+          );
+        }
+
+        for (const policy of policies) {
+          if (policy.endsWith(".rego")) {
+            throw new Error(
+              "Enter policy names without .rego for " +
+              resourceType
+            );
+          }
+        }
+
+        output[resourceType] = policies;
+      }
+
+      if (!Object.keys(output).length) {
+        throw new Error(
+          "Add at least one enabled policy selection"
+        );
+      }
+
+      return output;
+    }
+
+    function formatEnabledPolicies(policyGroups) {
+      return Object.entries(getObject(policyGroups))
+        .filter(([, policies]) => Array.isArray(policies))
+        .map(([resourceType, policies]) => {
+          return `${resourceType}: ${policies.join(", ")}`;
+        })
+        .join("\n");
+    }
+
+    function inferProfile(policyPackage) {
+      const groups =
+        getObject(policyPackage?.policy_groups);
+
+      if (
+        typeof groups.profile === "string" &&
+        ["full", "baseline", "custom"].includes(
+          groups.profile
+        )
+      ) {
+        return groups.profile;
+      }
+
+      const variables =
+        getVariables(policyPackage);
+
+      if (
+        typeof variables.policy_profile === "string" &&
+        ["full", "baseline", "custom"].includes(
+          variables.policy_profile
+        )
+      ) {
+        return variables.policy_profile;
+      }
+
+      if (
+        Object.keys(getPolicyGroups(policyPackage)).length
+      ) {
+        return "custom";
+      }
+
+      return "baseline";
+    }
+
+    function toggleCustomPolicies() {
+      customPolicies.style.display =
+        profile.value === "custom"
+          ? "block"
+          : "none";
+    }
+
+    function showImportMessage(message, isError = false) {
+      importMessage.className =
+        isError
+          ? "import-message import-error"
+          : "import-message";
+
+      importMessage.textContent = message;
+      importMessage.style.display = "block";
+    }
+
+    function hideImportMessage() {
+      importMessage.style.display = "none";
+      importMessage.textContent = "";
+    }
+
+    function showMessage(message) {
+      result.className = "result";
+      result.innerHTML = "";
+
+      const paragraph = document.createElement("p");
+      paragraph.textContent = message;
+
+      result.appendChild(paragraph);
+      result.style.display = "block";
+    }
+
+    function showError(message) {
+      result.className = "result error";
+      result.innerHTML = "";
+
+      const heading = document.createElement("h2");
+      heading.textContent = "Unable to complete request";
+
+      const paragraph = document.createElement("p");
+      paragraph.textContent = message;
+
+      result.appendChild(heading);
+      result.appendChild(paragraph);
+      result.style.display = "block";
+    }
+
+    async function readJson(response) {
+      try {
+        return await response.json();
+      } catch {
+        return {};
+      }
+    }
+
+    function validateImportedPackage(packageData) {
+      if (
+        !packageData ||
+        typeof packageData !== "object" ||
+        Array.isArray(packageData)
+      ) {
+        throw new Error(
+          "The selected file must contain a JSON object"
+        );
+      }
+
+      if (
+        typeof packageData.name !== "string" ||
+        !packageData.name.trim()
+      ) {
+        throw new Error(
+          "The imported package requires a name"
+        );
+      }
+
+      if (
+        !Array.isArray(packageData.platforms) ||
+        !packageData.platforms.length
+      ) {
+        throw new Error(
+          "The imported package requires at least one platform"
+        );
+      }
+
+      const policyGroups =
+        getObject(packageData.policy_groups);
+
+      if (!Object.keys(policyGroups).length) {
+        throw new Error(
+          "The imported package requires policy_groups"
+        );
+      }
+
+      for (const [resourceType, policies] of
+        Object.entries(policyGroups)) {
+        if (
+          !resourceType.trim() ||
+          !Array.isArray(policies) ||
+          !policies.length ||
+          !policies.every(policy => {
+            return (
+              typeof policy === "string" &&
+              policy.trim()
+            );
+          })
+        ) {
+          throw new Error(
+            "Each policy group must contain a resource type " +
+            "and at least one policy"
+          );
+        }
+      }
+
+      const variables =
+        getObject(packageData.variables);
+
+      if (
+        variables.approved_regions !== undefined &&
+        !Array.isArray(variables.approved_regions)
+      ) {
+        throw new Error(
+          "variables.approved_regions must be an array"
+        );
+      }
+
+      if (
+        variables.approved_zones !== undefined &&
+        !Array.isArray(variables.approved_zones)
+      ) {
+        throw new Error(
+          "variables.approved_zones must be an array"
+        );
+      }
+
+      return {
+        name: packageData.name.trim(),
+
+        description:
+          typeof packageData.description === "string"
+            ? packageData.description
+            : "",
+
+        platforms:
+          packageData.platforms
+            .map(platform => String(platform).trim())
+            .filter(Boolean),
+
+        policy_groups: policyGroups,
+
+        variables
+      };
+    }
+
+    function populateFields(policyPackage) {
+      const variables =
+        getVariables(policyPackage);
+
+      const policyGroups =
+        getPolicyGroups(policyPackage);
+
+      loadedPackage = policyPackage;
+
+      document.getElementById("package_name").value =
+        policyPackage.name || "";
+
+      document.getElementById(
+        "package_description"
+      ).value =
+        policyPackage.description || "";
+
+      document.getElementById("platforms").value =
+        Array.isArray(policyPackage.platforms)
+          ? policyPackage.platforms.join(", ")
+          : "";
+
+      document.getElementById(
+        "approved_regions"
+      ).value =
+        Array.isArray(variables.approved_regions)
+          ? variables.approved_regions.join(", ")
+          : "";
+
+      document.getElementById(
+        "approved_zones"
+      ).value =
+        Array.isArray(variables.approved_zones)
+          ? variables.approved_zones.join(", ")
+          : "";
+
+      document.getElementById(
+        "google_provider_version"
+      ).value =
+        variables.google_provider_version || "";
+
+      profile.value =
+        inferProfile(policyPackage);
+
+      document.getElementById(
+        "enabled_policies"
+      ).value =
+        formatEnabledPolicies(policyGroups);
+
+      importedPolicyGroups = null;
+      packageFile.value = "";
+      hideImportMessage();
+      toggleCustomPolicies();
+
+      packageForm.style.display = "block";
+    }
+
+    function populateImportedFields(packageData) {
+      const variables =
+        getVariables(packageData);
+
+      document.getElementById("package_name").value =
+        packageData.name;
+
+      document.getElementById(
+        "package_description"
+      ).value =
+        packageData.description || "";
+
+      document.getElementById("platforms").value =
+        packageData.platforms.join(", ");
+
+      document.getElementById(
+        "approved_regions"
+      ).value =
+        Array.isArray(variables.approved_regions)
+          ? variables.approved_regions.join(", ")
+          : "";
+
+      document.getElementById(
+        "approved_zones"
+      ).value =
+        Array.isArray(variables.approved_zones)
+          ? variables.approved_zones.join(", ")
+          : "";
+
+      document.getElementById(
+        "google_provider_version"
+      ).value =
+        variables.google_provider_version || "";
+
+      importedPolicyGroups =
+        packageData.policy_groups;
+
+      profile.value = "custom";
+
+      document.getElementById(
+        "enabled_policies"
+      ).value =
+        formatEnabledPolicies(
+          packageData.policy_groups
+        );
+
+      toggleCustomPolicies();
+
+      showImportMessage(
+        "Imported package.json successfully. " +
+        "Review the populated fields before saving."
+      );
+    }
+
+    function populatePackageSelector(packages) {
+      packageSelect.innerHTML = "";
+
+      for (const policyPackage of packages) {
+        const option =
+          document.createElement("option");
+
+        option.value =
+          getPackageId(policyPackage);
+
+        option.textContent =
+          policyPackage.name ||
+          getPackageId(policyPackage);
+
+        packageSelect.appendChild(option);
+      }
+
+      if (packages.length) {
+        packageSelect.value =
+          getPackageId(packages[0]);
+
+        populateFields(packages[0]);
+      }
+    }
+
+    async function loadPackages() {
+      const { orgId, apiKey } =
+        getCredentials();
+
+      if (!orgId || !apiKey) {
+        throw new Error(
+          "Organisation ID and API key are required"
+        );
+      }
+
+      const response = await fetch(
+        `/v1/orgs/${encodeURIComponent(orgId)}/packages`,
+        {
+          headers: authHeaders(apiKey)
+        }
+      );
+
+      const data = await readJson(response);
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+          "Unable to load policy packages"
+        );
+      }
+
+      loadedPackages =
+        Array.isArray(data.packages)
+          ? data.packages
+          : [];
+
+      if (!loadedPackages.length) {
+        loadedPackage = null;
+        packageForm.style.display = "none";
+
+        throw new Error(
+          "No policy packages were found for this organisation"
+        );
+      }
+
+      populatePackageSelector(loadedPackages);
+
+      showMessage(
+        `Loaded ${loadedPackages.length} policy package` +
+        `${loadedPackages.length === 1 ? "" : "s"}.`
+      );
+    }
+
+    credentialsForm.addEventListener(
+      "submit",
+      async event => {
+        event.preventDefault();
+
+        result.style.display = "none";
+        packageForm.style.display = "none";
+        loadButton.disabled = true;
+        loadButton.textContent = "Loading...";
+
+        try {
+          await loadPackages();
+        } catch (error) {
+          showError(
+            error instanceof Error
+              ? error.message
+              : "Unable to load policy packages"
+          );
+        } finally {
+          loadButton.disabled = false;
+          loadButton.textContent =
+            "Load policy packages";
+        }
+      }
+    );
+
+    packageSelect.addEventListener(
+      "change",
+      () => {
+        const selectedPackage =
+          loadedPackages.find(policyPackage => {
+            return (
+              getPackageId(policyPackage) ===
+              packageSelect.value
+            );
+          });
+
+        if (selectedPackage) {
+          populateFields(selectedPackage);
+          result.style.display = "none";
+        }
+      }
+    );
+
+    packageFile.addEventListener(
+      "change",
+      async event => {
+        const file = event.target.files[0];
+
+        if (!file) {
+          importedPolicyGroups = null;
+          hideImportMessage();
+          return;
+        }
+
+        try {
+          const rawJson = await file.text();
+          const parsedJson = JSON.parse(rawJson);
+
+          const validatedPackage =
+            validateImportedPackage(parsedJson);
+
+          populateImportedFields(validatedPackage);
+          result.style.display = "none";
+        } catch (error) {
+          importedPolicyGroups = null;
+
+          showImportMessage(
+            error instanceof Error
+              ? error.message
+              : "Unable to import package.json",
+            true
+          );
+
+          packageFile.value = "";
+        }
+      }
+    );
+
+    profile.addEventListener(
+      "change",
+      () => {
+        importedPolicyGroups = null;
+        toggleCustomPolicies();
+      }
+    );
+
+    document.getElementById(
+      "enabled_policies"
+    ).addEventListener(
+      "input",
+      () => {
+        importedPolicyGroups = null;
+      }
+    );
+
+    packageForm.addEventListener(
+      "submit",
+      async event => {
+        event.preventDefault();
+
+        if (!loadedPackage) {
+          showError(
+            "Load a policy package before saving changes"
+          );
+          return;
+        }
+
+        const { orgId, apiKey } =
+          getCredentials();
+
+        if (!orgId || !apiKey) {
+          showError(
+            "Organisation ID and API key are required"
+          );
+          return;
+        }
+
+        const packageId =
+          getPackageId(loadedPackage);
+
+        if (!packageId) {
+          showError(
+            "The selected policy package has no package ID"
+          );
+          return;
+        }
+
+        const packageName =
+          document
+            .getElementById("package_name")
+            .value
+            .trim();
+
+        const packageDescription =
+          document
+            .getElementById("package_description")
+            .value
+            .trim();
+
+        const platforms =
+          parseList(
+            document
+              .getElementById("platforms")
+              .value
+          );
+
+        const approvedRegions =
+          parseList(
+            document
+              .getElementById("approved_regions")
+              .value
+          );
+
+        const approvedZones =
+          parseList(
+            document
+              .getElementById("approved_zones")
+              .value
+          );
+
+        const googleProviderVersion =
+          document
+            .getElementById(
+              "google_provider_version"
+            )
+            .value
+            .trim();
+
+        if (!packageName) {
+          showError("Package name is required");
+          return;
+        }
+
+        if (!platforms.length) {
+          showError(
+            "Add at least one platform"
+          );
+          return;
+        }
+
+        if (!approvedRegions.length) {
+          showError(
+            "Add at least one approved region"
+          );
+          return;
+        }
+
+        let policyGroups;
+
+        try {
+          policyGroups =
+            importedPolicyGroups ||
+            parseEnabledPolicies(
+              document
+                .getElementById("enabled_policies")
+                .value
+            );
+        } catch (error) {
+          showError(
+            error instanceof Error
+              ? error.message
+              : "Invalid enabled policy configuration"
+          );
+          return;
+        }
+
+        const existingVariables =
+          getVariables(loadedPackage);
+
+        const variables = {
+          ...existingVariables,
+          approved_regions: approvedRegions,
+          approved_zones: approvedZones
+        };
+
+        delete variables.policy_profile;
+
+        if (googleProviderVersion) {
+          variables.google_provider_version =
+            googleProviderVersion;
+        } else {
+          delete variables.google_provider_version;
+        }
+
+        const requestBody = {
+          name: packageName,
+          description: packageDescription,
+          platforms,
+          policy_groups: policyGroups,
+          variables
+        };
+
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
+        result.style.display = "none";
+
+        try {
+          const response = await fetch(
+            `/v1/orgs/${encodeURIComponent(orgId)}` +
+            `/packages/${encodeURIComponent(packageId)}`,
+            {
+              method: "PATCH",
+              headers: authHeaders(apiKey),
+              body: JSON.stringify(requestBody)
+            }
+          );
+
+          const responseData =
+            await readJson(response);
+
+          if (!response.ok) {
+            throw new Error(
+              responseData.error ||
+              "Unable to save policy package"
+            );
+          }
+
+          const updatedPackage =
+            responseData.package ||
+            responseData;
+
+          loadedPackage = updatedPackage;
+
+          loadedPackages =
+            loadedPackages.map(policyPackage => {
+              return (
+                getPackageId(policyPackage) === packageId
+                  ? updatedPackage
+                  : policyPackage
+              );
+            });
+
+          populatePackageSelector(loadedPackages);
+
+          packageSelect.value =
+            getPackageId(updatedPackage);
+
+          populateFields(updatedPackage);
+
+          showMessage(
+            "Policy package settings saved successfully. " +
+            "The updated configuration will apply to the " +
+            "next PDE Gate check."
+          );
+        } catch (error) {
+          showError(
+            error instanceof Error
+              ? error.message
+              : "Unable to save policy package"
+          );
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = "Save changes";
+        }
+      }
+    );
+
+    toggleCustomPolicies();
+  </script>
+</body>
+</html>
