@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 10 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Element Required, Map Key Pattern Whitelist
+- Support for 11 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Element Required, Map Key Pattern Whitelist, Presence
 - OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -33,6 +33,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [8. Element Pattern Whitelist](#8-element-pattern-whitelist)
   - [9. Element Required](#9-element-required)
   - [10. Map Key Pattern Whitelist](#10-map-key-pattern-whitelist)
+  - [11. Presence](#11-presence)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
@@ -95,7 +96,8 @@ policies/_helpers/
     ├── map_key_blacklist.rego
     ├── element_pattern_whitelist.rego
     ├── element_required.rego
-    └── map_key_pattern_whitelist.rego
+    ├── map_key_pattern_whitelist.rego
+    └── presence.rego
 ```
 
 ### Component Responsibilities
@@ -415,6 +417,62 @@ Run the focused and integration tests from the repository root:
 
 ```shell
 opa test tests/_helpers/map_key_pattern_whitelist_test.rego tests/_helpers/map_key_pattern_whitelist_integration_test.rego policies/_helpers -v
+```
+
+---
+
+### 11. Presence
+
+**Module:** `policies/presence.rego`
+**Use Case:** Require an attribute or nested block to be set, or to not be set, whatever its value
+
+**Logic:**
+- `values` is exactly one of `["unset"]` or `["set"]` (any capitalisation)
+- `["unset"]` flags a resource when the attribute **is** set; `["set"]` flags it when the attribute is **not** set
+- An attribute counts as unset when it is missing, `null`, `""`, `[]` or `{}`. Terraform writes an absent nested block as `[]` in the plan, so `["unset"]` on a block path detects whether the block was configured
+- `false` and `0` are real values, so they count as set
+- Violation messages name the attribute path, never its value
+- Any other `values` would check nothing. Through `get_multi_summary` this returns `POLICY ERROR:`, and the linter reports `invalid-presence` as an error
+- Include the numeric indexes for list blocks, for example `["network_interface", 0, "access_config"]`. Without them the shared extractor returns a list of values, which is never empty for a configured parent block
+
+**Conditional checks:** combine a `presence ["unset"]` condition on an optional block with another condition in a `"match": "all"` situation. The resource is flagged only when it fails both, which reads as "when this block exists, the other condition must hold".
+
+**Example (no external IP):**
+```json
+{
+  "policy_type": "presence",
+  "attribute_path": ["network_interface", 0, "access_config"],
+  "values": ["unset"]
+}
+```
+
+**Example (a redirect must force HTTPS, routes without a redirect pass):**
+```rego
+conditions := [[
+    {
+        "situation_description": "A redirect action does not force HTTPS",
+        "remedies": ["Set rules.action.redirect.https_redirect to true on redirect actions."],
+        "match": "all",
+    },
+    {
+        "condition": "The rule configures a redirect",
+        "attribute_path": ["rules", 0, "action", 0, "redirect"],
+        "values": ["unset"],
+        "policy_type": "presence",
+    },
+    {
+        "condition": "The redirect forces HTTPS",
+        "attribute_path": ["rules", 0, "action", 0, "redirect", 0, "https_redirect"],
+        "values": [true],
+        "policy_type": "whitelist",
+    },
+]]
+```
+
+Run the focused and integration tests from the repository root:
+
+```shell
+opa test tests/_helpers/presence_test.rego tests/_helpers/presence_integration_test.rego policies/_helpers -v
 ```
 
 ---

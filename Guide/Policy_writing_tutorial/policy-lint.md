@@ -56,7 +56,7 @@ is *absent*, and the policy passes every resource you point it at.
 
 The supported values, exactly as the engine spells them:
 
-    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist, element required, map key pattern whitelist
+    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist, element required, map key pattern whitelist, presence
 
 They are **lowercase**, and multi-word names use **spaces, not underscores**. Writing
 `pattern_whitelist` is the mistake this rule exists to catch. `element whitelist` is not a type
@@ -208,6 +208,34 @@ Good:
       "attribute_path": ["resource_manager_tags"],
       "values": ["tagKeys/*"],
       "policy_type": "map key pattern whitelist"
+    }
+
+## invalid-presence
+
+For `presence`, `values` is a mode, not a list of attribute values. It must be exactly
+`["set"]` or `["unset"]` (any capitalisation). An empty list, both modes at once, or
+anything else such as `["present"]` or `[true]` would check nothing, so these are
+**errors**. The normal runtime summary also returns `POLICY ERROR:` for this
+configuration and checks nothing.
+
+`presence` is also the answer when you meet `presence-only` below and presence really
+is the control: `["unset"]` says "this must not be configured at all" directly, where a
+`blacklist` cannot flag every possible value.
+
+Bad:
+
+    {
+      "attribute_path": ["network_interface", 0, "access_config"],
+      "values": ["present"],
+      "policy_type": "presence"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["network_interface", 0, "access_config"],
+      "values": ["unset"],
+      "policy_type": "presence"
     }
 
 ## presence-only

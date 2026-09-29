@@ -1445,3 +1445,39 @@ def test_valid_map_key_pattern_whitelist_is_accepted(tmp_path):
     assert not [f for f in own if f.rule == "invalid-map-key-pattern-whitelist"]
     assert not [f for f in own if f.rule == "unknown-policy-type"]
     assert not [f for f in own if f.rule == "hard-coded-value"]
+
+
+def _presence_findings(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"presence"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    return [f for f in findings if f.policy == "bogus_type"]
+
+
+@pytest.mark.parametrize("values", [
+    [],
+    [None],
+    ["present"],
+    ["set", "unset"],
+    [True],
+])
+def test_invalid_presence_is_an_error(tmp_path, values):
+    own = _presence_findings(tmp_path, values)
+    invalid = [f for f in own if f.rule == "invalid-presence"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+
+
+@pytest.mark.parametrize("values", [["set"], ["unset"], ["UNSET"]])
+def test_valid_presence_is_accepted(tmp_path, values):
+    own = _presence_findings(tmp_path, values)
+    assert not [f for f in own if f.rule == "invalid-presence"]
+    assert not [f for f in own if f.rule == "unknown-policy-type"]
+    assert not [f for f in own if f.rule == "presence-only"]

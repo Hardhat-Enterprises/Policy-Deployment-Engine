@@ -148,6 +148,17 @@ run_test_suite "Map Key Pattern Whitelist Integration" \
     "policies/_helpers" \
     "false" "false"
 
+run_test_suite "Presence Policy" \
+    "tests/_helpers/presence_test.rego" \
+    "policies/_helpers/policies/presence.rego" \
+    "false" "false"
+
+# This suite exercises conditions through the complete dispatcher and summary.
+run_test_suite "Presence Integration" \
+    "tests/_helpers/presence_integration_test.rego" \
+    "policies/_helpers" \
+    "false" "false"
+
 echo ""
 echo "================================"
 echo "Test Suites: $PASSED passed, $FAILED failed"

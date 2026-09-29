@@ -23,6 +23,7 @@ import data.terraform.helpers.policies.element_pattern_whitelist
 import data.terraform.helpers.policies.map_key_blacklist
 import data.terraform.helpers.policies.element_required
 import data.terraform.helpers.policies.map_key_pattern_whitelist
+import data.terraform.helpers.policies.presence
 
 ################################################################################
 # Public API
@@ -109,6 +110,15 @@ get_multi_summary(conditions, tf_variables) = summary if {
     count(problems) > 0
     summary := {
         "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Give map key pattern whitelist at least one non-empty key shape with no leading or trailing whitespace, and point attribute_path at a map (include numeric indexes for list blocks).", [concat("; ", sort(problems))])],
+        "details": []
+    }
+} else = summary if {
+    # Preflight: presence needs exactly one of "set" or "unset". Anything else
+    # would check nothing, so report it instead of evaluating.
+    problems := presence_problems(conditions)
+    count(problems) > 0
+    summary := {
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Set presence values to exactly one of [\"set\"] or [\"unset\"].", [concat("; ", sort(problems))])],
         "details": []
     }
 } else = summary if {
@@ -330,6 +340,7 @@ valid_policy_types := [
     "map key blacklist",
     "element required",
     "map key pattern whitelist",
+    "presence",
 ]
 
 # Every reason `conditions` cannot be dispatched, as human-readable phrases. Two
@@ -451,6 +462,23 @@ map_key_pattern_whitelist_problems(conditions) := problems if {
         values := shared.ensure_array(object.get(entry, "values", null))
         not _valid_map_key_blacklist_values(values)
     }
+}
+
+# presence takes exactly one mode, "set" or "unset" (any capitalisation).
+presence_problems(conditions) := problems if {
+    problems := {sprintf("invalid presence values on '%s'", [shared.format_attribute_path(object.get(entry, "attribute_path", []))]) |
+        some group in conditions
+        some entry in group
+        lower(object.get(entry, "policy_type", "")) == "presence"
+        values := shared.ensure_array(object.get(entry, "values", null))
+        not _valid_presence_values(values)
+    }
+}
+
+_valid_presence_values(values) if {
+    count(values) == 1
+    is_string(values[0])
+    lower(values[0]) in {"set", "unset"}
 }
 
 # Missing/null optional maps are allowed; present non-map values are not, for
@@ -575,6 +603,10 @@ select_policy_logic(tf_variables, attribute_path, values_formatted, "element req
 
 select_policy_logic(tf_variables, attribute_path, values_formatted, "map key pattern whitelist") = results if {
     results := map_key_pattern_whitelist.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "presence") = results if {
+    results := presence.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
 # There is deliberately NO fallback rule for an unknown policy_type. One used to

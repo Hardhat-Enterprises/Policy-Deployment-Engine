@@ -106,6 +106,7 @@ The engine dispatches on `policy_type`, using these supported values:
 | `map key blacklist` | No map key may match a prohibited name, ignoring capitalisation, with a non-empty value |
 | `element required` | An array must **contain** every one of these values (unset counts as empty) |
 | `map key pattern whitelist` | Every map key must match one of these wildcard shapes, ignoring capitalisation |
+| `presence` | The attribute or block must be set (`["set"]`) or must not be set (`["unset"]`), whatever its value |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
@@ -437,6 +438,44 @@ Every key is checked whatever its value. A missing or empty map passes. An empty
 ```
 Violation messages name the offending keys without printing their values. See the
 [helper documentation](../../policies/_helpers/README.md#10-map-key-pattern-whitelist) for the test command.
+
+### Presence
+
+Checks whether an attribute or nested block is **set at all**, whatever its value.
+`values` is exactly `["unset"]` (flag the resource when it is set) or `["set"]` (flag it
+when it is not). Missing, `null`, `""`, `[]` and `{}` all count as unset, and an absent
+nested block appears as `[]` in the plan, so `["unset"]` on a block path tells you
+whether the block was configured. `false` and `0` count as set. Keep the numeric
+indexes in list-block paths. Anything other than one of the two modes is refused with
+`POLICY ERROR:`, and `policy_lint` reports [`invalid-presence`](policy-lint.md#invalid-presence).
+
+Its main use is making a check conditional on an optional block. Put a
+`presence ["unset"]` condition on the block in a `"match": "all"` situation with the
+real check, and only resources that have the block and fail the check are flagged:
+```rego
+    [
+      {
+        "situation_description": "A redirect action does not force HTTPS, so redirected requests can be downgraded to plain HTTP",
+        "remedies": ["Set rules.action.redirect.https_redirect to true on redirect actions."],
+        "match": "all"
+      },
+      {
+        "condition": "The rule configures a redirect",
+        "attribute_path": ["rules", 0, "action", 0, "redirect"],
+        "values": ["unset"],
+        "policy_type": "presence"
+      },
+      {
+        "condition": "The redirect forces HTTPS",
+        "attribute_path": ["rules", 0, "action", 0, "redirect", 0, "https_redirect"],
+        "values": [true],
+        "policy_type": "whitelist"
+      }
+    ]
+```
+A route without a redirect passes, and a redirect that sets `https_redirect = false` or
+leaves it out is flagged. See the
+[helper documentation](../../policies/_helpers/README.md#11-presence) for the test command.
 
 ---
 
