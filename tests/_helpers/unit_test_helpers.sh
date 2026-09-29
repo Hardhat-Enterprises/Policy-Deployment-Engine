@@ -126,6 +126,17 @@ run_test_suite "Policy Orchestration" \
     "policies/_helpers" \
     "false" "false"
 
+run_test_suite "Element Required Policy" \
+    "tests/_helpers/element_required_test.rego" \
+    "policies/_helpers/policies/element_required.rego" \
+    "false" "false"
+
+# This suite exercises conditions through the complete dispatcher and summary.
+run_test_suite "Element Required Integration" \
+    "tests/_helpers/element_required_integration_test.rego" \
+    "policies/_helpers" \
+    "false" "false"
+
 echo ""
 echo "================================"
 echo "Test Suites: $PASSED passed, $FAILED failed"

@@ -86,6 +86,10 @@ RULES = {
         "Map key blacklist `values` must contain at least one non-empty string "
         "key name without leading or trailing whitespace. A single string is "
         "also accepted, as in the dispatcher. Invalid configuration is an error."),
+    "invalid-element-required": (
+        "Element required `values` must list at least one non-empty value the "
+        "attribute must contain. An empty list, or null/blank entries, would "
+        "require nothing and pass every resource. Invalid configuration is an error."),
     "presence-only": (
         "`values` is only null/\"\": presence is the whole check. Acceptable when the "
         "rationale says presence is the control — the reviewer decides; pair with a "
@@ -435,6 +439,7 @@ VALID_POLICY_TYPES = (
     "pattern blacklist", "pattern whitelist", "element blacklist",
     "element pattern whitelist",
     "map key blacklist",
+    "element required",
 )
 
 # Blacklist/whitelist only — a pattern or range policy with empty values means
@@ -1047,6 +1052,16 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                              "Use at least one non-empty string key name with no "
                              "leading or trailing whitespace; empty lists and "
                              "null/non-string entries cannot perform this check.")
+
+            # Required values, not a presence check: an empty list requires nothing.
+            if policy_type == "element required":
+                required = values if isinstance(values, list) else [values]
+                if not required or any(v is None or v == "" for v in required):
+                    add_once("invalid-element-required", path_text,
+                             f"'{path_text}' has invalid element required values. "
+                             "List at least one non-empty value the attribute "
+                             "must contain; an empty list or null/blank entries "
+                             "would require nothing and pass every resource.")
 
             # --- index-path ------------------------------------------------ #
             if attribute_path and _is_index(attribute_path[-1]):
