@@ -32,3 +32,5 @@ resource "google_apihub_plugin" "compliant_example_1"{
     }
   }
 }
+
+this is not terraform
