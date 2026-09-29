@@ -10,7 +10,7 @@ resource "google_lustre_instance" "non_compliant_example_1" {
 
   gke_support_enabled = true
 
-  kms_key = ""
+  kms_key = "invalid-kms-key"
 
   labels = {
     test = "value"
