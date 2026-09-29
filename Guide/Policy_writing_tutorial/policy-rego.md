@@ -104,6 +104,7 @@ The engine dispatches on `policy_type`, using these supported values:
 | `element blacklist` | No element of an array may **contain** one of these substrings |
 | `element pattern whitelist` | Every element of an array must match one of the wildcard shapes |
 | `map key blacklist` | No map key may match a prohibited name, ignoring capitalisation, with a non-empty value |
+| `element required` | An array must **contain** every one of these values (unset counts as empty) |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
@@ -379,6 +380,36 @@ paths.
       }
     ]
 ```
+
+### Element Required
+
+Requires an **array** attribute to **contain** every value in `values`. This is the
+opposite direction to `whitelist`: a `whitelist` checks that every element present is
+allowed, while `element required` checks that every required value is present. Extra
+elements are fine. A string attribute is checked as a one-item list.
+
+An **unset** attribute counts as an empty list, so every required value is missing and
+the resource is flagged. If the requirement should only apply while some other setting
+is present, put this condition in a `"match": "all"` situation with a condition that
+detects that setting. An empty `values` list would require nothing, so it is refused:
+`get_multi_summary` returns `POLICY ERROR:` and `policy_lint` reports
+[`invalid-element-required`](policy-lint.md#invalid-element-required).
+```rego
+    [
+      {
+        "situation_description": "The boot disk does not enable the guest OS features required for Shielded VM and Confidential VM support",
+        "remedies": ["Add UEFI_COMPATIBLE and SEV_CAPABLE to disk.guest_os_features."]
+      },
+      {
+        "condition": "disk.guest_os_features contains every required feature",
+        "attribute_path": ["disk", 0, "guest_os_features"],
+        "values": ["UEFI_COMPATIBLE", "SEV_CAPABLE"],
+        "policy_type": "element required"
+      }
+    ]
+```
+The violation message names the missing values. See the
+[helper documentation](../../policies/_helpers/README.md#9-element-required) for the test command.
 
 ---
 

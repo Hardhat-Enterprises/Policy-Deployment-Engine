@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 8 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist
+- Support for 9 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Element Required
 - OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -31,6 +31,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [6. Element Blacklist](#6-element-blacklist)
   - [7. Map Key Blacklist](#7-map-key-blacklist)
   - [8. Element Pattern Whitelist](#8-element-pattern-whitelist)
+  - [9. Element Required](#9-element-required)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
@@ -91,7 +92,8 @@ policies/_helpers/
     ├── pattern_whitelist.rego
     ├── element_blacklist.rego
     ├── map_key_blacklist.rego
-    └── element_pattern_whitelist.rego
+    ├── element_pattern_whitelist.rego
+    └── element_required.rego
 ```
 
 ### Component Responsibilities
@@ -346,6 +348,38 @@ opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_black
   "attribute_path": ["guardrails"],
   "values": ["projects/*/locations/*/apps/*/guardrails/*"]
 }
+```
+
+---
+
+### 9. Element Required
+
+**Module:** `policies/element_required.rego`
+**Use Case:** Require a list attribute to contain every one of a set of values
+
+**Logic:**
+- `values` is a flat list of items the attribute must contain; every one must be present
+- Extra items in the attribute are allowed
+- A string attribute is checked as a one-item list
+- A missing (unset) attribute counts as an empty list, so every required value is missing and the resource is flagged
+- The violation message names exactly which required values are missing
+- An empty `values` list, missing `values`, or a `null` or `""` entry would require nothing. Through `get_multi_summary` this returns `POLICY ERROR:` and refuses the whole policy, and the linter reports `invalid-element-required` as an error
+
+Because an unset list is flagged, use a `"match": "all"` situation when the requirement should only apply while another setting is present.
+
+**Example:**
+```json
+{
+  "policy_type": "element required",
+  "attribute_path": ["disk", 0, "guest_os_features"],
+  "values": ["UEFI_COMPATIBLE", "SEV_CAPABLE"]
+}
+```
+
+Run the focused and integration tests from the repository root:
+
+```shell
+opa test tests/_helpers/element_required_test.rego tests/_helpers/element_required_integration_test.rego policies/_helpers -v
 ```
 
 ---

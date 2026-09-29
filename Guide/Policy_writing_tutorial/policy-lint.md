@@ -56,7 +56,7 @@ is *absent*, and the policy passes every resource you point it at.
 
 The supported values, exactly as the engine spells them:
 
-    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist
+    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist, element required
 
 They are **lowercase**, and multi-word names use **spaces, not underscores**. Writing
 `pattern_whitelist` is the mistake this rule exists to catch. `element whitelist` is not a type
@@ -158,6 +158,33 @@ Correct the configured names rather than relying on trimming. The normal runtime
 summary also returns `POLICY ERROR:` for this configuration and checks nothing.
 This is not a `presence-only` warning; empty/null values in the actual resource
 map are still allowed by the helper.
+
+## invalid-element-required
+
+For `element required`, `values` lists the items the attribute must contain. It must
+hold at least one value, and no entry may be `null` or `""`. An empty list, missing
+`values`, or a blank entry would require nothing, so the condition would pass every
+resource. These are **errors**, not warnings.
+
+The normal runtime summary also returns `POLICY ERROR:` for this configuration and
+checks nothing. This is not a `presence-only` warning: `values` here names what must be
+present in the list, not an empty attribute value.
+
+Bad:
+
+    {
+      "attribute_path": ["disk", 0, "guest_os_features"],
+      "values": [],
+      "policy_type": "element required"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["disk", 0, "guest_os_features"],
+      "values": ["UEFI_COMPATIBLE", "SEV_CAPABLE"],
+      "policy_type": "element required"
+    }
 
 ## presence-only
 
