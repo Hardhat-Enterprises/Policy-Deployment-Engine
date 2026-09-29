@@ -473,25 +473,22 @@ View full output for debugging:
 
 ### Individual Policy Tests
 
-Test specific policy modules:
+Plans live beside each argument's fixtures as `<sha>.json`. Use the shared resolver
+to obtain the path (including the selected config and provider pin):
 
 ```bash
-# Blacklist test
-opa eval --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_service_perimeter/status/plan.json \
-  "data.terraform.gcp.security.access_context_manager_vpc_service_controls.access_context_manager_service_perimeter.status.message" \
-  --format pretty
+python -c "from pathlib import Path; from scripts.auto_test.auto_test import plan_cache_path; print(plan_cache_path(Path('policies/gcp/<Service>/<resource>/<argument>'), Path.cwd()))"
+```
 
-# Whitelist test
-opa eval --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/api_hub/google_apihub_api_hub_instance/config_encryption_type/plan.json \
-  "data.terraform.gcp.security.api_hub.google_apihub_api_hub_instance.config_encryption_type.message" \
-  --format pretty
+Load the helper engine, selected policy and resource variables explicitly. Loading
+an entire production policy tree would also load committed plans as policy data.
 
-# Range test
-opa eval --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/cloud_storage/google_storage_bucket/retention_period/plan.json \
-  "data.terraform.gcp.security.cloud_storage.google_storage_bucket.message" \
+```bash
+opa eval --data policies/_helpers \
+  --data "policies/gcp/<Service>/<resource>/_vars.rego" \
+  --data "policies/gcp/<Service>/<resource>/<argument>/policy.rego" \
+  --input "policies/gcp/<Service>/<resource>/<argument>/<sha>.json" \
+  "data.terraform.gcp.security.<service_package>.<resource>.<argument_package>.message" \
   --format pretty
 ```
 
@@ -661,8 +658,9 @@ nc_resources := {
 
 **Debug command:**
 ```bash
-opa eval --explain full --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/.../plan.json \
+opa eval --explain full --data ./policies/_helpers --data "policies/gcp/<Service>/<resource>/_vars.rego" \
+  --data "policies/gcp/<Service>/<resource>/<argument>/policy.rego" \
+  --input "policies/gcp/<Service>/<resource>/<argument>/<sha>.json" \
   "data.terraform.gcp.security..." \
   --format pretty
 ```

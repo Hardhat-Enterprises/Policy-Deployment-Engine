@@ -1,10 +1,10 @@
 <a id="top"></a>
 <h1 align="center">policy_lint — content-quality rules</h1>
 
-> `linter.py` (the previous page) checks that `docs/`, `inputs/` and `policies/` **reconcile** —
+> `linter.py` (the previous page) checks that `docs/` and `policies/` **reconcile** —
 > every documented argument has a policy, a fixture pair, and the right file names. It says
 > nothing about whether the policy you wrote is any good. **`policy_lint.py`** reads the
-> `conditions` you declared in your `<argument>.rego` and the `variables` in your `_vars.rego`,
+> `conditions` you declared in your `<argument>/policy.rego` and the `variables` in your `_vars.rego`,
 > and reports the smells a reviewer would otherwise have to find by hand — a hard-coded project
 > id, a check that only tests presence, a fixture pair that drifted, and so on.
 
@@ -348,12 +348,12 @@ See [policy.rego](policy-rego.md#top) for what each mode does to the evaluation.
 
 ## wrong-argument
 
-No condition in `<argument>.rego` reads the argument the file is named after — usually a
+No condition in `<argument>/policy.rego` reads the argument named by its directory — usually a
 copy-paste from another resource's policy where the `attribute_path` never got updated.
-`policy_lint` checks each condition group's `attribute_path` against the filename stem, so
-`location.rego` must contain at least one condition whose path starts with `location`.
+`policy_lint` checks each condition group's `attribute_path` against the argument directory, so
+`location/policy.rego` must contain at least one condition whose path starts with `location`.
 
-Bad — file is `location.rego`, but the condition reads `region`:
+Bad — file is `location/policy.rego`, but the condition reads `region`:
 
     {
       "attribute_path": ["region"],
@@ -547,7 +547,7 @@ There's no committed plan for this fixture pair. Every fixture directory holds o
 it writes into your fixture directories:
 
     python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
-    git add "inputs/gcp/<Service>/<resource type>"
+    git add "policies/gcp/<Service>/<resource type>"
 
 If you changed a fixture, the same run also deletes the plan of its previous version — commit
 that deletion too.
@@ -673,7 +673,7 @@ finding means the policy was **not checked**, not that it passed.
 
 The message carries the reason OPA gave. Run `opa check` on the file to see it in full:
 
-    opa check policies/_helpers "policies/gcp/<Service>/<resource type>/<argument>.rego"
+    opa check policies/_helpers "policies/gcp/<Service>/<resource type>/<argument>/policy.rego"
 
 Fix the parse error (or add the missing `conditions := [...]`) and re-run the linter. If the file
 looks fine to you and the error persists, ask in the unit channel before changing anything else —

@@ -23,9 +23,9 @@ Each GCP service that supports IAM exposes three separate Terraform resource typ
 
 ### Example: `For API Gateway Gateway`
 
-- `inputs/gcp/service name/google_*_iam_binding`
-- `inputs/gcp/service name/google_*_iam_member`
-- `inputs/gcp/service name/google_*_iam_policy`
+- `policies/gcp/service name/google_*_iam_binding`
+- `policies/gcp/service name/google_*_iam_member`
+- `policies/gcp/service name/google_*_iam_policy`
 
 #### Attributes to Cover
 
@@ -78,19 +78,18 @@ resource "google_sql_database_instance" "instance" {
 
 ### 1. Copy required files
 
-Copy the fixture files from `templates/gcp` into your **inputs** attribute folder
-`inputs/gcp/<Service>/<IAM resource type>/<attribute>/`:
+Copy the fixture files from `templates/gcp` into your argument directory
+`policies/gcp/<Service>/<IAM resource type>/<attribute>/`:
 
 - `compliant.tf`
 - `nonCompliant.tf`
-- `config.tf`
+- Inherit `policies/gcp/config.tf`; add a local replacement only if needed.
 
 For the **policies** tree:
 
 - Copy **one** `_vars.rego` into the IAM resource folder
   `policies/gcp/<Service>/<IAM resource type>/`.
-- Copy `templates/gcp/policy.rego` into that same folder and **rename it to `<attribute>.rego`**
-  (a flat file — there is no per-attribute subfolder).
+- Copy `templates/gcp/policy.rego` beside the fixtures at `<attribute>/policy.rego`.
 
 > **Note:** Each IAM resource type (`_iam_binding`, `_iam_member`, `_iam_policy`) is its own
 > resource folder, so you need **3 separate `_vars.rego` files** — one per IAM resource type.
@@ -119,7 +118,7 @@ GKEHub/
 
 Complete every item before raising a PR:
 
-- [ ] `package` line updated in `<attribute>.rego`
+- [ ] `package` line updated in `<attribute>/policy.rego`
 - [ ] Folder name matches the resource type exactly
 - [ ] `_vars.rego` — all 3 fields filled in: `friendly_resource_name`, `resource_type`, `resource_value_name`
 - [ ] Condition 1 — `["role"]` confirmed in resource JSON

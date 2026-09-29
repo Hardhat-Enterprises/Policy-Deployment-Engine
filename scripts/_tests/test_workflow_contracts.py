@@ -181,3 +181,34 @@ def test_the_line_ending_check_is_not_on_the_pr_workflow():
     for job in jobs(PR_WORKFLOW).values():
         assert not [s for s in job["steps"] if "Line endings" in s], \
             "the detector is dev-only by design"
+
+
+def test_engine_and_rego_checks_remain_required_on_helper_changes():
+    workflow = jobs(PR_WORKFLOW)
+    engine = workflow["engine_check"]["body"]
+    assert "needs.lint.outputs.helpers == 'true'" in engine
+    assert "scripts/auto_test/auto_test.py gcp" in engine
+    assert "continue-on-error" not in engine
+    rego = step_of(PR_WORKFLOW, "lint", "Run the Rego test suite")
+    assert "steps.changed.outputs.helpers == 'true'" in rego
+    assert "tests/_helpers/unit_test_helpers.sh" in rego
+    assert "continue-on-error" not in rego
+    assert "engine_check" in workflow["gate"]["body"]
+
+
+def test_ci_does_not_migrate_production_data_to_hide_layout_failures():
+    for workflow in (ALL_WORKFLOW, PR_WORKFLOW):
+        body = workflow.read_text(encoding="utf-8")
+        assert "restructure_gcp.py" not in body
+        assert "--skip-coverage" not in body
+
+
+def test_plan_verification_failure_does_not_prevent_current_report():
+    workflow = jobs(ALL_WORKFLOW)
+    owner = next(name for name, job in workflow.items()
+                 if "Verify committed plans (read-only)" in job["steps"])
+    verify = step_of(ALL_WORKFLOW, owner, "Verify committed plans (read-only)")
+    evaluate = step_of(ALL_WORKFLOW, owner, "Run policy checks (Terraform + OPA)")
+    assert "id: plans" in verify and "continue-on-error" not in verify
+    assert "steps.plans.outcome == 'failure'" in evaluate
+    assert "--report policy_results.json" in evaluate
