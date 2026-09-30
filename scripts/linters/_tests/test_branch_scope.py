@@ -257,7 +257,7 @@ def test_check_reports_each_violation_once_sorted_by_rule_then_path():
 def test_every_finding_carries_a_remedy_naming_the_file():
     entries = [("M", "docs/gcp/Compute Engine/google_compute_image.json")]
     finding = bs.check(entries, PLATFORM, FOLDER, RTYPE, base="dev")[0]
-    assert "git checkout origin/dev" in finding.message
+    assert 'git restore --source="$(git merge-base HEAD origin/dev)"' in finding.message
     assert "google_compute_image.json" in finding.message
     assert finding.severity == "error"
 
@@ -335,16 +335,18 @@ def _commands(lines, name):
     return [line for line in lines if name in line]
 
 
-def test_the_whole_mess_becomes_one_checkout_and_one_removal():
+def test_the_whole_mess_becomes_one_merge_and_one_restore():
     findings = bs.check(MIXED, PLATFORM, FOLDER, RTYPE)
     recipe = bs.recovery_lines(findings, "origin/dev")
 
-    checkouts = _commands(recipe, "git checkout")
-    removals = _commands(recipe, "git rm")
-    assert len(checkouts) == 1
-    assert len(removals) == 1
-    assert _pathspec(checkouts[0]) == [".github", "Guide", "scripts", SIBLING]
-    assert _pathspec(removals[0]) == ["inputs/plan_cache"]
+    restores = _commands(recipe, "git restore")
+    assert _commands(recipe, "git merge origin/dev")
+    assert len(restores) == 1
+    # after a merge, restoring from the pre-merge base would undo it
+    assert "--source=origin/dev " in restores[0]
+    assert _pathspec(restores[0]) == [
+        ".github", "Guide", "scripts", "inputs/plan_cache", SIBLING]
+    assert not _commands(recipe, "git rm")
 
 
 def test_the_recipe_never_names_the_branchs_own_resource():
@@ -355,6 +357,15 @@ def test_the_recipe_never_names_the_branchs_own_resource():
     assert f"{RTYPE}.json" not in named
     # nor anything wide enough to swallow the branch's own kit on the way past
     assert not any(p in (".", "inputs", "docs", "policies") for p in named)
+
+
+def test_a_deletion_in_the_branchs_own_kit_is_restored_file_by_file():
+    # Restoring the whole of OWN would revert the contributor's work — and
+    # `git restore` would delete it outright where OWN is new on the branch.
+    entries = [("D", f"{OWN}/location/compliant.tf"), ("A", f"{OWN}/location/new.tf")]
+    findings = bs.check(entries, PLATFORM, FOLDER, RTYPE)
+    scope = (PLATFORM, FOLDER, RTYPE)
+    assert bs.recovery_plan(findings, scope) == ([f"{OWN}/location/compliant.tf"], False)
 
 
 def test_the_recipe_ends_with_commit_and_push():
@@ -376,9 +387,38 @@ def test_the_recipe_covers_findings_the_listing_truncated_away(capsys):
 
     assert "more file(s) with the same problem" in printed   # the listing truncated
     block = printed.split("How to fix all of the above", 1)[1]
-    checkouts = _commands(block.splitlines(), "git checkout")
-    assert len(checkouts) == 1
-    assert "Guide" in _pathspec(checkouts[0])
+    restores = _commands(block.splitlines(), "git restore")
+    assert len(restores) == 1
+    assert "Guide" in _pathspec(restores[0])
+
+
+@pytest.mark.parametrize("entries", [
+    [("M", f"{SIBLING}/main.tf")],
+    [("A", f"{SIBLING}/new.tf")],
+    [("D", f"{SIBLING}/variables.tf")],
+    [("M", "Guide/Policy_writing_tutorial/branch-scope.md")],
+])
+def test_another_resources_files_never_need_a_merge(entries):
+    recipe = bs.recovery_lines(bs.check(entries, PLATFORM, FOLDER, RTYPE), "origin/dev")
+    assert not _commands(recipe, "git merge origin/dev")
+    restores = _commands(recipe, "git restore")
+    assert len(restores) == 1
+    assert '--source="$(git merge-base HEAD origin/dev)"' in restores[0]
+
+
+@pytest.mark.parametrize("entry", [
+    ("M", "scripts/auto_test/auto_test.py"),
+    ("A", "inputs/plan_cache/gcp/old.json"),
+])
+def test_the_harness_and_the_plan_cache_still_need_a_merge(entry):
+    entries = [entry, ("M", f"{SIBLING}/main.tf")]
+    recipe = bs.recovery_lines(bs.check(entries, PLATFORM, FOLDER, RTYPE), "origin/dev")
+    merge = recipe.index("       git merge origin/dev")
+    restore = next(i for i, line in enumerate(recipe) if "git restore" in line)
+    assert merge < restore
+    # every flagged path comes from origin/dev, the sibling included
+    assert "--source=origin/dev " in recipe[restore]
+    assert SIBLING in _pathspec(recipe[restore])
 
 
 @pytest.mark.parametrize("path,group", [
@@ -396,13 +436,12 @@ def test_a_path_is_named_at_the_width_that_is_safe(path, group):
     assert bs.recovery_group(path) == group
 
 
-def test_a_directory_that_must_be_restored_is_not_also_removed_wholesale():
-    # A sibling resource with a modified file and an added one: restoring the
-    # directory and then `git rm -r` on it would delete what was just restored,
-    # so the addition is named file by file instead.
+def test_an_addition_is_covered_by_restoring_its_directory():
+    # `git restore` deletes what the source lacks, so the sibling's added file
+    # goes with the directory restore and needs no `git rm` of its own.
     findings = bs.check([("M", f"{SIBLING}/main.tf"), ("A", f"{SIBLING}/new.tf")],
                         PLATFORM, FOLDER, RTYPE)
-    assert bs.recovery_plan(findings) == ([SIBLING], [f"{SIBLING}/new.tf"])
+    assert bs.recovery_plan(findings) == ([SIBLING], False)
 
 
 def test_a_path_with_spaces_is_quoted_and_a_plain_one_is_not():
