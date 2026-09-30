@@ -16,7 +16,7 @@ resource "google_network_services_edge_cache_service" "non_compliant_example_1" 
             signed_request_mode   = "REQUIRE_TOKENS"
             signed_request_keyset = "projects/fake-project/global/edgeCacheKeysets/test-keyset"
             signed_token_options {
-              allowed_signature_algorithms = ["HMAC_SHA1"]
+              allowed_signature_algorithms = ["ED25519", "HMAC_SHA1"]
             }
           }
         }

@@ -31,7 +31,7 @@ conditions := [
         "TRACE",
         "CONNECT"
       ],
-      "policy_type": "blacklist"
+      "policy_type": "element blacklist"
     }
   ]
 ]

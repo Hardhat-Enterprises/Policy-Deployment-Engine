@@ -31,7 +31,7 @@ conditions := [
       "values": [
         "HMAC_SHA1"
       ],
-      "policy_type": "blacklist"
+      "policy_type": "element blacklist"
     }
   ]
 ]

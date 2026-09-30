@@ -14,7 +14,7 @@ resource "google_network_services_edge_cache_service" "non_compliant_example_1" 
         route_action {
           cors_policy {
             max_age        = "600s"
-            expose_headers = ["*"]
+            expose_headers = ["X-Request-ID", "*"]
           }
         }
       }

@@ -2,7 +2,7 @@ resource "google_network_services_edge_cache_service" "non_compliant_example_1" 
   name = "non_compliant_example_1"
   routing {
     host_rule {
-      hosts        = ["*"]
+      hosts        = ["media.example.com", "*"]
       path_matcher = "routes"
     }
     path_matcher {

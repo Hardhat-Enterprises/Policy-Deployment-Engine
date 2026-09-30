@@ -25,9 +25,9 @@ conditions := [
         "https_redirect"
       ],
       "values": [
-        false
+        true
       ],
-      "policy_type": "blacklist"
+      "policy_type": "whitelist"
     }
   ]
 ]

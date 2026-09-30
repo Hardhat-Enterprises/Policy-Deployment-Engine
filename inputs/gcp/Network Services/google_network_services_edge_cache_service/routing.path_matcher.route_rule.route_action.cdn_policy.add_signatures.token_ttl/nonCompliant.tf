@@ -17,7 +17,7 @@ resource "google_network_services_edge_cache_service" "non_compliant_example_1" 
             signed_request_keyset = "projects/fake-project/global/edgeCacheKeysets/test-keyset"
             add_signatures {
               actions   = ["GENERATE_COOKIE"]
-              token_ttl = "604800s"
+              token_ttl = "172800s"
             }
           }
         }
