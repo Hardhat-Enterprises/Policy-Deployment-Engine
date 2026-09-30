@@ -6,13 +6,13 @@ import data.terraform.helpers
 conditions := [
   [
     {
-      "situation_description": "CORS methods should not allow every method or unsafe diagnostic methods.",
+      "situation_description": "CORS methods should not allow every method or unnecessary write methods.",
       "remedies": [
-        "List only the HTTP methods the application needs."
+        "Remove the wildcard and unnecessary write methods from allow_methods."
       ]
     },
     {
-      "condition": "CORS methods should not allow every method or unsafe diagnostic methods.",
+      "condition": "CORS methods should not allow every method or unnecessary write methods.",
       "attribute_path": [
         "routing",
         0,
@@ -28,8 +28,9 @@ conditions := [
       ],
       "values": [
         "*",
-        "TRACE",
-        "CONNECT"
+        "PUT",
+        "DELETE",
+        "PATCH"
       ],
       "policy_type": "element blacklist"
     }
