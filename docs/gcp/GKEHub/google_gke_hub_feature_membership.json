@@ -54,14 +54,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls whether Config Sync is automatically managed and upgraded. Policy should use an approved management mode to keep security-sensitive configuration management under controlled operation."
+      "rationale": "Requires an explicit management setting by forbidding MANAGEMENT_UNSPECIFIED, without enforcing a specific choice between AUTOMATIC and MANUAL."
     },
     "configmanagement.version": {
       "description": "Optional. Version of ACM to install. Defaults to the latest version.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls the version of Config Management installed. Policy should require an approved and supported version to reduce exposure to outdated or unapproved components."
+      "security_impact": false,
+      "rationale": "The field selects a supported Config Management release and defaults to the latest supported version, so there is no documented insecure value that can be generically prohibited."
     },
     "configmanagement.config_sync": {
       "type": "block",
@@ -72,8 +72,8 @@
       "description": "Enables the installation of ConfigSync. If set to true, ConfigSync resources will be created and the other ConfigSync fields will be applied if exist. If set to false, all other ConfigSync fields will be ignored, ConfigSync resources will be deleted. If omitted, ConfigSync resources will be managed depends on the presence of the git or oci field.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Config Sync is installed and active. Policy should require Config Sync to be enabled where configuration synchronisation is part of the security baseline."
+      "security_impact": false,
+      "rationale": "This field controls whether GitOps-based Config Sync is enabled, which is a configuration-management choice rather than a generic security control with a universally insecure state."
     },
     "configmanagement.config_sync.prevent_drift": {
       "description": "Set to true to enable the Config Sync admission webhook to prevent drifts. If set to `false`, disables the Config Sync admission webhook and does not prevent drifts.",
@@ -165,7 +165,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Identifies the service account used for Git authentication. Policy should require an approved service-account format or approved identity rather than an arbitrary account."
+      "rationale": "Requires Config Sync to use an explicit, non-default service account for Git authentication so the workload uses a defined least-privilege execution identity without requiring a specific account."
     },
     "configmanagement.config_sync.git.https_proxy": {
       "description": "URL for the HTTPS proxy to be used when communicating with the Git repo.",
@@ -186,28 +186,28 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the authentication mechanism used to access the Git repository. Policy should restrict this to approved authentication types and avoid insecure or unauthorised methods."
+      "rationale": "Prevents weak or static Git authentication methods such as ssh, cookiefile, or token by requiring a managed-identity authentication method."
     },
     "configmanagement.config_sync.git.sync_branch": {
       "description": "The branch of the repository to sync from. Default: master.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls which Git branch is used as the configuration source. Policy should require an approved branch strategy to reduce the risk of synchronising from an unintended source."
+      "security_impact": false,
+      "rationale": "The branch identifies which team-managed Git revision is used for configuration synchronization, so selecting a particular branch is a team-specific repository choice rather than a generic security control."
     },
     "configmanagement.config_sync.git.sync_repo": {
       "description": "The URL of the Git repository to use as the source of truth.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Specifies the Git repository used as the source of truth for cluster configuration. Policy should require an approved repository URL or trusted repository pattern."
+      "rationale": "Requires configuration synchronization to use a secure repository URL by forbidding the cleartext http:// scheme without restricting which repository the team uses."
     },
     "configmanagement.config_sync.git.sync_rev": {
       "description": "Git revision (tag or hash) to check out. Default HEAD.",
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the Git revision checked out for configuration synchronisation. Policy should require a controlled revision strategy to reduce the risk of unexpected configuration changes."
+      "rationale": "Prevents floating configuration revisions by forbidding an unset or HEAD revision and requiring a pinned tag or commit hash."
     },
     "configmanagement.config_sync.git.sync_wait_secs": {
       "description": "Period in seconds between consecutive syncs. Default: 15.",
@@ -225,8 +225,8 @@
       "description": "The GCP Service Account Email used for auth when secret_type is gcpserviceaccount. ",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Identifies the service account used for OCI repository authentication. Policy should require an approved service-account format or approved identity."
+      "security_impact": false,
+      "rationale": "This field only identifies the service account used by Config Sync; the authentication mechanism is controlled by secret_type, so requiring a particular account or account format would be team-specific."
     },
     "configmanagement.config_sync.oci.policy_dir": {
       "description": "The absolute path of the directory that contains the local resources. Default: the root directory of the image.",
@@ -240,14 +240,14 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls the authentication mechanism used to access the OCI image repository. Policy should restrict it to approved authentication types."
+      "rationale": "Prevents unauthenticated OCI repository access by forbidding the none value and requiring a managed-identity authentication method such as gcenode or gcpserviceaccount."
     },
     "configmanagement.config_sync.oci.sync_repo": {
       "description": "The OCI image repository URL for the package to sync from. e.g. LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/PACKAGE_NAME.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Specifies the OCI image repository used as the configuration source. Policy should require an approved repository pattern or trusted Artifact Registry source."
+      "security_impact": false,
+      "rationale": "This field identifies the team's OCI or Artifact Registry image location, so the repository path is a team-specific reference rather than a generic security control."
     },
     "configmanagement.config_sync.oci.sync_wait_secs": {
       "description": "Period in seconds(int64 format) between consecutive syncs. Default: 15.",
@@ -265,8 +265,8 @@
       "description": "Whether hierarchical resource quota is enabled in this cluster.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls hierarchical resource quotas. Policy may require resource-quota enforcement where it is part of the cluster security and availability baseline."
+      "security_impact": false,
+      "rationale": "This field controls hierarchical resource-quota inheritance, which is an operational and resource-governance choice rather than a generic exposure, encryption, authentication, logging, or data-loss control."
     },
     "configmanagement.hierarchy_controller.enable_pod_tree_labels": {
       "description": "Whether pod tree labels are enabled in this cluster.",
@@ -280,7 +280,7 @@
       "required": false,
       "type": "bool",
       "security_impact": false,
-      "rationale": "This setting belongs to a deprecated Hierarchy Controller configuration path and is not recommended for new deployments."
+      "rationale": "This field controls whether Hierarchy Controller propagates namespace hierarchy metadata and related inheritance behavior; enabling or disabling it is an organizational and architecture choice without a universally insecure state."
     },
     "configmanagement.policy_controller": {
       "type": "block",
@@ -306,7 +306,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Defines namespaces that can be excluded from Policy Controller checks. Policy should restrict or prohibit security-sensitive namespace exemptions."
+      "rationale": "Prevents Policy Controller enforcement from being disabled through namespace exemptions by requiring the exemption list to remain empty."
     },
     "configmanagement.policy_controller.log_denies_enabled": {
       "description": "Logs all denies and dry run failures.",
@@ -319,22 +319,22 @@
       "description": "Enable or disable mutation in policy controller. If true, mutation CRDs, webhook and controller deployment will be deployed to the cluster.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Policy Controller mutation functionality is enabled. Policy should require an explicitly approved setting because mutation can modify cluster resources."
+      "security_impact": false,
+      "rationale": "This field enables Policy Controller mutation behavior, which is a dual-use architectural capability and does not have a universally insecure true or false state that can be enforced generically."
     },
     "configmanagement.policy_controller.referential_rules_enabled": {
       "description": "Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Constraint Templates can reference other objects during evaluation. Policy should require an explicitly approved setting because it expands policy evaluation scope."
+      "security_impact": false,
+      "rationale": "This field controls whether Policy Controller constraints can use referential rules and expanded query scope; it is a policy-authoring capability without a universally insecure true or false state."
     },
     "configmanagement.policy_controller.template_library_installed": {
       "description": "Installs the default template library along with Policy Controller.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls installation of the default Policy Controller template library. Policy should require an approved setting where the library is part of the organisation policy baseline."
+      "security_impact": false,
+      "rationale": "This field only controls whether the default Constraint Template library is installed; its presence does not itself enable or disable policy enforcement, so neither state is generically insecure."
     },
     "configmanagement.policy_controller.monitoring": {
       "type": "block",
@@ -346,7 +346,7 @@
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Controls where Policy Controller metrics are exported. Policy should require approved monitoring backends and prevent disabling security-relevant metrics export."
+      "rationale": "Requires Policy Controller monitoring to remain enabled by forbidding an empty backend list, which would disable export of audit and violation metrics."
     },
     "mesh": {
       "type": "block",
@@ -358,7 +358,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls automatic or manual management of Service Mesh. Policy should require an approved management mode to keep mesh lifecycle and security configuration controlled."
+      "rationale": "Requires an explicit mesh management setting by forbidding MANAGEMENT_UNSPECIFIED, without enforcing a specific choice between AUTOMATIC and MANUAL."
     },
     "policycontroller": {
       "type": "block",
@@ -369,8 +369,8 @@
       "description": "Optional. Version of Policy Controller to install. Defaults to the latest version.",
       "required": false,
       "type": "string",
-      "security_impact": true,
-      "rationale": "Controls the Policy Controller version installed. Policy should require an approved and supported version to reduce exposure to outdated components."
+      "security_impact": false,
+      "rationale": "The field selects a Policy Controller software version and defaults to the latest supported version, so there is no documented insecure value that can be generically prohibited without creating version drift."
     },
     "policycontroller.policy_controller_hub_config": {
       "type": "block",
@@ -382,21 +382,21 @@
       "required": false,
       "type": "number",
       "security_impact": true,
-      "rationale": "Controls the frequency of Policy Controller audit scans. Policy should prevent audit functionality from being disabled and require an approved interval."
+      "rationale": "Requires Policy Controller auditing to remain enabled by forbidding an audit interval of 0, which disables audit functionality."
     },
     "policycontroller.policy_controller_hub_config.constraint_violation_limit": {
       "description": "The maximum number of audit violations to be stored in a constraint. If not set, the internal default of 20 will be used.",
       "required": false,
       "type": "number",
-      "security_impact": true,
-      "rationale": "Controls how many audit violations are retained for a constraint. Policy should require a value sufficient for security monitoring and investigation."
+      "security_impact": false,
+      "rationale": "This field controls how many detected constraint violations are retained for reporting and does not enable or disable policy enforcement, making it a reporting and retention choice rather than a generic security control."
     },
     "policycontroller.policy_controller_hub_config.exemptable_namespaces": {
       "description": "The set of namespaces that are excluded from Policy Controller checks. Namespaces do not need to currently exist on the cluster.",
       "required": false,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "Defines namespaces that can be excluded from Policy Controller checks. Policy should restrict or prohibit security-sensitive namespace exemptions."
+      "rationale": "Prevents reserved system namespaces from bypassing Policy Controller enforcement by forbidding namespaces such as kube-system and gatekeeper-system from the exemption list."
     },
     "policycontroller.policy_controller_hub_config.install_spec": {
       "description": "Configures the mode of the Policy Controller installation. Possible values: INSTALL_SPEC_UNSPECIFIED, INSTALL_SPEC_NOT_INSTALLED, INSTALL_SPEC_ENABLED, INSTALL_SPEC_SUSPENDED, INSTALL_SPEC_DETACHED",
@@ -416,15 +416,15 @@
       "description": "Enables the ability to mutate resources using Policy Controller.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether Policy Controller can mutate resources. Policy should require an explicitly approved setting because mutation can change cluster resources."
+      "security_impact": false,
+      "rationale": "This field controls Policy Controller admission-time mutation, which is a dual-use functional capability and does not have a universally insecure true or false state that can be enforced generically."
     },
     "policycontroller.policy_controller_hub_config.referential_rules_enabled": {
       "description": "Enables the ability to use Constraint Templates that reference to objects other than the object currently being evaluated.",
       "required": false,
       "type": "bool",
-      "security_impact": true,
-      "rationale": "Controls whether policy templates can reference objects other than the object being evaluated. Policy should require an explicitly approved setting because it expands policy evaluation scope."
+      "security_impact": false,
+      "rationale": "This field controls whether Policy Controller constraint templates can use referential rules and cross-object references; it is a policy-authoring capability without a universally insecure true or false state."
     },
     "policycontroller.policy_controller_hub_config.deployment_configs": {
       "type": "block",
@@ -442,8 +442,8 @@
       "description": "Pod affinity configuration. Possible values: AFFINITY_UNSPECIFIED, NO_AFFINITY, ANTI_AFFINITY",
       "required": false,
       "type": "string",
-      "security_impact": false,
-      "rationale": "Controls pod scheduling preferences rather than a direct security control."
+      "security_impact": true,
+      "rationale": "Requires an explicit pod affinity setting by forbidding AFFINITY_UNSPECIFIED, without enforcing a particular explicit affinity choice."
     },
     "policycontroller.policy_controller_hub_config.deployment_configs.replica_count": {
       "description": "Pod replica count.",
@@ -574,7 +574,7 @@
       "required": false,
       "type": "string",
       "security_impact": true,
-      "rationale": "Controls installation of the Policy Controller template library. Policy should require an approved installation state where the template library is part of the policy enforcement baseline."
+      "rationale": "Requires an explicit template library installation setting by forbidding INSTALLATION_UNSPECIFIED, without enforcing a specific choice between the explicit installation options."
     }
   }
 }
