@@ -152,7 +152,7 @@
       "required": true,
       "type": "list(string)",
       "security_impact": true,
-      "rationale": "SSH public keys directly control who can authenticate to the VM cluster; this is a direct access-control mechanism and must be policed."
+      "rationale": "The ssh_public_keys list grants direct administrative SSH login to the ExadbVmCluster's VM nodes — whoever holds the matching private key can authenticate to the underlying database infrastructure. A policy on this field should enforce that the list is never left empty (an empty/omitted list can leave the platform's default provisioning key as the only access path) and can be extended to constrain accepted key types/lengths (e.g. disallow weak algorithms such as ssh-dss or short RSA keys) so only strong, deliberately-issued keys are provisioned."
     },
     "properties.data_collection_options": {
       "type": "block",
