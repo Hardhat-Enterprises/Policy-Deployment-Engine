@@ -1,4 +1,4 @@
-# Non-compliant fixture: no target rule IDs are specified, leaving the WAF exclusion unscoped.
+# Non-compliant fixture: target_rule_ids is omitted, causing the WAF exclusion to apply to all rule IDs.
 
 resource "google_compute_security_policy_rule" "non_compliant_example_1" {
   security_policy = "example-security-policy"
@@ -8,7 +8,6 @@ resource "google_compute_security_policy_rule" "non_compliant_example_1" {
   preconfigured_waf_config {
     exclusion {
       target_rule_set = "sqli-v33-stable"
-      target_rule_ids = []
     }
   }
 }

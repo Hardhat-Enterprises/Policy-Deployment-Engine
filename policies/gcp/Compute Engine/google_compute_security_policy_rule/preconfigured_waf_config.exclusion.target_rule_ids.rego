@@ -23,7 +23,8 @@ conditions := [
                 "target_rule_ids"
             ],
             "values": [
-                []
+                [],
+                null
             ],
             "policy_type": "blacklist"
         }
