@@ -6,29 +6,29 @@
       "description": "When the action is CUSTOM, customProvider must be specified.\nWhen the action is ALLOW, only requests matching the policy will be allowed.\nWhen the action is DENY, only requests matching the policy will be denied.\n\nWhen a request arrives, the policies are evaluated in the following order:\n1. If there is a CUSTOM policy that matches the request, the CUSTOM policy is evaluated using the custom authorization providers and the request is denied if the provider rejects the request.\n2. If there are any DENY policies that match the request, the request is denied.\n3. If there are no ALLOW policies for the resource or if any of the ALLOW policies match the request, the request is allowed.\n4. Else the request is denied by default if none of the configured AuthzPolicies with ALLOW action match the request. Possible values: [\"ALLOW\", \"DENY\", \"CUSTOM\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "ALLOW, DENY and CUSTOM are all valid authorization strategies. The secure choice depends on the purpose of the policy and the surrounding rule set, so no single action can be enforced generically."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This setting controls whether the authorization policy can be destroyed or removed from Terraform management. A policy should require PREVENT so an active access-control policy cannot be deleted or abandoned unintentionally."
     },
     "description": {
       "description": "A human-readable description of the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field is human-readable metadata only and does not change authorization matching or enforcement."
     },
     "labels": {
       "description": "Set of labels associated with the AuthzExtension resource.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are resource metadata used for organisation and management. Their values do not directly change authorization behaviour, so no generic security value can be enforced."
     },
     "location": {
       "description": "The location of the resource.",
@@ -41,22 +41,22 @@
       "description": "Identifier. Name of the AuthzPolicy resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies the AuthzPolicy resource. The correct name is deployment-specific and does not itself determine authorization behaviour."
     },
     "policy_profile": {
       "description": "Defines the type of authorization being performed. 'REQUEST_AUTHZ' applies to request authorization. CUSTOM\nauthorization policies with Authz extensions will be allowed with ext_authz or ext_proc protocols. Extensions are\ninvoked only once when the request headers arrive. 'CONTENT_AUTHZ' applies to content security, sanitization, etc.\nOnly CUSTOM action is allowed in this policy profile. AuthzExtensions in the custom provider must support ext_proc\nprotocol and be capable of receiving all ext_proc events (REQUEST_HEADERS, REQUEST_BODY, REQUEST_TRAILERS,\nRESPONSE_HEADERS, RESPONSE_BODY, RESPONSE_TRAILERS) with FULL_DUPLEX_STREAMED body send mode. Possible values: [\"REQUEST_AUTHZ\", \"CONTENT_AUTHZ\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "REQUEST_AUTHZ and CONTENT_AUTHZ serve different legitimate authorization use cases. The appropriate profile depends on the policy design and provider capabilities, so neither value is universally required."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects the project that owns the resource. The correct project is environment-specific and cannot be constrained by a generic security policy."
     },
     "custom_provider": {
       "type": "block",
@@ -72,8 +72,8 @@
       "description": "A list of references to authorization extensions that will be invoked for requests matching this policy. Limited to 1 custom provider.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field references the authorization extension used by a CUSTOM policy. The correct extension is deployment-specific, and the provider already limits the number of referenced custom providers."
     },
     "custom_provider.cloud_iap": {
       "type": "block",
@@ -84,8 +84,8 @@
       "description": "Enable Cloud IAP at the AuthzPolicy level.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Whether Cloud IAP is enabled at the AuthzPolicy level depends on the deployment architecture. The documentation notes that enabling IAP here conflicts with enabling it on the BackendService, so requiring either true or false generically could break a valid configuration."
     },
     "http_rules": {
       "type": "block",
@@ -96,8 +96,8 @@
       "description": "CEL expression that describes the conditions to be satisfied for the action. The result of the CEL expression is ANDed with the from and to. Refer to the CEL language reference for a list of available attributes.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This CEL expression defines application-specific conditions for an HTTP authorization rule. Its secure contents depend on the intended access-control logic, so there is no universal expression or value to enforce."
     },
     "http_rules.from": {
       "type": "block",
@@ -118,15 +118,15 @@
       "description": "The length of the address range.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines the prefix length of an authorization negated source range. Appropriate network ranges depend on the environment, and the effect of a broader or narrower range also depends on whether the surrounding rule allows, denies, or negates the match, so no single value is universally secure."
     },
     "http_rules.from.not_sources.ip_blocks.prefix": {
       "description": "The address prefix.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines the address prefix of an authorization negated source range. Valid source networks are environment-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic prefix can be enforced."
     },
     "http_rules.from.not_sources.principals": {
       "type": "block",
@@ -137,43 +137,43 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.principals.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.principals.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a certificate-principal matcher. Whether case-insensitive matching is appropriate depends on the identity format and on whether the surrounding rule allows, denies, or negates the match, so neither boolean value is universally secure."
     },
     "http_rules.from.not_sources.principals.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.principals.principal_selector": {
       "description": "An enum to decide what principal value the principal rule will match against. If not specified, the PrincipalSelector is CLIENT_CERT_URI_SAN. Default value: \"CLIENT_CERT_URI_SAN\" Possible values: [\"PRINCIPAL_SELECTOR_UNSPECIFIED\", \"CLIENT_CERT_URI_SAN\", \"CLIENT_CERT_DNS_NAME_SAN\", \"CLIENT_CERT_COMMON_NAME\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects which client-certificate identity component is matched. URI SAN, DNS SAN and common name can all be valid depending on the certificate and mTLS design, and the unspecified value defaults to URI SAN, so no single selector is universally required."
     },
     "http_rules.from.not_sources.principals.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.principals.principal": {
       "type": "block",
@@ -184,36 +184,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.principals.principal.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.principals.principal.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a certificate-principal matcher. Whether case-insensitive matching is appropriate depends on the identity format and on whether the surrounding rule allows, denies, or negates the match, so neither boolean value is universally secure."
     },
     "http_rules.from.not_sources.principals.principal.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.principals.principal.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.resources": {
       "type": "block",
@@ -229,36 +229,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match for the source VM service account. Service-account identities are deployment-specific and the effect of the match depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.resources.iam_service_account.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match for the source VM service account. Service-account identities are deployment-specific and the effect of the match depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.resources.iam_service_account.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity when matching the source VM service account. The appropriate behaviour depends on the identity format and surrounding authorization rule, so neither value is universally required."
     },
     "http_rules.from.not_sources.resources.iam_service_account.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match for the source VM service account. Service-account identities are deployment-specific and the effect of the match depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.resources.iam_service_account.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match for the source VM service account. Service-account identities are deployment-specific and the effect of the match depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.not_sources.resources.tag_value_id_set": {
       "type": "block",
@@ -269,8 +269,8 @@
       "description": "A list of resource tag value permanent IDs to match against the resource manager tags value associated with the source VM of a request. The match follows AND semantics which means all the ids must match.\nLimited to 5 matches.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies resource tag values used to match the source VM. The required tag IDs are organisation-specific, and their authorization effect depends on the surrounding rule, so no generic list can be enforced."
     },
     "http_rules.from.sources": {
       "type": "block",
@@ -286,15 +286,15 @@
       "description": "The length of the address range.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines the prefix length of an authorization source range. Appropriate network ranges depend on the environment, and the effect of a broader or narrower range also depends on whether the surrounding rule allows, denies, or negates the match, so no single value is universally secure."
     },
     "http_rules.from.sources.ip_blocks.prefix": {
       "description": "The address prefix.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines the address prefix of an authorization source range. Valid source networks are environment-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic prefix can be enforced."
     },
     "http_rules.from.sources.principals": {
       "type": "block",
@@ -305,43 +305,43 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.principals.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.principals.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a certificate-principal matcher. Whether case-insensitive matching is appropriate depends on the identity format and on whether the surrounding rule allows, denies, or negates the match, so neither boolean value is universally secure."
     },
     "http_rules.from.sources.principals.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.principals.principal_selector": {
       "description": "An enum to decide what principal value the principal rule will match against. If not specified, the PrincipalSelector is CLIENT_CERT_URI_SAN. Default value: \"CLIENT_CERT_URI_SAN\" Possible values: [\"PRINCIPAL_SELECTOR_UNSPECIFIED\", \"CLIENT_CERT_URI_SAN\", \"CLIENT_CERT_DNS_NAME_SAN\", \"CLIENT_CERT_COMMON_NAME\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects which client-certificate identity component is matched. URI SAN, DNS SAN and common name can all be valid depending on the certificate and mTLS design, and the unspecified value defaults to URI SAN, so no single selector is universally required."
     },
     "http_rules.from.sources.principals.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.principals.principal": {
       "type": "block",
@@ -352,36 +352,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.principals.principal.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.principals.principal.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a certificate-principal matcher. Whether case-insensitive matching is appropriate depends on the identity format and on whether the surrounding rule allows, denies, or negates the match, so neither boolean value is universally secure."
     },
     "http_rules.from.sources.principals.principal.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.principals.principal.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.resources": {
       "type": "block",
@@ -397,36 +397,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match for the source VM service account. Service-account identities are deployment-specific and the effect of the match depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.resources.iam_service_account.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match for the source VM service account. Service-account identities are deployment-specific and the effect of the match depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.resources.iam_service_account.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity when matching the source VM service account. The appropriate behaviour depends on the identity format and surrounding authorization rule, so neither value is universally required."
     },
     "http_rules.from.sources.resources.iam_service_account.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match for the source VM service account. Service-account identities are deployment-specific and the effect of the match depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.resources.iam_service_account.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match for the source VM service account. Service-account identities are deployment-specific and the effect of the match depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.from.sources.resources.tag_value_id_set": {
       "type": "block",
@@ -437,8 +437,8 @@
       "description": "A list of resource tag value permanent IDs to match against the resource manager tags value associated with the source VM of a request. The match follows AND semantics which means all the ids must match.\nLimited to 5 matches.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies resource tag values used to match the source VM. The required tag IDs are organisation-specific, and their authorization effect depends on the surrounding rule, so no generic list can be enforced."
     },
     "http_rules.to": {
       "type": "block",
@@ -454,8 +454,8 @@
       "description": "A list of HTTP methods to match against. Each entry must be a valid HTTP method name (GET, PUT, POST, HEAD, PATCH, DELETE, OPTIONS). It only allows exact match and is always case sensitive.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects HTTP methods for a negated operation match. Which methods should be authorized or denied is application-specific, so no universal method list can be enforced."
     },
     "http_rules.to.not_operations.header_set": {
       "type": "block",
@@ -471,8 +471,8 @@
       "description": "Specifies the name of the header in the request.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies the request header used by a negated authorization operation match. The relevant header name is application-specific, so no generic value can be required."
     },
     "http_rules.to.not_operations.header_set.headers.value": {
       "type": "block",
@@ -483,36 +483,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match for a negated HTTP header value. The expected value is application-specific and the security effect depends on the surrounding authorization action, so no generic matcher value can be enforced."
     },
     "http_rules.to.not_operations.header_set.headers.value.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match for a negated HTTP header value. The expected value is application-specific and the security effect depends on the surrounding authorization action, so no generic matcher value can be enforced."
     },
     "http_rules.to.not_operations.header_set.headers.value.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a negated header-value matcher. Its appropriate value depends on the header semantics and the surrounding authorization action, so neither boolean value is universally secure."
     },
     "http_rules.to.not_operations.header_set.headers.value.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match for a negated HTTP header value. The expected value is application-specific and the security effect depends on the surrounding authorization action, so no generic matcher value can be enforced."
     },
     "http_rules.to.not_operations.header_set.headers.value.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match for a negated HTTP header value. The expected value is application-specific and the security effect depends on the surrounding authorization action, so no generic matcher value can be enforced."
     },
     "http_rules.to.not_operations.hosts": {
       "type": "block",
@@ -523,36 +523,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match for a negated HTTP host. Authorized host patterns are application-specific and the effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.to.not_operations.hosts.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match for a negated HTTP host. Authorized host patterns are application-specific and the effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.to.not_operations.hosts.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a negated HTTP host matcher. The appropriate behaviour depends on the application's host naming and authorization design, so neither value is universally required."
     },
     "http_rules.to.not_operations.hosts.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match for a negated HTTP host. Authorized host patterns are application-specific and the effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.to.not_operations.hosts.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match for a negated HTTP host. Authorized host patterns are application-specific and the effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.to.not_operations.paths": {
       "type": "block",
@@ -563,36 +563,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match for a negated request path. Protected paths are application-specific and the effect depends on the surrounding authorization action, so no generic path value can be enforced."
     },
     "http_rules.to.not_operations.paths.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match for a negated request path. Protected paths are application-specific and the effect depends on the surrounding authorization action, so no generic path value can be enforced."
     },
     "http_rules.to.not_operations.paths.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a negated request-path matcher. The appropriate behaviour depends on the application's routing and authorization design, so neither value is universally required."
     },
     "http_rules.to.not_operations.paths.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match for a negated request path. Protected paths are application-specific and the effect depends on the surrounding authorization action, so no generic path value can be enforced."
     },
     "http_rules.to.not_operations.paths.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match for a negated request path. Protected paths are application-specific and the effect depends on the surrounding authorization action, so no generic path value can be enforced."
     },
     "http_rules.to.operations": {
       "type": "block",
@@ -603,8 +603,8 @@
       "description": "A list of HTTP methods to match against. Each entry must be a valid HTTP method name (GET, PUT, POST, HEAD, PATCH, DELETE, OPTIONS). It only allows exact match and is always case sensitive.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects HTTP methods for a operation match. Which methods should be authorized or denied is application-specific, so no universal method list can be enforced."
     },
     "http_rules.to.operations.header_set": {
       "type": "block",
@@ -620,8 +620,8 @@
       "description": "Specifies the name of the header in the request.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field identifies the request header used by a authorization operation match. The relevant header name is application-specific, so no generic value can be required."
     },
     "http_rules.to.operations.header_set.headers.value": {
       "type": "block",
@@ -632,36 +632,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match for a HTTP header value. The expected value is application-specific and the security effect depends on the surrounding authorization action, so no generic matcher value can be enforced."
     },
     "http_rules.to.operations.header_set.headers.value.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match for a HTTP header value. The expected value is application-specific and the security effect depends on the surrounding authorization action, so no generic matcher value can be enforced."
     },
     "http_rules.to.operations.header_set.headers.value.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a header-value matcher. Its appropriate value depends on the header semantics and the surrounding authorization action, so neither boolean value is universally secure."
     },
     "http_rules.to.operations.header_set.headers.value.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match for a HTTP header value. The expected value is application-specific and the security effect depends on the surrounding authorization action, so no generic matcher value can be enforced."
     },
     "http_rules.to.operations.header_set.headers.value.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match for a HTTP header value. The expected value is application-specific and the security effect depends on the surrounding authorization action, so no generic matcher value can be enforced."
     },
     "http_rules.to.operations.hosts": {
       "type": "block",
@@ -672,36 +672,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match for a HTTP host. Authorized host patterns are application-specific and the effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.to.operations.hosts.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match for a HTTP host. Authorized host patterns are application-specific and the effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.to.operations.hosts.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a HTTP host matcher. The appropriate behaviour depends on the application's host naming and authorization design, so neither value is universally required."
     },
     "http_rules.to.operations.hosts.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match for a HTTP host. Authorized host patterns are application-specific and the effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.to.operations.hosts.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match for a HTTP host. Authorized host patterns are application-specific and the effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "http_rules.to.operations.mcp": {
       "type": "block",
@@ -712,8 +712,8 @@
       "description": "If specified, matches on the MCP protocol’s non-access specific methods namely: * initialize/ * completion/ * logging/ * notifications/ * ping Default value: \"SKIP_BASE_PROTOCOL_METHODS\" Possible values: [\"SKIP_BASE_PROTOCOL_METHODS\", \"MATCH_BASE_PROTOCOL_METHODS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field decides whether MCP base protocol methods participate in the operation match. Matching or skipping them can both be valid depending on the intended authorization rule, so no single option is universally secure."
     },
     "http_rules.to.operations.mcp.methods": {
       "type": "block",
@@ -724,8 +724,8 @@
       "description": "The MCP method to match against. Allowed values are as follows:\n1) “tools”, “prompts”, “resources” - these will match against all sub methods under the respective methods.\n2) “prompts/list”, “tools/list”, “resources/list”, “resources/templates/list”\n3) “prompts/get”, “tools/call”, “resources/subscribe”, “resources/unsubscribe”, “resources/read”\nParams cannot be specified for categories 1) and 2).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects the MCP method or method category to match. The methods that should be authorized or denied depend on the Agent Gateway's capabilities and policy intent, so no generic method can be required."
     },
     "http_rules.to.operations.mcp.methods.params": {
       "type": "block",
@@ -736,36 +736,36 @@
       "description": "A substring match on the MCP method parameter name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match for an MCP method parameter name. Relevant parameters are application-specific and the authorization effect depends on the surrounding rule, so no generic value can be enforced."
     },
     "http_rules.to.operations.mcp.methods.params.exact": {
       "description": "An exact match on the MCP method parameter name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match for an MCP method parameter name. Relevant parameters are application-specific and the authorization effect depends on the surrounding rule, so no generic value can be enforced."
     },
     "http_rules.to.operations.mcp.methods.params.ignore_case": {
       "description": "Specifies that the string match should be case insensitive.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for MCP method-parameter matching. The correct behaviour depends on the parameter naming and authorization design, so neither value is universally required."
     },
     "http_rules.to.operations.mcp.methods.params.prefix": {
       "description": "A prefix match on the MCP method parameter name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match for an MCP method parameter name. Relevant parameters are application-specific and the authorization effect depends on the surrounding rule, so no generic value can be enforced."
     },
     "http_rules.to.operations.mcp.methods.params.suffix": {
       "description": "A suffix match on the MCP method parameter name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match for an MCP method parameter name. Relevant parameters are application-specific and the authorization effect depends on the surrounding rule, so no generic value can be enforced."
     },
     "http_rules.to.operations.paths": {
       "type": "block",
@@ -776,36 +776,36 @@
       "description": "The input string must have the substring specified here. Note: empty contains match is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc.def",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a contains match for a request path. Protected paths are application-specific and the effect depends on the surrounding authorization action, so no generic path value can be enforced."
     },
     "http_rules.to.operations.paths.exact": {
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match for a request path. Protected paths are application-specific and the effect depends on the surrounding authorization action, so no generic path value can be enforced."
     },
     "http_rules.to.operations.paths.ignore_case": {
       "description": "If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. For example, the matcher data will match both input string Data and data if set to true.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This setting controls case sensitivity for a request-path matcher. The appropriate behaviour depends on the application's routing and authorization design, so neither value is universally required."
     },
     "http_rules.to.operations.paths.prefix": {
       "description": "The input string must have the prefix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value abc.xyz",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a prefix match for a request path. Protected paths are application-specific and the effect depends on the surrounding authorization action, so no generic path value can be enforced."
     },
     "http_rules.to.operations.paths.suffix": {
       "description": "The input string must have the suffix specified here. Note: empty prefix is not allowed, please use regex instead.\nExamples:\n* abc matches the value xyz.abc",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a suffix match for a request path. Protected paths are application-specific and the effect depends on the surrounding authorization action, so no generic path value can be enforced."
     },
     "network_rules": {
       "type": "block",
@@ -831,15 +831,15 @@
       "description": "The length of the address range.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines the prefix length of an authorization negated source range. Appropriate network ranges depend on the environment, and the effect of a broader or narrower range also depends on whether the surrounding rule allows, denies, or negates the match, so no single value is universally secure."
     },
     "network_rules.from.not_sources.ip_blocks.prefix": {
       "description": "The address prefix.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines the address prefix of an authorization negated source range. Valid source networks are environment-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic prefix can be enforced."
     },
     "network_rules.from.not_sources.principals": {
       "type": "block",
@@ -850,8 +850,8 @@
       "description": "An enum to decide what principal value the principal rule will match against. If not specified, the PrincipalSelector is CLIENT_CERT_URI_SAN. Default value: \"CLIENT_CERT_URI_SAN\" Possible values: [\"PRINCIPAL_SELECTOR_UNSPECIFIED\", \"CLIENT_CERT_URI_SAN\", \"CLIENT_CERT_DNS_NAME_SAN\", \"CLIENT_CERT_COMMON_NAME\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects which client-certificate identity component is matched. URI SAN, DNS SAN and common name can all be valid depending on the certificate and mTLS design, and the unspecified value defaults to URI SAN, so no single selector is universally required."
     },
     "network_rules.from.not_sources.principals.principal": {
       "type": "block",
@@ -862,8 +862,8 @@
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "network_rules.from.sources": {
       "type": "block",
@@ -879,15 +879,15 @@
       "description": "The length of the address range.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines the prefix length of an authorization source range. Appropriate network ranges depend on the environment, and the effect of a broader or narrower range also depends on whether the surrounding rule allows, denies, or negates the match, so no single value is universally secure."
     },
     "network_rules.from.sources.ip_blocks.prefix": {
       "description": "The address prefix.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines the address prefix of an authorization source range. Valid source networks are environment-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic prefix can be enforced."
     },
     "network_rules.from.sources.principals": {
       "type": "block",
@@ -898,8 +898,8 @@
       "description": "An enum to decide what principal value the principal rule will match against. If not specified, the PrincipalSelector is CLIENT_CERT_URI_SAN. Default value: \"CLIENT_CERT_URI_SAN\" Possible values: [\"PRINCIPAL_SELECTOR_UNSPECIFIED\", \"CLIENT_CERT_URI_SAN\", \"CLIENT_CERT_DNS_NAME_SAN\", \"CLIENT_CERT_COMMON_NAME\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects which client-certificate identity component is matched. URI SAN, DNS SAN and common name can all be valid depending on the certificate and mTLS design, and the unspecified value defaults to URI SAN, so no single selector is universally required."
     },
     "network_rules.from.sources.principals.principal": {
       "type": "block",
@@ -910,8 +910,8 @@
       "description": "The input string must match exactly the string specified here.\nExamples:\n* abc only matches the value abc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field defines a exact match against a certificate-derived principal. The correct identity pattern is organisation-specific, and the security effect depends on the surrounding allow, deny, or negated rule, so no generic value can be enforced."
     },
     "network_rules.to": {
       "type": "block",
@@ -932,8 +932,8 @@
       "description": "N/A",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field specifies an exact SNI value to match for a network authorization operation. The correct server name is deployment-specific, so no generic SNI value can be enforced."
     },
     "target": {
       "type": "block",
@@ -944,15 +944,15 @@
       "description": "Required when targeting forwarding rules and secure web proxy. Must not be specified when targeting Agent\nGateway. All resources referenced by this policy and extensions must share the same load balancing scheme.\nFor more information, refer to [Backend services overview](https://cloud.google.com/load-balancing/docs/backend-service). Possible values: [\"INTERNAL_MANAGED\", \"EXTERNAL_MANAGED\", \"INTERNAL_SELF_MANAGED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field selects the load-balancing architecture used by the targeted resources. INTERNAL_MANAGED, EXTERNAL_MANAGED and INTERNAL_SELF_MANAGED are legitimate in different deployments, so no single scheme is universally secure."
     },
     "target.resources": {
       "description": "A list of references to the Forwarding Rules or Secure Web Proxy Gateways or Agent Gateways on which this\npolicy will be applied.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field references the forwarding rules, Secure Web Proxy gateways, or Agent Gateways to which the policy applies. The correct targets are deployment-specific resource references, so no generic list can be enforced."
     }
   }
 }
