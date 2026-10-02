@@ -163,6 +163,7 @@ get_target_list(resource, attribute_path, target) = target_list if {
 final_formatter(target, sub_pattern) = final_format if {
     final_format := regex.replace(target, sub_pattern, sprintf("'%s'", [sub_pattern]))
 }
+
 ################################################################################
 # Every-Element Attribute Lookup
 ################################################################################

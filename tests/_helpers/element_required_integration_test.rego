@@ -119,3 +119,83 @@ test_every_disk_compliant_passes if {
 	])
 	contains(json.marshal(result.message), "None - All passed")
 }
+
+# ==============================================================================
+# Reality check: the committed http_route plan
+# (inputs/gcp/Network Services/google_network_services_http_route/
+#  rules.action.redirect.https_redirect/), wrapped as data.gcp_http_route_plan.
+# attribute_entries depends on how Terraform writes nested blocks, so this runs
+# the per-rule HTTPS redirect recipe on a real plan rather than a mock.
+# ==============================================================================
+
+route_variables := {
+	"resource_type": "google_network_services_http_route",
+	"friendly_resource_name": "Network Services HTTP Route",
+	"resource_value_name": "name",
+}
+
+https_conditions(policy_type) := [[
+	{
+		"situation_description": "A redirect action does not force HTTPS, so redirected requests can be downgraded to plain HTTP",
+		"remedies": ["Set rules.action.redirect.https_redirect to true on every redirect action."],
+	},
+	{
+		"condition": "Every configured redirect sets https_redirect to true",
+		"attribute_path": ["rules", "action", "redirect", "https_redirect"],
+		"values": [true],
+		"policy_type": policy_type,
+	},
+]]
+
+real_plan := data.gcp_http_route_plan
+
+real_resource(name) := r if {
+	some r in real_plan.planned_values.root_module.resources
+	r.name == name
+}
+
+# The committed plan's compliant and non-compliant rules, as Terraform wrote them.
+secure_rule := real_resource("compliant_example_1").values.rules[0]
+
+insecure_rule := real_resource("non_compliant_example_1").values.rules[0]
+
+# The same real rule with its redirect block removed, as Terraform writes an
+# unconfigured block ([]).
+no_redirect_rule := object.union(secure_rule, {"action": [object.union(secure_rule.action[0], {"redirect": []})]})
+
+plan_with_rules(rules) := {"planned_values": {"root_module": {"resources": [object.union(
+	real_resource("compliant_example_1"),
+	{"values": object.union(real_resource("compliant_example_1").values, {"rules": rules})},
+)]}}}
+
+# 11. On the committed plan, only the non-compliant route is flagged, at its own path.
+test_reality_committed_plan_flags_only_insecure_route if {
+	result := helpers.get_multi_summary(https_conditions("element required"), route_variables) with input as real_plan
+	out := json.marshal(result.message)
+	contains(out, "non-compliant-example-1")
+	not contains(out, "Non-Compliant Resources: compliant-example-1")
+	contains(json.marshal(result), "rules.[0].action.[0].redirect.[0].https_redirect")
+}
+
+# 12. The insecure redirect in the second rule of a route is flagged by its path.
+test_reality_insecure_redirect_in_second_rule_is_flagged if {
+	result := helpers.get_multi_summary(https_conditions("element required"), route_variables) with input as plan_with_rules([secure_rule, insecure_rule])
+	out := json.marshal(result)
+	not contains(json.marshal(result.message), "None - All passed")
+	contains(out, "rules.[1].action.[0].redirect.[0].https_redirect")
+	not contains(out, "rules.[0].action.[0].redirect.[0].https_redirect")
+}
+
+# 13. A secure redirect plus a rule without a redirect passes.
+test_reality_rule_without_redirect_passes if {
+	result := helpers.get_multi_summary(https_conditions("element required"), route_variables) with input as plan_with_rules([secure_rule, no_redirect_rule])
+	contains(json.marshal(result.message), "None - All passed")
+}
+
+# 14. Pins the documented difference: the same path under whitelist reads one
+# value, which is null through two repeated blocks, so it flags the compliant
+# route too. See "Paths through repeated blocks" in policy-rego.md.
+test_reality_whitelist_on_same_path_flags_compliant_route if {
+	result := helpers.get_multi_summary(https_conditions("whitelist"), route_variables) with input as real_plan
+	contains(json.marshal(result.message), "compliant-example-1, non-compliant-example-1")
+}

@@ -89,24 +89,43 @@ The attribute path would be:
 
     ["rsa", 0, "key"]
 
+### Paths through repeated blocks: one element or every element
+
+Terraform writes every nested block as a list, even when there is only one, which is why
+`rsa` above needs the `0`. How a path behaves when you leave that index out depends on the
+`policy_type`, because the engine has two ways of reading a path:
+
+| Types | Reads | Index left out |
+|---|---|---|
+| `blacklist`, `whitelist`, `range`, `pattern blacklist`, `pattern whitelist`, `element blacklist`, `element pattern whitelist`, `map key blacklist` | **one value** | Give an index at every list level. Without them, one list level is gathered into a list of values, and a path through **two** list levels (for example `rules` then `action`) reads as `null`, as if the attribute were unset |
+| `element required`, `map key pattern whitelist`, `presence` | **every element** | Leave the indexes out to check every element of every repeated block. An index still selects one element. Messages name the failing element, such as `rules.[1].action.[0].redirect.[0].https_redirect` |
+
+So a path copied from one group into the other does not mean the same thing. For example,
+`["rules", "action", "redirect", "https_redirect"]` under `element required` with `values: [true]`
+checks every configured redirect. The same path under `whitelist` with `values: [true]` reads
+`null` for every route, and `null` is not in `[true]`, so it flags **every** route, including
+routes whose redirects force HTTPS and routes with no redirect at all. Under `blacklist` the same
+`null` passes every route. If you need a rule on every element, use one of the every-element types;
+see the note in [Whitelist](#whitelist).
+
 
 ### Different ways to write your policy
 
 The engine dispatches on `policy_type`, using these supported values:
 
-| `policy_type` | Use it when |
-|---|---|
-| `blacklist` | The attribute must not be one of these values |
-| `whitelist` | The attribute must be one of these values (arrays: **every** element must be) |
-| `range` | A number must be above / below / between bounds |
-| `pattern blacklist` | A wildcard-extracted part of the value must not be one of these |
-| `pattern whitelist` | A wildcard-extracted part of the value must be one of these |
-| `element blacklist` | No element of an array may **contain** one of these substrings |
-| `element pattern whitelist` | Every element of an array must match one of the wildcard shapes |
-| `map key blacklist` | No map key may match a prohibited name, ignoring capitalisation, with a non-empty value |
-| `element required` | An array must **contain** every one of these values (unset counts as empty) |
-| `map key pattern whitelist` | Every map key must match one of these wildcard shapes, ignoring capitalisation |
-| `presence` | The attribute or block must be set (`["set"]`) or must not be set (`["unset"]`), whatever its value |
+| `policy_type` | Use it when | Repeated blocks |
+|---|---|---|
+| `blacklist` | The attribute must not be one of these values | One element: give an index per list level |
+| `whitelist` | The attribute must be one of these values (arrays: **every** element must be) | One element: give an index per list level |
+| `range` | A number must be above / below / between bounds | One element: give an index per list level |
+| `pattern blacklist` | A wildcard-extracted part of the value must not be one of these | One element: give an index per list level |
+| `pattern whitelist` | A wildcard-extracted part of the value must be one of these | One element: give an index per list level |
+| `element blacklist` | No element of an array may **contain** one of these substrings | One element: give an index per list level |
+| `element pattern whitelist` | Every element of an array must match one of the wildcard shapes | One element: give an index per list level |
+| `map key blacklist` | No map key may match a prohibited name, ignoring capitalisation, with a non-empty value | One element: give an index per list level |
+| `element required` | An array must **contain** every one of these values (unset counts as empty). A single value counts as a one-item list, so `[true]` means "must be true", in every element the path reaches | Every element: leave the indexes out |
+| `map key pattern whitelist` | Every map key must match one of these wildcard shapes, ignoring capitalisation | Every element: leave the indexes out |
+| `presence` | The attribute or block must be set (`["set"]`) or must not be set (`["unset"]`), whatever its value | Every element: leave the indexes out |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports
@@ -130,6 +149,14 @@ Whitelist allows only specific values and blocks everything else.
 > type only because *forbidding* a list needs substring matching, which the plain `blacklist` does
 > not do. For *pattern*-based list validation (every element must match a shape), use
 > `element pattern whitelist`.
+
+> **Need a value on every element of a repeated block?** A `whitelist` reads one value, so it
+> checks one element (give the index). To require a value in every element, for example
+> "`https_redirect` must be true on every redirect of every rule", use `element required` with
+> `values: [true]` and leave the indexes out:
+> `["rules", "action", "redirect", "https_redirect"]`. It treats the single value as a one-item
+> list, so `false` and an omitted value both fail, and rules without a redirect have nothing to
+> check. See [Paths through repeated blocks](#paths-through-repeated-blocks-one-element-or-every-element).
 
 ```rego
 

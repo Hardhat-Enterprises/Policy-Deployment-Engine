@@ -13,6 +13,7 @@ FIXTURES=(
     "tests/_helpers/fixtures/gcp_storage_bucket/plan.json"
     "tests/_helpers/fixtures/gcp_project/plan.json"
     "tests/_helpers/fixtures/gcp_access_level/plan.json"
+    "tests/_helpers/fixtures/gcp_http_route/plan.json"
 )
 
 # Common helper modules
@@ -132,10 +133,11 @@ run_test_suite "Element Required Policy" \
     "false" "false"
 
 # This suite exercises conditions through the complete dispatcher and summary.
+# Includes a reality check against the committed http_route plan fixture.
 run_test_suite "Element Required Integration" \
     "tests/_helpers/element_required_integration_test.rego" \
     "policies/_helpers" \
-    "false" "false"
+    "false" "true"
 
 run_test_suite "Map Key Pattern Whitelist Policy" \
     "tests/_helpers/map_key_pattern_whitelist_test.rego" \
