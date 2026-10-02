@@ -79,11 +79,12 @@ wasn't yours. Watch out for near-identical neighbours: `google_compute_target_ht
 It also covers stray files that were never meant to be committed at all — a downloaded `opa.exe`,
 a screenshot, a scratch `commits.txt`, an edit to `.gitignore` or to a workflow in `.github/`.
 
-Fix it by putting the file back the way `dev` has it:
+Fix it by putting the file back the way it was when your branch left `dev`:
 
-    git checkout origin/dev -- 'docs/gcp/Compute Engine/google_compute_image.json'
+    git restore --source="$(git merge-base HEAD origin/dev)" --staged --worktree -- 'docs/gcp/Compute Engine/google_compute_image.json'
 
-or, if it is a file you created by accident, delete it from your branch and commit that.
+That works however far `dev` has moved on since, so you do not need to merge first. If it is a
+file your branch added, the same command deletes it.
 
 Then commit only your own paths, rather than everything:
 
@@ -100,7 +101,7 @@ fixture directory silently removes an argument you had already been credited for
 
 Put it back:
 
-    git checkout origin/dev -- '<the path in the message>'
+    git restore --source="$(git merge-base HEAD origin/dev)" --staged --worktree -- '<the path in the message>'
 
 If you are renaming something you added earlier on this branch, add the new name and leave the
 old file alone. If a file genuinely does need to go, ask a senior team member first.

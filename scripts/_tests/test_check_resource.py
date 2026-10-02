@@ -366,3 +366,124 @@ def test_the_commit_hook_skips_coverage_and_ci_does_not():
              if "check_resource.py" in step.get("run", "")]
     assert calls, "policy_check_PR.yaml no longer calls check_resource.py"
     assert all("--skip-coverage" not in c for c in calls)
+
+
+# --------------------------------------------------------------------------- #
+# A resource with no security-impacting arguments
+# --------------------------------------------------------------------------- #
+ALL_FALSE = "Service/gcp/apigee/google_apigee_example"
+
+
+@pytest.fixture
+def all_false_repo(tmp_path, monkeypatch):
+    """A repo holding one resource whose every leaf is security_impact: false."""
+    doc = tmp_path / "docs" / "gcp" / "Apigee" / "google_apigee_example.json"
+    doc.parent.mkdir(parents=True)
+    doc.write_text(json.dumps({"arguments": {
+        "name": {"security_impact": False, "rationale": "An identifier."},
+        "labels": {"security_impact": False, "rationale": "Metadata only."},
+    }}))
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(cr, "REPO", tmp_path)
+    monkeypatch.setattr(cr, "load_base_doc", lambda ref, path: None)
+    return tmp_path
+
+
+def test_an_all_false_resource_has_nothing_to_test_and_passes(all_false_repo, monkeypatch, capsys):
+    # auto_test finds no pairs under two missing roots and exits 1, so running it
+    # here made such a resource unmergeable (PR #805).
+    def no_opa(*a, **k):
+        raise AssertionError("auto_test must not run")
+    monkeypatch.setattr(cr, "step_opa", no_opa)
+    assert cr.main(["--branch", ALL_FALSE, "--gate-only"]) == 0
+    assert ("[OK]   OPA test  — no security-impacting arguments, so there are no "
+            "policies to test") in capsys.readouterr().out
+
+
+def test_an_all_false_resource_with_a_stray_policy_still_fails(all_false_repo, capsys):
+    # A policy with no fixture is an orphan whatever the doc says; auto_test is the
+    # thing that says so, so it must still run.
+    policy = all_false_repo / "policies" / "gcp" / "Apigee" / "google_apigee_example"
+    policy.mkdir(parents=True)
+    (policy / "labels.rego").write_text("package terraform.gcp.security.x.labels\n")
+    assert cr.main(["--branch", ALL_FALSE, "--gate-only"]) == 1
+    out = capsys.readouterr().out
+    assert "[FAIL] OPA test" in out
+    assert "No matching input fixture" in out
+    assert "inputs/gcp/Apigee/google_apigee_example/labels" in out
+
+
+def test_a_true_argument_means_there_is_something_to_test():
+    doc = _doc(a={"security_impact": False, "rationale": "r"},
+               b={"security_impact": True, "rationale": "r"})
+    assert cr.has_true_args(doc)
+    assert not cr.has_true_args(_doc(a={"security_impact": False, "rationale": "r"}))
+
+
+def test_a_fixture_dir_alone_counts_as_something_to_test(tmp_path, monkeypatch):
+    monkeypatch.setattr(cr, "REPO", tmp_path)
+    assert not cr.has_policies_or_fixtures(*ARGS)
+    _fixture_dir(tmp_path)
+    assert cr.has_policies_or_fixtures(*ARGS)
+
+
+# --------------------------------------------------------------------------- #
+# OPA failures carry auto_test's own reasons
+# --------------------------------------------------------------------------- #
+def test_opa_failures_are_read_from_the_report(tmp_path):
+    report = tmp_path / "report.json"
+    report.write_text(json.dumps([
+        {"policy": "a", "passed": True},
+        {"policy": "b", "passed": False, "failure": {
+            "reason": "terraform init failed for inputs/x/b:\nError: bad", "file": "inputs/x/b"}},
+    ]))
+    assert cr.opa_failures(report, "google_x") == [
+        ("inputs/x/b", "google_x/b", "b: terraform init failed for inputs/x/b:\nError: bad")]
+
+
+def test_a_missing_report_is_no_findings(tmp_path):
+    assert cr.opa_failures(tmp_path / "nope.json", "google_x") == []
+
+
+def test_the_summary_repeats_each_finding(capsys):
+    report = cr.Report()
+    report.fail("OPA test", "1 policy check(s) did not pass",
+                [("inputs/x/b", "google_x/b", "b: terraform init failed\nError: bad")])
+    report.summarise("google_x")
+    summary = capsys.readouterr().out.split("check(s) failed:")[1]
+    assert "terraform init failed" in summary and "Error: bad" in summary
+
+
+# --------------------------------------------------------------------------- #
+# GitHub Actions: an annotation per failure, and a step summary
+# --------------------------------------------------------------------------- #
+def test_every_failure_is_annotated_in_actions(tmp_path, monkeypatch, capsys):
+    summary = tmp_path / "summary.md"
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+    report = cr.Report()
+    report.fail("Doc completeness", "2 finding(s)", ["arg 'a': x", "arg 'b': y"],
+                file="docs/gcp/S/google_x.json")
+    report.fail("OPA test", "1 policy check(s) did not pass",
+                [("inputs/gcp/S/google_x/c", "google_x/c", "c: terraform plan failed\nError: z")])
+    report.fail("Resource gate", "resource doc not found")
+    assert report.summarise("google_x") == 1
+
+    errors = [l for l in capsys.readouterr().out.splitlines() if l.startswith("::error ")]
+    assert len(errors) == 4
+    assert errors[0] == ("::error file=docs/gcp/S/google_x.json,"
+                         "title=google_x%3A Doc completeness::arg 'a': x")
+    assert errors[2] == ("::error file=inputs/gcp/S/google_x/c,title=google_x/c::"
+                         "c: terraform plan failed%0AError: z")
+    assert errors[3] == "::error title=google_x%3A Resource gate::resource doc not found"
+    table = summary.read_text()
+    assert table.count("\n| ") == 5          # header + 4 rows
+    assert "terraform plan failed<br>Error: z" in table
+
+
+def test_nothing_is_annotated_outside_actions(monkeypatch, capsys):
+    monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+    report = cr.Report()
+    report.fail("Lint", "findings")
+    report.summarise("google_x")
+    assert "::error" not in capsys.readouterr().out
