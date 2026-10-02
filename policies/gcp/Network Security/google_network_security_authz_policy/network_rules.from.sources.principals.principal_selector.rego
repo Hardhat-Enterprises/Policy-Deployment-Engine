@@ -5,16 +5,16 @@ import data.terraform.gcp.security.network_security.google_network_security_auth
 conditions := [
   [
     {
-      "situation_description" : "Principal selector must use an explicit client certificate identity selector rather than PRINCIPAL_SELECTOR_UNSPECIFIED",
+      "situation_description" : "Principal selector must not be set to PRINCIPAL_SELECTOR_UNSPECIFIED",
       "remedies":[
-        "Set principal_selector to CLIENT_CERT_URI_SAN, CLIENT_CERT_DNS_NAME_SAN, or CLIENT_CERT_COMMON_NAME"
+        "Remove PRINCIPAL_SELECTOR_UNSPECIFIED or use CLIENT_CERT_URI_SAN, CLIENT_CERT_DNS_NAME_SAN, or CLIENT_CERT_COMMON_NAME"
       ]
     },
     {
       "condition": "c1 principal_selector uses an explicit client certificate identity selector",
       "attribute_path" : ["network_rules", 0, "from", 0, "sources", 0, "principals", 0, "principal_selector"],
-      "values" : ["CLIENT_CERT_URI_SAN", "CLIENT_CERT_DNS_NAME_SAN", "CLIENT_CERT_COMMON_NAME"],
-      "policy_type" : "whitelist"
+      "values" : ["PRINCIPAL_SELECTOR_UNSPECIFIED"],
+      "policy_type" : "blacklist"
     }
   ]
 ]
