@@ -23,7 +23,7 @@ Unit tests for policy helper functions in `policies/_helpers/`.
 | File | Tests | Coverage |
 |------|-------|----------|
 | `shared_test.rego` | 26 | Shared utilities (get_resource_attribute, format paths, every-element path lookup, wildcard matching, etc.) |
-| `helpers_test.rego` | 32 | Dispatcher and summary orchestration |
+| `helpers_test.rego` | 35 | Dispatcher and summary orchestration |
 | `blacklist_test.rego` | 10 | Blacklist policy (forbidden values) |
 | `whitelist_test.rego` | 11 | Whitelist policy (required values) |
 | `range_test.rego` | 8 | Range policy (numeric bounds, simplified) |
@@ -39,8 +39,9 @@ Unit tests for policy helper functions in `policies/_helpers/`.
 | `map_key_pattern_whitelist_integration_test.rego` | 7 | Map key pattern whitelist (dispatcher integration) |
 | `presence_test.rego` | 15 | Presence (attribute or block set or unset, in every element) |
 | `presence_integration_test.rego` | 9 | Presence and per-rule checks (dispatcher integration) |
+| `content_security_test.rego` | 6 | Content security (static-analysis findings at or above a severity threshold) |
 
-**Total:** 230 tests covering all 11 helper policies
+**Total:** 239 tests covering all 12 helper policies
 
 ## Test Structure
 

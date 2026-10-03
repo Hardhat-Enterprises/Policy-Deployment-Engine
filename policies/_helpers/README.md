@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 11 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Element Required, Map Key Pattern Whitelist, Presence
+- Support for 12 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Element Required, Map Key Pattern Whitelist, Presence, Content Security
 - OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -34,6 +34,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [9. Element Required](#9-element-required)
   - [10. Map Key Pattern Whitelist](#10-map-key-pattern-whitelist)
   - [11. Presence](#11-presence)
+  - [12. Content Security](#12-content-security)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
@@ -97,7 +98,8 @@ policies/_helpers/
     ├── element_pattern_whitelist.rego
     ├── element_required.rego
     ├── map_key_pattern_whitelist.rego
-    └── presence.rego
+    ├── presence.rego
+    └── content_security.rego
 ```
 
 ### Component Responsibilities
@@ -266,8 +268,6 @@ it, use **Element Pattern Whitelist** (section 8).
   "values": ["*", "0.0.0.0"]
 }
 ```
-
----
 
 ### 7. Map Key Blacklist
 
@@ -466,6 +466,26 @@ Run the focused and integration tests from the repository root:
 
 ```shell
 opa test tests/_helpers/presence_test.rego tests/_helpers/presence_integration_test.rego policies/_helpers -v
+```
+
+---
+
+### 12. Content Security
+**Module:** `policies/content_security.rego`
+**Use Case:** Flag resources whose embedded content (e.g. Python code) has static-analysis findings at/above a severity threshold.
+
+**Logic:**
+- Reads pre-computed findings from `input.content_security_findings` (produced by `scripts/content_analysis/`).
+- Matches findings to resources by `resource_type` + `resource_name`.
+- Any finding whose `severity` is at/above a threshold in `values` = violation.
+
+**Example:**
+```json
+{
+  "policy_type": "content security",
+  "attribute_path": ["after_agent_callbacks", 0, "python_code"],
+  "values": ["MEDIUM"]
+}
 ```
 
 ---

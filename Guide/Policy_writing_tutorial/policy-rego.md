@@ -126,6 +126,7 @@ The engine dispatches on `policy_type`, using these supported values:
 | `element required` | An array must **contain** every one of these values (unset counts as empty). A single value counts as a one-item list, so `[true]` means "must be true", in every element the path reaches | Every element: leave the indexes out |
 | `map key pattern whitelist` | Every map key must match one of these wildcard shapes, ignoring capitalisation | Every element: leave the indexes out |
 | `presence` | The attribute or block must be set (`["set"]`) or must not be set (`["unset"]`), whatever its value | Every element: leave the indexes out |
+| `content security` | Embedded code (e.g. Python callbacks) has no static-analysis findings at or above a severity threshold | One element: give an index per list level |
 
 Write them **lowercase, with a space** — `pattern whitelist`, never `pattern_whitelist`. Anything
 else is not a policy type: the engine cannot dispatch it, so it stops and reports

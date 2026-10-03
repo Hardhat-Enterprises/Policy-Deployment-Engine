@@ -63,6 +63,7 @@ test_valid_policy_types_matches_supported_set if {
 		"element required",
 		"map key pattern whitelist",
 		"presence",
+		"content security",
 	}
 }
 
@@ -382,4 +383,39 @@ test_a_bad_policy_type_is_still_reported_before_a_bad_match if {
 	) with input as mock_input
 
 	contains(summary.message[0], "nonsense")
+}
+
+# ==============================================================================
+# CONTENT SECURITY: unknown severity refusal
+# ==============================================================================
+
+# A content security threshold must name a severity the helper knows; a typo must
+# refuse the summary, not silently make the policy pass everything.
+test_unknown_content_security_severity_refuses_the_summary if {
+	summary := helpers.get_multi_summary(
+		[[meta, {"attribute_path": ["after_agent_callbacks", "python_code"], "values": ["MEDIUN"], "policy_type": "content security"}]],
+		mock_variables,
+	) with input as mock_input
+
+	count(summary.message) == 1
+	startswith(summary.message[0], "POLICY ERROR:")
+	contains(summary.message[0], "MEDIUN")
+	summary.details == []
+}
+
+test_valid_content_security_severity_is_accepted if {
+	count(helpers.content_security_severity_problems([[
+		meta, {"attribute_path": ["x"], "values": ["MEDIUM"], "policy_type": "content security"},
+	]])) == 0
+}
+
+test_content_security_error_message_names_the_valid_severities if {
+	summary := helpers.get_multi_summary(
+		[[meta, {"attribute_path": ["x"], "values": ["MEDIUN"], "policy_type": "content security"}]],
+		mock_variables,
+	) with input as mock_input
+
+	every s in ["LOW", "MEDIUM", "HIGH", "CRITICAL"] {
+		contains(summary.message[0], s)
+	}
 }

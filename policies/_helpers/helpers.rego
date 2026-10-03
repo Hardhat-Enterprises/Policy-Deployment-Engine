@@ -21,6 +21,7 @@ import data.terraform.helpers.policies.pattern_whitelist
 import data.terraform.helpers.policies.element_blacklist
 import data.terraform.helpers.policies.element_pattern_whitelist
 import data.terraform.helpers.policies.map_key_blacklist
+import data.terraform.helpers.policies.content_security
 import data.terraform.helpers.policies.element_required
 import data.terraform.helpers.policies.map_key_pattern_whitelist
 import data.terraform.helpers.policies.presence
@@ -119,6 +120,17 @@ get_multi_summary(conditions, tf_variables) = summary if {
     count(problems) > 0
     summary := {
         "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Set presence values to exactly one of [\"set\"] or [\"unset\"].", [concat("; ", sort(problems))])],
+        "details": []
+    }
+} else = summary if {
+    # A content security threshold (`values`) must name a severity the helper
+    # knows, or the severity_order lookup is undefined and the policy silently
+    # passes everything — the same broken-permissive failure an unknown
+    # policy_type causes.
+    problems := content_security_severity_problems(conditions)
+    count(problems) > 0
+    summary := {
+        "message": [sprintf("POLICY ERROR: %s. Nothing in this policy was checked. Valid severities are: %s.", [concat("; ", sort(problems)), concat(", ", sort(content_security.valid_severities))])],
         "details": []
     }
 } else = summary if {
@@ -341,6 +353,7 @@ valid_policy_types := [
     "element required",
     "map key pattern whitelist",
     "presence",
+    "content security",
 ]
 
 # Every reason `conditions` cannot be dispatched, as human-readable phrases. Two
@@ -432,6 +445,22 @@ _valid_key_names(values) if {
         is_string(name)
         name != ""
         name == trim_space(name)
+    }
+}
+
+# A content security threshold must be a severity the helper knows. An unknown
+# one makes severity_order[threshold] undefined, which silently drops the finding
+# and turns the policy permissive — refused for the same reason as an unknown
+# policy_type.
+content_security_severity_problems(conditions) := problems if {
+    problems := {sprintf("unknown severity '%v' on the content security condition reading '%s'",
+                         [value, shared.format_attribute_path(entry.attribute_path)]) |
+        some group in conditions
+        some entry in group
+        lower(object.get(entry, "policy_type", "")) == "content security"
+        values := shared.ensure_array(object.get(entry, "values", null))
+        value := values[_]
+        not value in content_security.valid_severities
     }
 }
 
@@ -598,6 +627,10 @@ select_policy_logic(tf_variables, attribute_path, values_formatted, "element bla
 
 select_policy_logic(tf_variables, attribute_path, values_formatted, "element pattern whitelist") = results if {
     results := element_pattern_whitelist.get_violations(tf_variables, attribute_path, values_formatted)
+}
+
+select_policy_logic(tf_variables, attribute_path, values_formatted, "content security") = results if {
+    results := content_security.get_violations(tf_variables, attribute_path, values_formatted)
 }
 
 select_policy_logic(tf_variables, attribute_path, values_formatted, "map key blacklist") = results if {

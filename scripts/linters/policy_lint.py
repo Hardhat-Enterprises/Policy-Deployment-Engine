@@ -450,6 +450,7 @@ VALID_POLICY_TYPES = (
     "element required",
     "map key pattern whitelist",
     "presence",
+    "content security",
 )
 
 # Blacklist/whitelist only — a pattern or range policy with empty values means
