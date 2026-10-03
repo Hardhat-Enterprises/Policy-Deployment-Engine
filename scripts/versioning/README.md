@@ -1,5 +1,17 @@
 # PDE Schema Differ — version-aware policies (prototype)
 
+## Status (read first)
+
+This is a prototype. What works: a stable policy ID (resource_type::argument_path), a per-version validity map, a provider-schema differ with rename detection, and the "does the resource/argument exist in this version" check.
+
+What does not exist yet: testing a policy under a different provider version. build_results.py's --version is only a label. It runs auto_test.py with the repo's pinned provider and committed plans, so a result recorded under any other version is really the pinned version's result. Do not commit validity-map entries for other versions produced this way.
+
+The "101 policies" figure in this handover counts schema arguments on three resources, not policies (dev has 12 policies across them).
+
+Next step: make the provider version a real input (install/select that provider version, plan the compliant and non-compliant fixtures under it, bypassing the committed plan cache, run OPA, and write the result into the validity map). A plan that fails because a newly required unrelated argument is missing should be recorded as "fixture needs updating", not as a policy failure.
+
+build_results.py looks for fixtures under inputs/<resource>/. Update it if the folder restructure (#926) lands.
+
 Read-only tool that compares two Terraform provider schema versions and reports what
 changed, plus what it means for our existing policies. It never writes to `docs/`,
 `inputs/`, or `policies/`, so it cannot affect the plan cache or the repo.
