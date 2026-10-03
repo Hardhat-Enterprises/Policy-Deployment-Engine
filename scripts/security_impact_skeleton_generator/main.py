@@ -12,14 +12,12 @@ from scripts.linters._service_slug import service_slug
 
 
 DOCS_DIR = REPO_ROOT / "docs"
-INPUTS_DIR = REPO_ROOT / "inputs"
 POLICIES_DIR = REPO_ROOT / "policies"
 TEMPLATES_DIR = REPO_ROOT / "templates"
 
 TF_TEMPLATE_FILES = [
     "compliant.tf",
     "nonCompliant.tf",
-    "config.tf",
 ]
 
 
@@ -35,53 +33,86 @@ def parse_target(target):
 
 
 def load_resource_document(cloud, service, resource):
-    resource_file = DOCS_DIR / cloud / service / f"{resource}.json"
+    resource_file = (
+        DOCS_DIR
+        / cloud
+        / service
+        / f"{resource}.json"
+    )
 
     if not resource_file.exists():
         raise FileNotFoundError(
             f"Resource documentation not found:\n{resource_file}"
         )
 
-    with resource_file.open("r", encoding="utf-8") as file:
+    with resource_file.open(
+        "r",
+        encoding="utf-8",
+    ) as file:
         return json.load(file)
 
 
 def find_security_impact_arguments(document):
-    arguments = document.get("arguments", {})
+    arguments = document.get(
+        "arguments",
+        {},
+    )
 
     return [
         argument_name
-        for argument_name, argument_data in arguments.items()
-        if argument_data.get("security_impact") is True
+        for argument_name, argument_data
+        in arguments.items()
+        if isinstance(argument_data, dict)
+        and argument_data.get(
+            "security_impact"
+        ) is True
     ]
 
 
-def get_required_paths(cloud, service, resource, argument):
-    input_dir = (
-        INPUTS_DIR
-        / cloud
-        / service
-        / resource
-        / argument
-    )
-
-    policy_dir = (
+def get_required_paths(
+    cloud,
+    service,
+    resource,
+    argument,
+):
+    resource_dir = (
         POLICIES_DIR
         / cloud
         / service
         / resource
     )
 
+    argument_dir = (
+        resource_dir
+        / argument
+    )
+
+    shared_config = (
+        POLICIES_DIR
+        / cloud
+        / "config.tf"
+    )
+
     return {
-        "compliant.tf": input_dir / "compliant.tf",
-        "nonCompliant.tf": input_dir / "nonCompliant.tf",
-        "config.tf": input_dir / "config.tf",
-        "policy.rego": policy_dir / f"{argument}.rego",
-        "_vars.rego": policy_dir / "_vars.rego",
+        "compliant.tf":
+            argument_dir / "compliant.tf",
+        "nonCompliant.tf":
+            argument_dir / "nonCompliant.tf",
+        "policy.rego":
+            argument_dir / "policy.rego",
+        "_vars.rego":
+            resource_dir / "_vars.rego",
+        "shared config.tf":
+            shared_config,
     }
 
 
-def check_argument_files(cloud, service, resource, argument):
+def check_argument_files(
+    cloud,
+    service,
+    resource,
+    argument,
+):
     paths = get_required_paths(
         cloud,
         service,
@@ -103,17 +134,22 @@ def render_template(
     policy_name=None,
 ):
     """
-    Create a file from a PDE template without overwriting existing work.
+    Create a file from a PDE template
+    without overwriting existing work.
 
-    Structural placeholders are replaced automatically.
-    Security policy logic remains for the contributor to complete.
+    Structural placeholders are replaced
+    automatically.
+
+    Security policy logic remains for the
+    contributor to complete.
     """
     if destination.exists():
         return False
 
     if not template.exists():
         raise FileNotFoundError(
-            f"Template not found: {template}"
+            f"Template not found: "
+            f"{template}"
         )
 
     content = template.read_text(
@@ -121,7 +157,9 @@ def render_template(
     )
 
     if service:
-        rego_service = service_slug(service)
+        rego_service = (
+            service_slug(service)
+        )
 
         content = content.replace(
             "<service>",
@@ -141,7 +179,10 @@ def render_template(
 
         content = content.replace(
             '"resource_type":  ""',
-            f'"resource_type": "{resource}"',
+            (
+                '"resource_type": '
+                f'"{resource}"'
+            ),
         )
 
     if policy_name:
@@ -163,19 +204,45 @@ def render_template(
     return True
 
 
+def ensure_shared_config(cloud):
+    shared_config = (
+        POLICIES_DIR
+        / cloud
+        / "config.tf"
+    )
+
+    if not shared_config.exists():
+        raise FileNotFoundError(
+            "Shared platform config.tf "
+            "is missing.\n"
+            f"Expected: {shared_config}\n"
+            "Complete the PDE layout "
+            "migration before generating "
+            "policy skeletons."
+        )
+
+    return shared_config
+
+
 def generate_argument_skeleton(
     cloud,
     service,
     resource,
     argument,
 ):
-    template_dir = TEMPLATES_DIR / cloud
+    template_dir = (
+        TEMPLATES_DIR
+        / cloud
+    )
 
     if not template_dir.exists():
         raise FileNotFoundError(
-            f"No template directory found for cloud: {cloud}\n"
+            "No template directory found "
+            f"for cloud: {cloud}\n"
             f"Expected: {template_dir}"
         )
+
+    ensure_shared_config(cloud)
 
     paths = get_required_paths(
         cloud,
@@ -187,10 +254,15 @@ def generate_argument_skeleton(
     created = []
     skipped = []
 
-    # Terraform fixture files
     for file_name in TF_TEMPLATE_FILES:
-        destination = paths[file_name]
-        template = template_dir / file_name
+        destination = (
+            paths[file_name]
+        )
+
+        template = (
+            template_dir
+            / file_name
+        )
 
         was_created = render_template(
             template,
@@ -199,21 +271,27 @@ def generate_argument_skeleton(
         )
 
         if was_created:
-            created.append(destination)
+            created.append(
+                destination
+            )
         else:
-            skipped.append(destination)
+            skipped.append(
+                destination
+            )
 
-    # Rego policy file
     policy_template = (
-        template_dir / "policy.rego"
+        template_dir
+        / "policy.rego"
     )
 
-    policy_created = render_template(
-        policy_template,
-        paths["policy.rego"],
-        service=service,
-        resource=resource,
-        policy_name=argument,
+    policy_created = (
+        render_template(
+            policy_template,
+            paths["policy.rego"],
+            service=service,
+            resource=resource,
+            policy_name=argument,
+        )
     )
 
     if policy_created:
@@ -225,16 +303,18 @@ def generate_argument_skeleton(
             paths["policy.rego"]
         )
 
-    # _vars.rego should exist once per resource
     vars_template = (
-        template_dir / "_vars.rego"
+        template_dir
+        / "_vars.rego"
     )
 
-    vars_created = render_template(
-        vars_template,
-        paths["_vars.rego"],
-        service=service,
-        resource=resource,
+    vars_created = (
+        render_template(
+            vars_template,
+            paths["_vars.rego"],
+            service=service,
+            resource=resource,
+        )
     )
 
     if vars_created:
@@ -257,18 +337,26 @@ def print_resource_header(
 ):
     print()
     print(
-        "PDE Security Impact Skeleton Generator"
+        "PDE Security Impact "
+        "Skeleton Generator"
     )
     print("=" * 50)
 
-    print(f"Cloud    : {cloud}")
-    print(f"Service  : {service}")
-    print(f"Resource : {resource}")
+    print(
+        f"Cloud    : {cloud}"
+    )
+    print(
+        f"Service  : {service}"
+    )
+    print(
+        f"Resource : {resource}"
+    )
 
     print()
 
     print(
-        "Security-impacting leaf arguments: "
+        "Security-impacting leaf "
+        "arguments: "
         f"{len(security_arguments)}"
     )
 
@@ -283,35 +371,49 @@ def print_argument_status(
 ):
     print()
     print(argument)
-    print("-" * len(argument))
-
-    status = check_argument_files(
-        cloud,
-        service,
-        resource,
-        argument,
+    print(
+        "-" * len(argument)
     )
 
-    for file_name, exists in status.items():
-        symbol = "✓" if exists else "✗"
+    status = (
+        check_argument_files(
+            cloud,
+            service,
+            resource,
+            argument,
+        )
+    )
+
+    for file_name, exists in (
+        status.items()
+    ):
+        symbol = (
+            "✓"
+            if exists
+            else "✗"
+        )
 
         print(
-            f"  [{symbol}] {file_name}"
+            f"  [{symbol}] "
+            f"{file_name}"
         )
 
 
 def main():
     parser = argparse.ArgumentParser(
         description=(
-            "Generate PDE skeleton files for "
-            "security-impacting leaf arguments."
+            "Generate PDE skeleton files "
+            "for security-impacting leaf "
+            "arguments using the current "
+            "policy-folder layout."
         )
     )
 
     parser.add_argument(
         "target",
         help=(
-            "Resource target in the format "
+            "Resource target in the "
+            "format "
             "'cloud/service/resource'"
         ),
     )
@@ -320,22 +422,27 @@ def main():
         "--generate",
         action="store_true",
         help=(
-            "Create missing skeleton files. "
-            "Existing files are never overwritten."
+            "Create missing skeleton "
+            "files. Existing files are "
+            "never overwritten."
         ),
     )
 
     args = parser.parse_args()
 
     try:
-        cloud, service, resource = parse_target(
-            args.target
+        cloud, service, resource = (
+            parse_target(
+                args.target
+            )
         )
 
-        document = load_resource_document(
-            cloud,
-            service,
-            resource,
+        document = (
+            load_resource_document(
+                cloud,
+                service,
+                resource,
+            )
         )
 
         security_arguments = (
@@ -353,14 +460,16 @@ def main():
 
         if not security_arguments:
             print(
-                "No security-impacting leaf "
-                "arguments found."
+                "No security-impacting "
+                "leaf arguments found."
             )
             return
 
         total_created = 0
 
-        for argument in security_arguments:
+        for argument in (
+            security_arguments
+        ):
             print_argument_status(
                 cloud,
                 service,
@@ -378,7 +487,9 @@ def main():
                     )
                 )
 
-                total_created += len(created)
+                total_created += (
+                    len(created)
+                )
 
                 for path in created:
                     relative_path = (
@@ -388,7 +499,7 @@ def main():
                     )
 
                     print(
-                        f"      CREATED: "
+                        "      CREATED: "
                         f"{relative_path}"
                     )
 
@@ -397,41 +508,65 @@ def main():
 
         if args.generate:
             print(
-                f"Created {total_created} "
+                f"Created "
+                f"{total_created} "
                 "missing file(s)."
             )
 
             if total_created == 0:
                 print(
                     "Nothing to generate. "
-                    "Resource is already complete."
+                    "Resource is already "
+                    "complete."
                 )
 
             else:
                 print()
                 print(
-                    "Skeleton generation complete."
+                    "Skeleton generation "
+                    "complete."
                 )
                 print(
-                    "Existing files were not "
-                    "overwritten."
+                    "Existing files were "
+                    "not overwritten."
                 )
+
                 print()
                 print(
                     "Next steps:"
                 )
+
                 print(
-                    "  1. Complete the Terraform fixtures."
+                    "  1. Complete the "
+                    "Terraform fixtures."
                 )
+
                 print(
-                    "  2. Complete friendly_resource_name "
-                    "and resource_value_name in _vars.rego."
+                    "  2. Complete "
+                    "friendly_resource_name "
+                    "and "
+                    "resource_value_name "
+                    "in _vars.rego."
                 )
+
                 print(
-                    "  3. Implement the security policy logic."
+                    "  3. Implement the "
+                    "security policy logic."
                 )
+
                 print(
-                    "  4. Run the PDE auto-test workflow."
+                    "  4. Add a local "
+                    "config.tf only if the "
+                    "policy needs to override "
+                    "the shared platform "
+                    "configuration."
+                )
+
+                print(
+                    "  5. Run the PDE "
+                    "auto-test workflow to "
+                    "generate and validate "
+                    "the cached plan."
                 )
 
         else:

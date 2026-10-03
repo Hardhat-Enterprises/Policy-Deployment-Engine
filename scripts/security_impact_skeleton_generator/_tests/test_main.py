@@ -46,8 +46,10 @@ def test_find_security_impact_arguments():
         }
     }
 
-    result = find_security_impact_arguments(
-        document
+    result = (
+        find_security_impact_arguments(
+            document
+        )
     )
 
     assert result == [
@@ -63,7 +65,9 @@ def test_service_slug_conversion():
     )
 
     assert (
-        service_slug("Cloud Run (v2 API)")
+        service_slug(
+            "Cloud Run (v2 API)"
+        )
         == "cloud_run_v2_api"
     )
 
@@ -80,9 +84,21 @@ def test_get_required_paths():
         paths["compliant.tf"]
     ).endswith(
         (
-            "inputs/gcp/Cloud IAM/"
+            "policies/gcp/Cloud IAM/"
             "google_test_resource/"
-            "secure_setting/compliant.tf"
+            "secure_setting/"
+            "compliant.tf"
+        )
+    )
+
+    assert str(
+        paths["nonCompliant.tf"]
+    ).endswith(
+        (
+            "policies/gcp/Cloud IAM/"
+            "google_test_resource/"
+            "secure_setting/"
+            "nonCompliant.tf"
         )
     )
 
@@ -92,7 +108,8 @@ def test_get_required_paths():
         (
             "policies/gcp/Cloud IAM/"
             "google_test_resource/"
-            "secure_setting.rego"
+            "secure_setting/"
+            "policy.rego"
         )
     )
 
@@ -106,16 +123,47 @@ def test_get_required_paths():
         )
     )
 
+    assert str(
+        paths["shared config.tf"]
+    ).endswith(
+        "policies/gcp/config.tf"
+    )
+
+
+def test_nested_argument_path():
+    paths = get_required_paths(
+        "gcp",
+        "Cloud IAM",
+        "google_test_resource",
+        (
+            "oidc.web_sso_config."
+            "response_type"
+        ),
+    )
+
+    assert str(
+        paths["policy.rego"]
+    ).endswith(
+        (
+            "google_test_resource/"
+            "oidc.web_sso_config."
+            "response_type/"
+            "policy.rego"
+        )
+    )
+
 
 def test_render_template_replaces_placeholders(
     tmp_path,
 ):
     template = (
-        tmp_path / "template.rego"
+        tmp_path
+        / "template.rego"
     )
 
     destination = (
-        tmp_path / "output.rego"
+        tmp_path
+        / "output.rego"
     )
 
     template.write_text(
@@ -124,7 +172,8 @@ def test_render_template_replaces_placeholders(
             "<service>.<resource_type>."
             "<policy_name>\n"
             '"resource_type":  ""\n'
-            'resource "RESOURCE_TYPE" "example" {}\n'
+            'resource "RESOURCE_TYPE" '
+            '"example" {}\n'
         ),
         encoding="utf-8",
     )
@@ -139,13 +188,17 @@ def test_render_template_replaces_placeholders(
 
     assert created is True
 
-    content = destination.read_text(
-        encoding="utf-8"
+    content = (
+        destination.read_text(
+            encoding="utf-8"
+        )
     )
 
     assert (
-        "terraform.gcp.security.cloud_iam."
-        "google_test_resource.secure_setting"
+        "terraform.gcp.security."
+        "cloud_iam."
+        "google_test_resource."
+        "secure_setting"
         in content
     )
 
@@ -156,7 +209,8 @@ def test_render_template_replaces_placeholders(
     )
 
     assert (
-        'resource "google_test_resource" '
+        'resource '
+        '"google_test_resource" '
         '"example"'
         in content
     )
@@ -166,11 +220,13 @@ def test_render_template_does_not_overwrite(
     tmp_path,
 ):
     template = (
-        tmp_path / "template.txt"
+        tmp_path
+        / "template.txt"
     )
 
     destination = (
-        tmp_path / "existing.txt"
+        tmp_path
+        / "existing.txt"
     )
 
     template.write_text(
@@ -190,6 +246,9 @@ def test_render_template_does_not_overwrite(
 
     assert created is False
 
-    assert destination.read_text(
-        encoding="utf-8"
-    ) == "existing contributor work"
+    assert (
+        destination.read_text(
+            encoding="utf-8"
+        )
+        == "existing contributor work"
+    )
