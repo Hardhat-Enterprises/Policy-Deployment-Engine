@@ -56,7 +56,7 @@ is *absent*, and the policy passes every resource you point it at.
 
 The supported values, exactly as the engine spells them:
 
-    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist
+    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist, element required, map key pattern whitelist, presence, content security
 
 They are **lowercase**, and multi-word names use **spaces, not underscores**. Writing
 `pattern_whitelist` is the mistake this rule exists to catch. `element whitelist` is not a type
@@ -123,6 +123,9 @@ list instead — with which `policy_type` depends on which way round the check g
   array against your `values`, which is almost never what you want, and forbidden things
   usually appear *inside* an element (`"*.googleapis.com"` contains `"*"`) rather than as the
   whole element. `element blacklist` does that substring match per element.
+- **Allowing a list by shape** — use **`element pattern whitelist`**. It requires every element
+  to match one of your wildcard shapes, which is the right check when the list holds resource
+  paths (e.g. `projects/*/locations/*/apps/*/guardrails/*`) rather than a fixed set of values.
 
 Bad:
 
@@ -155,6 +158,89 @@ Correct the configured names rather than relying on trimming. The normal runtime
 summary also returns `POLICY ERROR:` for this configuration and checks nothing.
 This is not a `presence-only` warning; empty/null values in the actual resource
 map are still allowed by the helper.
+
+## invalid-element-required
+
+For `element required`, `values` lists the items the attribute must contain. It must
+hold at least one value, and no entry may be `null`, `""` or a whitespace-padded string.
+An empty list, missing `values` or a blank entry would require nothing, and a padded
+string such as `"UEFI_COMPATIBLE "` would never match, so the condition would pass every
+resource or flag every one. These are **errors**, not warnings. Matching is exact,
+including capitalisation, so write provider enum values exactly as the provider does.
+
+The normal runtime summary also returns `POLICY ERROR:` for this configuration and
+checks nothing. This is not a `presence-only` warning: `values` here names what must be
+present in the list, not an empty attribute value.
+
+Bad:
+
+    {
+      "attribute_path": ["disk", 0, "guest_os_features"],
+      "values": [],
+      "policy_type": "element required"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["disk", 0, "guest_os_features"],
+      "values": ["UEFI_COMPATIBLE", "SEV_CAPABLE"],
+      "policy_type": "element required"
+    }
+
+## invalid-map-key-pattern-whitelist
+
+For `map key pattern whitelist`, `values` lists the allowed key shapes. It must hold at
+least one non-empty string shape with no leading or trailing whitespace. An empty list
+would flag every key, and `"tagKeys/* "` would silently fail to match anything, so these
+are **errors**. The normal runtime summary also returns `POLICY ERROR:` for this
+configuration and checks nothing.
+
+Bad:
+
+    {
+      "attribute_path": ["resource_manager_tags"],
+      "values": [],
+      "policy_type": "map key pattern whitelist"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["resource_manager_tags"],
+      "values": ["tagKeys/*"],
+      "policy_type": "map key pattern whitelist"
+    }
+
+## invalid-presence
+
+For `presence`, `values` is a mode, not a list of attribute values. It must be exactly
+`["set"]` or `["unset"]` (any capitalisation). An empty list, both modes at once, or
+anything else such as `["present"]` or `[true]` would check nothing, so these are
+**errors**. The normal runtime summary also returns `POLICY ERROR:` for this
+configuration and checks nothing.
+
+`presence` is also worth reaching for when you meet `presence-only` below and presence
+really is the control. On a single element, `["unset"]` gives the same results as
+`whitelist [null, "", [], {}]` and `["set"]` the same as `blacklist [null, "", [], {}]`, so
+it adds no new power there. It checks every element of every repeated block, and it is
+harder to get wrong: the list forms are easy to write without `[]` or `{}`.
+
+Bad:
+
+    {
+      "attribute_path": ["network_interface", 0, "access_config"],
+      "values": ["present"],
+      "policy_type": "presence"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["network_interface", 0, "access_config"],
+      "values": ["unset"],
+      "policy_type": "presence"
+    }
 
 ## presence-only
 

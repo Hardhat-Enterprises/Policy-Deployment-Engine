@@ -324,3 +324,69 @@ test_assert_valid_violation_fails_empty_message if {
 	mock_violation := {"name": "test-resource", "message": ""}
 	not _assert_valid_violation(mock_violation)
 }
+
+# ==============================================================================
+# attribute_entries: every element the path reaches
+# ==============================================================================
+
+entries_resource := {"values": {
+	"name": "r",
+	"network_interface": [{"access_config": []}, {"access_config": [{"nat_ip": ""}]}],
+	"rules": [
+		{"action": [{"redirect": [{"https_redirect": true}]}]},
+		{"action": [{"redirect": []}]},
+		{"action": [{"redirect": [{"host_redirect": "x"}]}]},
+	],
+	"labels": {"env": "prod"},
+}}
+
+test_attribute_entries_fans_out_one_repeated_block if {
+	shared.attribute_entries(entries_resource, ["network_interface", "access_config"]) == {
+		{"path": ["network_interface", 0, "access_config"], "value": []},
+		{"path": ["network_interface", 1, "access_config"], "value": [{"nat_ip": ""}]},
+	}
+}
+
+test_attribute_entries_explicit_index_selects_one_element if {
+	shared.attribute_entries(entries_resource, ["network_interface", 1, "access_config"]) == {
+		{"path": ["network_interface", 1, "access_config"], "value": [{"nat_ip": ""}]},
+	}
+}
+
+test_attribute_entries_fans_out_two_repeated_blocks if {
+	shared.attribute_entries(entries_resource, ["rules", "action", "redirect", "https_redirect"]) == {
+		{"path": ["rules", 0, "action", 0, "redirect", 0, "https_redirect"], "value": true},
+		{"path": ["rules", 2, "action", 0, "redirect", 0, "https_redirect"], "value": null},
+	}
+}
+
+test_attribute_entries_top_level_and_missing_keys if {
+	shared.attribute_entries(entries_resource, ["labels"]) == {{"path": ["labels"], "value": {"env": "prod"}}}
+	shared.attribute_entries(entries_resource, ["missing"]) == {{"path": ["missing"], "value": null}}
+	shared.attribute_entries(entries_resource, ["missing_block", "key"]) == set()
+}
+
+test_attribute_entries_out_of_range_index_is_empty if {
+	shared.attribute_entries(entries_resource, ["network_interface", 5, "access_config"]) == set()
+}
+
+# ==============================================================================
+# wildcard_match: shared by element pattern whitelist and map key pattern whitelist
+# ==============================================================================
+
+test_wildcard_match_one_segment if {
+	shared.wildcard_match("tagKeys/*", "tagKeys/123")
+	not shared.wildcard_match("tagKeys/*", "tagKeys/123/extra")
+	not shared.wildcard_match("tagKeys/*", "tagKeys/")
+}
+
+test_wildcard_match_escapes_metacharacters if {
+	shared.wildcard_match("team.*", "team.prod")
+	not shared.wildcard_match("team.*", "teamXprod")
+	shared.wildcard_match("a(b)*", "a(b)c")
+}
+
+test_wildcard_match_non_strings_do_not_match if {
+	not shared.wildcard_match("*", 5)
+	not shared.wildcard_match(5, "5")
+}
