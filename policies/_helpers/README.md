@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 8 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist
+- Support for 9 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Content Security
 - OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -31,6 +31,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [6. Element Blacklist](#6-element-blacklist)
   - [7. Map Key Blacklist](#7-map-key-blacklist)
   - [8. Element Pattern Whitelist](#8-element-pattern-whitelist)
+  - [9. Content Security](#9-content-security)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
@@ -90,8 +91,7 @@ policies/_helpers/
     ├── pattern_blacklist.rego
     ├── pattern_whitelist.rego
     ├── element_blacklist.rego
-    ├── map_key_blacklist.rego
-    └── element_pattern_whitelist.rego
+    └── map_key_blacklist.rego
 ```
 
 ### Component Responsibilities
@@ -261,8 +261,6 @@ it, use **Element Pattern Whitelist** (section 8).
 }
 ```
 
----
-
 ### 7. Map Key Blacklist
 
 **Module:** `policies/map_key_blacklist.rego`
@@ -345,6 +343,26 @@ opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_black
   "policy_type": "element pattern whitelist",
   "attribute_path": ["guardrails"],
   "values": ["projects/*/locations/*/apps/*/guardrails/*"]
+}
+```
+
+---
+
+### 9. Content Security
+**Module:** `policies/content_security.rego`
+**Use Case:** Flag resources whose embedded content (e.g. Python code) has static-analysis findings at/above a severity threshold.
+
+**Logic:**
+- Reads pre-computed findings from `input.content_security_findings` (produced by `scripts/content_analysis/`).
+- Matches findings to resources by `resource_type` + `resource_name`.
+- Any finding whose `severity` is at/above a threshold in `values` = violation.
+
+**Example:**
+```json
+{
+  "policy_type": "content security",
+  "attribute_path": ["after_agent_callbacks", 0, "python_code"],
+  "values": ["MEDIUM"]
 }
 ```
 
