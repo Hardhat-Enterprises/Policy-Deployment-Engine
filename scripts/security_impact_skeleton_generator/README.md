@@ -22,6 +22,8 @@ For a selected PDE resource, the generator:
 - Creates missing Terraform fixture files.
 - Creates missing Rego policy files.
 - Creates `_vars.rego` once per resource.
+- Uses the current PDE policy-folder layout.
+- Uses the shared platform `config.tf`.
 - Replaces structural template placeholders automatically.
 - Uses the existing PDE `service_slug()` helper for Rego package naming.
 - Never overwrites existing contributor files.
@@ -36,9 +38,40 @@ The generator does not:
 - Choose policy types.
 - Automatically complete `friendly_resource_name`.
 - Automatically choose `resource_value_name`.
-- Generate Terraform plan cache files.
+- Automatically generate a local `config.tf`.
+- Generate Terraform plan JSON files.
 
 These decisions remain the responsibility of the PDE contributor.
+
+Terraform plans are generated and validated later through the normal PDE auto-test workflow.
+
+## Current PDE layout
+
+The generator follows the current PDE policy structure:
+
+```text
+policies/gcp/
+├── config.tf
+└── <Service>/
+    └── <resource>/
+        ├── _vars.rego
+        └── <argument>/
+            ├── policy.rego
+            ├── compliant.tf
+            ├── nonCompliant.tf
+            ├── <fixture-sha>.json
+            └── config.tf         # optional local override
+```
+
+The shared:
+
+```text
+policies/gcp/config.tf
+```
+
+is used by default.
+
+A local `config.tf` should only be added when the policy requires resource-specific configuration that overrides the shared configuration.
 
 ## Usage
 
@@ -51,7 +84,7 @@ python3 scripts/security_impact_skeleton_generator/main.py \
 "gcp/Cloud IAM/google_iam_workforce_pool_provider"
 ```
 
-This displays all security-impacting arguments and shows whether their required skeleton files already exist.
+This displays all security-impacting arguments and shows whether their required files already exist.
 
 ### Generate missing skeleton files
 
@@ -62,6 +95,8 @@ python3 scripts/security_impact_skeleton_generator/main.py \
 ```
 
 Existing files are skipped and are never overwritten.
+
+The shared platform `config.tf` must already exist before skeleton files can be generated.
 
 ## Generated structure
 
@@ -74,21 +109,27 @@ attribute_condition
 the generator creates:
 
 ```text
-inputs/gcp/<Service>/<resource>/attribute_condition/
-├── compliant.tf
-├── config.tf
-└── nonCompliant.tf
-```
-
-and:
-
-```text
 policies/gcp/<Service>/<resource>/
 ├── _vars.rego
-└── attribute_condition.rego
+└── attribute_condition/
+    ├── policy.rego
+    ├── compliant.tf
+    └── nonCompliant.tf
 ```
 
-Nested arguments are also supported.
+The generator does not create a local `config.tf` by default.
+
+The policy inherits:
+
+```text
+policies/gcp/config.tf
+```
+
+unless a contributor later adds a policy-specific local override.
+
+## Nested arguments
+
+Nested arguments are supported.
 
 For example:
 
@@ -96,7 +137,16 @@ For example:
 oidc.web_sso_config.response_type
 ```
 
-is used directly as the fixture folder name and policy filename.
+is used directly as the argument folder name:
+
+```text
+policies/gcp/<Service>/<resource>/oidc.web_sso_config.response_type/
+├── policy.rego
+├── compliant.tf
+└── nonCompliant.tf
+```
+
+This keeps the generated structure aligned with the documented Terraform argument name.
 
 ## Template rendering
 
@@ -125,7 +175,27 @@ cloud_iam
 
 for Rego package paths.
 
+The service directory itself still uses the original PDE documentation taxonomy name:
+
+```text
+Cloud IAM
+```
+
 The generator also automatically fills the Terraform resource type in generated fixture files and in `_vars.rego`.
+
+## Shared configuration
+
+The current PDE layout uses one shared GCP Terraform configuration:
+
+```text
+policies/gcp/config.tf
+```
+
+The generator checks that this file exists before creating policy skeletons.
+
+If the shared configuration is missing, generation stops and reports an error.
+
+This protects the contributor from generating files against an incomplete or unmigrated repository layout.
 
 ## Safety
 
@@ -134,6 +204,14 @@ The generator never overwrites an existing file.
 If a contributor has already started or completed a policy or fixture, that file is skipped.
 
 This means the generator can safely be run multiple times on the same resource.
+
+The generator also does not modify:
+
+- Existing policy logic.
+- Existing Terraform fixtures.
+- Existing `_vars.rego`.
+- Cached Terraform plan JSON files.
+- Shared platform configuration.
 
 ## Testing
 
@@ -151,16 +229,38 @@ scripts/security_impact_skeleton_generator/_tests/test_main.py \
 -v
 ```
 
-The automated tests cover:
+The automated test suite currently contains 8 tests covering:
 
 - Valid target parsing.
 - Invalid target handling.
 - Security-impact argument detection.
 - Nested argument detection.
 - Service slug conversion.
-- PDE path generation.
+- PDE policy-folder path generation.
+- Nested argument path generation.
 - Template placeholder replacement.
 - No-overwrite behaviour.
+
+The test suite should complete with:
+
+```text
+8 passed
+```
+
+## Repository validation
+
+After modifying the generator, run:
+
+```bash
+pre-commit run --all-files
+```
+
+The generator has been validated against the PDE repository checks, including:
+
+- Policy / docs / inputs linter.
+- Branch naming convention.
+- Branch scope validation.
+- Resource gate validation.
 
 ## Example
 
@@ -187,12 +287,14 @@ attribute_condition
 -------------------
   [✓] compliant.tf
   [✓] nonCompliant.tf
-  [✓] config.tf
   [✓] policy.rego
   [✓] _vars.rego
+  [✓] shared config.tf
 ```
 
 If files are missing, running with `--generate` creates only the missing skeleton files.
+
+If all files already exist, the generator reports that there is nothing to generate.
 
 ## Contributor workflow
 
@@ -200,14 +302,17 @@ After generating the skeleton files, the contributor should:
 
 1. Complete the compliant Terraform fixture.
 2. Complete the non-compliant Terraform fixture.
-3. Review `config.tf`.
-4. Complete `friendly_resource_name` and `resource_value_name` in `_vars.rego`.
-5. Implement the Rego security policy logic.
-6. Run the PDE testing workflow.
-7. Review the generated Terraform plan files created by the testing workflow.
+3. Complete `friendly_resource_name` and `resource_value_name` in `_vars.rego`.
+4. Implement the Rego security policy logic.
+5. Add a local `config.tf` only if the policy requires an override to the shared GCP configuration.
+6. Run the PDE auto-test workflow.
+7. Allow the auto-test workflow to generate or validate the `<fixture-sha>.json` Terraform plan.
+8. Run repository validation before committing and raising a pull request.
 
 ## Design goal
 
 The generator automates repetitive project setup, not security decision-making.
 
 It provides the correct PDE file structure and known resource information so contributors can focus on implementing and validating the actual security policy.
+
+The tool is intentionally limited to safe structural automation and leaves all security judgement, compliant values, remediation logic, and policy implementation decisions to the contributor.
