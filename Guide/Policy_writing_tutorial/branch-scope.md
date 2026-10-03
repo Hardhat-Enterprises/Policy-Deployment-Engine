@@ -20,8 +20,7 @@ For a branch named `Service/gcp/cloud_storage/google_storage_bucket`, these are 
 | Path | What it is | Allowed |
 |---|---|---|
 | `docs/gcp/Cloud Storage/google_storage_bucket.json` | your documentation | add or edit |
-| `inputs/gcp/Cloud Storage/google_storage_bucket/**` | your `compliant.tf` / `config.tf` / `nonCompliant.tf`, and the `<sha>.json` plan the harness writes beside them | add or edit |
-| `policies/gcp/Cloud Storage/google_storage_bucket/**` | your `_vars.rego` and `<argument>.rego` | add or edit |
+| `policies/gcp/Cloud Storage/google_storage_bucket/**` | resource `_vars.rego`, argument `policy.rego`, fixtures, optional config overrides and committed plans | add or edit; stale-plan deletion allowed |
 
 Nothing else. Not another resource type in your own service folder, not the shared harness, not
 the workflow files, and **no deletions anywhere** — not even inside your own folder. The one
@@ -88,14 +87,13 @@ or, if it is a file you created by accident, delete it from your branch and comm
 Then commit only your own paths, rather than everything:
 
     git add "docs/gcp/<Service>/<resource type>.json" \
-            "inputs/gcp/<Service>/<resource type>" \
             "policies/gcp/<Service>/<resource type>"
 
 ## deleted-file
 
 Your branch removes a file. Writing a policy only ever **adds** files, so a deletion is nearly
 always an accident — a bad merge resolution, or a "clean up and start again" that took real work
-with it. This applies inside your own folder too: deleting your own `<argument>.rego` and its
+with it. This applies inside your own folder too: deleting your own `<argument>/policy.rego` and its
 fixture directory silently removes an argument you had already been credited for.
 
 Put it back:
@@ -127,25 +125,13 @@ branch, where it will be reviewed as a change to everybody's tooling.
 
 ## legacy-plan-cache
 
-Committed terraform plans used to live in one shared tree, `inputs/plan_cache/`. They now live
-inside the fixture directory they were planned from, as `<sha>.json`. That tree is gone, and a
-branch that adds files back into it is working from a checkout older than the move — usually
-because a local run on an old branch re-created it.
+Historical central caches are not supported by the new-layout commands. Reconcile
+them with `dev` before the reviewed layout migration; do not delete other
+contributors' plans. See the [cutover guide](../layout-cutover.md).
 
-**Usually you do not have to do anything about it by hand.** Merge `origin/dev`, then run the
-test harness for your resource as normal:
-
-    git merge origin/dev
-    python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
-
-The harness moves your own plan out of `inputs/plan_cache/` and into your fixture directory
-itself — the file's contents were always the plan for those `*.tf`, so nothing is re-planned. It
-prints `adopted N plan(s) from the pre-move inputs/plan_cache/ layout`. Commit what it moved:
-
-    git add inputs "the files it moved, and the deletions"
-
-If entries are left over afterwards, they belong to fixtures that are not yours — those came in
-with a stray `git add .`, and `git rm -r inputs/plan_cache` is the fix.
+Within your resource, deleting a stale plan is allowed when its fixture survives.
+Deleting policies or fixtures remains restricted. Shared `policies/gcp/config.tf`
+and `policies/_helpers/` are protected from Service-branch edits.
 
 ---
 

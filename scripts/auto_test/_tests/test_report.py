@@ -3,6 +3,7 @@
 import json
 import sys
 from pathlib import Path
+import pytest
 
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
@@ -38,3 +39,44 @@ def test_write_report_emits_valid_json_array_with_failures(tmp_path):
     assert failing[0]["policy"] == "autoclass.enabled"        # dotted leaf-key, unchanged
     # Extra keys already on failure entries are preserved.
     assert failing[0]["failure"]["reason"] == "Non-compliant resources were not flagged"
+
+
+def test_main_reports_malformed_dotted_argument_before_failure(tmp_path, monkeypatch):
+    directory = Path("policies/gcp/Cloud Storage/google_storage_bucket/autoclass.enabled")
+    report = tmp_path / "report.json"
+    monkeypatch.setattr(auto_test, "discover_policies", lambda *_: ([], [(directory, "missing compliant.tf")]))
+    monkeypatch.setattr(sys, "argv", ["auto_test.py", "gcp", "--report", str(report)])
+    with pytest.raises(SystemExit) as error:
+        auto_test.main()
+    assert error.value.code == 1
+    result, = json.loads(report.read_text())
+    assert result == auto_test.make_failure("autoclass.enabled", "missing compliant.tf",
+                                           "Cloud Storage", "google_storage_bucket")
+
+
+def test_no_discovered_policies_still_emits_empty_report(tmp_path, monkeypatch):
+    report = tmp_path / "report.json"
+    monkeypatch.setattr(auto_test, "discover_policies", lambda *_: ([], []))
+    monkeypatch.setattr(sys, "argv", ["auto_test.py", "gcp", "--report", str(report)])
+    with pytest.raises(SystemExit) as error:
+        auto_test.main()
+    assert error.value.code == 1
+    assert json.loads(report.read_text()) == []
+
+
+def test_provider_setup_failure_still_emits_failure_report(tmp_path, monkeypatch):
+    directory = Path("policies/gcp/Cloud Storage/google_storage_bucket/autoclass.enabled")
+    report = tmp_path / "report.json"
+    monkeypatch.setattr(auto_test, "discover_policies", lambda *_: ([(directory, directory / "policy.rego")], []))
+    monkeypatch.setattr(auto_test, "plan_cache_path", lambda *_: tmp_path / "missing.json")
+    monkeypatch.setattr(auto_test, "adopt_denormalised_plan", lambda *_: False)
+    def fail_setup(*_):
+        raise SystemExit("setup failed")
+    monkeypatch.setattr(auto_test, "ensure_cache_ready", fail_setup)
+    monkeypatch.setattr(sys, "argv", ["auto_test.py", "gcp", "--report", str(report)])
+    with pytest.raises(SystemExit):
+        auto_test.main()
+    result, = json.loads(report.read_text())
+    assert result["policy"] == "autoclass.enabled"
+    assert result["passed"] is False
+    assert "setup failed" in result["failure"]["reason"]

@@ -44,6 +44,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Published so engine_check below can gate on the same diff this job already
+    # computed, rather than checking out and diffing the repository a second time.
+    outputs:
+      helpers: ${{ steps.changed.outputs.helpers }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -88,9 +92,15 @@ jobs:
           fi
           echo "$files" | grep -qE '^(docs|inputs|policies)/' && trees=true || trees=false
           echo "$files" | grep -qE '^(scripts|tests|templates)/' && tooling=true || tooling=false
+          # The engine every policy is evaluated by. Called out separately from
+          # `trees` because its blast radius is the whole repository: a change
+          # here can alter what any of the 1,565 policies flags, while a change
+          # to one policy under policies/gcp/ cannot.
+          echo "$files" | grep -qE '^policies/_helpers/' && helpers=true || helpers=false
           echo "trees=$trees"     >> "$GITHUB_OUTPUT"
           echo "tooling=$tooling" >> "$GITHUB_OUTPUT"
-          echo "content trees changed: $trees | tooling changed: $tooling"
+          echo "helpers=$helpers" >> "$GITHUB_OUTPUT"
+          echo "content trees changed: $trees | tooling changed: $tooling | engine changed: $helpers"
 
       - name: Validate branch name
         if: github.event_name == 'pull_request'
@@ -131,6 +141,20 @@ jobs:
         run: |
           python3 -m pip install --quiet pytest pyyaml
           python3 -m pytest -q
+
+      # The Rego half of the tools' own tests. pytest does not collect .rego, so
+      # before this step the 275 tests under tests/_helpers/ ran only when
+      # someone remembered to run the script by hand — and 8 of its 11 suites
+      # could not load at all, because .gitignore's `plan.json` rule had made
+      # their fixtures unre-addable since #261. Both are fixed together: a suite
+      # that nothing runs is a suite that silently rots.
+      #
+      # Gated on `helpers` as well as `tooling`: these tests are ABOUT
+      # policies/_helpers/, which is not under any of the tooling paths.
+      # ~0.4s, and OPA is already on PATH from the step above.
+      - name: Run the Rego test suite
+        if: steps.changed.outputs.tooling == 'true' || steps.changed.outputs.helpers == 'true'
+        run: bash tests/_helpers/unit_test_helpers.sh
 
       # PR gate: structural + content checks (content is on by default), but only
       # fail on files this PR changed vs its base branch — never the repo-wide tree.
@@ -191,6 +215,59 @@ jobs:
           python3 scripts/linters/branch_scope.py \
             --branch "${HEAD_REF:-$GITHUB_REF_NAME}" \
             --base "origin/$BASE_REF"
+
+  # Whole-tree gate for a change to the evaluation engine.
+  #
+  # policy_check below is gated on `Service/` branches, because its per-resource
+  # checks are derived from the branch name. An engine change arrives on a
+  # feature/ branch and so ran no policy check at all — #884 changed
+  # find_failing_resources for all 1,565 policies and CI evaluated none of them.
+  # Whether it was safe was established by running auto_test locally, which is
+  # exactly the kind of verification CI exists to stop depending on.
+  #
+  # Every plan is committed as <sha>.json, so this skips terraform entirely and
+  # costs ~1 minute. Terraform is installed anyway: a cache miss must produce a
+  # real result rather than an error about a missing binary.
+  engine_check:
+    name: Engine check (whole tree)
+    needs: lint
+    if: needs.lint.outputs.helpers == 'true'
+    runs-on: ubuntu-latest
+    # The run is ~60-90s. A miss on the plan cache would invoke terraform for
+    # real and take hours; this makes that fail loudly instead of quietly
+    # burning a runner. Raise it only after checking why the plans missed.
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false   # auto_test redirects `terraform show -json` to a file
+
+      - name: Install OPA
+        env:
+          OPA_VERSION: ${{ env.OPA_VERSION }}
+        run: |
+          curl -L -o opa "https://openpolicyagent.org/downloads/${OPA_VERSION}/opa_linux_amd64_static"
+          chmod +x opa
+          sudo mv opa /usr/local/bin/opa
+
+      - name: Set up plugin cache config
+        run: bash scripts/auto_test/cache_setup.sh
+
+      # Every policy in the tree against its own fixtures. The engine decides
+      # what all of them flag, so all of them are the blast radius.
+      - name: Evaluate every policy
+        run: python3 scripts/auto_test/auto_test.py gcp
 
   policy_check:
     runs-on: ubuntu-latest
@@ -262,7 +339,7 @@ jobs:
     name: PR checks
     runs-on: ubuntu-latest
     if: always()
-    needs: [lint, branch_scope, policy_check]
+    needs: [lint, branch_scope, engine_check, policy_check]
     steps:
       - name: Every check passed or was skipped
         env:

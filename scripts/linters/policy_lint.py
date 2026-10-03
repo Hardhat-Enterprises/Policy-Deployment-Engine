@@ -62,7 +62,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 # cached plan belongs to this fixture". Importing keeps the two in lockstep: a
 # provider bump changes the sha in both places at once.
 from scripts.auto_test.auto_test import (  # noqa: E402
-    find_denormalised_plan, plan_cache_path)
+    find_denormalised_plan, make_streams_encoding_safe, plan_cache_path, sha_for_files)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HELPERS_DIR = REPO_ROOT / "policies" / "_helpers"
@@ -79,13 +79,30 @@ RULES = {
         "`attribute_path` ends in a list index; check the whole list with "
         "`element blacklist`."),
     "unknown-policy-type": (
-        "`policy_type` is not one of the seven the engine dispatches, so the condition "
+        "`policy_type` is not one of the supported types the engine dispatches, so the condition "
         "is never evaluated. Set it to a valid type (lowercase, spaces not "
         "underscores)."),
+    "invalid-map-key-blacklist": (
+        "Map key blacklist `values` must contain at least one non-empty string "
+        "key name without leading or trailing whitespace. A single string is "
+        "also accepted, as in the dispatcher. Invalid configuration is an error."),
     "presence-only": (
         "`values` is only null/\"\": presence is the whole check. Acceptable when the "
         "rationale says presence is the control — the reviewer decides; pair with a "
         "pattern where a shape exists (warn)."),
+    "pattern-values-shape": (
+        "A `pattern whitelist`/`pattern blacklist` `values` is not the "
+        "[target, [[allowed per *], ...]] pair the engine reads, so the condition "
+        "can never flag anything. For a plain shape check use "
+        "`element pattern whitelist` (warn)."),
+    "presence-missing-null": (
+        "A `blacklist` lists \"\" but not null, so an unset argument — which "
+        "reaches the engine as null in the plan JSON — is not caught. Use "
+        "[null, \"\"] (warn)."),
+    "situation-match-unset": (
+        "A situation has 2+ conditions and no `match` key, so it silently gets the "
+        "default: a resource is flagged when it fails ANY of them. Say which you "
+        "mean — `\"match\": \"any\"` or `\"match\": \"all\"` (warn)."),
     "wrong-argument": (
         "No condition in `<arg>.rego` reads the argument the file is named after."),
     "fixture-drift": (
@@ -129,6 +146,18 @@ RULES = {
 # (or the AI reviewer) makes, not something a linter can decide. It is surfaced
 # to the reviewer rather than failing a build.
 #
+# `pattern-values-shape` and `presence-missing-null` join them by the owner's
+# call (2026-09-20). Both describe a condition that silently under-checks rather
+# than one that is outright unparseable, and both were written this way across
+# the tree before the rule existed, so they start as findings a reviewer reads
+# rather than a gate that fails work already on dev.
+#
+# `situation-match-unset` is a warn for a different reason: the default it asks
+# about is CORRECT for most of the situations it will fire on (the presence +
+# shape pairs that need the union). It is a prompt to state an intention, not a
+# report of a defect, and erroring would demand edits to files whose behaviour
+# is already right.
+#
 # `repeated-helper-call` is deliberately NOT here: it is an error, by the owner's
 # call. The size of the backlog is what made that look risky — measured on dev
 # 2026-08-31, 498 of 1,395 policy files carried the pattern — but the mechanical
@@ -140,7 +169,9 @@ RULES = {
 # contributor OWNS (a file their own branch changed — see `_finding_owned`), and
 # branch_scope.py stops a Service/* branch touching a file outside its own
 # resource type. A pre-existing finding elsewhere is reported, never failed on.
-WARN_RULES = {"legacy-assign", "package-case", "presence-only"}
+WARN_RULES = {"legacy-assign", "package-case", "presence-only",
+              "pattern-values-shape", "presence-missing-null",
+              "situation-match-unset"}
 
 # --------------------------------------------------------------------------- #
 # Rule constants
@@ -403,12 +434,18 @@ VALID_POLICY_TYPES = (
     "blacklist", "whitelist", "range",
     "pattern blacklist", "pattern whitelist", "element blacklist",
     "element pattern whitelist",
+    "map key blacklist",
 )
 
 # Blacklist/whitelist only — a pattern or range policy with empty values means
 # something else entirely.
 PRESENCE_POLICY_TYPES = {"blacklist", "whitelist"}
 EMPTY_VALUES = (None, "", [], {})
+
+# The two types whose `values` is a [target, groups] pair rather than a flat list.
+# `element pattern whitelist` is deliberately absent: its `values` IS a flat list
+# of wildcard shapes, so the pair rule below must not be applied to it.
+PATTERN_POLICY_TYPES = {"pattern whitelist", "pattern blacklist"}
 
 
 class PolicyLintError(RuntimeError):
@@ -482,7 +519,7 @@ def _opa_reason(proc):
 
 def _run_opa(query, *data_dirs):
     """``opa eval --format json`` over ``data_dirs``; returns the query value."""
-    cmd = ["opa", "eval", "--format", "json"]
+    cmd = ["opa", "eval", "--format", "json", "--ignore", "*.json"]
     for d in data_dirs:
         cmd += ["-d", str(d)]
     cmd.append(query)
@@ -500,19 +537,20 @@ def _run_opa(query, *data_dirs):
 
 
 def _eval_dir(directory, helpers_dir):
-    """Whole-``data.terraform`` value for one policy directory, cached.
-
-    One OPA invocation per resource-type directory covers every policy file in
-    it; a per-file query is only used if this batch evaluation fails.
-    """
-    key = (str(Path(directory).resolve()), str(Path(helpers_dir).resolve()))
+    """Evaluate only Rego sources, never fixture JSON documents."""
+    directory = Path(directory)
+    key = (str(directory.resolve()), str(Path(helpers_dir).resolve()))
     if key not in _eval_cache:
+        sources = sorted(directory.rglob("*.rego"))
+        parent_vars = directory.parent / VARS_FILE
+        if parent_vars.is_file():
+            sources.append(parent_vars)
         try:
-            _eval_cache[key] = _run_opa("data.terraform", helpers_dir, directory) or {}
+            _eval_cache[key] = _run_opa("data.terraform", helpers_dir, *sources) or {}
         except OpaUnavailableError:
-            raise                                         # environment, not content
+            raise
         except PolicyLintError:
-            _eval_cache[key] = None                       # force the per-file path
+            _eval_cache[key] = None
     return _eval_cache[key]
 
 
@@ -543,7 +581,11 @@ def _rule_value(rego_path, helpers_dir, rule_name):
     # Batch evaluation failed or the rule is undefined in it — ask again with just
     # this one file, so a genuine OPA error surfaces (rather than becoming a silent
     # empty list) and an unparseable *sibling* cannot poison a healthy policy.
-    return _run_opa(f"data.{package}.{rule_name}", helpers_dir, Path(rego_path))
+    sources = [Path(rego_path)]
+    vars_path = Path(rego_path).parent.parent / VARS_FILE if Path(rego_path).name == "policy.rego" else Path(rego_path).parent / VARS_FILE
+    if vars_path.is_file() and vars_path != Path(rego_path):
+        sources.append(vars_path)
+    return _run_opa(f"data.{package}.{rule_name}", helpers_dir, *sources)
 
 
 def load_conditions(rego_path, policies_root, helpers_dir=None):
@@ -586,16 +628,34 @@ def _resolve_helpers(policies_root, helpers_dir=None):
 # --------------------------------------------------------------------------- #
 # Plan cache
 # --------------------------------------------------------------------------- #
-def plan_cache_for(input_dir):
+def plan_cache_for(input_dir, *, legacy=False):
     """``<input_dir>/<sha>.json`` — the committed plan, beside the fixture's *.tf.
 
     Straight through to ``auto_test.plan_cache_path`` (the pipeline's own
     definition of which plan belongs to a fixture), so a provider bump changes
     the expected filename here and in the harness at the same time. No root
-    rebasing is needed any more: the plan lives inside the directory it is for,
-    so a fixture tree under ``_tests/`` resolves inside itself for free.
+    rebasing is needed: the plan lives inside the directory it is for, so a
+    fixture tree under ``_tests/`` resolves inside itself for free.
+
+    ``legacy=True`` is for a pre-cutover tree, where the fixture sits under
+    ``inputs/`` and carries its own ``config.tf`` rather than sharing the
+    platform one. The plan is in the same place, but its sha is taken over the
+    directory's own *.tf alone — asking auto_test would fail, because that
+    resolves a policies/<platform>/<service>/<resource>/<argument> root which a
+    legacy path does not have.
+
+    This exists for exactly one caller: run_precommit_linter lints a baseline
+    worktree checked out from the base commit to subtract pre-existing findings,
+    and on a branch that spans the cutover that baseline is the old layout.
     """
-    return plan_cache_path(Path(input_dir))
+    directory = Path(input_dir)
+    if not legacy:
+        return plan_cache_path(directory)
+    # Baseline worktrees may have a different provider pin from the active tree.
+    roots = [p.parent for p in directory.parents if p.name == "inputs"]
+    baseline = next((p for p in roots if (p / "scripts/auto_test/provider_version.txt").is_file()), None)
+    sha = sha_for_files({p.name: p for p in directory.glob("*.tf")}, repo_root=baseline)
+    return directory / f"{sha}.json"
 
 
 # --------------------------------------------------------------------------- #
@@ -662,6 +722,45 @@ def _is_location_argument(stem, attribute_path):
         return True
     return any(stem.endswith("_" + seg) or stem.endswith("." + seg)
                for seg in LOCATION_SEGMENTS)
+
+
+def _pattern_values_problem(values):
+    """Why this pattern `values` can never flag anything, or None if it is sound.
+
+    ``pattern whitelist``/``pattern blacklist`` read ``values_formatted[0]`` as a
+    wildcard target and ``values_formatted[1]`` as one list of allowed (or denied)
+    values per ``*`` in that target — see
+    ``policies/_helpers/policies/pattern_whitelist.rego``. The common mistake is
+    writing a single regex instead, which leaves ``[1]`` undefined: the helper's
+    comparison never binds, so unset, empty, malformed and valid values all pass
+    the condition equally. The kit can still go green on a sibling condition, so
+    nothing else in the pipeline notices.
+    """
+    dead = ("As written the condition can never flag anything, so unset, "
+            "malformed and valid values all pass it alike.")
+    if not isinstance(values, list) or len(values) != 2:
+        return (f"values is {values!r}, not the [target, [[...], ...]] pair the "
+                f"engine reads. {dead}")
+    target, groups = values
+    if not isinstance(target, str) or "*" not in target:
+        return (f"values[0] is {target!r}, which is not a wildcard target — it "
+                f"must be a string containing at least one '*'. {dead}")
+    if (not isinstance(groups, list) or not groups
+            or not all(isinstance(group, list) for group in groups)):
+        return (f"values[1] is {groups!r}, not a list holding one list of allowed "
+                f"values per '*' in {target!r}. {dead}")
+    # Only an EXCESS of lists is reported. Fewer lists than wildcards is the
+    # deliberate open-tail idiom — `["*://*", [["https"]]]` constrains the scheme
+    # and says nothing about the host — which 20 of the 31 conditions this rule
+    # matched on dev (2026-09-20) were using correctly. Flagging it would bury
+    # the 11 genuinely dead ones. An extra list has no wildcard to apply to and
+    # is always a mistake, so that direction stays.
+    wildcards = target.count("*")
+    if len(groups) > wildcards:
+        return (f"values[1] holds {len(groups)} lists but {target!r} has only "
+                f"{wildcards} '*' — the last {len(groups) - wildcards} can never "
+                f"apply to anything")
+    return None
 
 
 # --------------------------------------------------------------------------- #
@@ -835,8 +934,8 @@ def _repeated_helper_calls(text):
 # Rules over one policy file
 # --------------------------------------------------------------------------- #
 def _lint_policy_file(root, platform, service, resource_type, rego_path, policies_root,
-                      identity_key=None):
-    stem = rego_path.stem
+                      identity_key=None, *, legacy_layout=False):
+    stem = rego_path.stem if legacy_layout else rego_path.parent.name
     text = rego_path.read_text(encoding="utf-8")
     out = []
 
@@ -886,7 +985,7 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
         # file never silences the rest of the run.
         add("lint-error", str(exc))
         return out + _lint_fixtures(root, platform, service, resource_type, stem,
-                                    identity_key)
+                                    identity_key, legacy_layout=legacy_layout)
 
     seen = set()
 
@@ -896,8 +995,29 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
             add(rule, message)
 
     joined_paths = []
-    for group in conditions:
+    for index, group in enumerate(conditions):
         metas, checks = _split_group(group)
+
+        # --- situation-match-unset (warn) ---------------------------------- #
+        # With 2+ conditions the situation gets one of two very different
+        # semantics, and saying nothing picks one of them silently. The default
+        # (union) is right for the common presence + shape pair and wrong for a
+        # rule meant to be conditional on a sibling argument — and the wrong one
+        # is invisible either way, since both produce a green kit. Asking the
+        # author to write it down is the only point at which the intention is
+        # known. See `match` in policies/_helpers/helpers.rego.
+        if len(checks) >= 2 and not any("match" in meta for meta in metas):
+            description = next((meta.get("situation_description")
+                                for meta in metas
+                                if meta.get("situation_description")), None)
+            named = f"'{description}'" if description else f"#{index + 1}"
+            add_once("situation-match-unset", index,
+                     f"situation {named} has {len(checks)} conditions and no "
+                     f"\"match\" key, so a resource is flagged when it fails ANY "
+                     f"of them. Add \"match\": \"any\" to confirm that, or "
+                     f"\"match\": \"all\" to flag only a resource that fails "
+                     f"every one (which is how a check is made conditional on a "
+                     f"sibling argument).")
 
         # --- trivial-message ---------------------------------------------- #
         for meta in metas:
@@ -938,6 +1058,19 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                          f"{', '.join(VALID_POLICY_TYPES)} (lowercase, and a space "
                          f"rather than an underscore).")
 
+            # These are key names, not a presence check on attribute values.
+            # Match the dispatcher's ensure_array normalisation and preflight.
+            if policy_type == "map key blacklist":
+                key_names = values if isinstance(values, list) else [values]
+                if not key_names or any(
+                        not isinstance(name, str) or not name
+                        or name != name.strip() for name in key_names):
+                    add_once("invalid-map-key-blacklist", path_text,
+                             f"'{path_text}' has invalid map key blacklist values. "
+                             "Use at least one non-empty string key name with no "
+                             "leading or trailing whitespace; empty lists and "
+                             "null/non-string entries cannot perform this check.")
+
             # --- index-path ------------------------------------------------ #
             if attribute_path and _is_index(attribute_path[-1]):
                 add_once("index-path", path_text,
@@ -951,6 +1084,33 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                 add_once("presence-only", path_text,
                          f"'{path_text}' only checks presence ({values!r}) under a "
                          f"{policy_type} — pair it with a pattern or justify it")
+
+            # --- presence-missing-null (warn) ------------------------------ #
+            # An argument the author left out reaches the engine as null in the
+            # plan JSON, not as "". A blacklist that denies only "" therefore
+            # passes the unset case, which is usually the one being guarded
+            # against.
+            if (policy_type == "blacklist" and isinstance(values, list)
+                    and "" in values and None not in values):
+                add_once("presence-missing-null", path_text,
+                         f"'{path_text}' blacklists \"\" but not null, so an unset "
+                         f"{path_text} still passes (the plan carries null) — use "
+                         f"[null, \"\"]")
+
+            # --- pattern-values-shape (warn) ------------------------------- #
+            # Checked after unknown-policy-type: a type the engine cannot
+            # dispatch is already reported, and reading its values would only
+            # add noise on top.
+            if policy_type in PATTERN_POLICY_TYPES:
+                problem = _pattern_values_problem(values)
+                if problem:
+                    add_once("pattern-values-shape", path_text,
+                             f"'{path_text}' under a {policy_type} — {problem} Give "
+                             f"it a target plus one list per '*' (e.g. "
+                             f"[\"projects/*/locations/*\", [[\"my-project\"], "
+                             f"[\"europe-west2\"]]]), or, if the check is that the "
+                             f"value has a shape at all, use "
+                             f"'element pattern whitelist' with that shape.")
 
             # --- hard-coded-value ------------------------------------------ #
             if not _is_location_argument(stem, attribute_path):
@@ -968,7 +1128,7 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
             f"no condition reads '{stem}' (attribute paths: "
             f"{', '.join(sorted(set(p for p in joined_paths if p))) or 'none'})")
 
-    out.extend(_lint_fixtures(root, platform, service, resource_type, stem, identity_key))
+    out.extend(_lint_fixtures(root, platform, service, resource_type, stem, identity_key, legacy_layout=legacy_layout))
     return out
 
 
@@ -1041,14 +1201,14 @@ def _drift_comparisons(compliant, non_compliant):
     return pairs
 
 
-def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=None):
-    input_dir = Path(root) / "inputs" / platform / service / resource_type / stem
+def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=None, *, legacy_layout=False):
+    input_dir = Path(root) / ("inputs" if legacy_layout else "policies") / platform / service / resource_type / stem
     # A missing input directory is linter.py's finding (an orphan policy), not
     # ours — we only speak about fixtures that exist.
     if not input_dir.is_dir() or not any(input_dir.glob("*.tf")):
         return []
 
-    cache = plan_cache_for(input_dir)
+    cache = plan_cache_for(input_dir, legacy=legacy_layout)
     if not cache.exists():
         # Reported repo-relative: the finding is read in CI logs and on the portal,
         # where an absolute path of the checkout means nothing.
@@ -1058,7 +1218,11 @@ def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=No
         # a UTF-8 BOM, so it was named for the pre-normalisation sha. Naming the
         # remedy is the difference between a rename and every contributor on the
         # branch re-running terraform for a file whose contents are already correct.
-        denormalised = find_denormalised_plan(input_dir)
+        # Not on a legacy tree: the alternate-sha hint resolves the shared
+        # platform config.tf, which a pre-cutover fixture does not have. The
+        # hint is a cutover convenience anyway — the baseline pass only needs
+        # to know which findings already existed.
+        denormalised = None if legacy_layout else find_denormalised_plan(input_dir)
         if denormalised is not None:
             return [Finding(service, resource_type, stem, "fixture-missing-plan",
                             f"no committed plan at {where} — but {denormalised.name} is "
@@ -1195,7 +1359,8 @@ def _documented_arguments(root, platform, service, resource_type):
     return set(arguments) if isinstance(arguments, dict) else None
 
 
-def _lint_drift_exemptions(root, platform, service, resource_type, identity_key=None):
+def _lint_drift_exemptions(root, platform, service, resource_type, identity_key=None,
+                           *, legacy_layout=False):
     """Validate a resource's ``drift_exemptions.json``.
 
     Every failure is an ordinary finding against the resource, never fatal, and a
@@ -1258,12 +1423,13 @@ def _lint_drift_exemptions(root, platform, service, resource_type, identity_key=
                                          f"a documented argument of {resource_type}"))
 
         out += _stale_exemption_findings(root, platform, service, resource_type,
-                                         stem, sorted(_entry_keys(entry)), identity_key)
+                                         stem, sorted(_entry_keys(entry)), identity_key,
+                                         legacy_layout=legacy_layout)
     return out
 
 
 def _stale_exemption_findings(root, platform, service, resource_type, stem, keys,
-                              identity_key):
+                              identity_key, *, legacy_layout=False):
     """Flag declared keys the fixture does not actually differ on.
 
     Same anti-rot principle as the test over the maintainer list: an entry that
@@ -1274,7 +1440,8 @@ def _stale_exemption_findings(root, platform, service, resource_type, stem, keys
     Silent when the fixture has no readable plan; ``fixture-missing-plan`` is that
     situation's finding and saying it twice helps nobody.
     """
-    sides = _fixture_sides(root, platform, service, resource_type, stem)
+    sides = _fixture_sides(root, platform, service, resource_type, stem,
+                           legacy_layout=legacy_layout)
     if sides is None:
         return []
     compliant, non_compliant = sides
@@ -1298,15 +1465,17 @@ def _stale_exemption_findings(root, platform, service, resource_type, stem, keys
                     f"{'them' if len(stale) > 1 else 'it'}")]
 
 
-def _fixture_sides(root, platform, service, resource_type, stem):
+def _fixture_sides(root, platform, service, resource_type, stem, *, legacy_layout=False):
     """``(compliant, non_compliant)`` value maps from a fixture's committed plan.
 
-    None when there is no readable plan for it.
+    None when there is no readable plan for it. Layout-aware like _lint_fixtures:
+    the fixture sits under inputs/ before the cutover and beside its policy.rego
+    under policies/ after it.
     """
-    input_dir = Path(root) / "inputs" / platform / service / resource_type / stem
+    input_dir = Path(root) / ("inputs" if legacy_layout else "policies") / platform / service / resource_type / stem
     if not input_dir.is_dir():
         return None
-    cache = plan_cache_for(input_dir)
+    cache = plan_cache_for(input_dir, legacy=legacy_layout)
     try:
         plan = json.loads(cache.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
@@ -1465,7 +1634,7 @@ def _lint_vars_file(platform, service, resource_type, vars_path, policies_root):
 # --------------------------------------------------------------------------- #
 # Entry points
 # --------------------------------------------------------------------------- #
-def lint_resource(root, platform, service_folder, resource_type):
+def _lint_resource(root, platform, service_folder, resource_type, *, legacy_layout=False):
     """Every finding for one ``policies/<platform>/<service>/<resource_type>/``."""
     root = Path(root)
     policies_root = root / "policies"
@@ -1494,20 +1663,38 @@ def lint_resource(root, platform, service_folder, resource_type):
     # rule below, so a malformed one should be reported once, against the file,
     # rather than implied by whatever the drift rule then does or does not say.
     findings += _lint_drift_exemptions(root, platform, service_folder, resource_type,
-                                       identity_key)
+                                       identity_key, legacy_layout=legacy_layout)
 
-    for rego_path in sorted(resource_dir.glob(f"*{REGO_EXT}")):
+    pattern = f"*{REGO_EXT}" if legacy_layout else "*/policy.rego"
+    if not legacy_layout:
+        for old in sorted(resource_dir.glob("*.rego")):
+            if old.name != VARS_FILE:
+                findings.append(Finding(service_folder, resource_type, old.stem,
+                                        "lint-error", f"legacy policy file {old.name}; run the layout migration"))
+    for rego_path in sorted(resource_dir.glob(pattern)):
         if rego_path.name == VARS_FILE:
             continue
         try:
             findings += _lint_policy_file(root, platform, service_folder, resource_type,
-                                          rego_path, policies_root, identity_key)
+                                          rego_path, policies_root, identity_key, legacy_layout=legacy_layout)
         except OpaUnavailableError:
             raise
         except (PolicyLintError, OSError, UnicodeDecodeError) as exc:
-            findings.append(Finding(service_folder, resource_type, rego_path.stem,
+            findings.append(Finding(service_folder, resource_type, rego_path.stem if legacy_layout else rego_path.parent.name,
                                     "lint-error", str(exc)))
     return findings
+
+
+def lint_resource(root, platform, service_folder, resource_type):
+    """Normal commands require the new nested layout."""
+    return _lint_resource(root, platform, service_folder, resource_type)
+
+
+def lint_resource_baseline(root, platform, service_folder, resource_type):
+    """Read either layout only when comparing inherited findings against a base."""
+    directory = Path(root) / "policies" / platform / service_folder / resource_type
+    legacy = any(p.name != VARS_FILE for p in directory.glob("*.rego"))
+    return _lint_resource(root, platform, service_folder, resource_type, legacy_layout=legacy)
 
 
 def _expand_target(root, target):
@@ -1562,6 +1749,7 @@ def _print_rules():
 
 
 def main(argv=None):
+    make_streams_encoding_safe()
     parser = argparse.ArgumentParser(
         description="Lint the content of a policy kit (conditions, _vars, fixtures).",
         formatter_class=argparse.RawDescriptionHelpFormatter)
