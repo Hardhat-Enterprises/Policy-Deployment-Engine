@@ -86,6 +86,18 @@ RULES = {
         "Map key blacklist `values` must contain at least one non-empty string "
         "key name without leading or trailing whitespace. A single string is "
         "also accepted, as in the dispatcher. Invalid configuration is an error."),
+    "invalid-element-required": (
+        "Element required `values` must list at least one value the attribute "
+        "must contain. An empty list, null/blank entries, or whitespace-padded "
+        "strings would require nothing or never match. Invalid configuration is "
+        "an error."),
+    "invalid-map-key-pattern-whitelist": (
+        "Map key pattern whitelist `values` must list at least one non-empty string "
+        "key shape without leading or trailing whitespace. An empty list would flag "
+        "every key. Invalid configuration is an error."),
+    "invalid-presence": (
+        "Presence `values` must be exactly one of [\"set\"] or [\"unset\"]. Anything "
+        "else checks nothing. Invalid configuration is an error."),
     "presence-only": (
         "`values` is only null/\"\": presence is the whole check. Acceptable when the "
         "rationale says presence is the control — the reviewer decides; pair with a "
@@ -435,6 +447,9 @@ VALID_POLICY_TYPES = (
     "pattern blacklist", "pattern whitelist", "element blacklist",
     "element pattern whitelist",
     "map key blacklist",
+    "element required",
+    "map key pattern whitelist",
+    "presence",
     "content security",
 )
 
@@ -1048,6 +1063,40 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                              "Use at least one non-empty string key name with no "
                              "leading or trailing whitespace; empty lists and "
                              "null/non-string entries cannot perform this check.")
+
+            # Required values, not a presence check: an empty list requires nothing.
+            if policy_type == "element required":
+                required = values if isinstance(values, list) else [values]
+                if not required or any(
+                        v is None or v == ""
+                        or (isinstance(v, str) and v != v.strip())
+                        for v in required):
+                    add_once("invalid-element-required", path_text,
+                             f"'{path_text}' has invalid element required values. "
+                             "List at least one value the attribute must "
+                             "contain, with no null, blank or whitespace-padded "
+                             "entries; those would require nothing or never match.")
+
+            # Allowed key shapes, matched like element pattern whitelist.
+            if policy_type == "map key pattern whitelist":
+                shapes = values if isinstance(values, list) else [values]
+                if not shapes or any(
+                        not isinstance(s, str) or not s or s != s.strip()
+                        for s in shapes):
+                    add_once("invalid-map-key-pattern-whitelist", path_text,
+                             f"'{path_text}' has invalid map key pattern whitelist "
+                             "values. List at least one non-empty string key shape "
+                             "with no leading or trailing whitespace; an empty list "
+                             "would flag every key.")
+
+            # Presence takes exactly one mode; its values are not attribute values.
+            if policy_type == "presence":
+                modes = values if isinstance(values, list) else [values]
+                if len(modes) != 1 or not isinstance(modes[0], str) \
+                        or modes[0].lower() not in ("set", "unset"):
+                    add_once("invalid-presence", path_text,
+                             f"'{path_text}' has invalid presence values. Use "
+                             "exactly one of [\"set\"] or [\"unset\"].")
 
             # --- index-path ------------------------------------------------ #
             if attribute_path and _is_index(attribute_path[-1]):

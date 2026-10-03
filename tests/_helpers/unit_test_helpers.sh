@@ -13,6 +13,7 @@ FIXTURES=(
     "tests/_helpers/fixtures/gcp_storage_bucket/plan.json"
     "tests/_helpers/fixtures/gcp_project/plan.json"
     "tests/_helpers/fixtures/gcp_access_level/plan.json"
+    "tests/_helpers/fixtures/gcp_http_route/plan.json"
 )
 
 # Common helper modules
@@ -129,6 +130,40 @@ run_test_suite "Map Key Blacklist Integration" \
 # none of it ran. Added 2026-09-20 with the "match" suite.
 run_test_suite "Policy Orchestration" \
     "tests/_helpers/helpers_test.rego" \
+    "policies/_helpers" \
+    "false" "false"
+
+run_test_suite "Element Required Policy" \
+    "tests/_helpers/element_required_test.rego" \
+    "policies/_helpers/policies/element_required.rego" \
+    "false" "false"
+
+# This suite exercises conditions through the complete dispatcher and summary.
+# Includes a reality check against the committed http_route plan fixture.
+run_test_suite "Element Required Integration" \
+    "tests/_helpers/element_required_integration_test.rego" \
+    "policies/_helpers" \
+    "false" "true"
+
+run_test_suite "Map Key Pattern Whitelist Policy" \
+    "tests/_helpers/map_key_pattern_whitelist_test.rego" \
+    "policies/_helpers/policies/map_key_pattern_whitelist.rego" \
+    "false" "false"
+
+# This suite exercises conditions through the complete dispatcher and summary.
+run_test_suite "Map Key Pattern Whitelist Integration" \
+    "tests/_helpers/map_key_pattern_whitelist_integration_test.rego" \
+    "policies/_helpers" \
+    "false" "false"
+
+run_test_suite "Presence Policy" \
+    "tests/_helpers/presence_test.rego" \
+    "policies/_helpers/policies/presence.rego" \
+    "false" "false"
+
+# This suite exercises conditions through the complete dispatcher and summary.
+run_test_suite "Presence Integration" \
+    "tests/_helpers/presence_integration_test.rego" \
     "policies/_helpers" \
     "false" "false"
 

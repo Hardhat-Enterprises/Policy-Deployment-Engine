@@ -1376,3 +1376,110 @@ def test_no_exemptions_file_is_the_normal_case(tmp_path):
         root / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket") == ({}, None)
     assert policy_lint.lint_resource(
         root, "gcp", "Cloud Storage", "google_storage_bucket") == []
+
+def _element_required_findings(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"element required"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    return [f for f in findings if f.policy == "bogus_type"]
+
+
+@pytest.mark.parametrize("values", [
+    [],
+    [None],
+    [""],
+    ["UEFI_COMPATIBLE", ""],
+    ["UEFI_COMPATIBLE "],
+])
+def test_invalid_element_required_is_an_error(tmp_path, values):
+    own = _element_required_findings(tmp_path, values)
+    invalid = [f for f in own if f.rule == "invalid-element-required"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+    assert not [f for f in own if f.rule == "presence-only"]
+
+
+@pytest.mark.parametrize("values", [["UEFI_COMPATIBLE", "SEV_CAPABLE"], [True]])
+def test_valid_element_required_is_accepted(tmp_path, values):
+    own = _element_required_findings(tmp_path, values)
+    assert not [f for f in own if f.rule == "invalid-element-required"]
+    assert not [f for f in own if f.rule == "unknown-policy-type"]
+
+
+def _map_key_pattern_findings(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"map key pattern whitelist"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    return [f for f in findings if f.policy == "bogus_type"]
+
+
+@pytest.mark.parametrize("values", [
+    [],
+    [None],
+    [""],
+    [7],
+    ["tagKeys/* "],
+])
+def test_invalid_map_key_pattern_whitelist_is_an_error(tmp_path, values):
+    own = _map_key_pattern_findings(tmp_path, values)
+    invalid = [f for f in own if f.rule == "invalid-map-key-pattern-whitelist"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+    assert not [f for f in own if f.rule == "presence-only"]
+
+
+def test_valid_map_key_pattern_whitelist_is_accepted(tmp_path):
+    own = _map_key_pattern_findings(tmp_path, ["tagKeys/*"])
+    assert not [f for f in own if f.rule == "invalid-map-key-pattern-whitelist"]
+    assert not [f for f in own if f.rule == "unknown-policy-type"]
+    assert not [f for f in own if f.rule == "hard-coded-value"]
+
+
+def _presence_findings(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"presence"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    return [f for f in findings if f.policy == "bogus_type"]
+
+
+@pytest.mark.parametrize("values", [
+    [],
+    [None],
+    ["present"],
+    ["set", "unset"],
+    [True],
+])
+def test_invalid_presence_is_an_error(tmp_path, values):
+    own = _presence_findings(tmp_path, values)
+    invalid = [f for f in own if f.rule == "invalid-presence"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+
+
+@pytest.mark.parametrize("values", [["set"], ["unset"], ["UNSET"]])
+def test_valid_presence_is_accepted(tmp_path, values):
+    own = _presence_findings(tmp_path, values)
+    assert not [f for f in own if f.rule == "invalid-presence"]
+    assert not [f for f in own if f.rule == "unknown-policy-type"]
+    assert not [f for f in own if f.rule == "presence-only"]
