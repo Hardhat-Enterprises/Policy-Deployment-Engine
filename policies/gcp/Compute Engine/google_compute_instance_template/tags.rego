@@ -16,7 +16,7 @@ conditions := [
             "condition": "Check that tags does not include http-server or https-server",
             "attribute_path": ["tags"],
             "values": ["http-server", "https-server"],
-            "policy_type": "blacklist"
+            "policy_type": "element blacklist"
         }
     ]
 ]
