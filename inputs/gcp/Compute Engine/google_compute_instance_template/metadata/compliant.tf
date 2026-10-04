@@ -3,7 +3,9 @@ resource "google_compute_instance_template" "compliant_example_1" {
   machine_type = "e2-medium"
 
   metadata = {
-    enable-oslogin = "TRUE"
+    enable-oslogin         = "TRUE"
+    block-project-ssh-keys = "TRUE"
+    serial-port-enable     = "FALSE"
   }
 
   disk {
