@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>PDE Gate — Register Organisation</title>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 620px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.6rem 1.2rem;
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .result {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .error {
+      background: #fef2f2;
+      border-color: #fca5a5;
+    }
+
+    .muted {
+      color: #4b5563;
+      font-size: 0.95rem;
+    }
+
+    code {
+      word-break: break-all;
+    }
+
+    pre {
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    nav a {
+      margin-right: 1rem;
+    }
+  </style>
+
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+  <nav>
+    <a href="/register">Register</a>
+    <a href="/packages">Packages</a>
+    <a href="/settings">Settings</a>
+    <a href="/check">Run check</a>
+  </nav>
+
+  <h1>PDE Gate — Register</h1>
+
+  <p>
+    Register your organisation and create its initial PDE Gate policy
+    package. You can import an existing <code>package.json</code> or
+    configure the package manually.
+  </p>
+
+  <form id="registration_form">
+    <label for="org_name">Organisation name</label>
+
+    <input
+      id="org_name"
+      name="org_name"
+      autocomplete="organization"
+      required
+    />
+
+    <label for="contact_email">Contact email</label>
+
+    <input
+      id="contact_email"
+      name="contact_email"
+      type="email"
+      autocomplete="email"
+      required
+    />
+
+    <label for="password">Password</label>
+
+    <input
+      id="password"
+      name="password"
+      type="password"
+      minlength="8"
+      autocomplete="new-password"
+      required
+    />
+
+    <p class="muted">
+      Use at least eight characters. This password can be used for
+      organisation login.
+    </p>
+
+    <label for="package_json">
+      Import package.json (optional)
+    </label>
+
+    <input
+      id="package_json"
+      name="package_json"
+      type="file"
+      accept=".json,application/json"
+    />
+
+    <p class="muted">
+      Select an existing PDE Gate package.json to populate the package
+      configuration automatically, or complete the following fields
+      manually.
+    </p>
+
+    <div id="import_status" class="result" aria-live="polite"></div>
+
+    <label for="package_name">Package name</label>
+
+    <input
+      id="package_name"
+      name="package_name"
+      value="acme-baseline"
+      required
+    />
+
+    <label for="package_description">Package description</label>
+
+    <textarea
+      id="package_description"
+      name="package_description"
+      rows="3"
+    >Client-selected PDE Gate policy package</textarea>
+
+    <label for="platforms">
+      Platforms (comma-separated)
+    </label>
+
+    <input
+      id="platforms"
+      name="platforms"
+      value="gcp"
+      required
+    />
+
+    <label for="approved_regions">
+      Approved regions (comma-separated)
+    </label>
+
+    <input
+      id="approved_regions"
+      name="approved_regions"
+      value="australia-southeast1, australia-southeast2"
+      required
+    />
+
+    <label for="approved_zones">
+      Approved zones (comma-separated, optional)
+    </label>
+
+    <input
+      id="approved_zones"
+      name="approved_zones"
+      value="australia-southeast1-a, australia-southeast1-b"
+    />
+
+    <label for="google_provider_version">
+      Google provider version
+    </label>
+
+    <input
+      id="google_provider_version"
+      name="google_provider_version"
+      value="7.37.0"
+      required
+    />
+
+    <label for="policy_profile">Policy profile</label>
+
+    <select id="policy_profile" name="policy_profile">
+      <option value="full">
+        full — all policies per resource
+      </option>
+
+      <option value="baseline">
+        baseline — standard policy subset
+      </option>
+
+      <option value="custom" selected>
+        custom — select policies by resource type
+      </option>
+    </select>
+
+    <div id="custom_policies">
+      <label for="enabled_policies">Enabled policies</label>
+
+      <textarea
+        id="enabled_policies"
+        name="enabled_policies"
+        rows="6"
+        placeholder="google_vpc_access_connector: region, network"
+      >google_vpc_access_connector: region, network</textarea>
+
+      <p class="muted">
+        Enter one Terraform resource type per line, followed by the
+        policy filenames without <code>.rego</code>.
+      </p>
+    </div>
+
+    <button id="submit_button" type="submit">
+      Register organisation
+    </button>
+  </form>
+
+  <div id="result" class="result" aria-live="polite"></div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const callbackUrl = params.get("callback");
+
+    const form =
+      document.getElementById("registration_form");
+
+    const packageJsonInput =
+      document.getElementById("package_json");
+
+    const importStatus =
+      document.getElementById("import_status");
+
+    const result =
+      document.getElementById("result");
+
+    const profile =
+      document.getElementById("policy_profile");
+
+    const customPolicies =
+      document.getElementById("custom_policies");
+
+    const submitButton =
+      document.getElementById("submit_button");
+
+    let importedPackage = null;
+
+    function isPlainObject(value) {
+      return (
+        value !== null &&
+        typeof value === "object" &&
+        !Array.isArray(value)
+      );
+    }
+
+    function isLocalCallback(url) {
+      try {
+        const parsedUrl = new URL(url);
+
+        return (
+          parsedUrl.protocol === "http:" &&
+          (
+            parsedUrl.hostname === "127.0.0.1" ||
+            parsedUrl.hostname === "localhost" ||
+            parsedUrl.hostname === "::1"
+          )
+        );
+      } catch {
+        return false;
+      }
+    }
+
+    function parseCommaSeparated(raw) {
+      return String(raw)
+        .split(",")
+        .map(value => value.trim())
+        .filter(Boolean);
+    }
+
+    function parseEnabledPolicies(raw) {
+      const output = {};
+
+      const lines = String(raw)
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
+
+      for (const line of lines) {
+        const separator = line.indexOf(":");
+
+        if (separator < 1) {
+          throw new Error(
+            "Each policy line must use: resource_type: policy1, policy2"
+          );
+        }
+
+        const resourceType =
+          line.slice(0, separator).trim();
+
+        const policies =
+          line
+            .slice(separator + 1)
+            .split(",")
+            .map(policy => policy.trim())
+            .filter(Boolean);
+
+        if (!policies.length) {
+          throw new Error(
+            "Add at least one policy for " + resourceType
+          );
+        }
+
+        output[resourceType] = policies;
+      }
+
+      if (!Object.keys(output).length) {
+        throw new Error(
+          "Add at least one enabled policy"
+        );
+      }
+
+      return output;
+    }
+
+    function formatEnabledPolicies(policyGroups) {
+      if (!isPlainObject(policyGroups)) {
+        return "";
+      }
+
+      return Object.entries(policyGroups)
+        .map(([resourceType, policies]) => {
+          if (!Array.isArray(policies)) {
+            throw new Error(
+              `Policies for ${resourceType} must be an array`
+            );
+          }
+
+          return (
+            `${resourceType}: ` +
+            policies.map(String).join(", ")
+          );
+        })
+        .join("\n");
+    }
+
+    function validatePackageJson(packageData) {
+      if (!isPlainObject(packageData)) {
+        throw new Error(
+          "package.json must contain a JSON object"
+        );
+      }
+
+      if (
+        typeof packageData.name !== "string" ||
+        !packageData.name.trim()
+      ) {
+        throw new Error(
+          "package.json requires a package name"
+        );
+      }
+
+      if (
+        !Array.isArray(packageData.platforms) ||
+        !packageData.platforms.length
+      ) {
+        throw new Error(
+          "package.json requires at least one platform"
+        );
+      }
+
+      if (!isPlainObject(packageData.policy_groups)) {
+        throw new Error(
+          "package.json requires a policy_groups object"
+        );
+      }
+
+      if (
+        !Object.keys(packageData.policy_groups).length
+      ) {
+        throw new Error(
+          "package.json requires at least one policy group"
+        );
+      }
+
+      for (
+        const [resourceType, policies]
+        of Object.entries(packageData.policy_groups)
+      ) {
+        if (
+          !resourceType.trim() ||
+          !Array.isArray(policies) ||
+          !policies.length
+        ) {
+          throw new Error(
+            "Every policy group must contain a resource type " +
+            "and at least one policy"
+          );
+        }
+      }
+
+      if (!isPlainObject(packageData.variables)) {
+        throw new Error(
+          "package.json requires a variables object"
+        );
+      }
+
+      return packageData;
+    }
+
+    function showImportMessage(message, isError = false) {
+      importStatus.className =
+        isError ? "result error" : "result";
+
+      importStatus.textContent = message;
+      importStatus.style.display = "block";
+    }
+
+    function showError(message) {
+      result.className = "result error";
+      result.innerHTML = "";
+
+      const heading = document.createElement("h2");
+      heading.textContent = "Registration failed";
+
+      const paragraph = document.createElement("p");
+      paragraph.textContent = message;
+
+      result.appendChild(heading);
+      result.appendChild(paragraph);
+      result.style.display = "block";
+    }
+
+    function toggleCustomPolicies() {
+      customPolicies.style.display =
+        profile.value === "custom"
+          ? "block"
+          : "none";
+    }
+
+    function populateFormFromPackage(packageData) {
+      const variables =
+        isPlainObject(packageData.variables)
+          ? packageData.variables
+          : {};
+
+      document.getElementById("package_name").value =
+        packageData.name || "";
+
+      document.getElementById(
+        "package_description"
+      ).value = packageData.description || "";
+
+      document.getElementById("platforms").value =
+        Array.isArray(packageData.platforms)
+          ? packageData.platforms.join(", ")
+          : "";
+
+      document.getElementById(
+        "approved_regions"
+      ).value =
+        Array.isArray(variables.approved_regions)
+          ? variables.approved_regions.join(", ")
+          : "";
+
+      document.getElementById(
+        "approved_zones"
+      ).value =
+        Array.isArray(variables.approved_zones)
+          ? variables.approved_zones.join(", ")
+          : "";
+
+      document.getElementById(
+        "google_provider_version"
+      ).value =
+        variables.google_provider_version || "";
+
+      profile.value = "custom";
+
+      document.getElementById(
+        "enabled_policies"
+      ).value =
+        formatEnabledPolicies(
+          packageData.policy_groups
+        );
+
+      toggleCustomPolicies();
+    }
+
+    async function readJson(response) {
+      try {
+        return await response.json();
+      } catch {
+        return {};
+      }
+    }
+
+    function showSuccess(
+      orgId,
+      apiKey,
+      packageName
+    ) {
+      sessionStorage.setItem("pde_org_id", orgId);
+      sessionStorage.setItem("pde_api_key", apiKey);
+
+      result.className = "result";
+
+      result.innerHTML = `
+        <h2>Registration successful</h2>
+
+        <p
+          id="callback_message"
+          class="muted"
+          style="display: none"
+        >
+          Credentials were sent to the PDE Gate CLI.
+          You can close this tab.
+        </p>
+
+        <p>
+          <strong>Organisation ID:</strong><br />
+          <code id="output_org_id"></code>
+        </p>
+
+        <p>
+          <strong>API key</strong>
+          (save as <code>PDE_API_KEY</code> in CI — shown once):
+          <br />
+          <code id="output_api_key"></code>
+        </p>
+
+        <p>
+          <strong>Policy package:</strong><br />
+          <code id="output_package"></code>
+        </p>
+
+        <p>
+          <strong>CI environment variables:</strong>
+        </p>
+
+        <pre id="output_ci"></pre>
+      `;
+
+      document.getElementById(
+        "output_org_id"
+      ).textContent = orgId;
+
+      document.getElementById(
+        "output_api_key"
+      ).textContent = apiKey;
+
+      document.getElementById(
+        "output_package"
+      ).textContent = packageName;
+
+      document.getElementById(
+        "output_ci"
+      ).textContent =
+        `PDE_ORG_ID=${orgId}\n` +
+        `PDE_API_KEY=${apiKey}\n` +
+        `PDE_API_URL=${location.origin}`;
+
+      result.style.display = "block";
+    }
+
+    packageJsonInput.addEventListener(
+      "change",
+      async event => {
+        importStatus.style.display = "none";
+        importedPackage = null;
+
+        const file = event.target.files?.[0];
+
+        if (!file) {
+          return;
+        }
+
+        try {
+          const rawJson = await file.text();
+          const parsedJson = JSON.parse(rawJson);
+
+          importedPackage =
+            validatePackageJson(parsedJson);
+
+          populateFormFromPackage(importedPackage);
+
+          showImportMessage(
+            `Imported ${file.name} successfully. ` +
+            "Review the populated fields before registering."
+          );
+        } catch (error) {
+          packageJsonInput.value = "";
+
+          showImportMessage(
+            error instanceof Error
+              ? error.message
+              : "Unable to import package.json",
+            true
+          );
+        }
+      }
+    );
+
+    profile.addEventListener(
+      "change",
+      toggleCustomPolicies
+    );
+
+    form.addEventListener(
+      "submit",
+      async event => {
+        event.preventDefault();
+
+        result.style.display = "none";
+        submitButton.disabled = true;
+        submitButton.textContent = "Registering...";
+
+        const formData = new FormData(form);
+
+        const orgName =
+          String(
+            formData.get("org_name")
+          ).trim();
+
+        const contactEmail =
+          String(
+            formData.get("contact_email")
+          ).trim();
+
+        const password =
+          String(
+            formData.get("password")
+          );
+
+        const packageName =
+          String(
+            formData.get("package_name")
+          ).trim();
+
+        const packageDescription =
+          String(
+            formData.get("package_description")
+          ).trim();
+
+        const platforms =
+          parseCommaSeparated(
+            formData.get("platforms")
+          );
+
+        const approvedRegions =
+          parseCommaSeparated(
+            formData.get("approved_regions")
+          );
+
+        const approvedZones =
+          parseCommaSeparated(
+            formData.get("approved_zones")
+          );
+
+        const googleProviderVersion =
+          String(
+            formData.get("google_provider_version")
+          ).trim();
+
+        const selectedProfile =
+          String(
+            formData.get("policy_profile")
+          );
+
+        let policyGroups = {};
+
+        try {
+          if (selectedProfile === "custom") {
+            policyGroups =
+              parseEnabledPolicies(
+                formData.get("enabled_policies")
+              );
+          } else if (
+            importedPackage &&
+            isPlainObject(
+              importedPackage.policy_groups
+            )
+          ) {
+            policyGroups =
+              importedPackage.policy_groups;
+          }
+        } catch (error) {
+          showError(
+            error instanceof Error
+              ? error.message
+              : "Invalid enabled-policy configuration"
+          );
+
+          submitButton.disabled = false;
+          submitButton.textContent =
+            "Register organisation";
+
+          return;
+        }
+
+        if (!platforms.length) {
+          showError(
+            "Add at least one platform"
+          );
+
+          submitButton.disabled = false;
+          submitButton.textContent =
+            "Register organisation";
+
+          return;
+        }
+
+        if (!Object.keys(policyGroups).length) {
+          showError(
+            "Add at least one enabled policy or import package.json"
+          );
+
+          submitButton.disabled = false;
+          submitButton.textContent =
+            "Register organisation";
+
+          return;
+        }
+
+        try {
+          const registrationResponse =
+            await fetch(
+              "/v1/orgs/register",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  org_name: orgName,
+                  contact_email: contactEmail,
+                  password
+                })
+              }
+            );
+
+          const registrationData =
+            await readJson(
+              registrationResponse
+            );
+
+          if (!registrationResponse.ok) {
+            throw new Error(
+              registrationData.error ||
+              "Organisation registration failed"
+            );
+          }
+
+          const packageResponse =
+            await fetch(
+              `/v1/orgs/${
+                encodeURIComponent(
+                  registrationData.org_id
+                )
+              }/packages`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type":
+                    "application/json",
+
+                  "Authorization":
+                    `Bearer ${
+                      registrationData.api_key
+                    }`
+                },
+                body: JSON.stringify({
+                  name: packageName,
+                  description:
+                    packageDescription,
+                  platforms,
+                  policy_groups:
+                    policyGroups,
+                  variables: {
+                    approved_regions:
+                      approvedRegions,
+
+                    approved_zones:
+                      approvedZones,
+
+                    google_provider_version:
+                      googleProviderVersion
+                  }
+                })
+              }
+            );
+
+          const packageData =
+            await readJson(
+              packageResponse
+            );
+
+          if (!packageResponse.ok) {
+            throw new Error(
+              packageData.error ||
+              "Organisation was registered, but " +
+              "policy package creation failed"
+            );
+          }
+
+          showSuccess(
+            registrationData.org_id,
+            registrationData.api_key,
+            packageData.name || packageName
+          );
+
+          if (
+            callbackUrl &&
+            isLocalCallback(callbackUrl)
+          ) {
+            try {
+              const callbackResponse =
+                await fetch(
+                  callbackUrl,
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type":
+                        "application/json"
+                    },
+                    body: JSON.stringify({
+                      org_id:
+                        registrationData.org_id,
+
+                      api_key:
+                        registrationData.api_key
+                    })
+                  }
+                );
+
+              if (callbackResponse.ok) {
+                const callbackMessage =
+                  document.getElementById(
+                    "callback_message"
+                  );
+
+                if (callbackMessage) {
+                  callbackMessage.style.display =
+                    "block";
+                }
+              }
+            } catch {
+            }
+          }
+
+          form.style.display = "none";
+        } catch (error) {
+          showError(
+            error instanceof Error
+              ? error.message
+              : "Registration failed"
+          );
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent =
+            "Register organisation";
+        }
+      }
+    );
+
+    toggleCustomPolicies();
+  </script>
+</body>
+</html>
