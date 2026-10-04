@@ -11,6 +11,8 @@ Express + Sequelize + MySQL config API for PDE Gate.
 | GET | `/v1/orgs/:orgId` | Bearer `PDE_API_KEY` |
 | GET/POST | `/v1/orgs/:orgId/packages` | Bearer |
 | GET/PATCH/DELETE | `/v1/orgs/:orgId/packages/:packageId` | Bearer |
+| GET | `/v1/orgs/:orgId/policy-catalog?platform=gcp` | Bearer; discovers available resource policies |
+| POST | `/v1/orgs/:orgId/checks` | Bearer; evaluates a Terraform plan with a saved package |
 
 ## Setup
 

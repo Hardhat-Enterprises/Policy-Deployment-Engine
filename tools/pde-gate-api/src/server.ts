@@ -10,6 +10,11 @@ import {
     updatePackage,
 } from './store.js';
 import { runServerCheck } from './engine/run-check.js';
+import { policiesRoot } from './engine/run-check.js';
+import { buildPolicyCatalog } from './engine/policy-catalog.js';
+import { getAdapter } from './engine/plugins/index.js';
+import type { PlatformId } from './engine/plugins/types.js';
+import path from 'node:path';
 import type { CreatePackageRequest, RegisterRequest } from './types.js';
 
 function parseBearer(header: string | undefined): string | null {
@@ -127,6 +132,30 @@ export function createApp() {
         const auth = await requireOrg(req, res);
         if (!auth) return;
         res.json({ packages: await listPackages(auth.orgId) });
+    });
+
+    app.get('/v1/orgs/:orgId/policy-catalog', async (req, res) => {
+        const auth = await requireOrg(req, res);
+        if (!auth) return;
+
+        const requested = String(req.query.platform || 'gcp').toLowerCase();
+        if (!['gcp', 'aws', 'azure'].includes(requested)) {
+            res.status(400).json({ error: 'platform must be gcp, aws or azure' });
+            return;
+        }
+
+        const platform = requested as PlatformId;
+        const platformRoot = path.join(policiesRoot(), getAdapter(platform).policiesSubdir());
+        const resources = buildPolicyCatalog(platformRoot);
+        res.json({
+            platform,
+            resources,
+            resource_count: resources.length,
+            policy_count: resources.reduce(
+                (count, resource) => count + resource.policies.length,
+                0
+            ),
+        });
     });
 
     app.post('/v1/orgs/:orgId/packages', async (req, res) => {
