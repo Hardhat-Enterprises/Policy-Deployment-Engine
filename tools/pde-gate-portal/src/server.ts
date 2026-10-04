@@ -22,6 +22,14 @@ export function createApp() {
     res.sendFile(path.join(publicDir, "settings.html"));
   });
 
+  app.get("/packages", (_req, res) => {
+    res.sendFile(path.join(publicDir, "packages.html"));
+  });
+
+  app.get("/check", (_req, res) => {
+    res.sendFile(path.join(publicDir, "check.html"));
+  });
+
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", service: "pde-gate-portal", api_url: API_URL });
   });

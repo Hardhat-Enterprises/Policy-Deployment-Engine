@@ -43,4 +43,20 @@ describe("portal web server", () => {
     const text = await res.text();
     assert.ok(text.includes("Organisation Settings"));
   });
+
+  it("serves policy package builder", async () => {
+    const res = await fetch(`${baseUrl}/packages`);
+    assert.equal(res.status, 200);
+    const text = await res.text();
+    assert.ok(text.includes("Policy package builder"));
+    assert.ok(text.includes("Available policy catalog"));
+  });
+
+  it("serves policy check page", async () => {
+    const res = await fetch(`${baseUrl}/check`);
+    assert.equal(res.status, 200);
+    const text = await res.text();
+    assert.ok(text.includes("Run policy check"));
+    assert.ok(text.includes("Terraform plan.json"));
+  });
 });

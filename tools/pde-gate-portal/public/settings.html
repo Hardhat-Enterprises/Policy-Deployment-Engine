@@ -101,7 +101,9 @@
 <body>
   <nav>
     <a href="/register">Register</a>
+    <a href="/packages">Packages</a>
     <a href="/settings">Settings</a>
+    <a href="/check">Run check</a>
   </nav>
 
   <h1>Organisation settings</h1>
@@ -279,6 +281,11 @@
     let loadedPackages = [];
     let loadedPackage = null;
     let importedPolicyGroups = null;
+
+    const orgIdInput = document.getElementById("org_id");
+    const apiKeyInput = document.getElementById("api_key");
+    orgIdInput.value = sessionStorage.getItem("pde_org_id") || "";
+    apiKeyInput.value = sessionStorage.getItem("pde_api_key") || "";
 
     function getCredentials() {
       return {
@@ -812,6 +819,9 @@
 
         try {
           await loadPackages();
+          const { orgId, apiKey } = getCredentials();
+          sessionStorage.setItem("pde_org_id", orgId);
+          sessionStorage.setItem("pde_api_key", apiKey);
         } catch (error) {
           showError(
             error instanceof Error
