@@ -6,11 +6,18 @@ import data.terraform.gcp.security.compute_engine.google_compute_instance_templa
 conditions := [
     [
         {
-            "situation_description": "The disk's disk encryption key accesses its KMS key through the default Compute Engine service account (PROJECT_NUMBER-compute@developer.gserviceaccount.com). The default account is broadly privileged, so relying on it for key access is an over-privilege risk compared with a dedicated least-privilege service account.",
+            "situation_description": "The disk's disk encryption key does not access its KMS key through a dedicated service account. When kms_key_service_account is left out, the default Compute Engine service account (PROJECT_NUMBER-compute@developer.gserviceaccount.com) is used, which is broadly privileged, so relying on it for key access is an over-privilege risk compared with a dedicated least-privilege service account.",
+            "match": "any",
             "remedies": [
                 "Set disk.disk_encryption_key.kms_key_service_account to a dedicated user-managed service account (an address ending in .iam.gserviceaccount.com).",
                 "Grant that service account only the Cloud KMS CryptoKey Encrypter/Decrypter role on the specific key."
             ]
+        },
+        {
+            "condition": "Check that disk.disk_encryption_key.kms_key_service_account is set",
+            "attribute_path": ["disk", 0, "disk_encryption_key", 0, "kms_key_service_account"],
+            "values": [null, ""],
+            "policy_type": "blacklist"
         },
         {
             "condition": "Check that disk.disk_encryption_key.kms_key_service_account is a user-managed service account",
@@ -20,6 +27,7 @@ conditions := [
         }
     ]
 ]
+
 
 result := helpers.get_multi_summary(conditions, vars.variables)
 message := result.message
