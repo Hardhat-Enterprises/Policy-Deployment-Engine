@@ -6,17 +6,17 @@ import data.terraform.gcp.security.compute_engine.google_compute_instance_templa
 conditions := [
     [
         {
-            "situation_description": "The instance template uses a network tag outside the approved set. GCP firewall rules are commonly scoped by target tag, so an unapproved tag can silently attach the instance to firewall rules it was never meant to receive, widening its network exposure.",
+            "situation_description": "The instance template uses the default http-server or https-server network tag. These tags attach GCP's default-allow-http and default-allow-https firewall rules, which open ports 80 and 443 to the whole internet, so instances can become publicly reachable without any deliberate firewall change.",
             "remedies": [
-                "Use only approved network tags in tags (web-server, app-server, db-server).",
-                "If a new tag is genuinely needed, add it to the approved set together with a review of the firewall rules that target it."
+                "Remove http-server and https-server from tags.",
+                "Use a team-specific tag targeted by a firewall rule that allows only the source ranges the workload needs, for example a load balancer's health check and proxy ranges."
             ]
         },
         {
-            "condition": "Check that every network tag is in the approved set",
+            "condition": "Check that tags does not include http-server or https-server",
             "attribute_path": ["tags"],
-            "values": ["web-server", "app-server", "db-server"],
-            "policy_type": "element pattern whitelist"
+            "values": ["http-server", "https-server"],
+            "policy_type": "blacklist"
         }
     ]
 ]

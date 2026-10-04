@@ -1,7 +1,7 @@
 resource "google_compute_instance_template" "compliant_example_1" {
   name         = "compliant-template"
   machine_type = "e2-medium"
-  tags         = ["web-server"]
+  tags         = ["web-server", "internal-lb-backend"]
 
   disk {
     source_image = "debian-cloud/debian-11"

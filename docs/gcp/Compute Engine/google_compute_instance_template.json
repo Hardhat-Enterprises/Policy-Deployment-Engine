@@ -98,7 +98,7 @@
       "required": false,
       "type": "map(string)",
       "security_impact": true,
-      "rationale": "Resource Manager tags can drive tag-based IAM and firewall policy conditions; incorrect tags can unintentionally widen or narrow enforced policy scope."
+      "rationale": "Resource Manager tags can drive tag-based IAM and firewall policy conditions. Policy checks that every key is a permanent tag key ID (tagKeys/{id}), so namespaced or mistyped keys are caught at plan time rather than at apply. Whether a correctly formatted tag maps to the intended IAM or firewall condition is team-specific and is not enforced by a platform-wide policy."
     },
     "resource_policies": {
       "description": "A list of self_links of resource policies to attach to the instance. Currently a max of 1 resource policy is supported.",
@@ -112,7 +112,7 @@
       "required": false,
       "type": "set(string)",
       "security_impact": true,
-      "rationale": "Network tags determine which firewall rules apply to an instance, since GCP firewall rules are commonly scoped by target tag rather than instance name. Policy should require tags to be drawn from an approved set, since incorrect or missing tags directly change which firewall rules match the instance and therefore its network exposure."
+      "rationale": "Network tags determine which firewall rules apply to an instance, since GCP firewall rules are commonly scoped by target tag rather than instance name. Tag names are otherwise team-specific, but the default http-server and https-server tags attach the default-allow-http and default-allow-https rules, which open ports 80 and 443 to the internet; policy should forbid those two tags."
     },
     "advanced_machine_features": {
       "type": "block",
