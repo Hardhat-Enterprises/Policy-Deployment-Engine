@@ -17,7 +17,7 @@ Differences other than CRLF/lone-CR/BOM normalization remain significant.
 From the repository root, with Python 3.11+, OPA and Git installed:
 
 ```bash
-python -m pip install pytest pyyaml
+python -m pip install pytest pyyaml bandit
 python -m pytest -q -m "not repository_data"
 bash tests/_helpers/unit_test_helpers.sh
 ```

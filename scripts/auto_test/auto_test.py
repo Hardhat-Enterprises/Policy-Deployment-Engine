@@ -222,7 +222,7 @@ _plan_locks: dict[str, Lock] = {}
 _plan_locks_guard = Lock()
 
 
-def get_or_build_plan(policy_dir: Path, cache_path: Path, verbose: bool = False) -> Path | None:
+def get_or_build_plan(policy_dir: Path, cache_path: Path, verbose: bool = False) -> Path:
     key = str(cache_path.resolve())
     with _plan_locks_guard:
         lock = _plan_locks.setdefault(key, Lock())
@@ -230,15 +230,14 @@ def get_or_build_plan(policy_dir: Path, cache_path: Path, verbose: bool = False)
         adopt_denormalised_plan(policy_dir, cache_path)
         if not is_committed_plan(cache_path):
             plan_json = run_terraform_commands(policy_dir, verbose)
-            if plan_json is None:
-                return None
             # Reject incomplete output before publishing or deleting the previous plan.
             try:
                 document = json.loads(plan_json)
                 if not isinstance(document, dict) or not isinstance(document.get("planned_values"), dict):
-                    return None
-            except (TypeError, json.JSONDecodeError):
-                return None
+                    raise ValueError("missing planned_values object")
+            except (TypeError, ValueError) as exc:
+                raise TerraformError(policy_dir, ["terraform", "show"],
+                                     f"Invalid Terraform plan JSON: {exc}") from exc
             tmp = cache_path.with_name(f"{cache_path.name}.{uuid.uuid4().hex}.tmp")
             try:
                 tmp.write_text(plan_json, encoding="utf-8")
@@ -351,9 +350,53 @@ def fmt_duration(seconds: float) -> str:
     return f"{s}s"
 
 
-def make_failure(attribute: str, reason: str, service: str, resource: str) -> dict:
+def make_failure(attribute: str, reason: str, service: str, resource: str,
+                 file: Path | str | None = None) -> dict:
+    """A failed result. ``file`` is the policy or fixture the failure is about — what
+    a CI annotation points at — and is left out of the report when unknown."""
+    failure = {"reason": reason}
+    if file is not None:
+        failure["file"] = repo_relative(file)
     return {"service": str(service), "resource": str(resource), "policy": str(attribute), "passed": False,
-            "failure": {"reason": reason}}
+            "failure": failure}
+
+
+def repo_relative(path: Path | str) -> str:
+    """``path`` relative to the repo root in forward slashes, or as given if outside it."""
+    try:
+        return Path(path).resolve().relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return Path(path).as_posix()
+
+
+# How much of a failing tool's output a failure reason quotes. Terraform's own
+# `Error:` block is a handful of lines; twenty keeps it whole without pasting a
+# provider's full diagnostic dump into a CI annotation.
+OUTPUT_HEAD_LINES = 20
+
+
+def output_head(text: str | None, lines: int = OUTPUT_HEAD_LINES) -> str:
+    """The part of a tool's output worth quoting: from its first ``Error:`` on (the
+    whole output when there is none), blank lines dropped, at most ``lines`` lines."""
+    body = [line.rstrip() for line in (text or "").splitlines()]
+    start = next((i for i, line in enumerate(body) if "Error:" in line), 0)
+    kept = [line for line in body[start:] if line.strip(" │╷╵")][:lines]
+    return "\n".join(kept) if kept else "(no output)"
+
+
+class TerraformError(Exception):
+    """Terraform could not plan a fixture. The message is the whole failure reason:
+    the fixture, the command that failed and terraform's own ``Error:`` block."""
+
+    def __init__(self, input_dir: Path, command: list[str], output: str):
+        self.input_dir = input_dir
+        super().__init__(f"{' '.join(command[:2])} failed for {repo_relative(input_dir)}:\n"
+                         f"{output_head(output)}")
+
+
+class OpaEvalError(Exception):
+    """``opa eval`` itself failed (a compile or runtime error), as opposed to the
+    query being undefined. The message is the head of opa's own output."""
 
 
 def make_success(attribute: str, service: str, resource: str) -> dict:
@@ -367,6 +410,11 @@ def opa_eval_value(data_paths, plan_json_path: Path, query: str):
     the helpers dir + the single resource's policy dir (instead of the whole
     ``policies/`` tree) makes each eval ~20x faster — OPA otherwise re-parses and
     compiles all ~1000 policies on every single call.
+
+    Returns None when the query is *undefined* — opa ran fine and the rule simply
+    has no value, which for a policy almost always means the package name is not
+    the one queried. Raises OpaEvalError when opa itself failed: the two need
+    different fixes, so they must not share a reason.
     """
     if isinstance(data_paths, (str, Path)):
         data_paths = [data_paths]
@@ -376,30 +424,17 @@ def opa_eval_value(data_paths, plan_json_path: Path, query: str):
     cmd += ["--input", str(plan_json_path), "--format", "json", query]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        thread_safe_print(f"❌ OPA eval failed for query: {query}")
-        thread_safe_print(f"Command: {' '.join(cmd)}")
-        if result.stdout:
-            thread_safe_print(f"STDOUT: {result.stdout[:500]}")
-        if result.stderr:
-            thread_safe_print(f"STDERR: {result.stderr[:500]}")
-        return None
+        # --format json puts compile errors on stdout, other failures on stderr.
+        raise OpaEvalError(output_head(result.stderr.strip() or result.stdout))
     try:
         payload = json.loads(result.stdout)
-        res = payload.get("result")
-        if not res:
-            thread_safe_print(f"OPA query returned empty result for: {query}")
-            return None
-        # Take first expression value
-        exprs = res[0].get("expressions") if isinstance(res, list) and res else None
-        if not exprs:
-            thread_safe_print(f"OPA query returned no expressions for: {query}")
-            return None
-        return exprs[0].get("value")
-    except Exception as e:
-        thread_safe_print(f"❌ Failed to parse OPA JSON output: {e}")
-        thread_safe_print(f"Query: {query}")
-        thread_safe_print(f"Output: {result.stdout[:500]}")
+    except json.JSONDecodeError as e:
+        raise OpaEvalError(f"unreadable opa output ({e}): {output_head(result.stdout)}")
+    res = payload.get("result")
+    exprs = res[0].get("expressions") if isinstance(res, list) and res else None
+    if not exprs:
         return None
+    return exprs[0].get("value")
 
 
 def get_unique_resource_names(plan_json_path: Path, resource_type: str) -> set[str]:
@@ -571,13 +606,8 @@ def normalize_messages(messages_value) -> list[str]:
     return []
 
 
-def get_policy_messages(data_paths, plan_path: Path, message_query: str) -> list[str]:
-    val = opa_eval_value(data_paths, plan_path, message_query)
-    return normalize_messages(val)
-
-
-def run_terraform_commands(policy_dir: Path, verbose: bool = False) -> str | None:
-    """Plan one fixture in a throwaway workspace; return the plan JSON text, or None.
+def run_terraform_commands(policy_dir: Path, verbose: bool = False) -> str:
+    """Plan one fixture in a throwaway workspace; return plan JSON text; raise TerraformError on failure.
 
     Terraform runs in a short-lived temp directory, never in the repo tree. Two reasons:
 
@@ -614,8 +644,8 @@ def run_terraform_commands(policy_dir: Path, verbose: bool = False) -> str | Non
     })
 
     commands = [
-        ["terraform", "init", "-backend=false"],
-        ["terraform", "plan", "-refresh=false", "-lock=false", "-input=false", "-out=plan"],
+        ["terraform", "init", "-backend=false", "-no-color"],
+        ["terraform", "plan", "-refresh=false", "-lock=false", "-input=false", "-no-color", "-out=plan"],
     ]
 
     try:
@@ -627,29 +657,23 @@ def run_terraform_commands(policy_dir: Path, verbose: bool = False) -> str | Non
                 cmd, cwd=work, capture_output=True, text=True, env=env)
             if result.returncode != 0:
                 if verbose:
-                    thread_safe_print(f"Command failed: {' '.join(cmd)} (in {policy_dir})")
-                    thread_safe_print("--- stdout ---")
-                    thread_safe_print(result.stdout)
-                    thread_safe_print("--- stderr ---")
-                    thread_safe_print(result.stderr)
-                return None
+                    thread_safe_print(f"Command failed: {' '.join(cmd)} (in {policy_dir})\n"
+                                      f"--- stdout ---\n{result.stdout}\n--- stderr ---\n{result.stderr}")
+                raise TerraformError(policy_dir, cmd, result.stderr or result.stdout)
 
         # `terraform show -json` writes the plan JSON to stdout; capture it directly
         # (no shell, no intermediate file — the caller writes it to the cache).
+        cmd = ["terraform", "show", "-no-color", "-json", "plan"]
         result = subprocess.run(
-            ["terraform", "show", "-json", "plan"],
+            cmd,
             cwd=work, capture_output=True, text=True, env=env)
         if result.returncode != 0:
             if verbose:
-                thread_safe_print("Command failed: terraform show -json plan")
-                thread_safe_print("--- stderr ---")
-                thread_safe_print(result.stderr)
-            return None
+                thread_safe_print(f"Command failed: terraform show -json plan\n{result.stderr}")
+            raise TerraformError(policy_dir, cmd, result.stderr or result.stdout)
         return result.stdout
     except OSError as e:
-        if verbose:
-            thread_safe_print(f"Workspace error for {policy_dir}: {e}")
-        return None
+        raise TerraformError(policy_dir, ["terraform", "workspace"], str(e)) from e
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
@@ -779,60 +803,149 @@ def validate_policy_output(attribute: str, resource_type: str | None, plan_path:
     return make_success(attribute, service, resource)
 
 
-def run_policy_check_pair(policy_dir: Path, policy_file: Path, policies_root: Path,
+def needs_content_analysis(policy_file: Path) -> bool:
+    """True when the policy declares the ``content security`` policy type.
+
+    Content-security policies read Bandit findings that must be injected into the
+    OPA input before evaluation. The policy-type field is the single, stable
+    marker shared with ``helpers.rego`` and ``policy_lint.py``, so this is a cheap,
+    precise gate: every other policy type skips the analysis entirely. The match is
+    against the exact ``"policy_type": "content security"`` field, not the bare
+    phrase, so a mention of "content security" in a comment or description cannot
+    trigger the analysis.
+    """
+    text = policy_file.read_text(encoding="utf-8")
+    return '"policy_type": "content security"' in text
+
+
+def inject_content_security_findings(plan_path: Path) -> Path | None:
+    """Run content analysis and return a plan augmented with findings.
+
+    Runs the ``extract -> analyze -> normalize`` pipeline and adds the result under
+    the top-level ``content_security_findings`` key the content-security Rego policy
+    reads. The committed ``<sha>.json`` plan is left untouched; a temp copy is
+    written and returned instead. Returns None (with a printed reason) when the
+    analyzer cannot run, so a missing ``bandit`` affects only this fixture and never
+    the rest of the tree.
+    """
+    if shutil.which("bandit") is None:
+        thread_safe_print("⚠️  `bandit` not installed — cannot run content-security analysis")
+        return None
+    try:
+        # Import via the package path (as the tests do), so REPO_ROOT must be on
+        # sys.path for `scripts` to be importable.
+        if str(REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(REPO_ROOT))
+        from scripts.content_analysis import extract, analyze, normalize
+        content_dir = REPO_ROOT / "scripts" / "content_analysis"
+        registry = extract.load_registry(content_dir / "registry.json")
+        plan = json.loads(plan_path.read_text(encoding="utf-8"))
+        key_map = extract.attribute_key_map(registry)
+        plan["content_security_findings"] = normalize.normalize_all(
+            analyze.analyze_snippets(extract.extract(plan, key_map), registry))
+    except Exception as exc:
+        thread_safe_print(f"⚠️  content-security analysis failed: {exc}")
+        return None
+
+    fd, tmp_path = tempfile.mkstemp(suffix=".json", prefix="csa-augmented-")
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        json.dump(plan, fh)
+    return Path(tmp_path)
+
+
+def run_policy_check_pair(input_dir: Path, policy_file: Path, policies_root: Path,
                           cache_path: Path, verbose: bool = False):
+    result = check_pair(input_dir, policy_file, policies_root, cache_path, verbose)
+    # Anything that went wrong past the plan is about the policy; point at it.
+    if not result.get("passed") and "file" not in result["failure"]:
+        result["failure"]["file"] = repo_relative(policy_file)
+    return result
+
+
+def check_pair(input_dir: Path, policy_file: Path, policies_root: Path,
+               cache_path: Path, verbose: bool = False):
     # Extract data about services and filesystem paths
-    abs_policy_dir = policy_dir.resolve()
-    service, resource, attribute = extract_path_parts(policy_dir)
-    # Cache hit -> use the committed plan.json; miss -> run terraform and cache it.
-    plan_path = get_or_build_plan(abs_policy_dir, cache_path, verbose)
+    abs_input_dir = input_dir.resolve()
+    service, resource, attribute = extract_path_parts(input_dir)
+    # Cache hit -> use the committed <sha>.json; miss -> run terraform and write it.
+    try:
+        plan_path = get_or_build_plan(abs_input_dir, cache_path, verbose)
+    except TerraformError as e:
+        return make_failure(attribute, str(e), service, resource, file=input_dir)
 
-    if plan_path is None:
-        return make_failure(attribute, "Terraform failed to compile!", service, resource)
+    # Content-security policies need Bandit findings in the OPA input. Only these
+    # policies take this branch; every other fixture is untouched. The augmented
+    # plan is a temp file (never the committed <sha>.json) and is removed below.
+    augmented_plan = None
+    if needs_content_analysis(policy_file):
+        augmented_plan = inject_content_security_findings(plan_path)
+        if augmented_plan is None:
+            return make_failure(
+                attribute,
+                "content-security fixture requires `bandit` (install: pip install bandit)",
+                service, resource)
+        plan_path = augmented_plan
 
-    # plan_path is the fixture's committed <sha>.json — never delete it here.
-    message_query, vars_query = get_policy_metadata(
-        policy_file, service, resource, attribute)
+    try:
+        # Only the augmented copy is disposable; the committed plan stays intact.
+        message_query, vars_query = get_policy_metadata(
+            policy_file, service, resource, attribute)
 
-    # Scope OPA's --data to just the shared helpers + this policy + its resource's
-    # _vars.rego. Loading the whole policies/ tree on every eval re-compiles ~1000
-    # policies per call and dominates runtime; this is ~20x faster. The files are named
-    # explicitly rather than passing the argument dir, because _vars.rego lives one
-    # level up (at the resource) and would otherwise be missed.
-    data_paths = [(policies_root / "_helpers").resolve(), policy_file.resolve()]
-    vars_file = policy_file.parent.parent / VARS_FILE
-    if vars_file.is_file():
-        data_paths.append(vars_file.resolve())
+        # Scope OPA's --data to just the shared helpers + this policy + its resource's
+        # _vars.rego. Loading the whole policies/ tree on every eval re-compiles ~1000
+        # policies per call and dominates runtime; this is ~20x faster. The files are named
+        # explicitly rather than passing the argument dir, because _vars.rego lives one
+        # level up (at the resource) and would otherwise be missed.
+        data_paths = [(policies_root / "_helpers").resolve(), policy_file.resolve()]
+        vars_file = policy_file.parent.parent / VARS_FILE
+        if vars_file.is_file():
+            data_paths.append(vars_file.resolve())
 
-    # One eval fetches the whole `variables` object (resource_type + value_name).
-    variables = opa_eval_value(data_paths, plan_path, vars_query)
-    resource_type = variables.get("resource_type") if isinstance(variables, dict) else None
-    if resource_type is None:
-        # Get diagnostic info
-        actual_types = get_all_resource_types(plan_path)
-        diagnostics = [
-            f"Query used: {vars_query}.resource_type",
-            f"Resource types found in plan: {', '.join(actual_types) if actual_types else 'NONE'}",
-            f"Plan file: {plan_path}"
-        ]
-        error_msg = "Could not find resource_type variable! " + " | ".join(diagnostics)
-        return make_failure(attribute, error_msg, service, resource)
+        # One eval fetches the whole `variables` object (resource_type + value_name).
+        try:
+            variables = opa_eval_value(data_paths, plan_path, vars_query)
+        except OpaEvalError as e:
+            return make_failure(attribute, f"opa eval failed: {e}", service, resource)
+        resource_type = variables.get("resource_type") if isinstance(variables, dict) else None
+        if resource_type is None:
+            # Get diagnostic info
+            actual_types = get_all_resource_types(plan_path)
+            diagnostics = [
+                f"Query used: {vars_query}.resource_type",
+                f"Resource types found in plan: {', '.join(actual_types) if actual_types else 'NONE'}",
+                f"Plan file: {plan_path}"
+            ]
+            error_msg = "Could not find resource_type variable! " + " | ".join(diagnostics)
+            return make_failure(attribute, error_msg, service, resource)
 
-    messages = get_policy_messages(data_paths, plan_path, message_query)
-    if not messages:
-        return make_failure(attribute, "Could not run OPA query!", service, resource)
+        # An eval error and an undefined rule need different fixes, so they get
+        # different reasons. A defined but *empty* message is neither: it falls through
+        # to validate_policy_output, which reports the non-compliant examples it missed.
+        try:
+            message_value = opa_eval_value(data_paths, plan_path, message_query)
+        except OpaEvalError as e:
+            return make_failure(attribute, f"opa eval failed: {e}", service, resource)
+        if message_value is None:
+            package = message_query.removeprefix("data.").removesuffix(".message")
+            return make_failure(attribute, f"policy's message rule is undefined (check the package "
+                                           f"name {package})", service, resource)
+        messages = normalize_messages(message_value)
 
-    resource_value_name = variables.get("resource_value_name")
-    if not isinstance(resource_value_name, str):
-        resource_value_name = None
+        resource_value_name = variables.get("resource_value_name")
+        if not isinstance(resource_value_name, str):
+            resource_value_name = None
 
-    if verbose:
-        thread_safe_print(f"OPA check: {message_query}")
-        for m in messages:
-            thread_safe_print(m)
+        if verbose:
+            thread_safe_print(f"OPA check: {message_query}")
+            for m in messages:
+                thread_safe_print(m)
 
-    return validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource,
-                                  resource_value_name)
+        result = validate_policy_output(attribute, resource_type, plan_path, messages, verbose, service, resource,
+                                        resource_value_name)
+        return result
+    finally:
+        if augmented_plan is not None:
+            augmented_plan.unlink(missing_ok=True)
 
 
 def discover_policies(policies_search_root: Path):
@@ -922,6 +1035,65 @@ def verify_plan_cache(pairs, verbose: bool = False) -> int:
     return 1 if errors else 0
 
 
+# --- GitHub Actions output ---------------------------------------------------
+# A failure printed to the log is visible only to someone who opens the log. As
+# an `::error` workflow command it becomes an annotation on the check run — on
+# the PR's checks page and in the check-runs API — and the step summary puts the
+# whole list at the top of the run page. Both are inert outside Actions.
+def in_github_actions(env=None) -> bool:
+    return bool((os.environ if env is None else env).get("GITHUB_ACTIONS"))
+
+
+def _escape_data(text: str) -> str:
+    return text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
+def _escape_property(text: str) -> str:
+    return _escape_data(text).replace(":", "%3A").replace(",", "%2C")
+
+
+def github_error(message: str, title: str, file: str | None = None) -> str:
+    """One ``::error`` workflow command. GitHub shows at most 10 per step and 50
+    per job as annotations; the step summary is where the full list lives."""
+    props = ([f"file={_escape_property(file)}"] if file else []) + \
+            [f"title={_escape_property(title)}"]
+    return f"::error {','.join(props)}::{_escape_data(message)}"
+
+
+def _cell(text: str) -> str:
+    """Markdown-table-safe: no pipes, no raw HTML, newlines as <br>."""
+    text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    return text.replace("|", "\\|").replace("\r", "").replace("\n", "<br>")
+
+
+def write_step_summary(heading: str, columns: list[str], rows: list[list[str]], env=None) -> None:
+    """Append a table of failures to $GITHUB_STEP_SUMMARY, when there is one."""
+    path = (os.environ if env is None else env).get("GITHUB_STEP_SUMMARY")
+    if not path or not rows:
+        return
+    lines = [f"### {heading}", "",
+             "| " + " | ".join(columns) + " |",
+             "|" + "---|" * len(columns)]
+    lines += ["| " + " | ".join(_cell(str(c)) for c in row) + " |" for row in rows]
+    with open(path, "a", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n\n")
+
+
+def report_failures_to_github(failures: list[dict], env=None) -> None:
+    """An annotation per failed policy check, and the summary table of all of them."""
+    if not in_github_actions(env):
+        return
+    rows = []
+    for r in failures:
+        reason = r["failure"]["reason"]
+        file = r["failure"].get("file")
+        print(github_error(reason, f"{r.get('resource')}/{r.get('policy')}", file))
+        rows.append([r.get("resource", ""), r.get("policy", ""),
+                     f"`{file}`" if file else "", reason])
+    write_step_summary(f"❌ {len(failures)} policy check(s) failed",
+                       ["Resource", "Argument", "File", "Reason"], rows, env)
+
+
 def main():
     make_streams_encoding_safe()
     parser = argparse.ArgumentParser(
@@ -1005,7 +1177,7 @@ def main():
     # A half-built policy is a hard failure (it can never be tested).
     for policy_dir, reason in malformed:
         service, resource, attribute = extract_path_parts(policy_dir)
-        results.append(make_failure(attribute, reason, service, resource))
+        results.append(make_failure(attribute, reason, service, resource, file=policy_dir))
 
     # Process pairs in parallel
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
@@ -1029,7 +1201,7 @@ def main():
             except Exception as exc:
                 thread_safe_print(f"Error processing {policy_dir}: {exc}")
                 service, resource, attribute = extract_path_parts(policy_dir)
-                results.append(make_failure(attribute, f"Exception: {exc}", service, resource))
+                results.append(make_failure(attribute, f"Exception: {exc}", service, resource, file=policy_file))
             done += 1
             if not args.verbose:
                 with print_lock:
@@ -1063,7 +1235,12 @@ def main():
         print("\nFailures:")
         for r in sorted(failures, key=lambda x: (x.get("service", ""), x.get("resource", ""), x.get("policy", ""))):
             print(f"  ❌ {r.get('service')} / {r.get('resource')} / {r.get('policy')}")
-            print(f"     {r['failure']['reason']}")
+            file = r["failure"].get("file")
+            if file:
+                print(f"     {file}")
+            for line in r["failure"]["reason"].splitlines():
+                print(f"     {line}")
+        report_failures_to_github(failures)
 
     print()
     if failures:
