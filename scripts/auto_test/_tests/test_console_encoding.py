@@ -32,14 +32,13 @@ def written(stream):
 def run_main(monkeypatch, tmp_path):
     """main() over one fake pair whose plan is already cached, on a cp1252 console."""
     plan = tmp_path / "plan.json"
-    plan.write_text("{}")
-    pair = (Path("inputs/gcp/Cloud Storage/google_storage_bucket/storage_class"),
-            Path("policies/gcp/Cloud Storage/google_storage_bucket/storage_class.rego"))
+    plan.write_text('{"planned_values": {}}')
+    directory = Path("policies/gcp/Cloud Storage/google_storage_bucket/storage_class")
+    pair = (directory, directory / "policy.rego")
 
     def run(result):
-        monkeypatch.setattr(auto_test, "find_matching_pairs", lambda *_: ([pair], [], []))
+        monkeypatch.setattr(auto_test, "discover_policies", lambda *_: ([pair], []))
         monkeypatch.setattr(auto_test, "plan_cache_path", lambda _: plan)
-        monkeypatch.setattr(auto_test, "adopt_legacy_plan", lambda *_: False)
         monkeypatch.setattr(auto_test, "adopt_denormalised_plan", lambda *_: False)
         monkeypatch.setattr(auto_test, "run_policy_check_pair", lambda *_: result)
         monkeypatch.setattr(sys, "argv", ["auto_test.py"])

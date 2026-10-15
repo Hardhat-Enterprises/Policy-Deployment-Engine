@@ -24,9 +24,9 @@ import pytest
 SCRIPT = Path(__file__).resolve().parent.parent / "branch_scope.py"
 
 BRANCH = "Service/gcp/cloud_storage/google_storage_bucket"
-OWN = "inputs/gcp/Cloud Storage/google_storage_bucket"
-SIBLING_POLICY = "policies/gcp/Cloud Storage/google_storage_hmac_key/foo.rego"
-SIBLING_INPUTS = "inputs/gcp/Cloud Storage/google_storage_hmac_key"
+OWN = "policies/gcp/Cloud Storage/google_storage_bucket"
+SIBLING_POLICY = "policies/gcp/Cloud Storage/google_storage_hmac_key/foo/policy.rego"
+SIBLING_INPUTS = "policies/gcp/Cloud Storage/google_storage_hmac_key"
 
 pytestmark = pytest.mark.skipif(
     shutil.which("git") is None or shutil.which("bash") is None,
@@ -58,6 +58,7 @@ def repo(tmp_path):
     _git(repo, "config", "user.name", "test")
     _git(repo, "config", "user.email", "test@example.com")
     _git(repo, "config", "commit.gpgsign", "false")
+    _git(repo, "config", "core.autocrlf", "false")
     _write(repo, "docs/gcp/Cloud Storage/google_storage_bucket.json", "{}\n")
     _write(repo, "docs/gcp/Cloud Storage/google_storage_hmac_key.json", "{}\n")
     _write(repo, SIBLING_POLICY, "package foo\n")
@@ -96,8 +97,10 @@ def _recipe(output):
 
 def _run_recipe(repo, commands):
     for command in commands:
-        subprocess.run(["bash", "-c", command], cwd=repo, check=True,
-                       capture_output=True, text=True)
+        result = subprocess.run(["bash", "-c", command], cwd=repo,
+                                capture_output=True, text=True,
+                                env={**os.environ, "GIT_MERGE_AUTOEDIT": "no"})
+        assert result.returncode == 0, command + "\n" + result.stdout + result.stderr
 
 
 def _fix_and_recheck(repo):

@@ -1,37 +1,40 @@
 <a id="top"></a>
 <h1 align="center">Terraform inputs</h1>
 
-> You generate a plan here mainly to **inspect it and find your attribute path**. You do
-> **not** commit the `plan` / `plan.json` you make by hand below — they are gitignored. The
-> test harness (`auto_test.py`) writes the plan that *is* committed: a `<sha>.json` in this
-> same directory, named for the hash of your `*.tf`. Commit that one, and nothing else.
+After cutover, fixtures and `policy.rego` share the argument directory:
+`policies/gcp/<Service>/<resource>/<attribute>/`.
 
-### 1. terraform init
+### 1. Generate the committed plan
 
-Make sure you are in the inputs directory of the attribute you are writing your policy on:
+From the repository root:
 
-`inputs/gcp/<Service>/<resource>/<attribute>/`
+```bash
+python scripts/auto_test/auto_test.py "gcp/<Service>/<resource>"
+```
 
+The harness copies the effective Terraform files into a short temporary workspace.
+It selects the argument's local `config.tf` if present, otherwise the shared
+`policies/gcp/config.tf`. These configurations are never combined. It runs Terraform
+there and atomically writes `<fixture-sha>.json` beside the fixtures. The policy
+may still fail while you are writing it; inspect the generated plan to determine
+your attribute path, finish the policy, and rerun the command.
 
-    terraform init
+### 2. Inspect and commit
 
-![Terraform-init](images/terraform-init.png)
+Open the argument directory's hash-named JSON plan to inspect `planned_values`.
+Commit that plan with the policy and fixtures, including deletion of its stale
+predecessor. Do not commit manual `plan.json`, binary plans or Terraform state.
+Running Terraform directly inside the argument directory does not inherit the
+shared config; use the harness to assemble the correct workspace.
 
+### 3. Verify without rebuilding
 
-### 2. get binary plan
+```bash
+python scripts/auto_test/auto_test.py "gcp/<Service>/<resource>" --verify-plan-cache
+```
 
-    terraform plan --out=plan
-
-![get-binary-plan](images/terraform-plan--out.PNG)
-
-
-### 3. turn plan into .json file
-
-    terraform show -json plan > plan.json
-
-![turn-plan-into-.json](images/plan-json.PNG)
-
-
+This is read-only and rejects missing, invalid or stale plans. During preparation,
+production data is still unmigrated; follow the [cutover guide](../layout-cutover.md).
 
 <div align="center">
 

@@ -33,14 +33,15 @@ TERRAFORM_ERROR = """\
 
 
 def _pair(tmp_path, tf="this is not terraform\n"):
-    """An inputs/.../<arg>/ fixture and its policies/.../<arg>.rego, repo-shaped."""
-    fixture = tmp_path / "inputs" / "gcp" / "Svc" / "google_x" / "location"
+    """A policy and fixtures in a synthetic argument directory."""
+    fixture = tmp_path / "policies" / "gcp" / "Svc" / "google_x" / "location"
     fixture.mkdir(parents=True)
-    (fixture / "main.tf").write_text(tf)
-    policy_dir = tmp_path / "policies" / "gcp" / "Svc" / "google_x"
-    policy_dir.mkdir(parents=True)
-    policy = policy_dir / "location.rego"
+    (fixture / "compliant.tf").write_text(tf)
+    (fixture / "nonCompliant.tf").write_text("# fixture\n")
+    (tmp_path / "policies/gcp/config.tf").write_text("# shared config\n")
+    policy = fixture / "policy.rego"
     policy.write_text("package terraform.gcp.security.svc.google_x.location\n")
+
     return fixture, policy
 
 
@@ -65,10 +66,10 @@ def test_a_terraform_failure_carries_the_fixture_the_command_and_the_error(
     reason = result["failure"]["reason"]
     assert result["passed"] is False
     assert reason.startswith("terraform init failed for ")
-    assert "inputs/gcp/Svc/google_x/location" in reason
+    assert "policies/gcp/Svc/google_x/location" in reason
     assert "Error: Argument or block definition required" in reason
     assert "on main.tf line 1" in reason
-    assert result["failure"]["file"].endswith("inputs/gcp/Svc/google_x/location")
+    assert result["failure"]["file"].endswith("policies/gcp/Svc/google_x/location")
 
 
 @pytest.mark.skipif(not shutil.which("terraform"), reason="terraform not installed")
@@ -78,7 +79,7 @@ def test_a_broken_fixture_fails_with_terraforms_own_error(tmp_path, verbose):
     # needed, so this runs offline.
     fixture, policy = _pair(tmp_path)
     reason = _check(fixture, policy, tmp_path, verbose)["failure"]["reason"]
-    assert "inputs/gcp/Svc/google_x/location" in reason
+    assert "policies/gcp/Svc/google_x/location" in reason
     assert "Error:" in reason
     assert "\x1b[" not in reason                 # -no-color: no ANSI in annotations
 
@@ -124,7 +125,7 @@ def test_an_undefined_message_rule_names_the_package(cached_pair, tmp_path, monk
     assert result["failure"]["reason"] == (
         "policy's message rule is undefined (check the package name "
         "terraform.gcp.security.svc.google_x.location)")
-    assert result["failure"]["file"].endswith("policies/gcp/Svc/google_x/location.rego")
+    assert result["failure"]["file"].endswith("policies/gcp/Svc/google_x/location/policy.rego")
 
 
 def test_an_opa_error_is_reported_as_one(cached_pair, tmp_path, monkeypatch):
@@ -164,7 +165,7 @@ def test_opa_itself_tells_undefined_from_broken(tmp_path):
 # --------------------------------------------------------------------------- #
 FAILURE = auto_test.make_failure(
     "location", "terraform plan failed for inputs/x:\nError: 100% broken, a:b",
-    "Svc", "google_x", file=project_root / "inputs/gcp/Svc/google_x/location")
+    "Svc", "google_x", file=project_root / "policies/gcp/Svc/google_x/location")
 
 
 def test_a_failure_becomes_an_annotation_and_a_summary_row(tmp_path, capsys):
@@ -172,10 +173,10 @@ def test_a_failure_becomes_an_annotation_and_a_summary_row(tmp_path, capsys):
     env = {"GITHUB_ACTIONS": "true", "GITHUB_STEP_SUMMARY": str(summary)}
     auto_test.report_failures_to_github([FAILURE], env)
     assert capsys.readouterr().out.strip() == (
-        "::error file=inputs/gcp/Svc/google_x/location,title=google_x/location::"
+        "::error file=policies/gcp/Svc/google_x/location,title=google_x/location::"
         "terraform plan failed for inputs/x:%0AError: 100%25 broken, a:b")
     table = summary.read_text()
-    assert "| google_x | location | `inputs/gcp/Svc/google_x/location` |" in table
+    assert "| google_x | location | `policies/gcp/Svc/google_x/location` |" in table
     assert "inputs/x:<br>Error: 100% broken" in table
 
 
@@ -194,10 +195,9 @@ def test_a_table_cell_cannot_break_the_table():
 # --------------------------------------------------------------------------- #
 def test_an_empty_run_names_where_it_looked(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(sys, "argv", ["auto_test.py", "--inputs", "inputs/gcp/A/r",
-                                      "--policies", "policies/gcp/A/r"])
+    monkeypatch.setattr(sys, "argv", ["auto_test.py", "--policies", "policies/gcp/A/r"])
     with pytest.raises(SystemExit) as exit_info:
         auto_test.main()
     assert exit_info.value.code == 1
     out = capsys.readouterr().out
-    assert "inputs/gcp/A/r" in out and "policies/gcp/A/r" in out
+    assert "policies/gcp/A/r" in out.replace("\\", "/")

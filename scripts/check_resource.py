@@ -20,11 +20,11 @@ tells you which one failed:
                            here) and a non-empty ``rationale``, and no argument in
                            the base branch's copy of the doc is missing from it
   5. True-arg coverage     every argument with ``security_impact: true`` has both a
-                           policy ``policies/.../<resource>/<arg>.rego`` and a fixture
-                           ``inputs/.../<resource>/<arg>/``
+                           policy ``policy.rego``, ``compliant.tf`` and ``nonCompliant.tf``
+                           inside ``policies/.../<resource>/<arg>/``
   6. OPA test              scripts/auto_test/auto_test.py scoped to the resource
                            (terraform plan + opa eval), which also enforces
-                           input<->policy pairing. A resource with no
+                           complete argument directories. A resource with no
                            security-impacting arguments, and no policies or
                            fixtures, has nothing to test and passes.
 
@@ -82,21 +82,11 @@ from _service_slug import slug_to_folder  # noqa: E402
 # re-derived, so --if-cached asks exactly the question auto_test itself asks.
 from scripts.auto_test.auto_test import (  # noqa: E402
     github_error, in_github_actions, make_streams_encoding_safe, plan_cache_path,
-    write_step_summary)
+    write_step_summary, discover_policies, is_committed_plan)
 
-DOCS, INPUTS, POLICIES = "docs", "inputs", "policies"
+DOCS, POLICIES = "docs", "policies"
 LINTERS = REPO / "scripts" / "linters"
 AUTO_TEST = str(REPO / "scripts" / "auto_test" / "auto_test.py")
-
-# TODO(after this migration branch merges to dev): confine a Service/ PR's DIFF to
-# its selected service. Fail the PR if it changes any docs/, inputs/ or policies/
-# file outside `<tree>/<platform>/<folder>/` (service-level, per the owner's intent;
-# could tighten to `<folder>/<resource>/` if desired). Add it as a step in the
-# policy_check job (gated on Service/ branches) — e.g. compare
-# `git diff --name-only origin/<base>...HEAD` against the selected service path.
-# DEFERRED because this chore/ branch intentionally modified inputs/policies/docs
-# across many services and must not be blocked by such a guardrail.
-
 
 # --------------------------------------------------------------------------- #
 # Reporting
@@ -219,11 +209,10 @@ def staged_paths():
 
 
 def touches_resource(paths, platform, folder, resource):
-    """The staged paths belonging to this resource's docs, fixtures or policies."""
-    prefixes = (f"{INPUTS}/{platform}/{folder}/{resource}/",
-                f"{POLICIES}/{platform}/{folder}/{resource}/")
-    doc = f"{DOCS}/{platform}/{folder}/{resource}.json"
-    return [p for p in paths if p == doc or p.startswith(prefixes)]
+    prefix = f"{POLICIES}/{platform}/{folder}/{resource}/"
+    dependencies = {f"{DOCS}/{platform}/{folder}/{resource}.json",
+                    f"{POLICIES}/{platform}/config.tf"}
+    return [p for p in paths if p in dependencies or p.startswith(prefix)]
 
 
 def touches_opa_inputs(paths):
@@ -234,7 +223,8 @@ def touches_opa_inputs(paths):
     what terraform plans or what OPA decides — so the expensive step is skippable
     while the two cheap ones still run.
     """
-    return any(p.endswith((".tf", ".rego")) for p in paths)
+    return any(p.endswith((".tf", ".rego")) or
+               (p.startswith(f"{POLICIES}/") and p.endswith(".json")) for p in paths)
 
 
 def base_ref():
@@ -353,22 +343,23 @@ def check_true_arg_coverage(doc, platform, folder, resource):
     errors = []
     for name, entry in leaf_args(doc):
         if entry.get("security_impact") is True:
-            policy = Path(POLICIES) / platform / folder / resource / f"{name}.rego"
-            fixture = Path(INPUTS) / platform / folder / resource / name
-            if not policy.is_file():
-                errors.append(f"true arg '{name}': missing policy {policy}")
-            if not fixture.is_dir():
-                errors.append(f"true arg '{name}': missing input fixture {fixture}/")
+            directory = Path(POLICIES) / platform / folder / resource / name
+            for required in ("policy.rego", "compliant.tf", "nonCompliant.tf"):
+                if not (directory / required).is_file():
+                    errors.append(f"true arg '{name}': missing {directory / required}")
     return errors
 
 
-def uncached_fixtures(inputs_dir):
-    """Fixture dirs under ``inputs_dir`` with no committed plan beside their *.tf."""
-    root = REPO / inputs_dir
-    if not root.is_dir():
-        return []
-    return [d for d in sorted(root.rglob("*"))
-            if d.is_dir() and any(d.glob("*.tf")) and not plan_cache_path(d).exists()]
+def uncached_fixtures(policies_dir):
+    """Missing/stale plans count as uncached; incomplete fixtures are checked by the gate."""
+    root = REPO / policies_dir
+    missing = []
+    pairs, malformed = discover_policies(root)
+    missing.extend(d for d, _ in malformed)
+    for directory, _ in pairs:
+        if not is_committed_plan(plan_cache_path(directory, REPO)):
+            missing.append(directory)
+    return missing
 
 
 def has_true_args(doc):
@@ -377,18 +368,18 @@ def has_true_args(doc):
 
 def has_policies_or_fixtures(platform, folder, resource):
     """Whether the resource has any fixture directory or policy file at all."""
-    inputs = REPO / INPUTS / platform / folder / resource
     policies = REPO / POLICIES / platform / folder / resource
-    return ((inputs.is_dir() and any(p.is_dir() for p in inputs.iterdir()))
-            or (policies.is_dir() and any(policies.glob("*.rego"))))
+    return policies.is_dir() and any(
+        p.is_dir() or p.suffix in {".rego", ".tf"}
+        for p in policies.iterdir()
+    )
 
 
 def step_opa(report, platform, folder, resource, if_cached):
-    inputs = Path(INPUTS) / platform / folder / resource
     policies = Path(POLICIES) / platform / folder / resource
 
     if if_cached:
-        missing = uncached_fixtures(inputs)
+        missing = uncached_fixtures(policies)
         if missing:
             report.skip("OPA test",
                         f"{len(missing)} fixture(s) have no committed plan — terraform would "
@@ -399,7 +390,7 @@ def step_opa(report, platform, folder, resource, if_cached):
         report_path = Path(tmp) / "report.json"
         # The child's own ::error lines would arrive here indented inside show()'s
         # echo; the annotations are raised once, from its report, by report.fail.
-        result = run([AUTO_TEST, "--inputs", str(inputs), "--policies", str(policies),
+        result = run([AUTO_TEST, "--policies", str(policies),
                       "--verbose", "--report", str(report_path)],
                      env_drop=("GITHUB_ACTIONS", "GITHUB_STEP_SUMMARY"))
         failures = opa_failures(report_path, resource)
@@ -549,7 +540,7 @@ def main(argv=None):
         # auto_test, which reports it as an orphan.
         report.ok("OPA test", "no security-impacting arguments, so there are no policies to test")
     elif not staged_opa:
-        report.skip("OPA test", "this commit changes no *.tf or *.rego, so the plan "
+        report.skip("OPA test", "this commit changes no Terraform files, Rego or committed plans, so the plan "
                                 "and the policy verdicts cannot have moved")
     else:
         step_opa(report, platform, folder, resource, args.if_cached)

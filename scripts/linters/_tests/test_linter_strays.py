@@ -37,7 +37,7 @@ def repo(tmp_path):
     _git("config", "user.email", "t@example.com", cwd=tmp_path)
     _git("config", "user.name", "t", cwd=tmp_path)
     (tmp_path / ".gitignore").write_text("plan\nplan.json\ntfplan\n")
-    d = tmp_path / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket" / "location"
+    d = tmp_path / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket" / "location"
     d.mkdir(parents=True)
     for name in ("compliant.tf", "config.tf", "nonCompliant.tf"):
         (d / name).write_text("# fixture\n")
@@ -60,9 +60,9 @@ def test_the_artifacts_the_guide_produces_are_ignored(repo):
     root, d = repo
     for name in ("plan", "plan.json", "tfplan"):
         (d / name).write_text("x")
-    ignored = _ignored(root, "inputs")
+    ignored = _ignored(root, "policies")
     for name in ("plan", "plan.json", "tfplan"):
-        rel = os.path.normpath(os.path.join("inputs", "gcp", "Cloud Storage",
+        rel = os.path.normpath(os.path.join("policies", "gcp", "Cloud Storage",
                                             "google_storage_bucket", "location", name))
         assert rel in ignored, f"{name} should be ignored"
 
@@ -70,8 +70,8 @@ def test_the_artifacts_the_guide_produces_are_ignored(repo):
 def test_a_file_git_would_commit_is_not_ignored(repo):
     root, d = repo
     (d / "notes.txt").write_text("x")
-    ignored = _ignored(root, "inputs")
-    rel = os.path.normpath("inputs/gcp/Cloud Storage/google_storage_bucket/location/notes.txt")
+    ignored = _ignored(root, "policies")
+    rel = os.path.normpath("policies/gcp/Cloud Storage/google_storage_bucket/location/notes.txt")
     assert rel not in ignored
 
 
@@ -84,8 +84,8 @@ def test_a_tracked_file_is_never_ignored_however_well_gitignore_matches_it(repo)
     _git("add", "-f", str(d / "tfplan"), cwd=root)
     _git("commit", "-qm", "oops", cwd=root)
 
-    ignored = _ignored(root, "inputs")
-    rel = os.path.normpath("inputs/gcp/Cloud Storage/google_storage_bucket/location/tfplan")
+    ignored = _ignored(root, "policies")
+    rel = os.path.normpath("policies/gcp/Cloud Storage/google_storage_bucket/location/tfplan")
     assert rel not in ignored, "a tracked file must stay visible to the linter"
 
 
@@ -94,29 +94,31 @@ def test_outside_a_git_checkout_it_declines_to_answer(tmp_path):
     # which would flag every contributor's plan.json. The callers fall back to the
     # name allow-list instead.
     plain = tmp_path / "not-a-repo"
-    (plain / "inputs").mkdir(parents=True)
+    (plain / "policies").mkdir(parents=True)
     cwd = os.getcwd()
     os.chdir(plain)
     try:
-        assert linter.ignored_under("inputs") is None
+        assert linter.ignored_under("policies") is None
     finally:
         os.chdir(cwd)
 
 
+@pytest.mark.repository_data
 def test_the_real_repo_has_no_strays():
+    assert (project_root / "policies/gcp/config.tf").is_file(), "cutover is required"
     # The whole point, asserted against the tree that ships: every file in every
     # argument directory is a fixture, its committed plan, or something git ignores.
     cwd = os.getcwd()
     os.chdir(project_root)
     try:
-        ignored = linter.ignored_under("inputs")
+        ignored = linter.ignored_under("policies")
         assert ignored is not None, "the repo is a git checkout"
         strays = []
-        for arg_dir in Path("inputs").glob("gcp/*/*/*"):
+        for arg_dir in Path("policies").glob("gcp/*/*/*"):
             if not arg_dir.is_dir():
                 continue
             for f in arg_dir.iterdir():
-                if f.is_dir() or f.suffix in (".tf", ".json"):
+                if f.is_dir() or f.suffix in (".tf", ".json", ".rego"):
                     continue
                 if os.path.normpath(str(f)) not in ignored:
                     strays.append(str(f))
