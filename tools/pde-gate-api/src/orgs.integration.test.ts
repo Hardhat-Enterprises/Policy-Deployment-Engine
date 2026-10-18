@@ -1,5 +1,6 @@
 /**
- * API integration tests — need MySQL via tools/pde-gate-api/.env
+ * API integration tests — need MySQL via tools/pde-gate-api/.env, migrated
+ * (`npm run db:migrate`). Skipped when no database is reachable.
  * Cases that break auth, validation, and package CRUD.
  */
 import assert from "node:assert/strict";
@@ -10,6 +11,12 @@ import { sequelize } from "./db/sequelize.js";
 import "./db/models/index.js";
 
 dotenv.config();
+
+const dbAvailable = await sequelize.authenticate().then(
+  () => true,
+  () => false
+);
+const opts = { skip: dbAvailable ? false : "no MySQL reachable (see tools/pde-gate-api/.env)" };
 
 after(async () => {
   await sequelize.close();
@@ -61,7 +68,7 @@ async function json(
   return { status: res.status, body };
 }
 
-test("API: health", async () => {
+test("API: health", opts, async () => {
   const srv = await startServer();
   try {
     const { status, body } = await json(srv.base, "GET", "/health");
@@ -72,7 +79,7 @@ test("API: health", async () => {
   }
 });
 
-test("API: register validation — missing fields", async () => {
+test("API: register validation — missing fields", opts, async () => {
   const srv = await startServer();
   try {
     const missingName = await json(srv.base, "POST", "/v1/orgs/register", {
@@ -89,7 +96,7 @@ test("API: register validation — missing fields", async () => {
   }
 });
 
-test("API: register → login → auth → package CRUD lifecycle", async () => {
+test("API: register → login → auth → package CRUD lifecycle", opts, async () => {
   const srv = await startServer();
   const testEmail = `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`;
   const testPassword = "super-secret-password-123";
@@ -98,16 +105,22 @@ test("API: register → login → auth → package CRUD lifecycle", async () => 
       body: { org_name: "Test Org", contact_email: testEmail, password: testPassword },
     });
     assert.equal(reg.status, 201);
-    const { org_id, api_key } = reg.body as { org_id: string; api_key: string };
+    const { org_id } = reg.body as { org_id: string };
+    let { api_key } = reg.body as { api_key: string };
     assert.ok(org_id.startsWith("org_"));
     assert.ok(api_key.startsWith("pde_"));
 
-    // Test Login / API key recovery
+    // Login issues a new key and revokes the old one (only hashes are stored).
     const loginOk = await json(srv.base, "POST", "/v1/orgs/login", {
       body: { email: testEmail, password: testPassword },
     });
     assert.equal(loginOk.status, 200);
-    assert.equal((loginOk.body as { api_key: string }).api_key, api_key);
+    const firstKey = api_key;
+    api_key = (loginOk.body as { api_key: string }).api_key;
+    assert.ok(api_key.startsWith("pde_"));
+    assert.notEqual(api_key, firstKey);
+    const revoked = await json(srv.base, "GET", `/v1/orgs/${org_id}`, { key: firstKey });
+    assert.equal(revoked.status, 401);
 
     const loginFail = await json(srv.base, "POST", "/v1/orgs/login", {
       body: { email: testEmail, password: "wrong-password" },
@@ -131,6 +144,12 @@ test("API: register → login → auth → package CRUD lifecycle", async () => 
       body: { policy_groups: {} },
     });
     assert.equal(createMissingName.status, 400);
+
+    const createUnknownArgument = await json(srv.base, "POST", `/v1/orgs/${org_id}/packages`, {
+      key: api_key,
+      body: { name: "bad", policy_groups: { google_vpc_access_connector: ["network"] } },
+    });
+    assert.equal(createUnknownArgument.status, 400);
 
     const created = await json(srv.base, "POST", `/v1/orgs/${org_id}/packages`, {
       key: api_key,
