@@ -70,9 +70,13 @@ export function isPolicyFailure(message: unknown): boolean {
   return false;
 }
 
+/** policy_type is matched case-insensitively: policies spell it "whitelist" and "Whitelist". */
+const CONTENT_SECURITY = /"policy_type"\s*:\s*"content security"/i;
+const WHITELIST = /"policy_type"\s*:\s*"whitelist"/i;
+
 /** Content-security policies read Bandit findings that this check does not produce. */
 export function needsContentAnalysis(policyFile: string): boolean {
-  return fs.readFileSync(policyFile, "utf8").includes('"policy_type": "content security"');
+  return CONTENT_SECURITY.test(fs.readFileSync(policyFile, "utf8"));
 }
 
 export function writeTempInput(plan: unknown): string {
@@ -120,7 +124,7 @@ export function substituteOrgValues(
     const attr = obj.match(/"attribute_path"\s*:\s*\[\s*"([a-z_]+)"\s*\]/)?.[1];
     const spec = attr ? ORG_VALUE_ATTRIBUTES[attr] : undefined;
     if (!attr || !spec) return obj;
-    if (!/"policy_type"\s*:\s*"whitelist"/.test(obj)) return obj;
+    if (!WHITELIST.test(obj)) return obj;
     const approved = approvedValues(orgConfig, spec.variable);
     if (!approved) return obj;
     const values = obj.match(VALUES_ARRAY);

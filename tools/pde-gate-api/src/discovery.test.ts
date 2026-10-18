@@ -157,6 +157,16 @@ test("substitution: location values that are not regions are kept, with a warnin
   assert.match(warnings[0]!, /\["global"\] are not approved_regions names/);
 });
 
+test("substitution: policy_type is read case-insensitively (\"Whitelist\")", () => {
+  const file = path.join(root, "gcp/Compute Engine/google_compute_region_autoscaler/region/policy.rego");
+  const original = fs.readFileSync(file, "utf8");
+  assert.match(original, /"policy_type": "Whitelist"/);
+  const { text } = substituteOrgValues(original, { approved_regions: ["europe-west1"] });
+  assert.match(text, /"values": \["europe-west1"\]/);
+  const blacklist = REGION_POLICY.replace('"whitelist"', '"Blacklist"');
+  assert.equal(substituteOrgValues(blacklist, { approved_regions: ["us-central1"] }).text, blacklist);
+});
+
 test("substitution: zones use approved_zones, any key order", () => {
   const zone = `{
       "attribute_path": ["zone"],

@@ -54,10 +54,10 @@ test("a package for another platform is rejected", async () => {
 // ---------------------------------------------------------------------------
 const regionDir = path.join(policiesRoot(), "gcp/Memorystore (Redis)/google_redis_instance/region");
 
-function committedPlan(): Record<string, unknown> {
-  const name = fs.readdirSync(regionDir).find((f) => /^[0-9a-f]{64}\.json$/.test(f));
+function committedPlan(dir = regionDir): Record<string, unknown> {
+  const name = fs.readdirSync(dir).find((f) => /^[0-9a-f]{64}\.json$/.test(f));
   assert.ok(name, "committed <sha>.json plan");
-  return JSON.parse(fs.readFileSync(path.join(regionDir, name), "utf8"));
+  return JSON.parse(fs.readFileSync(path.join(dir, name), "utf8"));
 }
 
 function nonCompliant(message: unknown): string[] {
@@ -118,15 +118,65 @@ test("opa: all 9 redis policies run on their own data, none errors", { skip: !ha
   assert.equal(result.evaluated, 9);
 });
 
-test("opa: a content-security policy is skipped and the check is an error", { skip: !hasOpa }, async () => {
+const cesAgentDir = path.join(policiesRoot(), "gcp/Customer Engagement Suite/google_ces_agent/location");
+
+test("opa: the 6 content-security policies are skipped, the rest decide the result", { skip: !hasOpa }, async () => {
+  const result = await evaluateCheck({ pkg: pkg(), plan: committedPlan(cesAgentDir) });
+  const skipped = result.policies.filter((p) => p.status === "skipped").map((p) => p.argument);
+  assert.deepEqual(skipped.sort(), [
+    "after_agent_callbacks.python_code",
+    "after_model_callbacks.python_code",
+    "after_tool_callbacks.python_code",
+    "before_agent_callbacks.python_code",
+    "before_model_callbacks.python_code",
+    "before_tool_callbacks.python_code",
+  ]);
+  assert.equal(result.skipped.length, 6);
+  for (const argument of skipped) {
+    assert.ok(
+      result.warnings.some((w) => w.startsWith(`google_ces_agent/${argument}: skipped`)),
+      `warning for ${argument}`
+    );
+  }
+  assert.deepEqual(result.errors, []);
+  assert.notEqual(result.status, "error");
+  assert.equal(result.evaluated, result.policies.length - 6);
+  assert.ok(result.evaluated > 0);
+  // The location fixture's non-compliant resource still fails its policy.
+  assert.equal(result.status, "fail");
+  assert.ok(result.failures.some((f) => f.argument === "location"));
+});
+
+test("opa: when every selected policy is skipped, nothing was evaluated → error", { skip: !hasOpa }, async () => {
   const result = await evaluateCheck({
     pkg: pkg({ policy_groups: { google_ces_agent: ["after_agent_callbacks.python_code"] } }),
     plan: planWith([{ type: "google_ces_agent", name: "a", values: {} }]),
   });
   assert.equal(result.status, "error");
   assert.equal(result.ok, false);
-  assert.equal(result.skipped.length, 1);
+  assert.equal(result.evaluated, 0);
+  assert.deepEqual(result.policies.map((p) => p.status), ["skipped"]);
   assert.match(result.skipped[0]!.reason, /Bandit/);
+  assert.match(result.message, /Every selected policy was skipped/);
+});
+
+test("opa: a capitalised \"Whitelist\" still takes the org's approved_regions", { skip: !hasOpa }, async () => {
+  const dir = path.join(policiesRoot(), "gcp/Compute Engine/google_compute_region_autoscaler/region");
+  assert.match(fs.readFileSync(path.join(dir, "policy.rego"), "utf8"), /"policy_type": "Whitelist"/);
+  const only = { google_compute_region_autoscaler: ["region"] };
+  const own = await evaluateCheck({ pkg: pkg({ policy_groups: only }), plan: committedPlan(dir) });
+  assert.deepEqual(nonCompliant(own.failures[0]!.message), ["non_compliant_example_1"]);
+
+  const org = await evaluateCheck({
+    pkg: pkg({
+      policy_groups: only,
+      variables: { google_provider_version: "7.37.0", approved_regions: ["asia-south1"] },
+    }),
+    plan: committedPlan(dir),
+  });
+  // compliant_example_1 is in us-central1, non_compliant_example_1 in asia-south1.
+  assert.equal(org.status, "fail");
+  assert.deepEqual(nonCompliant(org.failures[0]!.message), ["compliant_example_1"]);
 });
 
 test("opa: a policy OPA rejects, or with no message rule, is a per-policy error", { skip: !hasOpa }, async () => {
