@@ -52,6 +52,28 @@ test("package body: field types are checked", () => {
   assert.deepEqual(packageBody({ description: "x" }, { partial: true }), { description: "x" });
 });
 
+test("package body: approved_regions and approved_zones must be GCP names", () => {
+  const vars = (variables: Record<string, unknown>) => () =>
+    packageBody({ name: "p", variables }, { partial: false });
+  rejects400(vars({ approved_regions: ["us-east-1"] }), /approved_regions: \["us-east-1"\] is not a GCP name/);
+  rejects400(vars({ approved_regions: ["US-CENTRAL1"] }), /approved_regions/);
+  rejects400(vars({ approved_regions: ["global"] }), /approved_regions/);
+  rejects400(vars({ approved_regions: ["us-central1", "$&"] }), /approved_regions: \["\$&"\]/);
+  rejects400(vars({ approved_zones: ["us-east-1a"] }), /approved_zones: \["us-east-1a"\]/);
+  rejects400(vars({ approved_zones: ["us-central1"] }), /approved_zones/);
+  rejects400(
+    () => packageBody({ variables: { approved_zones: ["us-central1-a", "eu"] } }, { partial: true }),
+    /approved_zones: \["eu"\]/
+  );
+  assert.deepEqual(
+    packageBody(
+      { variables: { approved_regions: ["us-central1", "us-east1"], approved_zones: ["us-central1-a"] } },
+      { partial: true }
+    ).variables,
+    { approved_regions: ["us-central1", "us-east1"], approved_zones: ["us-central1-a"] }
+  );
+});
+
 test("api keys: stored as sha256, compared in constant time", () => {
   const key = "pde_0123456789abcdef";
   const stored = hashApiKey(key);

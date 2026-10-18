@@ -7,6 +7,12 @@ import type { CreatePackageRequest } from "./types.js";
 
 const PLATFORMS: readonly PlatformId[] = ["gcp", "aws", "azure"];
 
+/** GCP names: a region is australia-southeast1, a zone australia-southeast1-a. */
+const ORG_VALUE_SHAPES: Record<string, { shape: RegExp; example: string }> = {
+  approved_regions: { shape: /^[a-z]+-[a-z]+[0-9]+$/, example: "us-central1" },
+  approved_zones: { shape: /^[a-z]+-[a-z]+[0-9]+-[a-z]$/, example: "us-central1-a" },
+};
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -107,8 +113,17 @@ export function packageBody(
   if (body.variables !== undefined) {
     if (!isPlainObject(body.variables)) throw new HttpError(400, "variables must be an object");
     const variables: Record<string, unknown> = { ...body.variables };
-    for (const field of ["approved_regions", "approved_zones"]) {
-      if (variables[field] !== undefined) variables[field] = stringList(variables[field], `variables.${field}`);
+    for (const [field, { shape, example }] of Object.entries(ORG_VALUE_SHAPES)) {
+      if (variables[field] === undefined) continue;
+      const list = stringList(variables[field], `variables.${field}`);
+      const bad = list.filter((v) => !shape.test(v));
+      if (bad.length > 0) {
+        throw new HttpError(
+          400,
+          `variables.${field}: ${JSON.stringify(bad.slice(0, 10))} ${bad.length === 1 ? "is not a GCP name" : "are not GCP names"} (e.g. ${example})`
+        );
+      }
+      variables[field] = list;
     }
     if (variables.google_provider_version !== undefined && typeof variables.google_provider_version !== "string") {
       throw new HttpError(400, "variables.google_provider_version must be a string");
