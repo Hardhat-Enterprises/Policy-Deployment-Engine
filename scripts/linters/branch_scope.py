@@ -8,8 +8,7 @@ exactly one resource, so it also names exactly the set of files the branch is
 allowed to touch::
 
     docs/<platform>/<Service folder>/<resource_type>.json      the documentation
-    inputs/<platform>/<Service folder>/<resource_type>/**      the fixtures
-    policies/<platform>/<Service folder>/<resource_type>/**    the policies
+    policies/<platform>/<Service folder>/<resource_type>/**    the policies and fixtures
 
 Anything else is somebody else's work or is shared by everybody, and a branch
 that changes it is either a stray `git add .` or a merge gone wrong. Two of
@@ -27,12 +26,10 @@ Neither shows up as a failing test on the branch that caused it, which is why
 this runs as its own gate on the push that introduces it.
 
 Committed terraform plans (``<sha>.json``) live inside the fixture directory they
-belong to, so they are covered by the ``inputs/`` line above and need no rule of
+belong to, so they are covered by the ``policies/`` line above and need no rule of
 their own — with one exception: deleting one is allowed *inside the branch's own
 scope*, because editing a fixture changes its sha and the harness prunes the plan
-of the old version as it writes the new one. ``inputs/plan_cache/`` is the tree
-those plans used to live in; a branch that re-adds it is working from a checkout
-older than that move.
+of the old version as it writes the new one.
 
 Note the service *slug* in the branch name is not the directory name: docs
 folders contain spaces and parentheses that are illegal in a git ref, so
@@ -71,7 +68,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from scripts.auto_test.auto_test import make_streams_encoding_safe  # noqa: E402
 
 RULES = {
-    "legacy-layout": "GCP fixtures now live beside policy.rego under policies/.",
     "out-of-scope-file": (
         "The file is not part of this branch's resource type. A Service/ branch may "
         "change only its own docs JSON and its own policies/ directory."),
@@ -83,9 +79,6 @@ RULES = {
     "shared-harness-edit": (
         "The file is part of the shared test harness, helper library or templates. "
         "It is common to every resource type and is not editable from a resource branch."),
-    "legacy-plan-cache": (
-        "inputs/plan_cache/ no longer exists. Committed terraform plans now live as "
-        "<sha>.json inside the fixture directory they were planned from."),
 }
 
 # Shared across every resource type, so never in one branch's scope.
@@ -101,9 +94,6 @@ SHARED_HARNESS_PREFIXES = (
     "templates/",
 )
 
-# Where committed plans used to live, before they moved beside their fixtures.
-LEGACY_PLAN_CACHE_PREFIX = "inputs/plan_cache/"
-
 # A committed plan is named for the sha of the *.tf beside it (auto_test.fixture_sha).
 PLAN_FILE_RE = re.compile(r"^[0-9a-f]{64}\.json$")
 
@@ -111,20 +101,19 @@ PLAN_FILE_RE = re.compile(r"^[0-9a-f]{64}\.json$")
 #
 # Restoring `.` would also revert a resource type the contributor legitimately
 # edited, and since `git restore` deletes what the source lacks, wipe one that is
-# new on this branch. Under the three content roots the recipe therefore
-# names the resource type itself — `inputs/gcp/Cloud Storage/google_storage_bucket`
-# — so a sibling resource is restored precisely and the contributor's own kit is
+# new on this branch. Under the content roots the recipe therefore names the
+# resource type itself — `policies/gcp/Cloud Storage/google_storage_bucket` — so
+# a sibling resource is restored precisely and the contributor's own kit is
 # never inside the command. Everywhere else the top-level directory is safe:
 # nothing under `.github/`, `Guide/`, `scripts/` or `tests/` is ever one
 # contributor's work.
-CONTENT_ROOTS = ("docs/", "inputs/", "policies/")
+CONTENT_ROOTS = ("docs/", "policies/")
 RESOURCE_DEPTH = 4
 
 SERVICE_PREFIX = "Service/"
 
 # Where to send a contributor for each rule.
 REMEDIES = {
-    "legacy-layout": "Merge origin/{base} after cutover and use the nested policies/ layout; do not resurrect inputs/gcp/.",
     "out-of-scope-file": (
         "Restore it with `git restore --source=\"$(git merge-base HEAD origin/{base})\" "
         "--staged --worktree -- '{path}'`, then commit again. That also removes it if "
@@ -141,11 +130,6 @@ REMEDIES = {
         "template really does need changing, raise it with a senior team member so it "
         "can go in on its own feature/ branch — editing it here does not change what "
         "you are checked against, and it stops the portal scanning your branch."),
-    "legacy-plan-cache": (
-        "Delete it with `git rm -r --cached inputs/plan_cache` (or `git checkout "
-        "origin/{base} -- .` if the whole tree came back), then merge `origin/{base}` "
-        "so your branch has the current layout. Your own plan is written beside your "
-        "fixtures by the next `auto_test.py` run — commit that instead."),
 }
 
 
@@ -238,7 +222,7 @@ def changed_entries(base, head="HEAD"):
 
     ``-z`` is used rather than plain ``--name-status``: it turns off git's
     C-style path quoting, and every service folder in this repo has a space in
-    it (``inputs/gcp/Cloud Storage/...``).
+    it (``policies/gcp/Cloud Storage/...``).
     """
     merge_base = subprocess.run(["git", "merge-base", head, base],
                                 capture_output=True, text=True)
@@ -358,7 +342,7 @@ def path_in_scope(path, platform, folder, resource_type):
         # docs/<platform>/<folder>/<resource_type>.json — exactly one file.
         return len(parts) == 4 and _segments_match(parts[3], f"{resource_type}.json")
 
-    # inputs|policies/<platform>/<folder>/<resource_type>/** — anything below.
+    # policies/<platform>/<folder>/<resource_type>/** — anything below.
     return len(parts) >= 5 and _segments_match(parts[3], resource_type)
 
 
@@ -366,14 +350,8 @@ def classify(status, path, platform, folder, resource_type):
     """The single rule ``path`` breaks, or None if it is allowed.
 
     Order is most-specific-location first so a contributor gets the one message
-    that tells them what to do: a branch working from the pre-move layout is told
-    that once, not once per resurrected cache file.
+    that tells them what to do.
     """
-    if path.startswith((LEGACY_PLAN_CACHE_PREFIX, "plan_cache/")):
-        # Deleting the old tree is exactly right; bringing it back is the mistake.
-        return None if status == "D" else "legacy-plan-cache"
-    if path.startswith("inputs/gcp/"):
-        return "legacy-layout"
     if re.fullmatch(r"policies/[^/]+/config\.tf", path):
         return "shared-harness-edit"
     if status == "D":
@@ -438,14 +416,11 @@ def _quote(path):
 def recovery_group(path):
     """The directory the recipe names on ``path``'s behalf.
 
-    Under the three content roots that is the resource type itself
-    (``inputs/<platform>/<Service folder>/<resource_type>``), so a sibling's kit
+    Under the content roots that is the resource type itself
+    (``policies/<platform>/<Service folder>/<resource_type>``), so a sibling's kit
     is named exactly and the contributor's own is never inside the command; the
-    top-level directory everywhere else; and the legacy plan cache as a whole,
-    because a branch that resurrected it did so wholesale.
+    top-level directory everywhere else.
     """
-    if path.startswith(LEGACY_PLAN_CACHE_PREFIX):
-        return LEGACY_PLAN_CACHE_PREFIX.rstrip("/")
     parts = path.split("/")
     if path.startswith(CONTENT_ROOTS):
         return "/".join(parts[:RESOURCE_DEPTH])
@@ -458,11 +433,10 @@ def _ordered(paths):
 
 
 # Only these rules need the branch brought up to date first. The harness is
-# pulled from dev when the portal scans a branch, and a resurrected plan cache
-# means the checkout predates the move, so both are fixed by catching up with
-# dev. Everything else is somebody else's file, and the branch being behind dev
-# is no reason to make its contributor merge.
-MERGE_RULES = ("shared-harness-edit", "legacy-plan-cache")
+# pulled from dev when the portal scans a branch, so it is fixed by catching up
+# with dev. Everything else is somebody else's file, and the branch being behind
+# dev is no reason to make its contributor merge.
+MERGE_RULES = ("shared-harness-edit",)
 
 
 def recovery_plan(findings, scope=None):
@@ -568,7 +542,7 @@ def _print_rules():
 
 def _report(findings, max_per_rule, base="origin/dev", staged=False, scope=None):
     """Human-readable report. Findings are grouped by rule so the explanation is
-    printed once and a wiped plan cache does not scroll the real message away.
+    printed once and a long list of files does not scroll the real message away.
 
     The per-rule sections say *why* each file is a problem, one file's remedy as
     the example; the block after them says how to fix all of them at once.

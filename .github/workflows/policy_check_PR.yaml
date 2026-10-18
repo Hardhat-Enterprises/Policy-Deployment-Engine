@@ -90,7 +90,7 @@ jobs:
           else
             files=$(git ls-files)      # workflow_dispatch: treat everything as changed
           fi
-          echo "$files" | grep -qE '^(docs|inputs|policies)/' && trees=true || trees=false
+          echo "$files" | grep -qE '^(docs|policies)/' && trees=true || trees=false
           echo "$files" | grep -qE '^(scripts|tests|templates)/' && tooling=true || tooling=false
           # The engine every policy is evaluated by. Called out separately from
           # `trees` because its blast radius is the whole repository: a change
@@ -111,7 +111,7 @@ jobs:
       # Hard gate: the whole tree must stay structurally valid. Structural only
       # (--no-content-checks) on purpose — a whole-tree content gate would block
       # every PR on any repo-wide content regression; content is gated per-PR below.
-      # Reconciliation is between docs/, inputs/ and policies/, so only a change to
+      # Reconciliation is between docs/ and policies/, so only a change to
       # one of them — or to the linter that judges them — can alter the verdict.
       - name: Structural lint (whole tree)
         if: steps.changed.outputs.trees == 'true' || steps.changed.outputs.tooling == 'true'
@@ -135,7 +135,7 @@ jobs:
       # this step a change to the linters or the harness could break all 269 of them
       # and still merge — and those are exactly the changes that reach every
       # contributor at once. After Install OPA because most of them evaluate Rego.
-      # The tools test the tools; nothing under docs/ or inputs/ can break them.
+      # The tools test the tools; nothing under docs/ can break them.
       - name: Run the test suite
         if: steps.changed.outputs.tooling == 'true'
         run: |

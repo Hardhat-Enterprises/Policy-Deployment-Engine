@@ -164,7 +164,7 @@ def test_opa_itself_tells_undefined_from_broken(tmp_path):
 # GitHub Actions output
 # --------------------------------------------------------------------------- #
 FAILURE = auto_test.make_failure(
-    "location", "terraform plan failed for inputs/x:\nError: 100% broken, a:b",
+    "location", "terraform plan failed for policies/x:\nError: 100% broken, a:b",
     "Svc", "google_x", file=project_root / "policies/gcp/Svc/google_x/location")
 
 
@@ -174,10 +174,10 @@ def test_a_failure_becomes_an_annotation_and_a_summary_row(tmp_path, capsys):
     auto_test.report_failures_to_github([FAILURE], env)
     assert capsys.readouterr().out.strip() == (
         "::error file=policies/gcp/Svc/google_x/location,title=google_x/location::"
-        "terraform plan failed for inputs/x:%0AError: 100%25 broken, a:b")
+        "terraform plan failed for policies/x:%0AError: 100%25 broken, a:b")
     table = summary.read_text()
     assert "| google_x | location | `policies/gcp/Svc/google_x/location` |" in table
-    assert "inputs/x:<br>Error: 100% broken" in table
+    assert "policies/x:<br>Error: 100% broken" in table
 
 
 def test_nothing_is_emitted_outside_actions(tmp_path, capsys):

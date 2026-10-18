@@ -11,7 +11,7 @@ count but never block.
 
 The same "own it, don't block on the backlog" treatment applies to
 ``policy_lint`` (scripts/linters/policy_lint.py): every resource type touched
-under policies/ or inputs/ is content-linted, but an individual finding only
+under policies/ is content-linted, but an individual finding only
 fails the run when the .rego file (or, for a fixture finding, the argument
 directory) it names was itself changed — a sibling argument's pre-existing
 finding never blocks you. See Guide/Policy_writing_tutorial/policy-lint.md.
@@ -62,11 +62,11 @@ ARGUMENT_FILES = {"policy.rego", "compliant.tf", "nonCompliant.tf", "config.tf"}
 
 # Findings about the fixture pair itself (compliant.tf/nonCompliant.tf), as
 # opposed to a policy .rego file — displayed and owned via the argument
-# directory under inputs/, not a single policy file.
+# directory, not a single policy file.
 #
 # fixture-one-sided belongs here for the same reason as the other two, and its
 # absence was a real bug under the old name (fixture-unpaired): the finding is
-# about inputs/, so leaving it out blamed it on a .rego file the contributor may
+# about the fixtures, so leaving it out blamed it on a .rego file the contributor may
 # never have touched. It fires 0 times on the tree today, so this closes a trap
 # set for whoever first writes a fixture with nothing on one side.
 FIXTURE_RULES = {"fixture-drift", "fixture-missing-plan", "fixture-one-sided"}
@@ -139,8 +139,8 @@ def _owned(changed):
 def _owned_triples(changed, root=REPO_ROOT):
     """(platform, service, resource_type) triples policy_lint should check.
 
-    Any changed file at least 4 segments deep under ``policies/`` or
-    ``inputs/`` puts its resource type in scope for ``policy_lint`` — the
+    Any changed file at least 4 segments deep under ``policies/`` puts its
+    resource type in scope for ``policy_lint`` — the
     individual *findings* are then scoped back down to the argument or
     fixture pair actually touched by ``_finding_owned``, so touching one
     argument does not put a sibling argument's pre-existing findings on you.
@@ -148,7 +148,7 @@ def _owned_triples(changed, root=REPO_ROOT):
     triples = set()
     for f in changed:
         parts = f.split("/")
-        if len(parts) >= 4 and parts[0] in ("policies", "inputs"):
+        if len(parts) >= 4 and parts[0] == "policies":
             triples.add((parts[1], parts[2], parts[3]))
         if len(parts) == 3 and parts[0] == "policies" and parts[-1] == "config.tf":
             platform_dir = Path(root) / "policies" / parts[1]
@@ -300,7 +300,7 @@ def _baseline_counts(triples, base_root):
     """
     findings = []
     for platform, service, resource_type in sorted(triples):
-        findings += policy_lint.lint_resource_baseline(base_root, platform, service, resource_type)
+        findings += policy_lint.lint_resource(base_root, platform, service, resource_type)
     return _finding_counts(findings)
 
 

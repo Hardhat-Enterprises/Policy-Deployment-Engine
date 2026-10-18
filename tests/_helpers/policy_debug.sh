@@ -8,6 +8,17 @@ cd "$(git rev-parse --show-toplevel)" || exit 1
 SUCCESS=0
 ERRORS=0
 
+# A policy's committed plan (the one <sha>.json in its argument directory) and its
+# package, so the cases below survive a provider bump renaming the plan.
+plan_of() {
+    local plan
+    plan=$(ls "$1" 2>/dev/null | grep -E '^[0-9a-f]{64}\.json$' | head -1)
+    echo "$1/$plan"
+}
+package_of() {
+    echo "data.$(awk 'NR == 1 {print $2}' "$1/policy.rego" 2>/dev/null)"
+}
+
 test_policy() {
     local name="$1"
     local input="$2"
@@ -105,25 +116,31 @@ test_policy() {
 echo "Policy Debug Output"
 echo "======================================"
 
-test_policy "Blacklist & Element Blacklist" \
-    "./inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_service_perimeter/status/plan.json" \
-    "data.terraform.gcp.security.access_context_manager_vpc_service_controls.access_context_manager_service_perimeter.status.message"
+ACM_OS_TYPE="./policies/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_level/basic.conditions.device_policy.os_constraints.os_type"
+APIHUB_ENCRYPTION="./policies/gcp/API Hub/google_apihub_api_hub_instance/config.encryption_type"
+BACKUP_LOG_RETENTION="./policies/gcp/Backup and DR Service/google_backup_dr_backup_plan/log_retention_days"
+APIGEE_CONTROL_PLANE_KEY="./policies/gcp/Apigee/google_apigee_organization/control_plane_encryption_key_name"
+INGRESS_POLICY_RESOURCE="./policies/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_ingress_policy/resource"
+
+test_policy "Blacklist" \
+    "$(plan_of "$ACM_OS_TYPE")" \
+    "$(package_of "$ACM_OS_TYPE").message"
 
 test_policy "Whitelist" \
-    "./inputs/gcp/api_hub/google_apihub_api_hub_instance/config_encryption_type/plan.json" \
-    "data.terraform.gcp.security.api_hub.google_apihub_api_hub_instance.config_encryption_type.message"
+    "$(plan_of "$APIHUB_ENCRYPTION")" \
+    "$(package_of "$APIHUB_ENCRYPTION").message"
 
 test_policy "Range" \
-    "./inputs/gcp/cloud_storage/google_storage_bucket/retention_period/plan.json" \
-    "data.terraform.gcp.security.cloud_storage.google_storage_bucket.retention_period.message"
+    "$(plan_of "$BACKUP_LOG_RETENTION")" \
+    "$(package_of "$BACKUP_LOG_RETENTION").message"
 
 test_policy "Pattern Blacklist" \
-    "./inputs/gcp/cloud_storage/google_storage_default_object_acl/public_access_prevention/plan.json" \
-    "data.terraform.gcp.security.cloud_storage.google_storage_default_object_acl.public_access_prevention.message"
+    "$(plan_of "$APIGEE_CONTROL_PLANE_KEY")" \
+    "$(package_of "$APIGEE_CONTROL_PLANE_KEY").message"
 
 test_policy "Pattern Whitelist" \
-    "./inputs/gcp/cloud_platform_service/google_project/project_id/plan.json" \
-    "data.terraform.gcp.security.cloud_platform_service.google_project.project_id.message"
+    "$(plan_of "$INGRESS_POLICY_RESOURCE")" \
+    "$(package_of "$INGRESS_POLICY_RESOURCE").message"
 
 echo ""
 echo "======================================"

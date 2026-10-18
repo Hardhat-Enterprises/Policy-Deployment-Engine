@@ -1,7 +1,7 @@
 """Unit tests for scripts/linters/policy_lint.py.
 
-Each case under ``fixtures/`` is a miniature repo tree (``docs/``, ``policies/``,
-``inputs/``). The trees are copied into ``tmp_path`` before every test and the
+Each case under ``fixtures/`` is a miniature repo tree (``docs/``, ``policies/``).
+The trees are copied into ``tmp_path`` before every test and the
 committed ``expected_plan.json`` next to a fixture's ``*.tf`` files is renamed to
 the sha-named ``<sha>.json`` that ``auto_test.plan_cache_path`` derives — the same
 directory, the committed name. Renaming at copy time (instead of committing it
@@ -40,7 +40,7 @@ def build_tree(tmp_path, case):
     dst = tmp_path / case
     shutil.copytree(FIXTURES / case, dst)
     for template in sorted(dst.rglob("expected_plan.json")):
-        cache = policy_lint.plan_cache_for(template.parent)
+        cache = policy_lint.plan_cache_path(template.parent)
         # Guard rail: the plan must land inside the copied tree, never in the real
         # repo — it is derived from a path, and a path bug is silent otherwise.
         assert dst in cache.parents, f"{cache} escaped the fixture tree {dst}"
@@ -60,33 +60,6 @@ def test_clean_resource_has_no_findings(tmp_path):
     root = build_tree(tmp_path, "clean")
     findings = policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
     assert findings == [], f"clean fixture must be silent, got {findings}"
-
-
-def test_old_base_and_new_head_keep_finding_identities_and_baseline_pin(tmp_path, monkeypatch):
-    root = build_tree(tmp_path, "fixtures_bad")
-    pin = root / "scripts/auto_test/provider_version.txt"
-    pin.parent.mkdir(parents=True)
-    pin.write_text(auto_test.TARGET_PROVIDER_VERSION)
-    resource = root / "policies/gcp/Cloud Storage/google_storage_bucket"
-    before = policy_lint.lint_resource(root, "gcp", "Cloud Storage", resource.name)
-    assert any(f.rule == "fixture-drift" for f in before)
-    # Reconstruct an old base from this synthetic head, preserving file bytes.
-    for policy in list(resource.glob("*/policy.rego")):
-        argument = policy.parent
-        fixtures = root / "inputs/gcp/Cloud Storage" / resource.name / argument.name
-        fixtures.mkdir(parents=True)
-        policy.rename(resource / f"{argument.name}.rego")
-        for source in list(argument.iterdir()):
-            source.rename(fixtures / source.name)
-        if not (fixtures / "config.tf").exists():
-            shutil.copyfile(root / "policies/gcp/config.tf", fixtures / "config.tf")
-        argument.rmdir()
-    monkeypatch.setattr(auto_test, "TARGET_PROVIDER_VERSION", "different-active-pin")
-    policy_lint.clear_caches()
-    baseline = policy_lint.lint_resource_baseline(root, "gcp", "Cloud Storage", resource.name)
-    assert pairs(baseline) == pairs(before)
-    assert not any(f.rule == "fixture-missing-plan" and f.policy == "public_access_prevention"
-                   for f in baseline)
 
 
 # --------------------------------------------------------------------------- #
@@ -459,7 +432,7 @@ def test_fixture_drift_ignores_identity_and_computed_mirrors(tmp_path, resource_
         f"{noise} must not be read as drift"
     # And the plan really does differ on it, so the exemption is doing work.
     plan_dir = root / "policies" / "gcp" / "Cloud Storage" / resource_type
-    cache = policy_lint.plan_cache_for(next(d for d in plan_dir.iterdir() if d.is_dir()))
+    cache = policy_lint.plan_cache_path(next(d for d in plan_dir.iterdir() if d.is_dir()))
     plan = json.loads(cache.read_text())
     values = {r["name"]: r["values"]
               for r in plan["planned_values"]["root_module"]["resources"]}
@@ -501,18 +474,6 @@ def test_the_prefix_alone_does_not_qualify_it():
     # separator is what makes it a name for this fixture.
     assert policy_lint._label_polarity("compliant") is None
     assert policy_lint._label_polarity("complianceteam") is None
-
-
-@pytest.mark.repository_data
-def test_plan_cache_for_matches_auto_test_on_the_real_repo():
-    # The linter must read exactly the file auto_test writes: same directory as the
-    # fixture, same sha-derived name.
-    input_dir = (project_root / "policies" / "gcp" / "Cloud Storage"
-                 / "google_storage_bucket" / "public_access_prevention")
-    assert input_dir.is_dir(), "real fixture moved — update this test"
-    cache = policy_lint.plan_cache_for(input_dir)
-    assert cache == auto_test.plan_cache_path(input_dir)
-    assert cache.parent == input_dir, "the committed plan lives beside its fixture"
 
 
 # --------------------------------------------------------------------------- #
@@ -956,7 +917,7 @@ def test_malformed_plan_cache_is_a_lint_error(tmp_path, payload):
     root = build_tree(tmp_path, "clean")
     input_dir = (root / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket"
                  / "public_access_prevention")
-    policy_lint.plan_cache_for(input_dir).write_text(payload)
+    policy_lint.plan_cache_path(input_dir).write_text(payload)
     findings = policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
     assert pairs(findings) == {("public_access_prevention", "lint-error")}
 
@@ -1004,7 +965,7 @@ def _bucket_plan(root):
     """(cache_path, plan, resources) for the clean tree's bucket fixture."""
     input_dir = (root / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket"
                  / CLEAN_BUCKET_ARG)
-    cache = policy_lint.plan_cache_for(input_dir)
+    cache = policy_lint.plan_cache_path(input_dir)
     plan = json.loads(cache.read_text())
     return cache, plan, plan["planned_values"]["root_module"]["resources"]
 
@@ -1167,7 +1128,6 @@ def test_an_exemption_silences_only_the_keys_it_names(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("entry", sorted(policy_lint.FIXTURE_DRIFT_EXEMPT))
-@pytest.mark.repository_data
 def test_every_exemption_is_still_needed(entry, monkeypatch):
     """Removing an entry must bring its finding back on the real tree.
 
@@ -1213,13 +1173,13 @@ def test_the_write_only_trio_is_one_setting():
 def _fixture_only_tree(tmp_path, stem, compliant_values, non_compliant_values,
                        service="Compute Engine",
                        resource_type="google_compute_region_ssl_certificate"):
-    """An inputs/ tree with a committed plan, and nothing else.
+    """A fixture directory with a committed plan, and nothing else.
 
     The fixture rules read the plan and the *.tf names only — no policies, no OPA —
     so this exercises the real drift rule without standing up a whole resource.
     """
-    # The nested layout, like every other tree in this file: fixtures sit in the
-    # argument directory under policies/. A local config.tf stands in for the
+    # Fixtures sit in the argument directory under policies/, like every other
+    # tree in this file. A local config.tf stands in for the
     # shared platform one so the hash resolver needs nothing outside this dir.
     input_dir = tmp_path / "policies" / "gcp" / service / resource_type / stem
     input_dir.mkdir(parents=True)
@@ -1234,7 +1194,7 @@ def _fixture_only_tree(tmp_path, stem, compliant_values, non_compliant_values,
     plan = {"planned_values": {"root_module": {"resources": [
         resource("compliant_example_1", compliant_values),
         resource("non_compliant_example_1", non_compliant_values)]}}}
-    policy_lint.plan_cache_for(input_dir).write_text(json.dumps(plan))
+    policy_lint.plan_cache_path(input_dir).write_text(json.dumps(plan))
     return input_dir
 
 
@@ -1393,7 +1353,7 @@ def test_an_entry_duplicating_the_write_only_pairing_is_stale(tmp_path):
         {"private_key": "leaked-in-state", "private_key_wo": None})
     resource_dir = (tree / "policies" / "gcp" / "Compute Engine"
                     / "google_compute_region_ssl_certificate")
-    resource_dir.mkdir(parents=True, exist_ok=True)   # shared with the fixture dir in the nested layout
+    resource_dir.mkdir(parents=True, exist_ok=True)   # already made: the fixture dir sits inside it
     (resource_dir / policy_lint.DRIFT_EXEMPTIONS_FILE).write_text(json.dumps(
         {"private_key": {"keys": ["private_key_wo"],
                          "reason": "One of private_key or private_key_wo can only be set."}}))

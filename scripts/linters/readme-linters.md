@@ -5,9 +5,6 @@ cross-consistency between `docs/` and `policies/`,
 treating `docs/` as the source of truth that policy directories and fixtures must
 reconcile to. It uses only the Python standard library (no extra installs).
 
-During preparation, production data is still in the old layout and whole-tree
-checks are expected to fail. See [cutover](../../Guide/layout-cutover.md).
-
 Supporting scripts:
 
 - `run_precommit_linter.py` — runs the linter but fails only on **your** changed
@@ -75,7 +72,8 @@ The structural pass validates directories, required files and committed plans.
   `compliant.tf`, `nonCompliant.tf` and the expected valid `<sha>.json`.
   Local `config.tf` replaces the shared `policies/gcp/config.tf` default.
   `_vars.rego` stays at resource level. Stale plans, tracked Terraform artifacts,
-  incomplete arguments and legacy flat policy placement are rejected.
+  incomplete arguments and any other file beside the argument directories are
+  rejected.
 
 ---
 

@@ -7,7 +7,6 @@ folder per attribute under `policies/`, shared config plus optional per-argument
 every link/image reference resolves. The items below
 are things that could not be fixed from text alone — mostly **screenshots** whose *content* is
 outdated (they still render; they just depict the old layout), plus a few content gaps.
-Production data is still unmigrated during preparation; see [cutover](layout-cutover.md).
 
 Paths below are relative to `Guide/Policy_writing_tutorial/` unless noted.
 

@@ -27,7 +27,7 @@ MIRROR_DIR = CACHE_ROOT / "mirror"
 CACHE_SETUP_SCRIPT = Path(__file__).resolve().parent / "cache_setup.sh"
 
 # Committed plans live beside their fixtures. Every consumer uses the same
-# effective-file resolver and hash, including migrations and temporary test trees.
+# effective-file resolver and hash, including temporary test trees.
 TARGET_PROVIDER_VERSION = (Path(__file__).resolve().parent / "provider_version.txt").read_text().strip()
 POLICIES_ROOT = REPO_ROOT / "policies"
 PLATFORM_CONFIG_NAME = "config.tf"
@@ -110,7 +110,7 @@ def fixture_repo_root(policy_dir: Path, repo_root: Path | None = None) -> Path |
 
 
 def sha_for_files(files: dict[str, Path], transform=canonical_text_bytes, *, repo_root: Path | None = None) -> str:
-    """Hash named effective files. Also used by the read-only legacy migration adapter."""
+    """Hash named effective files."""
     h = hashlib.sha256()
     h.update(f"provider={provider_version(repo_root)}\n".encode())
     for name in sorted(files):
@@ -987,7 +987,8 @@ def discover_policies(policies_search_root: Path):
 
     for rego in sorted(policies_search_root.rglob("*.rego")):
         if rego.name not in {POLICY_FILE, VARS_FILE} and "_helpers" not in rego.parts:
-            malformed.append((rego.parent / rego.stem, f"legacy policy file {rego}; run the layout migration"))
+            malformed.append((rego.parent / rego.stem,
+                              f"stray policy file {rego}; a policy lives at <argument>/{POLICY_FILE}"))
     for directory, _ in pairs[:]:
         try:
             fixture_files(directory)

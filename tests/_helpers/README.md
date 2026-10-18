@@ -54,7 +54,7 @@ Terraform fixtures. Exact per-file counts are in the table above.
 Runs all 17 test suites, with fixtures where a suite uses them. Use for comprehensive validation.
 
 ### smoke_test_helpers.sh
-Fast integration tests (5 policies at policy level). Use for quick feedback during development.
+Fast integration tests (one policy per type, each against its committed plan). Use for quick feedback during development.
 
 ### policy_debug.sh
 Shows full policy output with `--format pretty`. Use when debugging failures.
@@ -87,10 +87,10 @@ OPA loads all JSON files recursively and merges them into a single `data` namesp
 
 | Fixture | Resource | Used By | Source |
 |---------|----------|---------|--------|
-| `gcp_storage_bucket_plan` | `google_storage_bucket` | blacklist, whitelist, range tests | `inputs/gcp/cloud_storage/google_storage_bucket/retention_period/` |
-| `gcp_project_plan` | `google_project` | pattern blacklist/whitelist tests | `inputs/gcp/cloud_platform_service/google_project/project_id/` |
-| `gcp_access_level_plan` | `google_access_context_manager_access_level` | shared tests (deep nesting) | `inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_access_level/device_policy/` |
-| `gcp_http_route_plan` | `google_network_services_http_route` | element required integration (every-element reality check) | `inputs/gcp/Network Services/google_network_services_http_route/rules.action.redirect.https_redirect/` |
+| `gcp_storage_bucket_plan` | `google_storage_bucket` | blacklist, whitelist, range tests | self-contained capture (`retention_period` fixture pair) |
+| `gcp_project_plan` | `google_project` | pattern blacklist/whitelist tests | self-contained capture (`project_id` fixture pair) |
+| `gcp_access_level_plan` | `google_access_context_manager_access_level` | shared tests (deep nesting) | self-contained capture (`device_policy` fixture pair) |
+| `gcp_http_route_plan` | `google_network_services_http_route` | element required integration (every-element reality check) | `policies/gcp/Network Services/google_network_services_http_route/rules.action.redirect.https_redirect/` |
 
 **Note:** `gcp_access_level_plan` has 5-level deep nesting, ideal for testing nested attribute extraction.
 
@@ -106,44 +106,26 @@ test_with_fixture if {
 
 ### Regenerating Fixtures
 
-When helper functions change or test cases need updates:
+A fixture is a committed plan (the `<sha>.json` beside a policy's fixtures) wrapped in
+its unique key. To refresh one from its source policy:
 
 ```bash
-# 1. Navigate to Terraform configuration
-cd inputs/gcp/<service>/<resource>/<scenario>
+# 1. Make sure the source policy's committed plan is current
+python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource>"
 
-# 2. Generate plan (if not already exists)
-terraform init
-terraform plan -out=plan.tfplan
-
-# 3. Export to JSON and wrap in unique namespace
-terraform show -json plan.tfplan > plan.json
-jq '{<fixture_name>_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/<fixture_name>/plan.json
-
-# 4. Cleanup
-rm plan.json plan.tfplan
+# 2. Wrap that plan in the fixture's unique key
+jq '{<fixture_name>_plan: .}' "policies/gcp/<Service>/<resource>/<argument>/<sha>.json" \
+  > tests/_helpers/fixtures/<fixture_name>/plan.json
 ```
 
-**Examples:**
+**Example:**
 
 ```bash
-# Storage Bucket
-cd inputs/gcp/cloud_storage/google_storage_bucket/retention_period
-terraform show -json plan.tfplan > plan.json
-jq '{gcp_storage_bucket_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/gcp_storage_bucket/plan.json
-rm plan.json
-
-# Project
-cd inputs/gcp/cloud_platform_service/google_project/project_id
-terraform show -json plan.tfplan > plan.json
-jq '{gcp_project_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/gcp_project/plan.json
-rm plan.json
-
-# Access Level
-cd inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_access_level/device_policy
-terraform show -json plan.tfplan > plan.json
-jq '{gcp_access_level_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/gcp_access_level/plan.json
-rm plan.json
+# HTTP Route
+python3 scripts/auto_test/auto_test.py "gcp/Network Services/google_network_services_http_route"
+jq '{gcp_http_route_plan: .}' \
+  "policies/gcp/Network Services/google_network_services_http_route/rules.action.redirect.https_redirect/"<sha>.json \
+  > tests/_helpers/fixtures/gcp_http_route/plan.json
 ```
 
 ### Creating New Fixtures
@@ -154,27 +136,18 @@ Follow this pattern for new fixtures:
 # 1. Create fixture directory (name becomes data path prefix)
 mkdir tests/_helpers/fixtures/gcp_compute_instance
 
-# 2. Navigate to relevant Terraform configuration
-cd inputs/gcp/<service>/google_compute_instance/<scenario>
+# 2. Wrap the source policy's committed plan with a unique key matching
+#    the directory name + _plan
+jq '{gcp_compute_instance_plan: .}' "policies/gcp/<Service>/google_compute_instance/<argument>/<sha>.json" \
+  > tests/_helpers/fixtures/gcp_compute_instance/plan.json
 
-# 3. Generate Terraform plan
-terraform init
-terraform plan -out=plan.tfplan
-terraform show -json plan.tfplan > plan.json
-
-# 4. Wrap with unique key matching directory name + _plan
-jq '{gcp_compute_instance_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/gcp_compute_instance/plan.json
-
-# 5. Cleanup
-rm plan.json plan.tfplan
-
-# 6. Access in tests as data.gcp_compute_instance_plan
+# 3. Access in tests as data.gcp_compute_instance_plan
 ```
 
 **Key requirements:**
 - Directory name must match wrapper key prefix (e.g., `gcp_compute_instance/` → `gcp_compute_instance_plan`)
 - Always use `jq` to wrap the plan (prevents namespace conflicts)
-- Source Terraform configs from `inputs/gcp/` directory
+- Source plans are the committed `<sha>.json` files under `policies/gcp/`
 
 ## Adding New Tests
 

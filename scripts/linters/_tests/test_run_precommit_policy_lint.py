@@ -378,7 +378,7 @@ def test_subtract_baseline_lints_a_real_base_worktree_and_removes_it(git_repo, m
         seen_roots.append(Path(root))
         return [_hard_coded("literal 'projects/PDE' (base wording)")]
 
-    monkeypatch.setattr(policy_lint, "lint_resource_baseline", fake_lint_resource)
+    monkeypatch.setattr(policy_lint, "lint_resource", fake_lint_resource)
 
     new, inherited = rpl._subtract_baseline(
         _owned(_hard_coded("literal 'projects/PDE' (head wording)")))
@@ -401,7 +401,7 @@ def test_base_tree_is_removed_even_when_linting_it_raises(git_repo, monkeypatch)
         seen_roots.append(Path(root))
         raise policy_lint.PolicyLintError("opa fell over")
 
-    monkeypatch.setattr(policy_lint, "lint_resource_baseline", exploding_lint_resource)
+    monkeypatch.setattr(policy_lint, "lint_resource", exploding_lint_resource)
 
     with pytest.raises(policy_lint.PolicyLintError):
         rpl._subtract_baseline(_owned(_hard_coded()))
@@ -428,7 +428,7 @@ def test_only_targets_with_a_finding_at_head_are_linted_on_the_base(git_repo, mo
         linted.append((platform, service, resource_type))
         return []
 
-    monkeypatch.setattr(policy_lint, "lint_resource_baseline", fake_lint_resource)
+    monkeypatch.setattr(policy_lint, "lint_resource", fake_lint_resource)
 
     # The base targets come from the owned findings, not from the changed set:
     # a resource type the change touched but left clean never reaches the base

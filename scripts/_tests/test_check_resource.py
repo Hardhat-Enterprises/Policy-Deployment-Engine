@@ -309,7 +309,6 @@ def test_a_service_branch_with_no_doc_fails(capsys):
     assert "resource doc not found" in capsys.readouterr().out
 
 
-@pytest.mark.repository_data
 def test_the_real_repo_passes_its_own_gate(capsys):
     # An end-to-end check against a resource that is green on dev, so a regression
     # in the wiring (paths, slug resolution, auto_test invocation) fails here rather
@@ -444,10 +443,10 @@ def test_opa_failures_are_read_from_the_report(tmp_path):
     report.write_text(json.dumps([
         {"policy": "a", "passed": True},
         {"policy": "b", "passed": False, "failure": {
-            "reason": "terraform init failed for inputs/x/b:\nError: bad", "file": "inputs/x/b"}},
+            "reason": "terraform init failed for policies/x/b:\nError: bad", "file": "policies/x/b"}},
     ]))
     assert cr.opa_failures(report, "google_x") == [
-        ("inputs/x/b", "google_x/b", "b: terraform init failed for inputs/x/b:\nError: bad")]
+        ("policies/x/b", "google_x/b", "b: terraform init failed for policies/x/b:\nError: bad")]
 
 
 def test_a_missing_report_is_no_findings(tmp_path):
@@ -457,7 +456,7 @@ def test_a_missing_report_is_no_findings(tmp_path):
 def test_the_summary_repeats_each_finding(capsys):
     report = cr.Report()
     report.fail("OPA test", "1 policy check(s) did not pass",
-                [("inputs/x/b", "google_x/b", "b: terraform init failed\nError: bad")])
+                [("policies/x/b", "google_x/b", "b: terraform init failed\nError: bad")])
     report.summarise("google_x")
     summary = capsys.readouterr().out.split("check(s) failed:")[1]
     assert "terraform init failed" in summary and "Error: bad" in summary
@@ -474,7 +473,7 @@ def test_every_failure_is_annotated_in_actions(tmp_path, monkeypatch, capsys):
     report.fail("Doc completeness", "2 finding(s)", ["arg 'a': x", "arg 'b': y"],
                 file="docs/gcp/S/google_x.json")
     report.fail("OPA test", "1 policy check(s) did not pass",
-                [("inputs/gcp/S/google_x/c", "google_x/c", "c: terraform plan failed\nError: z")])
+                [("policies/gcp/S/google_x/c", "google_x/c", "c: terraform plan failed\nError: z")])
     report.fail("Resource gate", "resource doc not found")
     assert report.summarise("google_x") == 1
 
@@ -482,7 +481,7 @@ def test_every_failure_is_annotated_in_actions(tmp_path, monkeypatch, capsys):
     assert len(errors) == 4
     assert errors[0] == ("::error file=docs/gcp/S/google_x.json,"
                          "title=google_x%3A Doc completeness::arg 'a': x")
-    assert errors[2] == ("::error file=inputs/gcp/S/google_x/c,title=google_x/c::"
+    assert errors[2] == ("::error file=policies/gcp/S/google_x/c,title=google_x/c::"
                          "c: terraform plan failed%0AError: z")
     assert errors[3] == "::error title=google_x%3A Resource gate::resource doc not found"
     table = summary.read_text()

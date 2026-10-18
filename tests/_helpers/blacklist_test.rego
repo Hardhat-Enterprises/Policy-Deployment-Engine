@@ -47,7 +47,7 @@ test_is_blacklisted_empty_array if {
 # attributes to validate exact behavior (e.g., single violation, edge cases).
 #
 # Reality check (test 8) uses: tests/_helpers/fixtures/gcp_storage_bucket/plan.json
-# Source: inputs/gcp/cloud_storage/google_storage_bucket/retention_period/
+# Source: terraform plan of a google_storage_bucket retention_period fixture pair
 # Purpose: Tests against actual Terraform plan structure with 2 buckets:
 #   - c123: retention_period=604800 (7 days), location=US, force_destroy=true
 #   - nc123: retention_period=2692000 (31 days), location=US, force_destroy=true

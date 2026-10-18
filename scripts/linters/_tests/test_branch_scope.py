@@ -101,7 +101,7 @@ def test_own_docs_json_is_in_scope():
         "docs/gcp/Cloud Storage/google_storage_bucket.json", PLATFORM, FOLDER, RTYPE)
 
 
-def test_own_inputs_fixture_is_in_scope():
+def test_own_fixture_is_in_scope():
     assert bs.path_in_scope(
         "policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
         PLATFORM, FOLDER, RTYPE)
@@ -184,16 +184,6 @@ def test_deleting_someone_elses_plan_is_still_out_of_scope():
     ) == "deleted-file"
 
 
-def test_reviving_the_legacy_plan_cache_is_its_own_finding():
-    # One message about a stale layout, not a thousand out-of-scope files.
-    assert classify("A", "inputs/plan_cache/gcp/abc123.json") == "legacy-plan-cache"
-    assert classify("M", "inputs/plan_cache/gcp/abc123.json") == "legacy-plan-cache"
-
-
-def test_deleting_the_legacy_plan_cache_is_allowed():
-    assert classify("D", "inputs/plan_cache/gcp/abc123.json") is None
-
-
 def test_deleting_your_own_file_is_still_a_deletion():
     assert classify(
         "D", "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego"
@@ -206,15 +196,16 @@ def test_a_non_plan_json_deletion_in_scope_is_still_a_deletion():
     ) == "deleted-file"
 
 
-def test_anything_under_the_old_inputs_tree_is_legacy_layout():
-    """After the cutover inputs/ does not exist, so touching it is one mistake with
-    one remedy — merge and use the nested layout — whatever the status. This rule
-    deliberately sits ahead of the deletion rule: a branch working from the old
-    layout should be told that once, not told off per file it removes."""
-    for status in ("A", "M", "D"):
-        assert classify(
-            status, "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"
-        ) == "legacy-layout"
+@pytest.mark.parametrize("path", [
+    "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
+    "inputs/plan_cache/gcp/abc123.json",
+])
+def test_a_file_under_inputs_is_out_of_scope(path):
+    """A resource's scope is its docs JSON and its policies/ directory, so a
+    fixture-shaped path under any other top-level tree — even one naming the
+    branch's own service and resource type — is rejected like any stray file."""
+    assert classify("A", path) == "out-of-scope-file"
+    assert classify("M", path) == "out-of-scope-file"
 
 
 def test_editing_the_harness_is_a_shared_harness_edit():
@@ -323,15 +314,14 @@ def test_changed_entries_parses_statuses_spaces_and_renames(monkeypatch):
 SIBLING = "policies/gcp/Cloud Storage/google_storage_hmac_key"
 OWN = "policies/gcp/Cloud Storage/google_storage_bucket"
 
-# Three rule kinds spread over the shared trees, a sibling resource type and a
-# resurrected plan cache — plus the contributor's own files, which are legitimate.
+# Three rule kinds spread over the shared trees and a sibling resource type —
+# plus the contributor's own files, which are legitimate.
 MIXED = [
     ("D", ".github/workflows/branch-scope.yml"),             # deleted-file
     ("M", "Guide/Policy_writing_tutorial/branch-scope.md"),  # out-of-scope-file
     ("M", "scripts/_tests/test_check_resource.py"),          # shared-harness-edit
     ("M", f"{SIBLING}/main.tf"),                             # out-of-scope-file
     ("D", f"{SIBLING}/variables.tf"),                        # deleted-file
-    ("A", "inputs/plan_cache/gcp/old.json"),                 # legacy-plan-cache
     ("M", f"{OWN}/location/compliant.tf"),                   # in scope
     ("M", "docs/gcp/Cloud Storage/google_storage_bucket.json"),  # in scope
 ]
@@ -356,7 +346,7 @@ def test_the_whole_mess_becomes_one_merge_and_one_restore():
     # after a merge, restoring from the pre-merge base would undo it
     assert "--source=origin/dev " in restores[0]
     assert _pathspec(restores[0]) == [
-        ".github", "Guide", "scripts", "inputs/plan_cache", SIBLING]
+        ".github", "Guide", "scripts", SIBLING]
     assert not _commands(recipe, "git rm")
 
 
@@ -367,7 +357,7 @@ def test_the_recipe_never_names_the_branchs_own_resource():
     assert not any(p == OWN or p.startswith(OWN + "/") for p in named)
     assert f"{RTYPE}.json" not in named
     # nor anything wide enough to swallow the branch's own kit on the way past
-    assert not any(p in (".", "inputs", "docs", "policies") for p in named)
+    assert not any(p in (".", "docs", "policies") for p in named)
 
 
 def test_a_deletion_in_the_branchs_own_kit_is_restored_file_by_file():
@@ -417,12 +407,8 @@ def test_another_resources_files_never_need_a_merge(entries):
     assert '--source="$(git merge-base HEAD origin/dev)"' in restores[0]
 
 
-@pytest.mark.parametrize("entry", [
-    ("M", "scripts/auto_test/auto_test.py"),
-    ("A", "inputs/plan_cache/gcp/old.json"),
-])
-def test_the_harness_and_the_plan_cache_still_need_a_merge(entry):
-    entries = [entry, ("M", f"{SIBLING}/main.tf")]
+def test_the_harness_still_needs_a_merge():
+    entries = [("M", "scripts/auto_test/auto_test.py"), ("M", f"{SIBLING}/main.tf")]
     recipe = bs.recovery_lines(bs.check(entries, PLATFORM, FOLDER, RTYPE), "origin/dev")
     merge = recipe.index("       git merge origin/dev")
     restore = next(i for i, line in enumerate(recipe) if "git restore" in line)
@@ -441,7 +427,7 @@ def test_the_harness_and_the_plan_cache_still_need_a_merge(entry):
      "policies/gcp/Cloud Storage/google_storage_hmac_key"),
     ("docs/gcp/Compute Engine/google_compute_image.json",
      "docs/gcp/Compute Engine/google_compute_image.json"),
-    ("inputs/plan_cache/gcp/Cloud Storage/old.json", "inputs/plan_cache"),
+    ("inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf", "inputs"),
 ])
 def test_a_path_is_named_at_the_width_that_is_safe(path, group):
     assert bs.recovery_group(path) == group
@@ -457,5 +443,5 @@ def test_an_addition_is_covered_by_restoring_its_directory():
 
 def test_a_path_with_spaces_is_quoted_and_a_plain_one_is_not():
     assert bs._quote("scripts") == "scripts"
-    assert bs._quote("inputs/gcp/Cloud Run (v2 API)/x") == (
-        '"inputs/gcp/Cloud Run (v2 API)/x"')
+    assert bs._quote("policies/gcp/Cloud Run (v2 API)/x") == (
+        '"policies/gcp/Cloud Run (v2 API)/x"')

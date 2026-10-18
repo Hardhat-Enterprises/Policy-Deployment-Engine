@@ -11,8 +11,7 @@ The "101 policies" figure in this handover counts schema arguments on three reso
 Next step: make the provider version a real input (install/select that provider version, plan the compliant and non-compliant fixtures under it, bypassing the committed plan cache, run OPA, and write the result into the validity map). A plan that fails because a newly required unrelated argument is missing should be recorded as "fixture needs updating", not as a policy failure.
 
 build_results.py discovers argument directories containing policy.rego under
-policies/<platform>/<service>/<resource>/. It uses the restructured runner and
-requires migrated data; production data remains in the legacy layout until cutover.
+policies/<platform>/<service>/<resource>/.
 
 ## 1. Feature Overview
 
@@ -34,7 +33,7 @@ future contributors should take into account when maintaining or extending it.
 
 ## 2. Original Problem
 
-PDE's docs, inputs, and policies are based on one pinned provider version. Not all real
+PDE's docs and policies are based on one pinned provider version. Not all real
 customers use the latest version and many stick to a previous version for a considerable amount of
 time
 
@@ -70,7 +69,7 @@ The solution implemented offers:
   reimplemented.
 
 Everything is read-only: the feature only writes its own JSON map and reports, and never writes
-anything to docs/, inputs/, policies/, or the plan cache.
+anything to docs/, policies/, or the plan cache.
 
 ## 4. How the Feature Works
 

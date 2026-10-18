@@ -417,9 +417,8 @@ def build_gcp_docs_index(docs_root):
 class PoliciesValidator:
     """Validate the ``policies/`` tree, reconciling its taxonomy to ``docs/gcp``.
 
-    This is the only content tree: each argument is a self-contained directory holding
-    its policy and both terraform fixtures. (There used to be a mirrored ``inputs/``
-    tree validated separately; its rules live here now.)
+    Each argument is a self-contained directory holding its policy and both
+    terraform fixtures.
     """
 
     def __init__(self, policies_root, docs_index, logger):
@@ -493,8 +492,8 @@ class PoliciesValidator:
 
     # ----- 3d: policies/gcp services + the one platform config.tf --------- #
     def validate_gcp(self, gcp_root):
-        # Every fixture used to carry its own duplicate config.tf; there is now exactly
-        # one per platform, here, copied into a throwaway workspace at plan time.
+        # Exactly one config.tf per platform, here, copied into a throwaway workspace
+        # at plan time (an argument dir may carry a local config.tf that replaces it).
         if not os.path.isfile(os.path.join(gcp_root, PLATFORM_CONFIG_FILE)):
             self.logger.log(f"policies/gcp/: missing '{PLATFORM_CONFIG_FILE}' "
                             "(the shared provider stub every fixture is planned with)")
@@ -596,8 +595,8 @@ class PoliciesValidator:
 #   C. fixtures: tested-resource labels follow the example convention,
 #      compliant_example_N (compliant.tf) / non_compliant_example_N
 #      (nonCompliant.tf), sequential from 1, always suffixed.
-# Deliberately NOT carried over from the legacy linter: `terraform fmt`
-# (mutates files) and the lowercase-filename regex (breaks on dotted docs keys).
+# Deliberately NOT checked: `terraform fmt` (mutates files) and a
+# lowercase-filename regex (breaks on dotted docs keys).
 # =========================================================================== #
 
 PKG_RE = re.compile(r"^\s*package\s+([A-Za-z0-9_.]+)")
@@ -644,8 +643,8 @@ class ContentChecksValidator:
         where ``<seg>`` is the ARGUMENT with dots->underscores (argument dirs may carry
         dotted docs keys; packages sanitise them). ``_vars.rego`` -> ``.<resource>.vars``.
 
-        The argument now comes from the DIRECTORY name, since every policy file is
-        called policy.rego; only ``_vars.rego`` still contributes its own name.
+        The argument comes from the DIRECTORY name, since every policy file is
+        called policy.rego; only ``_vars.rego`` contributes its own name.
 
         CAVEAT: ``<service_seg>`` is NOT validated — the on-disk service dir
         (e.g. "Data Catalog") differs from the package service segment (e.g.
@@ -769,10 +768,6 @@ def main(argv=None):
         print(f"\n[*] Linting policies tree at {policies_root}"
               f"{f' (platform: {args.platform})' if args.platform else ''}\n")
         PoliciesValidator(policies_root, docs_index, logger).validate_root(only_platform=args.platform)
-        legacy_inputs = Path(policies_root).parent / "inputs" / "gcp"
-        if (args.platform in (None, "gcp") and legacy_inputs.is_dir()
-                and any(p.is_file() for p in legacy_inputs.rglob("*") if p.name != ".gitkeep")):
-            logger.log("inputs/gcp/: legacy fixture tree remains; complete the layout migration")
 
     if args.content_checks:
         print("\n[*] Running content checks\n")

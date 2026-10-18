@@ -5,8 +5,8 @@ previously untested, and the parts most likely to break silently: a wrong cache 
 just re-runs terraform (slow but green in CI), and a wrong discovery rule just tests
 fewer policies.
 
-The module resolves its roots at import time, so each test points POLICIES_ROOT and
-PLAN_CACHE_ROOT at a tmp_path tree.
+The module resolves its roots at import time, so each test points POLICIES_ROOT at
+a tmp_path tree.
 """
 import hashlib
 import sys
@@ -27,7 +27,7 @@ NONCOMPLIANT_TF = b'resource "google_storage_bucket" "non_compliant_example_1" {
 
 @pytest.fixture
 def tree(tmp_path, monkeypatch):
-    """A minimal new-layout repo: one platform config + one complete policy."""
+    """A minimal repo: one platform config + one complete policy."""
     policies = tmp_path / "policies"
     arg_dir = policies / "gcp" / "Cloud Storage" / "google_storage_bucket" / "public_access_prevention"
     arg_dir.mkdir(parents=True)
@@ -40,18 +40,15 @@ def tree(tmp_path, monkeypatch):
     return tmp_path, policies, arg_dir
 
 
-def legacy_sha(input_dir, provider):
-    """The pre-migration hash: every *.tf in the fixture dir, raw bytes, config.tf included.
-
-    Reproduced here so the cache-preservation test below is anchored to the real old
-    algorithm rather than to the new one restated.
-    """
+def expected_sha(files, provider):
+    """The cache key, restated independently: the provider pin, then every effective
+    file (name, NUL, bytes, NUL) in name order."""
     h = hashlib.sha256()
     h.update(f"provider={provider}\n".encode())
-    for tf in sorted(input_dir.glob("*.tf")):
-        h.update(tf.name.encode())
+    for name in sorted(files):
+        h.update(name.encode())
         h.update(b"\0")
-        h.update(tf.read_bytes())
+        h.update(files[name])
         h.update(b"\0")
     return h.hexdigest()
 
@@ -90,21 +87,15 @@ class TestFixtureSha:
 
         assert crlf == lf
 
-    def test_matches_legacy_key_so_committed_cache_survives(self, tmp_path, tree):
-        """The migration must not invalidate the ~1000 committed plans.
-
-        Builds the OLD layout (config.tf duplicated into the fixture dir) beside the new
-        one and asserts both hash the same. This is what lets the cutover happen without
-        re-planning every fixture.
-        """
+    def test_matches_the_pinned_algorithm_so_committed_plans_stay_valid(self, tree):
+        """Every committed plan is named for this key, so an accidental change to how it
+        is computed would orphan all of them. Pinned to the restatement above, with the
+        shared config.tf hashed under its own name."""
         _tmp, _policies, arg_dir = tree
-        legacy_dir = tmp_path / "legacy_fixture"
-        legacy_dir.mkdir()
-        (legacy_dir / "compliant.tf").write_bytes(COMPLIANT_TF)
-        (legacy_dir / "nonCompliant.tf").write_bytes(NONCOMPLIANT_TF)
-        (legacy_dir / "config.tf").write_bytes(CONFIG_TF)
-
-        expected = legacy_sha(legacy_dir, auto_test.TARGET_PROVIDER_VERSION)
+        expected = expected_sha({"compliant.tf": COMPLIANT_TF,
+                                 "nonCompliant.tf": NONCOMPLIANT_TF,
+                                 "config.tf": CONFIG_TF},
+                                auto_test.TARGET_PROVIDER_VERSION)
         assert auto_test.fixture_sha(arg_dir) == expected
 
     def test_changes_when_a_fixture_changes(self, tree):
