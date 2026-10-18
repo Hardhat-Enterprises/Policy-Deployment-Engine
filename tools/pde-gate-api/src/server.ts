@@ -4,14 +4,17 @@ import {
     loginOrg,
     createPackage,
     deletePackage,
+    findOrgById,
     findOrgByKey,
     getPackage,
     listPackages,
+    rotateApiKey,
     updatePackage,
 } from './store.js';
 import type { Org } from './db/models/index.js';
 import { runServerCheck } from './engine/run-check.js';
 import { HttpError } from './http-error.js';
+import { isSessionToken, issueSession, verifySession } from './session.js';
 import {
     bodyObject,
     optionalBoolean,
@@ -46,13 +49,44 @@ function asyncRoute(handler: AsyncHandler): express.RequestHandler {
     };
 }
 
-/** The org the bearer key belongs to, or a 401. */
-async function requireOrg(req: express.Request): Promise<Org> {
+/**
+ * Two credentials, two jobs:
+ * - the API key (PDE_API_KEY) runs checks from CI, and nothing else;
+ * - a session token from login manages the org, its packages and its key.
+ * Logging in therefore never disturbs a pipeline.
+ */
+
+/** The org the bearer API key belongs to, or a 401. */
+async function requireApiKey(req: express.Request): Promise<Org> {
     const key = parseBearer(req.header('authorization'));
     if (!key) throw new HttpError(401, 'Authorization: Bearer <PDE_API_KEY> required');
+    if (isSessionToken(key)) {
+        throw new HttpError(401, 'Checks need the API key (PDE_API_KEY), not a session token');
+    }
     const org = await findOrgByKey(param(req.params.orgId), key);
     if (!org) throw new HttpError(401, 'Invalid org_id or api_key');
     return org;
+}
+
+/** The org a bearer session token was issued for, or a 401. */
+async function requireSession(req: express.Request): Promise<Org> {
+    const token = parseBearer(req.header('authorization'));
+    if (!token) throw new HttpError(401, 'Authorization: Bearer <session token> required (POST /v1/orgs/login)');
+    if (!isSessionToken(token)) {
+        throw new HttpError(401, 'This route needs a session token from POST /v1/orgs/login, not the API key');
+    }
+    const orgId = verifySession(token);
+    if (!orgId || orgId !== param(req.params.orgId)) {
+        throw new HttpError(401, 'Invalid or expired session; log in again');
+    }
+    const org = await findOrgById(orgId);
+    if (!org) throw new HttpError(401, 'Invalid or expired session; log in again');
+    return org;
+}
+
+function sessionBody(orgId: string) {
+    const session = issueSession(orgId);
+    return { session_token: session.token, session_expires_at: session.expires_at };
 }
 
 /** Last middleware: known errors get their status, anything else a generic 500. */
@@ -92,13 +126,16 @@ export function createApp() {
             res.status(201).json({
                 org_id: org.org_id,
                 api_key,
-                message: 'Organisation registered. Store api_key as PDE_API_KEY in CI.',
+                ...sessionBody(org.org_id),
+                message:
+                    'Organisation registered. Store api_key as PDE_API_KEY in CI: it is shown only this once ' +
+                    '(POST /v1/orgs/:orgId/api-key/rotate issues a replacement).',
             });
         } catch (err: unknown) {
             if ((err as { name?: string }).name === 'SequelizeUniqueConstraintError') {
                 throw new HttpError(
                     409,
-                    `Organisation with contact_email '${contact_email}' already exists. Use 'login' to get a new api_key.`
+                    `Organisation with contact_email '${contact_email}' already exists. Use 'login' to sign in.`
                 );
             }
             throw err;
@@ -115,17 +152,28 @@ export function createApp() {
         const email = (raw as string | undefined)?.trim();
         const password = (body.password as string | undefined)?.trim();
         if (!email || !password) throw new HttpError(400, 'email and password are required');
-        const result = await loginOrg(email, password);
-        if (!result) throw new HttpError(401, 'Invalid email or password');
+        const org = await loginOrg(email, password);
+        if (!org) throw new HttpError(401, 'Invalid email or password');
         res.json({
-            org_id: result.org.org_id,
-            api_key: result.api_key,
-            message: 'Login successful. A new api_key was issued; the previous one no longer works.',
+            org_id: org.org_id,
+            ...sessionBody(org.org_id),
+            message: 'Login successful. The session token manages this org for 12 hours; the API key is unchanged.',
+        });
+    }));
+
+    /** Replace the API key: the old one stops working at once. The new key is shown only here. */
+    app.post('/v1/orgs/:orgId/api-key/rotate', asyncRoute(async (req, res) => {
+        const org = await requireSession(req);
+        const api_key = await rotateApiKey(org);
+        res.json({
+            org_id: org.org_id,
+            api_key,
+            message: 'New api_key issued; the previous one no longer works. Update PDE_API_KEY in CI. Shown only once.',
         });
     }));
 
     app.get('/v1/orgs/:orgId', asyncRoute(async (req, res) => {
-        const org = await requireOrg(req);
+        const org = await requireSession(req);
         res.json({
             org_id: org.org_id,
             org_name: org.org_name,
@@ -135,25 +183,25 @@ export function createApp() {
     }));
 
     app.get('/v1/orgs/:orgId/packages', asyncRoute(async (req, res) => {
-        const org = await requireOrg(req);
+        const org = await requireSession(req);
         res.json({ packages: await listPackages(org.org_id) });
     }));
 
     app.post('/v1/orgs/:orgId/packages', asyncRoute(async (req, res) => {
-        const org = await requireOrg(req);
+        const org = await requireSession(req);
         const body = packageBody(req.body, { partial: false }) as CreatePackageRequest;
         res.status(201).json(await createPackage(org.org_id, body));
     }));
 
     app.get('/v1/orgs/:orgId/packages/:packageId', asyncRoute(async (req, res) => {
-        const org = await requireOrg(req);
+        const org = await requireSession(req);
         const pkg = await getPackage(org.org_id, param(req.params.packageId));
         if (!pkg) throw new HttpError(404, 'package not found');
         res.json(pkg);
     }));
 
     app.patch('/v1/orgs/:orgId/packages/:packageId', asyncRoute(async (req, res) => {
-        const org = await requireOrg(req);
+        const org = await requireSession(req);
         const packageId = param(req.params.packageId);
         const existing = await getPackage(org.org_id, packageId);
         if (!existing) throw new HttpError(404, 'package not found');
@@ -164,7 +212,7 @@ export function createApp() {
     }));
 
     app.delete('/v1/orgs/:orgId/packages/:packageId', asyncRoute(async (req, res) => {
-        const org = await requireOrg(req);
+        const org = await requireSession(req);
         const ok = await deletePackage(org.org_id, param(req.params.packageId));
         if (!ok) throw new HttpError(404, 'package not found');
         res.status(204).end();
@@ -177,7 +225,7 @@ export function createApp() {
      * incomplete (status "error": nothing evaluated, or a policy could not be).
      */
     app.post('/v1/orgs/:orgId/checks', asyncRoute(async (req, res) => {
-        const org = await requireOrg(req);
+        const org = await requireApiKey(req);
         const body = bodyObject(req.body);
         const packageId = requiredString(body, 'package_id', 64);
         const plan = body.plan;

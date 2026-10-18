@@ -2,9 +2,15 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+/**
+ * api_key (PDE_API_KEY) runs checks; session_token (from login, 12h) manages the
+ * org and its packages. Login never replaces the api_key.
+ */
 export type Credentials = {
   org_id: string;
-  api_key: string;
+  api_key?: string;
+  session_token?: string;
+  session_expires_at?: string;
   api_url?: string;
 };
 
@@ -64,18 +70,42 @@ export function saveCredentials(creds: Credentials): void {
   fs.writeFileSync(p, JSON.stringify(creds, null, 2) + "\n", { mode: 0o600 });
 }
 
+function resolveOrg(file: Credentials | null): { org_id?: string; api_url: string } {
+  return {
+    org_id: process.env.PDE_ORG_ID || file?.org_id,
+    api_url: process.env.PDE_API_URL || file?.api_url || "http://127.0.0.1:3847",
+  };
+}
+
+/** Org + API key, for checks. */
 export function resolveAuth(): { org_id: string; api_key: string; api_url: string } {
   loadDotEnv();
   const file = loadCredentials();
-  const org_id = process.env.PDE_ORG_ID || file?.org_id;
+  const { org_id, api_url } = resolveOrg(file);
   const api_key =
     process.env.PDE_API_KEY || process.env.PDE_ORG_TOKEN || file?.api_key;
-  const api_url =
-    process.env.PDE_API_URL || file?.api_url || "http://127.0.0.1:3847";
   if (!org_id || !api_key) {
     throw new Error(
       "Missing org credentials. Run `pde-gate register` or set PDE_ORG_ID + PDE_API_KEY in .env or environment."
     );
   }
   return { org_id, api_key, api_url };
+}
+
+/** Org + session token, for managing the org and its packages. */
+export function resolveSession(): { org_id: string; session_token: string; api_url: string } {
+  loadDotEnv();
+  const file = loadCredentials();
+  const { org_id, api_url } = resolveOrg(file);
+  const session_token = process.env.PDE_SESSION_TOKEN || file?.session_token;
+  const expired =
+    !process.env.PDE_SESSION_TOKEN &&
+    file?.session_expires_at !== undefined &&
+    Date.parse(file.session_expires_at) <= Date.now();
+  if (!org_id || !session_token || expired) {
+    throw new Error(
+      `${expired ? "Session expired" : "No session"}. Run \`pde-gate login --email <email>\` (sessions last 12 hours).`
+    );
+  }
+  return { org_id, session_token, api_url };
 }

@@ -9,6 +9,7 @@ import { discoverPolicies, readRegoPackage } from "./policy-select.js";
 import { gcpCanonicalizer } from "./plugins/gcp/canonicalizer.js";
 import { resolvePlatform } from "./plugins/index.js";
 import { exitCodeFor } from "./api-client.js";
+import { resolveAuth, resolveSession, saveCredentials } from "./credentials.js";
 
 const repoPolicies = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -96,6 +97,31 @@ test("exit codes: 0 pass, 1 policy failure, 2 error — zero evaluated is never 
   // An older API with no `status` field
   assert.equal(exitCodeFor({ ...base, ok: true, evaluated: 0 }), 2);
   assert.equal(exitCodeFor({ ...base, ok: false, evaluated: 2 }), 1);
+});
+
+test("credentials: checks use the API key, management the unexpired session", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pde-gate-creds-"));
+  const saved = { ...process.env };
+  try {
+    for (const k of ["PDE_ORG_ID", "PDE_API_KEY", "PDE_ORG_TOKEN", "PDE_SESSION_TOKEN", "PDE_API_URL"]) {
+      delete process.env[k];
+    }
+    process.env.PDE_CREDENTIALS_FILE = path.join(dir, "credentials.json");
+    const future = new Date(Date.now() + 3600_000).toISOString();
+    saveCredentials({ org_id: "org_a", api_key: "pde_k", session_token: "pds.x.y", session_expires_at: future });
+    assert.equal(resolveAuth().api_key, "pde_k");
+    assert.equal(resolveSession().session_token, "pds.x.y");
+
+    saveCredentials({ org_id: "org_a", api_key: "pde_k", session_token: "pds.x.y", session_expires_at: new Date(0).toISOString() });
+    assert.throws(() => resolveSession(), /Session expired.*pde-gate login/);
+    assert.equal(resolveAuth().api_key, "pde_k");
+
+    saveCredentials({ org_id: "org_a", session_token: "pds.x.y", session_expires_at: future });
+    assert.throws(() => resolveAuth(), /PDE_API_KEY/);
+  } finally {
+    process.env = saved;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("canonicalizer: strict rejects unsupported terraform version", () => {

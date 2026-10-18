@@ -59,28 +59,30 @@ export async function createOrg(input: {
   return { org, api_key: key };
 }
 
-/**
- * Email + password → a NEW api key. Only the hash is stored, so the old key cannot
- * be returned; issuing a new one also revokes the old.
- */
-export async function loginOrg(
-  email: string,
-  password: string
-): Promise<{ org: Org; api_key: string } | null> {
+/** Email + password → the org, or null. The API key is not touched. */
+export async function loginOrg(email: string, password: string): Promise<Org | null> {
   const org = await Org.findOne({ where: { contact_email: email.trim() } });
   if (!org || !org.password_hash) {
     verifyPassword(password, DUMMY_PASSWORD_HASH);
     return null;
   }
-  if (!verifyPassword(password, org.password_hash)) return null;
+  return verifyPassword(password, org.password_hash) ? org : null;
+}
+
+/** Issue a new API key and revoke the old one. The only way to replace a key. */
+export async function rotateApiKey(org: Org): Promise<string> {
   const key = apiKey();
   org.api_key_hash = hashApiKey(key);
   await org.save();
-  return { org, api_key: key };
+  return key;
+}
+
+export async function findOrgById(orgId: string): Promise<Org | null> {
+  return Org.findOne({ where: { org_id: orgId } });
 }
 
 export async function findOrgByKey(orgId: string, key: string): Promise<Org | null> {
-  const org = await Org.findOne({ where: { org_id: orgId } });
+  const org = await findOrgById(orgId);
   if (!org || !apiKeyMatches(key, org.api_key_hash)) return null;
   return org;
 }
