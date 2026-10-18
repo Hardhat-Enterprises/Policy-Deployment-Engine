@@ -1,10 +1,10 @@
 <a id="top"></a>
 <h1 align="center">policy_lint — content-quality rules</h1>
 
-> `linter.py` (the previous page) checks that `docs/`, `inputs/` and `policies/` **reconcile** —
+> `linter.py` (the previous page) checks that `docs/` and `policies/` **reconcile** —
 > every documented argument has a policy, a fixture pair, and the right file names. It says
 > nothing about whether the policy you wrote is any good. **`policy_lint.py`** reads the
-> `conditions` you declared in your `<argument>.rego` and the `variables` in your `_vars.rego`,
+> `conditions` you declared in your `<argument>/policy.rego` and the `variables` in your `_vars.rego`,
 > and reports the smells a reviewer would otherwise have to find by hand — a hard-coded project
 > id, a check that only tests presence, a fixture pair that drifted, and so on.
 
@@ -56,7 +56,7 @@ is *absent*, and the policy passes every resource you point it at.
 
 The supported values, exactly as the engine spells them:
 
-    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist
+    blacklist, whitelist, range, pattern blacklist, pattern whitelist, element blacklist, element pattern whitelist, map key blacklist, element required, map key pattern whitelist, presence, content security
 
 They are **lowercase**, and multi-word names use **spaces, not underscores**. Writing
 `pattern_whitelist` is the mistake this rule exists to catch. `element whitelist` is not a type
@@ -158,6 +158,89 @@ Correct the configured names rather than relying on trimming. The normal runtime
 summary also returns `POLICY ERROR:` for this configuration and checks nothing.
 This is not a `presence-only` warning; empty/null values in the actual resource
 map are still allowed by the helper.
+
+## invalid-element-required
+
+For `element required`, `values` lists the items the attribute must contain. It must
+hold at least one value, and no entry may be `null`, `""` or a whitespace-padded string.
+An empty list, missing `values` or a blank entry would require nothing, and a padded
+string such as `"UEFI_COMPATIBLE "` would never match, so the condition would pass every
+resource or flag every one. These are **errors**, not warnings. Matching is exact,
+including capitalisation, so write provider enum values exactly as the provider does.
+
+The normal runtime summary also returns `POLICY ERROR:` for this configuration and
+checks nothing. This is not a `presence-only` warning: `values` here names what must be
+present in the list, not an empty attribute value.
+
+Bad:
+
+    {
+      "attribute_path": ["disk", 0, "guest_os_features"],
+      "values": [],
+      "policy_type": "element required"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["disk", 0, "guest_os_features"],
+      "values": ["UEFI_COMPATIBLE", "SEV_CAPABLE"],
+      "policy_type": "element required"
+    }
+
+## invalid-map-key-pattern-whitelist
+
+For `map key pattern whitelist`, `values` lists the allowed key shapes. It must hold at
+least one non-empty string shape with no leading or trailing whitespace. An empty list
+would flag every key, and `"tagKeys/* "` would silently fail to match anything, so these
+are **errors**. The normal runtime summary also returns `POLICY ERROR:` for this
+configuration and checks nothing.
+
+Bad:
+
+    {
+      "attribute_path": ["resource_manager_tags"],
+      "values": [],
+      "policy_type": "map key pattern whitelist"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["resource_manager_tags"],
+      "values": ["tagKeys/*"],
+      "policy_type": "map key pattern whitelist"
+    }
+
+## invalid-presence
+
+For `presence`, `values` is a mode, not a list of attribute values. It must be exactly
+`["set"]` or `["unset"]` (any capitalisation). An empty list, both modes at once, or
+anything else such as `["present"]` or `[true]` would check nothing, so these are
+**errors**. The normal runtime summary also returns `POLICY ERROR:` for this
+configuration and checks nothing.
+
+`presence` is also worth reaching for when you meet `presence-only` below and presence
+really is the control. On a single element, `["unset"]` gives the same results as
+`whitelist [null, "", [], {}]` and `["set"]` the same as `blacklist [null, "", [], {}]`, so
+it adds no new power there. It checks every element of every repeated block, and it is
+harder to get wrong: the list forms are easy to write without `[]` or `{}`.
+
+Bad:
+
+    {
+      "attribute_path": ["network_interface", 0, "access_config"],
+      "values": ["present"],
+      "policy_type": "presence"
+    }
+
+Good:
+
+    {
+      "attribute_path": ["network_interface", 0, "access_config"],
+      "values": ["unset"],
+      "policy_type": "presence"
+    }
 
 ## presence-only
 
@@ -348,12 +431,12 @@ See [policy.rego](policy-rego.md#top) for what each mode does to the evaluation.
 
 ## wrong-argument
 
-No condition in `<argument>.rego` reads the argument the file is named after — usually a
+No condition in `<argument>/policy.rego` reads the argument named by its directory — usually a
 copy-paste from another resource's policy where the `attribute_path` never got updated.
-`policy_lint` checks each condition group's `attribute_path` against the filename stem, so
-`location.rego` must contain at least one condition whose path starts with `location`.
+`policy_lint` checks each condition group's `attribute_path` against the argument directory, so
+`location/policy.rego` must contain at least one condition whose path starts with `location`.
 
-Bad — file is `location.rego`, but the condition reads `region`:
+Bad — file is `location/policy.rego`, but the condition reads `region`:
 
     {
       "attribute_path": ["region"],
@@ -547,7 +630,7 @@ There's no committed plan for this fixture pair. Every fixture directory holds o
 it writes into your fixture directories:
 
     python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
-    git add "inputs/gcp/<Service>/<resource type>"
+    git add "policies/gcp/<Service>/<resource type>"
 
 If you changed a fixture, the same run also deletes the plan of its previous version — commit
 that deletion too.
@@ -673,7 +756,7 @@ finding means the policy was **not checked**, not that it passed.
 
 The message carries the reason OPA gave. Run `opa check` on the file to see it in full:
 
-    opa check policies/_helpers "policies/gcp/<Service>/<resource type>/<argument>.rego"
+    opa check policies/_helpers "policies/gcp/<Service>/<resource type>/<argument>/policy.rego"
 
 Fix the parse error (or add the missing `conditions := [...]`) and re-run the linter. If the file
 looks fine to you and the error persists, ask in the unit channel before changing anything else —

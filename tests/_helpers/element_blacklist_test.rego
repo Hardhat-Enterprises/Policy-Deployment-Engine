@@ -377,8 +377,8 @@ test_get_violations_realistic if {
 # ============================================================================
 # FIXTURE PROVENANCE
 # ============================================================================
-# Source: inputs/gcp/access_context_manager_vpc_service_controls/
-#         access_context_manager_access_level/device_policy/
+# Source: terraform plan of a google_access_context_manager_access_level
+#         device_policy fixture pair
 # Fixture: tests/_helpers/fixtures/gcp_access_level/plan.json
 # Why this fixture: Contains actual array data (regions: ["CH", "IT", "US"])
 #                   for testing element blacklist on string arrays

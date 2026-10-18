@@ -47,7 +47,7 @@ test_is_whitelisted_empty_array if {
 # attributes to validate exact behavior (e.g., AND logic, edge cases).
 #
 # Reality check (test 8) uses: tests/_helpers/fixtures/gcp_storage_bucket/plan.json
-# Source: inputs/gcp/cloud_storage/google_storage_bucket/retention_period/
+# Source: terraform plan of a google_storage_bucket retention_period fixture pair
 # Purpose: Tests against actual Terraform plan structure (see blacklist_test.rego)
 # ==============================================================================
 

@@ -9,6 +9,17 @@ echo "🔍 UX Message Review"
 echo "======================================"
 echo ""
 
+# A policy's committed plan (the one <sha>.json in its argument directory) and its
+# package, so the cases below survive a provider bump renaming the plan.
+plan_of() {
+    local plan
+    plan=$(ls "$1" 2>/dev/null | grep -E '^[0-9a-f]{64}\.json$' | head -1)
+    echo "$1/$plan"
+}
+package_of() {
+    echo "data.$(awk 'NR == 1 {print $2}' "$1/policy.rego" 2>/dev/null)"
+}
+
 inspect_policy() {
     local name="$1"
     local input="$2"
@@ -49,27 +60,33 @@ inspect_policy() {
     echo ""
 }
 
-# Test all 6 policy types with their violations
+# One policy per type, with its violations
 
-inspect_policy "Blacklist & Element Blacklist (Access Context Manager)" \
-    "./inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_service_perimeter/status/plan.json" \
-    "data.terraform.gcp.security.access_context_manager_vpc_service_controls.access_context_manager_service_perimeter.status"
+ACM_OS_TYPE="./policies/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_access_level/basic.conditions.device_policy.os_constraints.os_type"
+APIHUB_ENCRYPTION="./policies/gcp/API Hub/google_apihub_api_hub_instance/config.encryption_type"
+BACKUP_LOG_RETENTION="./policies/gcp/Backup and DR Service/google_backup_dr_backup_plan/log_retention_days"
+APIGEE_CONTROL_PLANE_KEY="./policies/gcp/Apigee/google_apigee_organization/control_plane_encryption_key_name"
+INGRESS_POLICY_RESOURCE="./policies/gcp/Access Context Manager (VPC Service Controls)/google_access_context_manager_ingress_policy/resource"
+
+inspect_policy "Blacklist (Access Level OS Type)" \
+    "$(plan_of "$ACM_OS_TYPE")" \
+    "$(package_of "$ACM_OS_TYPE")"
 
 inspect_policy "Whitelist (API Hub Encryption)" \
-    "./inputs/gcp/api_hub/google_apihub_api_hub_instance/config_encryption_type/plan.json" \
-    "data.terraform.gcp.security.api_hub.google_apihub_api_hub_instance.config_encryption_type"
+    "$(plan_of "$APIHUB_ENCRYPTION")" \
+    "$(package_of "$APIHUB_ENCRYPTION")"
 
-inspect_policy "Range (Storage Bucket Retention Period)" \
-    "./inputs/gcp/cloud_storage/google_storage_bucket/retention_period/plan.json" \
-    "data.terraform.gcp.security.cloud_storage.google_storage_bucket.retention_period"
+inspect_policy "Range (Backup Plan Log Retention)" \
+    "$(plan_of "$BACKUP_LOG_RETENTION")" \
+    "$(package_of "$BACKUP_LOG_RETENTION")"
 
-inspect_policy "Pattern Blacklist (Storage Default Object ACL)" \
-    "./inputs/gcp/cloud_storage/google_storage_default_object_acl/public_access_prevention/plan.json" \
-    "data.terraform.gcp.security.cloud_storage.google_storage_default_object_acl.public_access_prevention"
+inspect_policy "Pattern Blacklist (Apigee Control Plane Key)" \
+    "$(plan_of "$APIGEE_CONTROL_PLANE_KEY")" \
+    "$(package_of "$APIGEE_CONTROL_PLANE_KEY")"
 
-inspect_policy "Pattern Whitelist (Project ID)" \
-    "./inputs/gcp/cloud_platform_service/google_project/project_id/plan.json" \
-    "data.terraform.gcp.security.cloud_platform_service.google_project.project_id"
+inspect_policy "Pattern Whitelist (Ingress Policy Resource)" \
+    "$(plan_of "$INGRESS_POLICY_RESOURCE")" \
+    "$(package_of "$INGRESS_POLICY_RESOURCE")"
 
 echo "======================================"
 echo "✅ Inspection complete"

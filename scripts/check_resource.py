@@ -20,11 +20,16 @@ tells you which one failed:
                            here) and a non-empty ``rationale``, and no argument in
                            the base branch's copy of the doc is missing from it
   5. True-arg coverage     every argument with ``security_impact: true`` has both a
-                           policy ``policies/.../<resource>/<arg>.rego`` and a fixture
-                           ``inputs/.../<resource>/<arg>/``
+                           policy ``policy.rego``, ``compliant.tf`` and ``nonCompliant.tf``
+                           inside ``policies/.../<resource>/<arg>/``
   6. OPA test              scripts/auto_test/auto_test.py scoped to the resource
                            (terraform plan + opa eval), which also enforces
-                           input<->policy pairing
+                           complete argument directories. A resource with no
+                           security-impacting arguments, and no policies or
+                           fixtures, has nothing to test and passes.
+
+In GitHub Actions every failure is also an ``::error`` annotation and a row in the
+step summary, so the reason is on the checks page, not only in the log.
 
 Steps 4-6 are the *resource gate*: they are the checks that only make sense for one
 resource, and they are what CI's ``policy_check`` job runs (with ``--gate-only``,
@@ -65,6 +70,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
@@ -75,21 +81,12 @@ from _service_slug import slug_to_folder  # noqa: E402
 # The single definition of which plan belongs to which fixture — imported, never
 # re-derived, so --if-cached asks exactly the question auto_test itself asks.
 from scripts.auto_test.auto_test import (  # noqa: E402
-    make_streams_encoding_safe, plan_cache_path)
+    github_error, in_github_actions, make_streams_encoding_safe, plan_cache_path,
+    write_step_summary, discover_policies, is_committed_plan)
 
-DOCS, INPUTS, POLICIES = "docs", "inputs", "policies"
+DOCS, POLICIES = "docs", "policies"
 LINTERS = REPO / "scripts" / "linters"
 AUTO_TEST = str(REPO / "scripts" / "auto_test" / "auto_test.py")
-
-# TODO(after this migration branch merges to dev): confine a Service/ PR's DIFF to
-# its selected service. Fail the PR if it changes any docs/, inputs/ or policies/
-# file outside `<tree>/<platform>/<folder>/` (service-level, per the owner's intent;
-# could tighten to `<folder>/<resource>/` if desired). Add it as a step in the
-# policy_check job (gated on Service/ branches) — e.g. compare
-# `git diff --name-only origin/<base>...HEAD` against the selected service path.
-# DEFERRED because this chore/ branch intentionally modified inputs/policies/docs
-# across many services and must not be blocked by such a guardrail.
-
 
 # --------------------------------------------------------------------------- #
 # Reporting
@@ -104,6 +101,7 @@ class Report:
 
     def __init__(self):
         self.rows = []
+        self.findings = {}         # step -> [(file or None, title, message)]
 
     def _add(self, mark, step, detail):
         self.rows.append((mark, step, detail))
@@ -113,8 +111,16 @@ class Report:
     def ok(self, step, detail=""):
         self._add("[OK]", step, detail)
 
-    def fail(self, step, detail=""):
+    def fail(self, step, detail="", findings=(), file=None):
+        """A failed step. ``findings`` are its individual problems, printed under it
+        now and again in the summary; each is a message, or ``(file, title,
+        message)`` when it is about one file. ``file`` is where a step's plain
+        messages (or the step itself, with none) point in CI."""
         self._add("[FAIL]", step, detail)
+        found = [f if isinstance(f, tuple) else (file, step, f) for f in findings]
+        for _, _, message in found:
+            print(indent(f"- {message}", 6))
+        self.findings[step] = found or [(file, step, detail or "failed")]
 
     def skip(self, step, detail=""):
         self._add("[skip]", step, detail)
@@ -133,17 +139,43 @@ class Report:
         print(f"[FAIL] {resource}: {len(self.failed)} check(s) failed:")
         for _, step, detail in self.failed:
             print(f"  - {step}{f' — {detail}' if detail else ''}")
+            for _, _, message in self.findings.get(step, []):
+                if message != detail:
+                    print(indent(f"- {message}", 6))
+        self.to_github(resource)
         print("\nFix these before pushing; CI runs the same checks.")
         return 1
 
+    def to_github(self, resource):
+        """Every failure as an ``::error`` annotation, and all of them as a table in
+        the step summary. A no-op outside GitHub Actions."""
+        if not in_github_actions():
+            return
+        rows = []
+        for step, found in self.findings.items():
+            for file, title, message in found:
+                title = title if title != step else f"{resource}: {step}"
+                print(github_error(message, title, file))
+                rows.append([step, f"`{file}`" if file else "", message])
+        write_step_summary(f"❌ {resource}: {len(self.failed)} check(s) failed",
+                           ["Check", "File", "Reason"], rows)
 
-def run(cmd, **kwargs):
+
+def indent(text, width):
+    """``text`` indented by ``width``, continuation lines two further."""
+    pad = " " * width
+    return pad + text.replace("\n", "\n" + pad + "  ")
+
+
+def run(cmd, env_drop=(), **kwargs):
     """Run a subprocess from the repo root, capturing its output.
 
     The child's stdout is a pipe, which on Windows takes the ANSI code page rather
     than the console's — so the child is told to write UTF-8, and we read UTF-8.
+    ``env_drop`` names variables the child must not see.
     """
-    env = {**os.environ, "PYTHONUTF8": "1"}
+    env = {k: v for k, v in os.environ.items() if k not in env_drop}
+    env["PYTHONUTF8"] = "1"
     return subprocess.run([sys.executable, *cmd], cwd=REPO, env=env,
                           capture_output=True, encoding="utf-8", errors="replace",
                           **kwargs)
@@ -177,11 +209,10 @@ def staged_paths():
 
 
 def touches_resource(paths, platform, folder, resource):
-    """The staged paths belonging to this resource's docs, fixtures or policies."""
-    prefixes = (f"{INPUTS}/{platform}/{folder}/{resource}/",
-                f"{POLICIES}/{platform}/{folder}/{resource}/")
-    doc = f"{DOCS}/{platform}/{folder}/{resource}.json"
-    return [p for p in paths if p == doc or p.startswith(prefixes)]
+    prefix = f"{POLICIES}/{platform}/{folder}/{resource}/"
+    dependencies = {f"{DOCS}/{platform}/{folder}/{resource}.json",
+                    f"{POLICIES}/{platform}/config.tf"}
+    return [p for p in paths if p in dependencies or p.startswith(prefix)]
 
 
 def touches_opa_inputs(paths):
@@ -192,7 +223,8 @@ def touches_opa_inputs(paths):
     what terraform plans or what OPA decides — so the expensive step is skippable
     while the two cheap ones still run.
     """
-    return any(p.endswith((".tf", ".rego")) for p in paths)
+    return any(p.endswith((".tf", ".rego")) or
+               (p.startswith(f"{POLICIES}/") and p.endswith(".json")) for p in paths)
 
 
 def base_ref():
@@ -311,42 +343,78 @@ def check_true_arg_coverage(doc, platform, folder, resource):
     errors = []
     for name, entry in leaf_args(doc):
         if entry.get("security_impact") is True:
-            policy = Path(POLICIES) / platform / folder / resource / f"{name}.rego"
-            fixture = Path(INPUTS) / platform / folder / resource / name
-            if not policy.is_file():
-                errors.append(f"true arg '{name}': missing policy {policy}")
-            if not fixture.is_dir():
-                errors.append(f"true arg '{name}': missing input fixture {fixture}/")
+            directory = Path(POLICIES) / platform / folder / resource / name
+            for required in ("policy.rego", "compliant.tf", "nonCompliant.tf"):
+                if not (directory / required).is_file():
+                    errors.append(f"true arg '{name}': missing {directory / required}")
     return errors
 
 
-def uncached_fixtures(inputs_dir):
-    """Fixture dirs under ``inputs_dir`` with no committed plan beside their *.tf."""
-    root = REPO / inputs_dir
-    if not root.is_dir():
-        return []
-    return [d for d in sorted(root.rglob("*"))
-            if d.is_dir() and any(d.glob("*.tf")) and not plan_cache_path(d).exists()]
+def uncached_fixtures(policies_dir):
+    """Missing/stale plans count as uncached; incomplete fixtures are checked by the gate."""
+    root = REPO / policies_dir
+    missing = []
+    pairs, malformed = discover_policies(root)
+    missing.extend(d for d, _ in malformed)
+    for directory, _ in pairs:
+        if not is_committed_plan(plan_cache_path(directory, REPO)):
+            missing.append(directory)
+    return missing
+
+
+def has_true_args(doc):
+    return any(entry.get("security_impact") is True for _, entry in leaf_args(doc))
+
+
+def has_policies_or_fixtures(platform, folder, resource):
+    """Whether the resource has any fixture directory or policy file at all."""
+    policies = REPO / POLICIES / platform / folder / resource
+    return policies.is_dir() and any(
+        p.is_dir() or p.suffix in {".rego", ".tf"}
+        for p in policies.iterdir()
+    )
 
 
 def step_opa(report, platform, folder, resource, if_cached):
-    inputs = Path(INPUTS) / platform / folder / resource
     policies = Path(POLICIES) / platform / folder / resource
 
     if if_cached:
-        missing = uncached_fixtures(inputs)
+        missing = uncached_fixtures(policies)
         if missing:
             report.skip("OPA test",
                         f"{len(missing)} fixture(s) have no committed plan — terraform would "
                         "have to run. Run `python3 scripts/check_resource.py` before pushing")
             return
 
-    result = run([AUTO_TEST, "--inputs", str(inputs), "--policies", str(policies), "--verbose"])
+    with tempfile.TemporaryDirectory() as tmp:
+        report_path = Path(tmp) / "report.json"
+        # The child's own ::error lines would arrive here indented inside show()'s
+        # echo; the annotations are raised once, from its report, by report.fail.
+        result = run([AUTO_TEST, "--policies", str(policies),
+                      "--verbose", "--report", str(report_path)],
+                     env_drop=("GITHUB_ACTIONS", "GITHUB_STEP_SUMMARY"))
+        failures = opa_failures(report_path, resource)
     if result.returncode == 0:
         report.ok("OPA test", "every policy passes its compliant and non-compliant fixture")
+        return
+    show(result)
+    if failures:
+        report.fail("OPA test", f"{len(failures)} policy check(s) did not pass", failures)
     else:
-        report.fail("OPA test", "terraform plan + opa eval did not pass")
-        show(result)
+        # No report means auto_test stopped before testing anything; its output,
+        # echoed above, says why.
+        report.fail("OPA test", "terraform plan + opa eval did not pass", file=str(policies))
+
+
+def opa_failures(report_path, resource):
+    """auto_test's failed results as ``(file, title, message)`` findings."""
+    try:
+        results = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    return [(r["failure"].get("file"), f"{resource}/{r.get('policy')}",
+             f"{r.get('policy')}: {r['failure']['reason']}")
+            for r in results if not r.get("passed")]
 
 
 COVERAGE_SKIPPED = ("not a commit-time check — checked on the PR and by the full "
@@ -434,10 +502,9 @@ def main(argv=None):
     base = base_ref()
     base_version = load_base_doc(base, f"{DOCS}/{platform}/{folder}/{resource}.json")
     doc_errors = check_no_lost_args(doc, base_version) + check_doc_completeness(doc)
+    doc_rel = f"{DOCS}/{platform}/{folder}/{resource}.json"
     if doc_errors:
-        report.fail("Doc completeness", f"{len(doc_errors)} finding(s)")
-        for e in doc_errors:
-            print(f"      - {e}")
+        report.fail("Doc completeness", f"{len(doc_errors)} finding(s)", doc_errors, file=doc_rel)
     else:
         compared = (f"nothing lost against {base}" if base_version is not None
                     else "no base doc to compare with — run `git fetch origin`"
@@ -457,9 +524,8 @@ def main(argv=None):
     if cover_errors:
         report.fail("True-arg coverage",
                     f"{len(cover_errors)} gap(s) — expected until the policies and "
-                    "fixtures are written; they block merging the PR, not your commits")
-        for e in cover_errors:
-            print(f"      - {e}")
+                    "fixtures are written; they block merging the PR, not your commits",
+                    cover_errors, file=doc_rel)
     else:
         report.ok("True-arg coverage", "every security-impacting argument has a policy and a fixture")
 
@@ -467,8 +533,14 @@ def main(argv=None):
     # missing policy or fixture the OPA run would fail for a reason already reported.
     if doc_errors or cover_errors:
         report.skip("OPA test", "fix the findings above first")
+    elif not has_true_args(doc) and not has_policies_or_fixtures(platform, folder, resource):
+        # Every argument is security_impact: false, so coverage asked for nothing
+        # and nothing was written. auto_test would find no pairs and fail; there is
+        # simply nothing to test. Any stray policy or fixture still goes through
+        # auto_test, which reports it as an orphan.
+        report.ok("OPA test", "no security-impacting arguments, so there are no policies to test")
     elif not staged_opa:
-        report.skip("OPA test", "this commit changes no *.tf or *.rego, so the plan "
+        report.skip("OPA test", "this commit changes no Terraform files, Rego or committed plans, so the plan "
                                 "and the policy verdicts cannot have moved")
     else:
         step_opa(report, platform, folder, resource, args.if_cached)

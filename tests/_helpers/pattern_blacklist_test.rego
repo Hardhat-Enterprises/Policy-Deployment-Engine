@@ -103,7 +103,7 @@ test_get_blacklist_multiple_patterns_or_logic if {
 # They represent simplified hierarchical patterns (organizations/*/folders/*).
 #
 # Reality check (test 8) uses: tests/_helpers/fixtures/gcp_project/plan.json
-# Source: inputs/gcp/cloud_platform_service/google_project/project_id/
+# Source: terraform plan of a google_project project_id fixture pair
 # Purpose: Tests pattern extraction on actual project_id values:
 #   - c123: project_id="proj-app-dev" (pattern: proj-*-*)
 #   - c223: project_id="proj-sec-prod" (pattern: proj-*-*)
