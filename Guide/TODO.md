@@ -19,11 +19,9 @@ repo.
 
 | Image | Used in | What's stale → should show |
 |---|---|---|
-| `images/c.tf-nc.tf-file-structure.png` | policy-writing.md | `c.tf` / `nc.tf` → **`compliant.tf` / `nonCompliant.tf`**; service folder shown as slug `access_approval` → display name **`Access Approval`**; the fixtures now live under `policies/`, and **`config.tf` is gone** from the attribute folder |
 | `images/policy-vars-file-structure.PNG` | policy-writing.md, vars-rego.md | `vars.rego` → **`_vars.rego`**; slug folder → display name. (Attributes-as-folders, which this shot already shows, is correct again after the restructure.) |
 | `images/vars-rego.PNG` | vars-rego.md | slug `cloud_functions` → **`Cloud Functions`**. (The `policy.rego`-inside-attribute-folder tree this shot shows is correct again; only the `vars.rego` filename and the slug are wrong.) |
 | `images/runtime-policy-gcp.png` | policy-writing.md | slug `cloud_functions` → **`Cloud Functions`**. (Attributes-as-folders is correct again.) |
-| `images/runtime-example-inputs-policy.png` | policy-writing.md | **Re-capture entirely.** It contrasts an `inputs/` tree with a `policies/` tree; there is no `inputs/` tree any more — one `policies/gcp/<Service>/<resource>/<attribute>/` folder holds `policy.rego`, `compliant.tf` and `nonCompliant.tf` together |
 | `images/resource-folders.PNG` | policy-writing.md | slug `cloud_functions` → display name **`Cloud Functions`** |
 | `images/linters-output.PNG` | testing-policies.md | command `linter.py --gcp cloud_functions` → **`python3 scripts/linters/linter.py --platform gcp`** (the `--gcp` flag no longer exists) |
 | `images/artifact_registry.PNG` | researching-and-documentation.md | `docs/gcp/<Service>/resource_json/` subfolder → **flat `docs/gcp/<Service>/<resource>.json`**; underscore names (`App_Engine`, `Artifact_Registry`) → display names with spaces (**`App Engine`**, **`Artifact Registry`**) |
