@@ -6,6 +6,7 @@ import {
   isPolicyFailure,
   needsContentAnalysis,
   opaEvalMessage,
+  policyErrorText,
   writeJitPolicyDir,
   writeTempInput,
 } from "./opa.js";
@@ -29,7 +30,7 @@ export type CheckResult = {
   package_id: string;
   warnings: string[];
   failures: (PolicyRef & { message: unknown })[];
-  /** Policies that could not be evaluated (OPA error, undefined message). */
+  /** Policies that could not be evaluated (OPA error, undefined message, the helpers' POLICY ERROR). */
   errors: (PolicyRef & { error: string })[];
   /** Policies deliberately not evaluated (content security needs Bandit findings). */
   skipped: (PolicyRef & { reason: string })[];
@@ -157,6 +158,13 @@ export async function evaluateCheck(input: EvaluateInput): Promise<CheckResult> 
       }
       if (message === null || message === undefined) {
         errors.push({ ...ref(target), error: `policy message is undefined (package ${target.packageName})` });
+        policies.push({ ...ref(target), status: "error" });
+        continue;
+      }
+      // The helpers refused the policy: nothing in it was checked, so it is not a pass.
+      const policyError = policyErrorText(message);
+      if (policyError !== null) {
+        errors.push({ ...ref(target), error: policyError });
         policies.push({ ...ref(target), status: "error" });
         continue;
       }

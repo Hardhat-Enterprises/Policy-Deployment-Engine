@@ -70,6 +70,31 @@ export function isPolicyFailure(message: unknown): boolean {
   return false;
 }
 
+/** The marker policies/_helpers put on a policy it refuses to evaluate (see auto_test.py). */
+export const POLICY_ERROR_PREFIX = "POLICY ERROR:";
+
+/**
+ * The helper's own hard-error text, from "POLICY ERROR:" onwards, or null. Searched
+ * for anywhere: OPA returns the message as nested arrays, so the marker may sit at
+ * any depth and not at the start of a string.
+ */
+export function policyErrorText(message: unknown): string | null {
+  if (typeof message === "string") {
+    const index = message.indexOf(POLICY_ERROR_PREFIX);
+    return index === -1 ? null : message.slice(index).trim();
+  }
+  const children = Array.isArray(message)
+    ? message
+    : typeof message === "object" && message !== null
+      ? Object.values(message)
+      : [];
+  for (const child of children) {
+    const text = policyErrorText(child);
+    if (text !== null) return text;
+  }
+  return null;
+}
+
 /** policy_type is matched case-insensitively: policies spell it "whitelist" and "Whitelist". */
 const CONTENT_SECURITY = /"policy_type"\s*:\s*"content security"/i;
 const WHITELIST = /"policy_type"\s*:\s*"whitelist"/i;

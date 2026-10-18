@@ -6,6 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { evaluateCheck, policiesRoot, type CheckPackage } from "./engine/evaluate.js";
+import { policyErrorText } from "./engine/opa.js";
 
 const hasOpa = spawnSync("opa", ["version"]).status === 0;
 
@@ -47,6 +48,14 @@ test("a package for another platform is rejected", async () => {
     evaluateCheck({ pkg: pkg({ platforms: ["aws"] }), plan: planWith([{ type: "google_redis_instance" }]) }),
     (err: { status?: number }) => err.status === 400
   );
+});
+
+test("policyErrorText: finds the helpers' marker at any depth, from the marker on", () => {
+  assert.equal(policyErrorText(["Total X detected: 1 ", ["Situation 1: x", "Non-Compliant Resources: a"]]), null);
+  assert.equal(policyErrorText(["POLICY ERROR: bad. Nothing was checked."]), "POLICY ERROR: bad. Nothing was checked.");
+  assert.equal(policyErrorText([["x", ["note: POLICY ERROR: deep "]]]), "POLICY ERROR: deep");
+  assert.equal(policyErrorText({ message: ["POLICY ERROR: in an object"] }), "POLICY ERROR: in an object");
+  assert.equal(policyErrorText(null), null);
 });
 
 // ---------------------------------------------------------------------------
@@ -213,6 +222,56 @@ test("opa: a policy OPA rejects, or with no message rule, is a per-policy error"
         ["silent", "policy message is undefined (package terraform.gcp.security.test.google_test_thing.silent)"],
       ]
     );
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test("opa: a policy the helpers refuse (POLICY ERROR) is an error, not a pass", { skip: !hasOpa }, async () => {
+  const tmp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), "pde-gate-policy-error-"));
+  try {
+    fs.symlinkSync(path.join(policiesRoot(), "_helpers"), path.join(tmp, "_helpers"));
+    const realResource = path.join(policiesRoot(), "gcp/Memorystore (Redis)/google_redis_instance");
+    const resource = path.join(tmp, "gcp", "Memorystore (Redis)", "google_redis_instance");
+    fs.mkdirSync(path.join(resource, "refused"), { recursive: true });
+    fs.mkdirSync(path.join(resource, "region"), { recursive: true });
+    fs.copyFileSync(path.join(realResource, "_vars.rego"), path.join(resource, "_vars.rego"));
+    // A passing policy beside it, so without the POLICY ERROR handling the check would pass.
+    fs.copyFileSync(path.join(realResource, "region", "policy.rego"), path.join(resource, "region", "policy.rego"));
+    // policies/_helpers/README.md: an empty "values" on element required refuses the whole policy.
+    fs.writeFileSync(
+      path.join(resource, "refused", "policy.rego"),
+      `package terraform.gcp.security.memorystore_redis.google_redis_instance.refused
+
+import data.terraform.helpers
+import data.terraform.gcp.security.memorystore_redis.google_redis_instance.vars
+
+conditions := [[
+  {"situation_description": "x", "remedies": ["y"]},
+  {"condition": "c", "attribute_path": ["region"], "values": [], "policy_type": "element required"}
+]]
+
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+`
+    );
+    const result = await evaluateCheck({
+      pkg: pkg(),
+      plan: planWith([{ type: "google_redis_instance", name: "a", values: { region: "australia-southeast1" } }]),
+      policiesRoot: tmp,
+    });
+    assert.equal(result.status, "error");
+    assert.equal(result.ok, false);
+    assert.deepEqual(
+      result.policies.map((p) => [p.argument, p.status]),
+      [
+        ["refused", "error"],
+        ["region", "pass"],
+      ]
+    );
+    assert.equal(result.evaluated, 1);
+    assert.equal(result.errors.length, 1);
+    assert.match(result.errors[0]!.error, /^POLICY ERROR: invalid element required values on 'region'\. Nothing in this policy was checked\./);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
