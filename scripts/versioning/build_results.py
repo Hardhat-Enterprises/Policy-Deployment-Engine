@@ -9,7 +9,7 @@ writes a results.json that validity_check.py can consume:
 
 It does NOT reimplement OPA. It shells out to the project's auto_test.py and reports
 what that harness says. The policies for a resource are the argument folders under
-inputs/<resource>. If auto_test reports all passed, every such argument is marked valid
+policies/<resource>. If auto_test reports all passed, every such argument is marked valid
 for the given version. If any failed, it writes nothing and asks you to investigate,
 so we never record a pass we did not actually get.
 
@@ -30,12 +30,13 @@ import sys
 
 
 def list_argument_folders(repo, resource):
-    inputs_dir = os.path.join(repo, "inputs", *resource.split("/"))
-    if not os.path.isdir(inputs_dir):
-        raise SystemExit(f"inputs folder not found: {inputs_dir}")
+    policies_dir = os.path.join(repo, "policies", *resource.split("/"))
+    if not os.path.isdir(policies_dir):
+        raise SystemExit(f"policy resource folder not found: {policies_dir}")
     return sorted(
-        name for name in os.listdir(inputs_dir)
-        if os.path.isdir(os.path.join(inputs_dir, name))
+        name for name in os.listdir(policies_dir)
+        if os.path.isdir(os.path.join(policies_dir, name))
+        and os.path.isfile(os.path.join(policies_dir, name, "policy.rego"))
     )
 
 
@@ -79,7 +80,7 @@ def main():
     resource_type = args.resource.rstrip("/").split("/")[-1]
     arguments = list_argument_folders(args.repo, args.resource)
     if not arguments:
-        raise SystemExit("no argument folders found under inputs/ for this resource")
+        raise SystemExit("no policy argument folders found under policies/ for this resource")
 
     print(f"Found {len(arguments)} policy argument(s) for {resource_type}")
     output = run_auto_test(args.repo, args.resource)

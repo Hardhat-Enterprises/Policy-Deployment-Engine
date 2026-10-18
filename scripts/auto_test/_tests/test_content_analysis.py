@@ -65,3 +65,74 @@ def test_inject_content_security_findings_injects_findings(tmp_path):
         assert "non_compliant_example_1" in names
     finally:
         augmented.unlink(missing_ok=True)
+
+
+@pytest.mark.skipif(not shutil.which("bandit") or not shutil.which("opa"),
+                    reason="needs Bandit and OPA")
+@pytest.mark.parametrize("outcome", ["success", "opa_error", "undefined"])
+def test_content_analysis_in_argument_layout_preserves_plan_and_cleans_copy(
+        tmp_path, monkeypatch, outcome):
+    resource = "google_ces_agent"
+    argument = "after_agent_callbacks.python_code"
+    directory = tmp_path / "policies/gcp/Customer Engagement Suite" / resource / argument
+    directory.mkdir(parents=True)
+    (tmp_path / "policies/gcp/config.tf").write_text("# shared config\n")
+    for name in auto_test.FIXTURE_TF_FILES:
+        (directory / name).write_text("# cached synthetic fixture\n")
+    policy = directory / "policy.rego"
+    policy.write_text('''package terraform.gcp.security.test.google_ces_agent.callback
+import data.terraform.helpers
+import data.terraform.gcp.security.test.google_ces_agent.vars
+conditions := [[
+    {"situation_description": "Unsafe callback", "remedies": ["Fix the code"]},
+    {"condition": "Safe code", "attribute_path": ["after_agent_callbacks", 0, "python_code"],
+     "values": ["MEDIUM"], "policy_type": "content security"}
+]]
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+''')
+    (directory.parent / "_vars.rego").write_text('''package terraform.gcp.security.test.google_ces_agent.vars
+variables := {"resource_type": "google_ces_agent", "resource_value_name": "name",
+              "friendly_resource_name": "Agent"}
+''')
+    resources = []
+    for name, code in [
+        ("compliant_example_1", "def callback():\n    return 1\n"),
+        ("non_compliant_example_1", "import subprocess\nsubprocess.call(input(), shell=True)\n"),
+    ]:
+        resources.append({"type": resource, "name": name, "values": {
+            "name": name, "after_agent_callbacks": [{"python_code": code}]}})
+    cache = auto_test.plan_cache_path(directory)
+    cache.write_text(json.dumps({"planned_values": {"root_module": {"resources": resources}}}))
+    before = {p.name: p.read_bytes() for p in directory.iterdir()}
+    copies = []
+    inject = auto_test.inject_content_security_findings
+
+    def track_copy(path):
+        result = inject(path)
+        assert result is not None
+        copies.append(result)
+        return result
+
+    monkeypatch.setattr(auto_test, "inject_content_security_findings", track_copy)
+    if outcome != "success":
+        evaluate = auto_test.opa_eval_value
+
+        def message_result(paths, plan, query):
+            if query.endswith(".message"):
+                if outcome == "opa_error":
+                    raise auto_test.OpaEvalError("simulated evaluation failure")
+                return None
+            return evaluate(paths, plan, query)
+
+        monkeypatch.setattr(auto_test, "opa_eval_value", message_result)
+    result = auto_test.run_policy_check_pair(
+        directory, policy, project_root / "policies", cache)
+    assert result["passed"] is (outcome == "success"), json.dumps(result, indent=2)
+    assert result["policy"] == argument
+    if outcome != "success":
+        assert result["failure"]["file"].endswith(f"{argument}/policy.rego")
+        reason = result["failure"]["reason"]
+        assert ("opa eval failed" if outcome == "opa_error" else "message rule is undefined") in reason
+    assert copies and all(not path.exists() for path in copies)
+    assert {p.name: p.read_bytes() for p in directory.iterdir()} == before

@@ -3,31 +3,25 @@
 
 ## Folder Structure
 
-Set up the correct folder structure for your service. Each resource type has its own folder
-under both `inputs/gcp` and `policies/gcp`. Note the two trees differ: in `inputs/` each
-attribute gets its **own subfolder** (holding the fixtures), while in `policies/` each
-attribute is a **flat `<attribute>.rego` file** inside the resource folder.
+Set up the correct folder structure for your service. Everything lives under
+`policies/gcp`: each resource type has its own folder, and each attribute gets its own
+subfolder inside it holding the policy **and** its fixtures together.
 
 ### 1. Create a folder for your service and resource type
 
-Navigate to `inputs/gcp` and create a folder for your service
+Navigate to `policies/gcp` and create a folder for your service.
 
 Inside this folder, create a new folder for your resource type based on Terraform.
 
-Repeat the same steps in `policies/gcp`:
 
+### 2. Add the attribute (policy)
 
-### 2. Add the attribute (policy) to each tree
+When you have determined that an argument reference has security relevance, create one
+folder for it:
 
-When you have determined that an argument reference has security relevance:
+  `policies/gcp/<Service>/<resource type>/<attribute>/`
 
-- In `inputs/`, create a folder for it (this holds the fixtures):
-
-  `inputs/gcp/<Service>/<resource type>/<attribute>/`
-
-- In `policies/`, add a flat policy file (there is **no** per-attribute folder here):
-
-  `policies/gcp/<Service>/<resource type>/<attribute>.rego`
+It holds three files — `policy.rego`, `compliant.tf` and `nonCompliant.tf`.
 
 ### Example: `runtime`
 
@@ -54,18 +48,18 @@ When you have determined that an argument reference has security relevance:
 
 ### 1. Copy required files
 
-Copy the fixture files from `templates/gcp` into your **inputs** attribute folder
-`inputs/gcp/<Service>/<resource type>/<attribute>/`:
+Copy from `templates/gcp` into your attribute folder
+`policies/gcp/<Service>/<resource type>/<attribute>/`:
 - `compliant.tf`
 - `nonCompliant.tf`
-- `config.tf`
+- `policy.rego`
 
-For the **policies** tree:
+There is no `config.tf` to copy — one shared provider stub lives at
+`policies/gcp/config.tf` and the test harness supplies it automatically.
 
-- Copy **one** `_vars.rego` into the resource folder `policies/gcp/<Service>/<resource type>/`
-  (one per resource, shared by all of its policies).
-- Copy `templates/gcp/policy.rego` into that same resource folder and **rename it to
-  `<attribute>.rego`** — one flat file per attribute (there is no per-attribute subfolder here).
+Then copy **one** `_vars.rego` into the resource folder
+`policies/gcp/<Service>/<resource type>/` (one per resource, shared by all of its
+policies) — it sits beside the attribute folders, not inside them.
 
 
 ### For example

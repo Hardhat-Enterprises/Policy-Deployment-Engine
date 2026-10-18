@@ -2,7 +2,7 @@
 """Lint gate: run the linter but only fail on the author's *own* changes.
 
 The linter (scripts/linters/linter.py) is whole-tree by design — it must build
-the full docs index to reconcile inputs/ and policies/ against it, so it cannot
+the full docs index to reconcile policies/ against it, so it cannot
 meaningfully lint a single file in isolation. To hold contributors to their own
 work *without* blocking them on the repo-wide backlog, we run the linter once
 over the whole tree (with --content-checks) and fail only on error lines whose
@@ -55,7 +55,10 @@ from scripts.linters import policy_lint  # noqa: E402
 
 LINTER = [sys.executable, os.path.join("scripts", "linters", "linter.py"),
           "--tree", "all", "--platform", "gcp", "--content-checks"]
-RELEVANT_PREFIXES = ("docs/", "inputs/", "policies/")
+RELEVANT_PREFIXES = ("docs/", "policies/")
+# The files that make up one argument policy; touching any of them means owning
+# the whole argument directory (see _owned).
+ARGUMENT_FILES = {"policy.rego", "compliant.tf", "nonCompliant.tf", "config.tf"}
 
 # Findings about the fixture pair itself (compliant.tf/nonCompliant.tf), as
 # opposed to a policy .rego file — displayed and owned via the argument
@@ -117,19 +120,23 @@ def _owns_error(error_path, owned_path):
 def _owned(changed):
     """The set of paths a contributor is accountable for.
 
-    A contributor owns every file they changed. For input fixtures they also own
-    the whole *argument directory*: compliant.tf and nonCompliant.tf test one
-    argument together, so touching one means owning the pair (and config.tf).
-    Policies/docs stay file-level — each policy/doc is an independent unit.
+    A contributor owns every file they changed. For an argument policy they also own
+    the whole *argument directory*: policy.rego, compliant.tf and nonCompliant.tf test
+    one argument together, so touching one means owning all three. Docs and the
+    per-resource _vars.rego stay file-level — each is an independent unit.
     """
     owned = set(changed)
     for f in changed:
-        if f.startswith("inputs/") and "/" in f:
+        if f.startswith("policies/") and len(f.split("/")) == 6:
             owned.add(f.rsplit("/", 1)[0])   # the argument directory
+        if f.startswith("policies/") and f.endswith("/config.tf") and len(f.split("/")) == 3:
+            owned.add(f.rsplit("/", 1)[0])
+        if f.startswith("policies/") and f.endswith("/_vars.rego") and len(f.split("/")) == 5:
+            owned.add(f.rsplit("/", 1)[0])
     return owned
 
 
-def _owned_triples(changed):
+def _owned_triples(changed, root=REPO_ROOT):
     """(platform, service, resource_type) triples policy_lint should check.
 
     Any changed file at least 4 segments deep under ``policies/`` or
@@ -143,6 +150,11 @@ def _owned_triples(changed):
         parts = f.split("/")
         if len(parts) >= 4 and parts[0] in ("policies", "inputs"):
             triples.add((parts[1], parts[2], parts[3]))
+        if len(parts) == 3 and parts[0] == "policies" and parts[-1] == "config.tf":
+            platform_dir = Path(root) / "policies" / parts[1]
+            for resource in platform_dir.glob("*/*"):
+                if resource.is_dir():
+                    triples.add((parts[1], resource.parent.name, resource.name))
     return triples
 
 
@@ -151,8 +163,8 @@ def _finding_path(platform, service, resource_type, finding):
     a ``policy_lint`` finding is about."""
     base = f"{platform}/{service}/{resource_type}"
     if finding.rule in FIXTURE_RULES:
-        return f"inputs/{base}/{finding.policy}"
-    name = "_vars.rego" if finding.policy == "_vars" else f"{finding.policy}.rego"
+        return f"policies/{base}/{finding.policy}"
+    name = "_vars.rego" if finding.policy == "_vars" else f"{finding.policy}/policy.rego"
     return f"policies/{base}/{name}"
 
 
@@ -160,7 +172,12 @@ def _finding_owned(path, changed):
     """True if ``path`` (a file, or a fixture argument directory) is among
     ``changed`` — either changed directly, or (for a directory) it has a
     changed file beneath it."""
-    return path in changed or any(c == path or c.startswith(path + "/") for c in changed)
+    parts = path.split("/")
+    dependencies = set()
+    if len(parts) >= 5 and parts[0] == "policies":
+        dependencies = {"/".join(parts[:2]) + "/config.tf", "/".join(parts[:4]) + "/_vars.rego"}
+    return bool(dependencies & changed) or path in changed or any(
+        c.startswith(path + "/") or path.startswith(c + "/") for c in changed)
 
 
 def _policy_lint_findings(triples, changed, root=REPO_ROOT):
@@ -177,7 +194,7 @@ def _policy_lint_findings(triples, changed, root=REPO_ROOT):
             if finding.severity != "error":
                 continue
             path = _finding_path(platform, service, resource_type, finding)
-            if _finding_owned(path, changed):
+            if _finding_owned(path, _owned(changed)):
                 owned.append((path, finding))
             else:
                 backlog += 1
@@ -283,7 +300,7 @@ def _baseline_counts(triples, base_root):
     """
     findings = []
     for platform, service, resource_type in sorted(triples):
-        findings += policy_lint.lint_resource(base_root, platform, service, resource_type)
+        findings += policy_lint.lint_resource_baseline(base_root, platform, service, resource_type)
     return _finding_counts(findings)
 
 
@@ -393,9 +410,9 @@ def main(argv=None):
     if not lint_all:
         changed = {f for f in changed_files(base) if f.startswith(RELEVANT_PREFIXES)}
         if not changed:
-            print("No docs/ inputs/ policies/ changes — skipping linter.")
+            print("No docs/ policies/ changes — skipping linter.")
             return 0
-        print("Linting your changed files under docs/ inputs/ policies/:")
+        print("Linting your changed files under docs/ policies/:")
         for f in sorted(changed):
             print(f"  {f}")
 

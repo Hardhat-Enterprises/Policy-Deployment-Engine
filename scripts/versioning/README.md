@@ -10,7 +10,9 @@ The "101 policies" figure in this handover counts schema arguments on three reso
 
 Next step: make the provider version a real input (install/select that provider version, plan the compliant and non-compliant fixtures under it, bypassing the committed plan cache, run OPA, and write the result into the validity map). A plan that fails because a newly required unrelated argument is missing should be recorded as "fixture needs updating", not as a policy failure.
 
-build_results.py looks for fixtures under inputs/<resource>/. Update it if the folder restructure (#926) lands.
+build_results.py discovers argument directories containing policy.rego under
+policies/<platform>/<service>/<resource>/. It uses the restructured runner and
+requires migrated data; production data remains in the legacy layout until cutover.
 
 Read-only tool that compares two Terraform provider schema versions and reports what
 changed, plus what it means for our existing policies. It never writes to `docs/`,

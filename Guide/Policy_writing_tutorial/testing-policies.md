@@ -38,7 +38,7 @@ arguments left to cover.
 You do not need these day to day — check 3 and check 6 above run them for you — but they are
 useful when you are chasing one specific failure.
 
-The linter validates that the `docs/`, `inputs/`, and `policies/` trees reconcile and that your
+The linter validates that the `docs/` and `policies/` trees reconcile and that your
 fixtures are well-formed:
 
     python3 scripts/linters/linter.py --platform gcp

@@ -1,13 +1,13 @@
 <a id="top"></a>
 <h1 align="center">policy.rego</h1>
 
-> Your policy file is named after the attribute it checks — `<attribute>.rego` — and lives
-> **flat** in the resource folder `policies/gcp/<Service>/<resource type>/` (there is no
-> per-attribute subfolder).
+> Your policy file is always called `policy.rego` and lives in the folder for the attribute
+> it checks: `policies/gcp/<Service>/<resource type>/<attribute>/policy.rego`, beside that
+> attribute's `compliant.tf` and `nonCompliant.tf`.
 
 ### Rego package naming convention from directory structure
 
-The package name in your `<attribute>.rego` file must follow the directory structure of your policy.
+The package name in your `policy.rego` file must follow the directory structure of your policy.
 
 
 
