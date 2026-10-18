@@ -1,8 +1,13 @@
 import type { CanonicalPlan, Canonicalizer, PlanResource } from "../types.js";
 import { applyVersionRegistry, loadVersionRegistry } from "./registry/loader.js";
 
+/** PDE policies are authored against this Google provider pin. */
 export const PDE_GOOGLE_PROVIDER_PIN = "7.37.0";
 
+/**
+ * Enforced support matrix for GCP checks.
+ * Out-of-range versions fail when strict (API checks enforce by default).
+ */
 export const PDE_SUPPORT_MATRIX = {
   terraform: { min: "1.5.0", max: "1.99.99" },
   format_version: ["1.0", "1.1", "1.2"] as readonly string[],
@@ -10,7 +15,9 @@ export const PDE_SUPPORT_MATRIX = {
 } as const;
 
 export type CanonicalizeOpts = {
+  /** Reject unsupported / missing versions (API default: true). */
   strict?: boolean;
+  /** Fallback when plan JSON has no provider version (from package.variables). */
   googleProviderVersion?: string;
 };
 
@@ -53,6 +60,7 @@ function failOrWarn(strict: boolean, warnings: string[], msg: string): void {
   warnings.push(msg);
 }
 
+/** Best-effort Google provider version from plan JSON + optional package fallback. */
 export function detectGoogleProviderVersion(
   plan: Record<string, unknown>,
   fallback?: string
@@ -146,6 +154,7 @@ export const gcpCanonicalizer: Canonicalizer = {
     const planned = (raw.planned_values ?? {}) as { root_module?: TfModule };
     const flat = flatten(planned.root_module);
 
+    // Architecture: version pack hook — no packs yet → pass-through.
     const pack =
       tf && google
         ? loadVersionRegistry({ terraform: tf, google_provider: google })

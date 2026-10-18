@@ -30,5 +30,5 @@ export function resolvePlatform(plan: Record<string, unknown>, explicit?: string
     if (gcpAdapter.detect(plan)) return 'gcp';
     if (awsAdapter.detect(plan)) return 'aws';
     if (azureAdapter.detect(plan)) return 'azure';
-    return 'gcp';
+    return 'gcp'; // MVP default
 }

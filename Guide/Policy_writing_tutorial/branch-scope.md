@@ -20,8 +20,7 @@ For a branch named `Service/gcp/cloud_storage/google_storage_bucket`, these are 
 | Path | What it is | Allowed |
 |---|---|---|
 | `docs/gcp/Cloud Storage/google_storage_bucket.json` | your documentation | add or edit |
-| `inputs/gcp/Cloud Storage/google_storage_bucket/**` | your `compliant.tf` / `config.tf` / `nonCompliant.tf`, and the `<sha>.json` plan the harness writes beside them | add or edit |
-| `policies/gcp/Cloud Storage/google_storage_bucket/**` | your `_vars.rego` and `<argument>.rego` | add or edit |
+| `policies/gcp/Cloud Storage/google_storage_bucket/**` | resource `_vars.rego`, argument `policy.rego`, fixtures, optional config overrides and committed plans | add or edit; stale-plan deletion allowed |
 
 Nothing else. Not another resource type in your own service folder, not the shared harness, not
 the workflow files, and **no deletions anywhere** — not even inside your own folder. The one
@@ -79,37 +78,37 @@ wasn't yours. Watch out for near-identical neighbours: `google_compute_target_ht
 It also covers stray files that were never meant to be committed at all — a downloaded `opa.exe`,
 a screenshot, a scratch `commits.txt`, an edit to `.gitignore` or to a workflow in `.github/`.
 
-Fix it by putting the file back the way `dev` has it:
+Fix it by putting the file back the way it was when your branch left `dev`:
 
-    git checkout origin/dev -- 'docs/gcp/Compute Engine/google_compute_image.json'
+    git restore --source="$(git merge-base HEAD origin/dev)" --staged --worktree -- 'docs/gcp/Compute Engine/google_compute_image.json'
 
-or, if it is a file you created by accident, delete it from your branch and commit that.
+That works however far `dev` has moved on since, so you do not need to merge first. If it is a
+file your branch added, the same command deletes it.
 
 Then commit only your own paths, rather than everything:
 
     git add "docs/gcp/<Service>/<resource type>.json" \
-            "inputs/gcp/<Service>/<resource type>" \
             "policies/gcp/<Service>/<resource type>"
 
 ## deleted-file
 
 Your branch removes a file. Writing a policy only ever **adds** files, so a deletion is nearly
 always an accident — a bad merge resolution, or a "clean up and start again" that took real work
-with it. This applies inside your own folder too: deleting your own `<argument>.rego` and its
+with it. This applies inside your own folder too: deleting your own `<argument>/policy.rego` and its
 fixture directory silently removes an argument you had already been credited for.
 
 Put it back:
 
-    git checkout origin/dev -- '<the path in the message>'
+    git restore --source="$(git merge-base HEAD origin/dev)" --staged --worktree -- '<the path in the message>'
 
 If you are renaming something you added earlier on this branch, add the new name and leave the
 old file alone. If a file genuinely does need to go, ask a senior team member first.
 
 ## shared-harness-edit
 
-`scripts/**`, `policies/_helpers/**`, `tests/**` and `templates/**` are shared by every resource
-in the repo — the test harness, the Rego helper library, the helper tests, and the starter
-templates.
+`scripts/**`, `policies/_helpers/**`, `policies/<platform>/config.tf`, `tests/**` and
+`templates/**` are shared by every resource in the repo — the test harness, the Rego helper
+library, the shared Terraform configuration, the helper tests, and the starter templates.
 
 Editing them from a resource branch does not do what you want. When the PDE Portal scans your
 branch it takes `scripts/` and `policies/_helpers/` **from `dev`**, not from your branch, so your
@@ -125,36 +124,14 @@ If you think the harness or a template really is wrong — a missing rule, a bug
 `policy_lint.py` — raise it with a senior team member so it can go in on its own `feature/`
 branch, where it will be reviewed as a change to everybody's tooling.
 
-## legacy-plan-cache
-
-Committed terraform plans used to live in one shared tree, `inputs/plan_cache/`. They now live
-inside the fixture directory they were planned from, as `<sha>.json`. That tree is gone, and a
-branch that adds files back into it is working from a checkout older than the move — usually
-because a local run on an old branch re-created it.
-
-**Usually you do not have to do anything about it by hand.** Merge `origin/dev`, then run the
-test harness for your resource as normal:
-
-    git merge origin/dev
-    python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
-
-The harness moves your own plan out of `inputs/plan_cache/` and into your fixture directory
-itself — the file's contents were always the plan for those `*.tf`, so nothing is re-planned. It
-prints `adopted N plan(s) from the pre-move inputs/plan_cache/ layout`. Commit what it moved:
-
-    git add inputs "the files it moved, and the deletions"
-
-If entries are left over afterwards, they belong to fixtures that are not yours — those came in
-with a stray `git add .`, and `git rm -r inputs/plan_cache` is the fix.
-
 ---
 
 ## Why this is a gate and not just advice
 
 The two mistakes this catches are both **silent on the branch that causes them**. Editing the
 harness doesn't break your tests — it stops the portal scanning you, days later, with no failing
-check to point at. Wiping the plan cache doesn't break your resource — it breaks everybody
-else's next CI run. Neither one shows up in the OPA or Terraform checks, which is why the scope
+check to point at. Deleting another resource's committed plans doesn't break your resource —
+it breaks everybody else's next CI run. Neither one shows up in the OPA or Terraform checks, which is why the scope
 check runs on its own, on every push, on the branch that introduced the problem.
 
 <div align="center">

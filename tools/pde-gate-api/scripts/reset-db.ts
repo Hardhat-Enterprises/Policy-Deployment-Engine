@@ -1,4 +1,7 @@
-
+/**
+ * One-shot: reset local pde_gate schema to match greenfield migrations.
+ * Loads credentials from .env — run: npx tsx scripts/reset-db.ts
+ */
 import dotenv from "dotenv";
 import mysql from "mysql2/promise";
 

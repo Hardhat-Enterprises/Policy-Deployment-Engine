@@ -1,49 +1,34 @@
 import fs from "node:fs";
 import path from "node:path";
+import { loadPolicyCatalog } from "./policy-select.js";
 
 export type PolicyCatalogResource = {
   service: string;
   resource_type: string;
+  /** Argument names: the policy folders under the resource type, as policy_groups takes them. */
   policies: string[];
 };
 
-export function buildPolicyCatalog(platformRoot: string): PolicyCatalogResource[] {
+/**
+ * Every resource type of a platform with its argument policies, for the portal's
+ * package builder. Built on the same discovery the checks use (policy-select.ts),
+ * so whatever it lists is a valid policy_groups entry.
+ */
+export function buildPolicyCatalog(policiesRoot: string, platformSubdir: string): PolicyCatalogResource[] {
+  const platformRoot = path.join(policiesRoot, platformSubdir);
   if (!fs.existsSync(platformRoot)) return [];
 
   const resources: PolicyCatalogResource[] = [];
-
-  function walk(dir: string) {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (entry.isDirectory()) walk(path.join(dir, entry.name));
-    }
-
-    const varsPath = path.join(dir, "_vars.rego");
-    if (!fs.existsSync(varsPath)) return;
-
-    const varsText = fs.readFileSync(varsPath, "utf8");
-    const match =
-      varsText.match(/"resource_type"\s*:\s*"([^"]+)"/) ||
-      varsText.match(/resource_type\s*:=\s*"([^"]+)"/);
-    const resourceType = match?.[1];
-    if (!resourceType) return;
-
-    const policies = fs
-      .readdirSync(dir)
-      .filter(file => file.endsWith(".rego") && file !== "_vars.rego")
-      .map(file => path.basename(file, ".rego"))
-      .sort((a, b) => a.localeCompare(b));
-    if (!policies.length) return;
-
-    const parts = path.relative(platformRoot, dir).split(path.sep).filter(Boolean);
+  for (const [resourceType, targets] of loadPolicyCatalog(policiesRoot, platformSubdir)) {
+    if (targets.length === 0) continue;
+    const service = path.relative(platformRoot, targets[0]!.policyFile).split(path.sep)[0] ?? "";
     resources.push({
-      service: parts.slice(0, -1).join(" / ") || "Uncategorised",
+      service: service || "Uncategorised",
       resource_type: resourceType,
-      policies,
+      policies: targets.map((target) => target.argument),
     });
   }
-
-  walk(platformRoot);
-  return resources.sort((a, b) =>
-    a.service.localeCompare(b.service) || a.resource_type.localeCompare(b.resource_type)
+  return resources.sort(
+    (a, b) => a.service.localeCompare(b.service) || a.resource_type.localeCompare(b.resource_type)
   );
 }

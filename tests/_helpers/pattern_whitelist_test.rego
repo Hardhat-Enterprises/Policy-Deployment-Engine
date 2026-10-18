@@ -100,7 +100,7 @@ test_get_whitelist_multiple_patterns_or_logic if {
 # They represent simplified hierarchical patterns (folders/*/projects/*).
 #
 # Reality check (test 8) uses: tests/_helpers/fixtures/gcp_project/plan.json
-# Source: inputs/gcp/cloud_platform_service/google_project/project_id/
+# Source: terraform plan of a google_project project_id fixture pair
 # Purpose: Tests pattern validation on actual project_id values (see pattern_blacklist_test.rego)
 # ==============================================================================
 

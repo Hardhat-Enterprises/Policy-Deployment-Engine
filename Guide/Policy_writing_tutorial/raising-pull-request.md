@@ -8,7 +8,6 @@ scratch files, downloaded binaries and any file you were only looking at, and wi
 `Branch scope` check on your pull request:
 
     git add "docs/gcp/<Service>/<resource type>.json" \
-            "inputs/gcp/<Service>/<resource type>" \
             "policies/gcp/<Service>/<resource type>"
 
     git status          # check nothing else crept in

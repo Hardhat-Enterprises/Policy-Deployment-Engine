@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PDE Gate — Run Policy Check</title>
   <link rel="stylesheet" href="/styles.css" />
+  <script src="/session.js"></script>
 </head>
 <body>
   <nav>
@@ -16,24 +17,22 @@
 
   <h1>Run policy check</h1>
   <p class="muted">
-    Authenticate, select a saved policy package, and evaluate a Terraform
+    Sign in, select a saved policy package, and evaluate a Terraform
     <code>plan.json</code> through the PDE Gate backend and OPA engine.
   </p>
 
-  <form id="credentials_form">
-    <h2>1. Authenticate and load packages</h2>
-
-    <label for="org_id">Organisation ID</label>
-    <input id="org_id" name="org_id" autocomplete="off" required />
-
-    <label for="api_key">API key</label>
-    <input id="api_key" name="api_key" type="password" autocomplete="off" required />
-
-    <button id="load_button" type="submit">Load policy packages</button>
-  </form>
+  <section id="sign_in"></section>
 
   <form id="check_form" class="check-form" hidden>
-    <h2>2. Configure the check</h2>
+    <h2>Configure the check</h2>
+
+    <label for="api_key">API key (<code>PDE_API_KEY</code>)</label>
+    <input id="api_key" name="api_key" type="password" autocomplete="off" required />
+    <p class="muted">
+      Paste the organisation's API key for this check: checks run with the
+      same key CI uses, and the sign-in session only manages packages. The
+      key is not stored. Lost it? Rotate it on the <a href="/settings">Settings</a> page.
+    </p>
 
     <label for="package_select">Policy package</label>
     <select id="package_select" required></select>
@@ -73,9 +72,7 @@
   <section id="result" class="check-result" hidden aria-live="polite"></section>
 
   <script>
-    const credentialsForm = document.getElementById("credentials_form");
     const checkForm = document.getElementById("check_form");
-    const loadButton = document.getElementById("load_button");
     const checkButton = document.getElementById("check_button");
     const packageSelect = document.getElementById("package_select");
     const packageSummary = document.getElementById("package_summary");
@@ -86,17 +83,8 @@
     let packages = [];
     let parsedPlan = null;
 
-    const orgIdInput = document.getElementById("org_id");
+    // Pasted for each check and never stored: the API key belongs in CI.
     const apiKeyInput = document.getElementById("api_key");
-    orgIdInput.value = sessionStorage.getItem("pde_org_id") || "";
-    apiKeyInput.value = sessionStorage.getItem("pde_api_key") || "";
-
-    function credentials() {
-      return {
-        orgId: document.getElementById("org_id").value.trim(),
-        apiKey: document.getElementById("api_key").value.trim()
-      };
-    }
 
     function authHeaders(apiKey) {
       return {
@@ -219,23 +207,33 @@
     }
 
     function renderCheck(checkResult) {
-      const passed = checkResult.ok === true;
-      result.className = passed
-        ? "check-result check-result--pass"
-        : "check-result check-result--fail";
+      // pass: every evaluated policy passed; fail: a policy failed; error: the
+      // check is incomplete (nothing evaluated, or a policy could not be).
+      const status = checkResult.status || (checkResult.ok === true ? "pass" : "fail");
+      const passed = status === "pass";
+      result.className = {
+        pass: "check-result check-result--pass",
+        fail: "check-result check-result--fail",
+        error: "check-result check-result--error"
+      }[status] || "check-result check-result--fail";
       result.replaceChildren();
 
       appendText(
         result,
         "p",
-        passed ? "COMPLIANT" : "POLICY VIOLATIONS FOUND",
+        { pass: "COMPLIANT", fail: "POLICY VIOLATIONS FOUND", error: "CHECK INCOMPLETE" }[status] || status,
         "status-badge"
       );
       appendText(
         result,
         "h2",
-        passed ? "PDE Gate check passed" : "PDE Gate check failed"
+        {
+          pass: "PDE Gate check passed",
+          fail: "PDE Gate check failed",
+          error: "PDE Gate check could not be completed"
+        }[status] || "PDE Gate check failed"
       );
+      if (checkResult.message) appendText(result, "p", checkResult.message);
 
       const metrics = document.createElement("div");
       metrics.className = "result-metrics";
@@ -243,7 +241,9 @@
       const metricValues = [
         ["Platform", checkResult.platform || "Unknown"],
         ["Policies evaluated", String(checkResult.evaluated ?? 0)],
-        ["Violations", String(Array.isArray(checkResult.failures) ? checkResult.failures.length : 0)]
+        ["Violations", String(Array.isArray(checkResult.failures) ? checkResult.failures.length : 0)],
+        ["Errors", String(Array.isArray(checkResult.errors) ? checkResult.errors.length : 0)],
+        ["Skipped", String(Array.isArray(checkResult.skipped) ? checkResult.skipped.length : 0)]
       ];
 
       for (const [label, value] of metricValues) {
@@ -276,12 +276,28 @@
           failureList.appendChild(item);
         });
         result.appendChild(failureList);
-      } else {
+      } else if (passed) {
         appendText(
           result,
           "p",
           "No selected policy reported a non-compliant Terraform resource."
         );
+      }
+
+      const errors = Array.isArray(checkResult.errors) ? checkResult.errors : [];
+      if (errors.length) {
+        appendText(result, "h3", "Policies that could not be evaluated");
+        const list = document.createElement("ul");
+        errors.forEach(item => appendText(list, "li", `${item.policy || "Unknown policy"}: ${item.error}`));
+        result.appendChild(list);
+      }
+
+      const skipped = Array.isArray(checkResult.skipped) ? checkResult.skipped : [];
+      if (skipped.length) {
+        appendText(result, "h3", "Skipped policies");
+        const list = document.createElement("ul");
+        skipped.forEach(item => appendText(list, "li", `${item.policy || "Unknown policy"}: ${item.reason}`));
+        result.appendChild(list);
       }
 
       appendText(result, "h3", "Applied organisation configuration");
@@ -290,48 +306,28 @@
       result.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    credentialsForm.addEventListener("submit", async event => {
-      event.preventDefault();
-      clearResult();
-      checkForm.hidden = true;
-
-      const { orgId, apiKey } = credentials();
-      if (!orgId || !apiKey) {
-        showError("Organisation ID and API key are required.");
-        return;
-      }
-
-      loadButton.disabled = true;
-      loadButton.textContent = "Loading...";
-
-      try {
-        const response = await fetch(
-          `/v1/orgs/${encodeURIComponent(orgId)}/packages`,
-          { headers: authHeaders(apiKey) }
-        );
-        const data = await readJson(response);
-
-        if (!response.ok) {
-          throw new Error(data.error || "Unable to load policy packages.");
+    PdeSession.mount(
+      document.getElementById("sign_in"),
+      async () => {
+        clearResult();
+        checkForm.hidden = true;
+        try {
+          const data = await PdeSession.api("/packages");
+          packages = Array.isArray(data.packages) ? data.packages : [];
+          if (!packages.length) {
+            throw new Error(
+              "No saved policy packages were found. Register or create a package first."
+            );
+          }
+          populatePackages(packages);
+        } catch (error) {
+          showError(error instanceof Error ? error.message : "Unable to load packages.");
         }
-
-        packages = Array.isArray(data.packages) ? data.packages : [];
-        if (!packages.length) {
-          throw new Error(
-            "No saved policy packages were found. Register or create a package first."
-          );
-        }
-
-        populatePackages(packages);
-        sessionStorage.setItem("pde_org_id", orgId);
-        sessionStorage.setItem("pde_api_key", apiKey);
-      } catch (error) {
-        showError(error instanceof Error ? error.message : "Unable to load packages.");
-      } finally {
-        loadButton.disabled = false;
-        loadButton.textContent = "Load policy packages";
+      },
+      () => {
+        checkForm.hidden = true;
       }
-    });
+    );
 
     packageSelect.addEventListener("change", updatePackageSummary);
 
@@ -366,10 +362,15 @@
       event.preventDefault();
       clearResult();
 
-      const { orgId, apiKey } = credentials();
+      const session = PdeSession.current();
+      const apiKey = apiKeyInput.value.trim();
       const packageId = packageSelect.value;
-      if (!orgId || !apiKey) {
-        showError("Organisation ID and API key are required.");
+      if (!session) {
+        showError("Sign in first.");
+        return;
+      }
+      if (!apiKey) {
+        showError("Enter the organisation's API key (PDE_API_KEY).");
         return;
       }
       if (!packageId) {
@@ -394,7 +395,7 @@
 
       try {
         const response = await fetch(
-          `/v1/orgs/${encodeURIComponent(orgId)}/checks`,
+          `/v1/orgs/${encodeURIComponent(session.orgId)}/checks`,
           {
             method: "POST",
             headers: authHeaders(apiKey),

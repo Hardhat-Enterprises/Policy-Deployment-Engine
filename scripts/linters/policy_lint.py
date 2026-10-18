@@ -2,17 +2,17 @@
 """
 policy_lint — deterministic quality rules for the *content* of a policy kit.
 
-``linter.py`` checks that the ``docs/``, ``inputs/`` and ``policies/`` trees
-reconcile with each other (does every documented argument have a policy, a
-fixture pair and the right file names). It says nothing about whether the policy
-those files contain is any good. This linter reads the declarations themselves —
-the ``conditions`` list of every ``<argument>.rego``, the ``variables`` of every
+``linter.py`` checks that the ``docs/`` and ``policies/`` trees reconcile with
+each other (does every documented argument have a policy, a fixture pair and the
+right file names). It says nothing about whether the policy those files contain
+is any good. This linter reads the declarations themselves — the ``conditions``
+list of every ``<argument>/policy.rego``, the ``variables`` of every
 ``_vars.rego``, and the committed Terraform plan behind every fixture pair — and
 reports the smells a marker would otherwise have to find by hand.
 
 Every rule is deterministic and carries a stable id (see ``RULES``), so a finding
 can be cited, suppressed by fixing it, and counted over time. Nothing here writes
-to ``docs/``, ``policies/`` or ``inputs/``.
+to ``docs/`` or ``policies/``.
 
 How a policy is read
 --------------------
@@ -68,6 +68,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 HELPERS_DIR = REPO_ROOT / "policies" / "_helpers"
 
 VARS_FILE = "_vars.rego"
+POLICY_FILE = "policy.rego"
 REGO_EXT = ".rego"
 
 RULES = {
@@ -86,6 +87,18 @@ RULES = {
         "Map key blacklist `values` must contain at least one non-empty string "
         "key name without leading or trailing whitespace. A single string is "
         "also accepted, as in the dispatcher. Invalid configuration is an error."),
+    "invalid-element-required": (
+        "Element required `values` must list at least one value the attribute "
+        "must contain. An empty list, null/blank entries, or whitespace-padded "
+        "strings would require nothing or never match. Invalid configuration is "
+        "an error."),
+    "invalid-map-key-pattern-whitelist": (
+        "Map key pattern whitelist `values` must list at least one non-empty string "
+        "key shape without leading or trailing whitespace. An empty list would flag "
+        "every key. Invalid configuration is an error."),
+    "invalid-presence": (
+        "Presence `values` must be exactly one of [\"set\"] or [\"unset\"]. Anything "
+        "else checks nothing. Invalid configuration is an error."),
     "presence-only": (
         "`values` is only null/\"\": presence is the whole check. Acceptable when the "
         "rationale says presence is the control — the reviewer decides; pair with a "
@@ -104,7 +117,7 @@ RULES = {
         "default: a resource is flagged when it fails ANY of them. Say which you "
         "mean — `\"match\": \"any\"` or `\"match\": \"all\"` (warn)."),
     "wrong-argument": (
-        "No condition in `<arg>.rego` reads the argument the file is named after."),
+        "No condition in `<arg>/policy.rego` reads the argument its folder is named after."),
     "fixture-drift": (
         "compliant.tf and nonCompliant.tf differ on attributes other than the "
         "argument under test."),
@@ -435,6 +448,10 @@ VALID_POLICY_TYPES = (
     "pattern blacklist", "pattern whitelist", "element blacklist",
     "element pattern whitelist",
     "map key blacklist",
+    "element required",
+    "map key pattern whitelist",
+    "presence",
+    "content security",
 )
 
 # Blacklist/whitelist only — a pattern or range policy with empty values means
@@ -519,7 +536,7 @@ def _opa_reason(proc):
 
 def _run_opa(query, *data_dirs):
     """``opa eval --format json`` over ``data_dirs``; returns the query value."""
-    cmd = ["opa", "eval", "--format", "json"]
+    cmd = ["opa", "eval", "--format", "json", "--ignore", "*.json"]
     for d in data_dirs:
         cmd += ["-d", str(d)]
     cmd.append(query)
@@ -537,19 +554,20 @@ def _run_opa(query, *data_dirs):
 
 
 def _eval_dir(directory, helpers_dir):
-    """Whole-``data.terraform`` value for one policy directory, cached.
-
-    One OPA invocation per resource-type directory covers every policy file in
-    it; a per-file query is only used if this batch evaluation fails.
-    """
-    key = (str(Path(directory).resolve()), str(Path(helpers_dir).resolve()))
+    """Evaluate only Rego sources, never fixture JSON documents."""
+    directory = Path(directory)
+    key = (str(directory.resolve()), str(Path(helpers_dir).resolve()))
     if key not in _eval_cache:
+        sources = sorted(directory.rglob("*.rego"))
+        parent_vars = directory.parent / VARS_FILE
+        if parent_vars.is_file():
+            sources.append(parent_vars)
         try:
-            _eval_cache[key] = _run_opa("data.terraform", helpers_dir, directory) or {}
+            _eval_cache[key] = _run_opa("data.terraform", helpers_dir, *sources) or {}
         except OpaUnavailableError:
-            raise                                         # environment, not content
+            raise
         except PolicyLintError:
-            _eval_cache[key] = None                       # force the per-file path
+            _eval_cache[key] = None
     return _eval_cache[key]
 
 
@@ -580,7 +598,11 @@ def _rule_value(rego_path, helpers_dir, rule_name):
     # Batch evaluation failed or the rule is undefined in it — ask again with just
     # this one file, so a genuine OPA error surfaces (rather than becoming a silent
     # empty list) and an unparseable *sibling* cannot poison a healthy policy.
-    return _run_opa(f"data.{package}.{rule_name}", helpers_dir, Path(rego_path))
+    sources = [Path(rego_path)]
+    vars_path = Path(rego_path).parent.parent / VARS_FILE if Path(rego_path).name == "policy.rego" else Path(rego_path).parent / VARS_FILE
+    if vars_path.is_file() and vars_path != Path(rego_path):
+        sources.append(vars_path)
+    return _run_opa(f"data.{package}.{rule_name}", helpers_dir, *sources)
 
 
 def load_conditions(rego_path, policies_root, helpers_dir=None):
@@ -618,21 +640,6 @@ def _resolve_helpers(policies_root, helpers_dir=None):
         return Path(helpers_dir)
     local = Path(policies_root) / "_helpers"
     return local if local.is_dir() else HELPERS_DIR
-
-
-# --------------------------------------------------------------------------- #
-# Plan cache
-# --------------------------------------------------------------------------- #
-def plan_cache_for(input_dir):
-    """``<input_dir>/<sha>.json`` — the committed plan, beside the fixture's *.tf.
-
-    Straight through to ``auto_test.plan_cache_path`` (the pipeline's own
-    definition of which plan belongs to a fixture), so a provider bump changes
-    the expected filename here and in the harness at the same time. No root
-    rebasing is needed any more: the plan lives inside the directory it is for,
-    so a fixture tree under ``_tests/`` resolves inside itself for free.
-    """
-    return plan_cache_path(Path(input_dir))
 
 
 # --------------------------------------------------------------------------- #
@@ -912,7 +919,7 @@ def _repeated_helper_calls(text):
 # --------------------------------------------------------------------------- #
 def _lint_policy_file(root, platform, service, resource_type, rego_path, policies_root,
                       identity_key=None):
-    stem = rego_path.stem
+    stem = rego_path.parent.name
     text = rego_path.read_text(encoding="utf-8")
     out = []
 
@@ -1048,6 +1055,40 @@ def _lint_policy_file(root, platform, service, resource_type, rego_path, policie
                              "leading or trailing whitespace; empty lists and "
                              "null/non-string entries cannot perform this check.")
 
+            # Required values, not a presence check: an empty list requires nothing.
+            if policy_type == "element required":
+                required = values if isinstance(values, list) else [values]
+                if not required or any(
+                        v is None or v == ""
+                        or (isinstance(v, str) and v != v.strip())
+                        for v in required):
+                    add_once("invalid-element-required", path_text,
+                             f"'{path_text}' has invalid element required values. "
+                             "List at least one value the attribute must "
+                             "contain, with no null, blank or whitespace-padded "
+                             "entries; those would require nothing or never match.")
+
+            # Allowed key shapes, matched like element pattern whitelist.
+            if policy_type == "map key pattern whitelist":
+                shapes = values if isinstance(values, list) else [values]
+                if not shapes or any(
+                        not isinstance(s, str) or not s or s != s.strip()
+                        for s in shapes):
+                    add_once("invalid-map-key-pattern-whitelist", path_text,
+                             f"'{path_text}' has invalid map key pattern whitelist "
+                             "values. List at least one non-empty string key shape "
+                             "with no leading or trailing whitespace; an empty list "
+                             "would flag every key.")
+
+            # Presence takes exactly one mode; its values are not attribute values.
+            if policy_type == "presence":
+                modes = values if isinstance(values, list) else [values]
+                if len(modes) != 1 or not isinstance(modes[0], str) \
+                        or modes[0].lower() not in ("set", "unset"):
+                    add_once("invalid-presence", path_text,
+                             f"'{path_text}' has invalid presence values. Use "
+                             "exactly one of [\"set\"] or [\"unset\"].")
+
             # --- index-path ------------------------------------------------ #
             if attribute_path and _is_index(attribute_path[-1]):
                 add_once("index-path", path_text,
@@ -1179,13 +1220,13 @@ def _drift_comparisons(compliant, non_compliant):
 
 
 def _lint_fixtures(root, platform, service, resource_type, stem, identity_key=None):
-    input_dir = Path(root) / "inputs" / platform / service / resource_type / stem
+    input_dir = Path(root) / "policies" / platform / service / resource_type / stem
     # A missing input directory is linter.py's finding (an orphan policy), not
     # ours — we only speak about fixtures that exist.
     if not input_dir.is_dir() or not any(input_dir.glob("*.tf")):
         return []
 
-    cache = plan_cache_for(input_dir)
+    cache = plan_cache_path(input_dir)
     if not cache.exists():
         # Reported repo-relative: the finding is read in CI logs and on the portal,
         # where an absolute path of the checkout means nothing.
@@ -1440,10 +1481,10 @@ def _fixture_sides(root, platform, service, resource_type, stem):
 
     None when there is no readable plan for it.
     """
-    input_dir = Path(root) / "inputs" / platform / service / resource_type / stem
+    input_dir = Path(root) / "policies" / platform / service / resource_type / stem
     if not input_dir.is_dir():
         return None
-    cache = plan_cache_for(input_dir)
+    cache = plan_cache_path(input_dir)
     try:
         plan = json.loads(cache.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
@@ -1633,16 +1674,19 @@ def lint_resource(root, platform, service_folder, resource_type):
     findings += _lint_drift_exemptions(root, platform, service_folder, resource_type,
                                        identity_key)
 
-    for rego_path in sorted(resource_dir.glob(f"*{REGO_EXT}")):
-        if rego_path.name == VARS_FILE:
-            continue
+    for stray in sorted(resource_dir.glob(f"*{REGO_EXT}")):
+        if stray.name != VARS_FILE:
+            findings.append(Finding(service_folder, resource_type, stray.stem, "lint-error",
+                                    f"stray policy file {stray.name}; a policy lives at "
+                                    f"<argument>/{POLICY_FILE}"))
+    for rego_path in sorted(resource_dir.glob(f"*/{POLICY_FILE}")):
         try:
             findings += _lint_policy_file(root, platform, service_folder, resource_type,
                                           rego_path, policies_root, identity_key)
         except OpaUnavailableError:
             raise
         except (PolicyLintError, OSError, UnicodeDecodeError) as exc:
-            findings.append(Finding(service_folder, resource_type, rego_path.stem,
+            findings.append(Finding(service_folder, resource_type, rego_path.parent.name,
                                     "lint-error", str(exc)))
     return findings
 
@@ -1711,7 +1755,7 @@ def main(argv=None):
                              "the stderr line reads "
                              "'[ERROR] no-policies-dir: <target> (...)'.")
     parser.add_argument("--root", default=str(REPO_ROOT),
-                        help="repo root holding docs/, policies/ and inputs/ "
+                        help="repo root holding docs/ and policies/ "
                              "(default: this checkout)")
     parser.add_argument("--json", action="store_true", dest="as_json",
                         help="print the findings as a JSON array")
