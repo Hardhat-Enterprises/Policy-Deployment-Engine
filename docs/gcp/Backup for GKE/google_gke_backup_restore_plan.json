@@ -6,8 +6,8 @@
       "description": "A reference to the BackupPlan from which Backups may be used\nas the source for Restores created via this RestorePlan.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the source BackupPlan used for restores. It is an external resource reference, so policy should not constrain team-specific BackupPlan names or IDs."
     },
     "cluster": {
       "description": "The name of the target cluster to which you want to Restore via this RestorePlan.",
@@ -20,22 +20,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete or abandon the RestorePlan. Requiring deletion prevention reduces the risk of accidental or unauthorised removal."
     },
     "description": {
       "description": "User specified descriptive string for this RestorePlan.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Human-readable descriptive metadata only; it does not alter restore behaviour or security controls."
     },
     "labels": {
       "description": "Description: A set of custom labels supplied by the user.\nA list of key->value pairs.\nExample: { \"name\": \"wrench\", \"mass\": \"1.3kg\", \"count\": \"3\" }.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "User-defined organisational metadata used for identification and management; labels do not directly control restore security behaviour."
     },
     "location": {
       "description": "The region of the Restore Plan.",
@@ -48,15 +48,15 @@
       "description": "The full name of the BackupPlan Resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the RestorePlan resource. Resource names are team-specific identifiers and are not security policy targets."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the GCP project containing the RestorePlan. This is an external/project reference and should not be constrained by a generic resource policy."
     },
     "restore_config": {
       "type": "block",
@@ -67,8 +67,8 @@
       "description": "If True, restore all namespaced resources in the Backup.\nSetting this field to False will result in an error.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether all namespaces are included in the restore. This is a functional disaster-recovery scope choice, and the accepted enabled value is not inherently insecure."
     },
     "restore_config.cluster_resource_conflict_policy": {
       "description": "Defines the behavior for handling the situation where cluster-scoped resources\nbeing restored already exist in the target cluster.\nThis MUST be set to a value other than 'CLUSTER_RESOURCE_CONFLICT_POLICY_UNSPECIFIED'\nif 'clusterResourceRestoreScope' is anyting other than 'noGroupKinds'.\nSee https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#clusterresourceconflictpolicy\nfor more information on each policy option. Possible values: [\"USE_EXISTING_VERSION\", \"USE_BACKUP_VERSION\"]",
@@ -81,22 +81,22 @@
       "description": "Defines the behavior for handling the situation where sets of namespaced resources\nbeing restored already exist in the target cluster.\nThis MUST be set to a value other than 'NAMESPACED_RESOURCE_RESTORE_MODE_UNSPECIFIED'\nif the 'namespacedResourceRestoreScope' is anything other than 'noNamespaces'.\nSee https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#namespacedresourcerestoremode\nfor more information on each mode. Possible values: [\"DELETE_AND_RESTORE\", \"FAIL_ON_CONFLICT\", \"MERGE_SKIP_ON_CONFLICT\", \"MERGE_REPLACE_VOLUME_ON_CONFLICT\", \"MERGE_REPLACE_ON_CONFLICT\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines how conflicts with existing namespaced resources are handled during restoration. Insecure conflict behaviour can overwrite or alter existing workloads."
     },
     "restore_config.no_namespaces": {
       "description": "Do not restore any namespaced resources if set to \"True\".\nSpecifying this field to \"False\" is not allowed.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether namespaced resources are excluded from restoration. This is an architectural restore-scope choice rather than a generic security control."
     },
     "restore_config.volume_data_restore_policy": {
       "description": "Specifies the mechanism to be used to restore volume data.\nThis should be set to a value other than 'NAMESPACED_RESOURCE_RESTORE_MODE_UNSPECIFIED'\nif the 'namespacedResourceRestoreScope' is anything other than 'noNamespaces'.\nIf not specified, it will be treated as 'NO_VOLUME_DATA_RESTORATION'.\nSee https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#VolumeDataRestorePolicy\nfor more information on each policy option. Possible values: [\"RESTORE_VOLUME_DATA_FROM_BACKUP\", \"REUSE_VOLUME_HANDLE_FROM_BACKUP\", \"NO_VOLUME_DATA_RESTORATION\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the mechanism used for restoring volume data. The supported restore mechanisms are functional data-recovery choices and none is inherently insecure."
     },
     "restore_config.cluster_resource_restore_scope": {
       "type": "block",
@@ -114,8 +114,8 @@
       "description": "If True, no cluster-scoped resources will be restored.\nMutually exclusive to any other field in 'clusterResourceRestoreScope'.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether cluster-scoped resources are excluded from restoration. This is a functional restore-scope choice rather than a security control."
     },
     "restore_config.cluster_resource_restore_scope.excluded_group_kinds": {
       "type": "block",
@@ -126,15 +126,15 @@
       "description": "API Group string of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a Kubernetes API group to exclude from restoration. API group names are workload-specific scope identifiers and should not be constrained generically."
     },
     "restore_config.cluster_resource_restore_scope.excluded_group_kinds.resource_kind": {
       "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a Kubernetes resource kind to exclude from restoration. Resource kinds are restore-scope selectors rather than generic security controls."
     },
     "restore_config.cluster_resource_restore_scope.selected_group_kinds": {
       "type": "block",
@@ -145,15 +145,15 @@
       "description": "API Group string of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a Kubernetes API group to include in restoration. This is a workload-specific restore-scope selector with no generic insecure value."
     },
     "restore_config.cluster_resource_restore_scope.selected_group_kinds.resource_kind": {
       "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a Kubernetes resource kind to include in restoration. This is a functional restore-scope selector rather than a generic security control."
     },
     "restore_config.excluded_namespaces": {
       "type": "block",
@@ -164,8 +164,8 @@
       "description": "A list of Kubernetes Namespaces.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies team-selected namespaces to exclude from restoration. Namespace names are deployment-specific identifiers and should not be hardcoded by generic policy."
     },
     "restore_config.restore_order": {
       "type": "block",
@@ -186,15 +186,15 @@
       "description": "API Group of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the API group participating in a custom restore dependency. It describes ordering rather than enforcing a security boundary."
     },
     "restore_config.restore_order.group_kind_dependencies.requiring.resource_kind": {
       "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a Kubernetes resource kind in the custom restore order; this is dependency/order configuration rather than a generic security constraint."
     },
     "restore_config.restore_order.group_kind_dependencies.satisfying": {
       "type": "block",
@@ -205,15 +205,15 @@
       "description": "API Group of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the API group that must be restored first. It controls dependency ordering rather than a security minimum."
     },
     "restore_config.restore_order.group_kind_dependencies.satisfying.resource_kind": {
       "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the resource kind satisfying a restore dependency and is primarily restore sequencing configuration."
     },
     "restore_config.selected_applications": {
       "type": "block",
@@ -229,15 +229,15 @@
       "description": "The name of a Kubernetes Resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a specific Kubernetes application/resource to restore. Application names are deployment-specific and should not be constrained generically."
     },
     "restore_config.selected_applications.namespaced_names.namespace": {
       "description": "The namespace of a Kubernetes Resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the namespace containing an application selected for restoration. Namespace names are team-specific identifiers rather than generic security policy targets."
     },
     "restore_config.selected_namespaces": {
       "type": "block",
@@ -248,8 +248,8 @@
       "description": "A list of Kubernetes Namespaces.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies team-selected namespaces to include in restoration. This is a deployment-specific restore-scope choice rather than a generic security control."
     },
     "restore_config.transformation_rules": {
       "type": "block",
@@ -260,8 +260,8 @@
       "description": "The description is a user specified string description\nof the transformation rule.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Descriptive metadata for a transformation rule and does not itself modify restored resources."
     },
     "restore_config.transformation_rules.field_actions": {
       "type": "block",
@@ -272,29 +272,29 @@
       "description": "A string containing a JSON Pointer value that references the\nlocation in the target document to move the value from.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies an arbitrary JSON Pointer used by a transformation action. Its meaning depends on the target resource, so no generic insecure path can be defined."
     },
     "restore_config.transformation_rules.field_actions.op": {
       "description": "Specifies the operation to perform. Possible values: [\"REMOVE\", \"MOVE\", \"COPY\", \"ADD\", \"TEST\", \"REPLACE\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the transformation operation such as REMOVE, MOVE, COPY, ADD, TEST or REPLACE. No operation is inherently insecure without considering the target path and value."
     },
     "restore_config.transformation_rules.field_actions.path": {
       "description": "A string containing a JSON-Pointer value that references a\nlocation within the target document where the operation is performed.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies an arbitrary target JSON Pointer for a transformation. Its security meaning depends on the target resource, so it cannot be constrained generically."
     },
     "restore_config.transformation_rules.field_actions.value": {
       "description": "A string that specifies the desired value in string format\nto use for transformation.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies a free-form value for a transformation action. Its meaning depends on the target path and resource, so no generic insecure value can be identified."
     },
     "restore_config.transformation_rules.resource_filter": {
       "type": "block",
@@ -305,15 +305,15 @@
       "description": "This is a JSONPath expression that matches specific fields of\ncandidate resources and it operates as a filtering parameter\n(resources that are not matched with this expression will not\nbe candidates for transformation).",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies an arbitrary JSONPath expression for filtering resources. This is free-form resource-specific content with no generic insecure value."
     },
     "restore_config.transformation_rules.resource_filter.namespaces": {
       "description": "(Filtering parameter) Any resource subject to transformation must\nbe contained within one of the listed Kubernetes Namespace in the\nBackup. If this field is not provided, no namespace filtering will\nbe performed (all resources in all Namespaces, including all\ncluster-scoped resources, will be candidates for transformation).\nTo mix cluster-scoped and namespaced resources in the same rule,\nuse an empty string (\"\") as one of the target namespaces.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies team-selected namespaces to which a transformation rule applies. This is a deployment-specific scope choice rather than a generic security control."
     },
     "restore_config.transformation_rules.resource_filter.group_kinds": {
       "type": "block",
@@ -324,15 +324,15 @@
       "description": "API Group string of a Kubernetes resource, e.g.\n\"apiextensions.k8s.io\", \"storage.k8s.io\", etc.\nUse empty string for core group.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a Kubernetes API group to which a transformation applies. It is a workload-specific scope identifier with no generic insecure value."
     },
     "restore_config.transformation_rules.resource_filter.group_kinds.resource_kind": {
       "description": "Kind of a Kubernetes resource, e.g.\n\"CustomResourceDefinition\", \"StorageClass\", etc.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects a Kubernetes resource kind to which a transformation applies. It is a functional scope selector rather than a generic security control."
     },
     "restore_config.volume_data_restore_policy_bindings": {
       "type": "block",
@@ -343,15 +343,15 @@
       "description": "Specifies the mechanism to be used to restore this volume data.\nSee https://cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/reference/rest/v1/RestoreConfig#VolumeDataRestorePolicy\nfor more information on each policy option. Possible values: [\"RESTORE_VOLUME_DATA_FROM_BACKUP\", \"REUSE_VOLUME_HANDLE_FROM_BACKUP\", \"NO_VOLUME_DATA_RESTORATION\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the volume restore mechanism for the binding. The supported mechanisms are functional data-recovery choices and none represents an inherently insecure configuration."
     },
     "restore_config.volume_data_restore_policy_bindings.volume_type": {
       "description": "The volume type, as determined by the PVC's\nbound PV, to apply the policy to. Possible values: [\"GCE_PERSISTENT_DISK\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the volume technology to which a binding applies. The supported volume type is provider-defined rather than a security policy choice."
     }
   }
 }

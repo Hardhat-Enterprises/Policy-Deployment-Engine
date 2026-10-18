@@ -3,6 +3,7 @@
 Validate branch naming convention. Allowed branches:
 
 - feature/<name>
+- Task/<topic_slug>  (also Task/<github_handle>/<slug>)
 - Service/<platform>/<service_slug>/<resource_type>
     * <platform>: gcp | aws | azure (only gcp is populated today)
     * <service_slug>: the underscore slug of a docs/<platform> service folder
@@ -15,6 +16,7 @@ Validate branch naming convention. Allowed branches:
 
 Examples:
 - feature/add-validator
+- Task/harden_ci_unpinned_actions
 - Service/gcp/cloud_run_v2_api/google_cloud_run_v2_service
 - dev (protected)
 
@@ -34,6 +36,10 @@ PROTECTED_BRANCHES = {"dev"}
 # feature/<name>: <name> is free-form (letters incl. uppercase, digits, '.',
 # '_', '-', and '/' for sub-scopes), min 2 chars.
 SIMPLE_BRANCH = re.compile(r"^feature/[A-Za-z0-9._/-]{2,}$")
+# Task/<topic_slug> or Task/<github_handle>/<slug>: instructor-assigned task branches. The
+# first segment may carry a GitHub handle, so mixed case is allowed; everything after
+# `Task/` is free-form path characters like feature/.
+TASK_BRANCH = re.compile(r"^Task/[A-Za-z0-9][A-Za-z0-9._/-]+$")
 RESOURCE_TYPE = re.compile(r"^[a-z0-9_]+$")
 
 
@@ -55,6 +61,7 @@ def _allowed_formats():
     return (
         "Allowed branch names:\n"
         "  - feature/<name>\n"
+        "  - Task/<topic_slug>  (instructor-assigned task branches)\n"
         "  - Service/<platform>/<service_slug>/<resource_type>\n"
         "      platform in gcp|aws|azure; service_slug is the underscore slug of a\n"
         "      docs/<platform> service folder; resource_type is a documented resource.\n"
@@ -66,6 +73,9 @@ def _allowed_formats():
 def validate_branch_name(branch, docs_root="docs"):
     """Return (is_valid, error_message_or_None)."""
     if SIMPLE_BRANCH.match(branch):
+        return True, None
+
+    if TASK_BRANCH.match(branch):
         return True, None
 
     parts = branch.split("/")

@@ -1,41 +1,41 @@
 {
-  "last_updated": "2026-06-23T08:26:44Z",
+  "last_updated": "2026-09-06T00:00:00Z",
   "provider_version": "7.37.0",
   "arguments": {
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Prevents accidental or unauthorized deletion of critical Network Connectivity Center infrastructure. A policy should require deletion_policy to be set to PREVENT."
     },
     "description": {
       "description": "An optional description of the spoke.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides descriptive metadata only and does not control connectivity, routing, access, or data protection."
     },
     "group": {
       "description": "The name of the group that this spoke is associated with.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a spoke group. Restricting specific group identifiers would require organization-specific resource names and is outside generic platform security policy."
     },
     "hub": {
       "description": "Immutable. The URI of the hub that this spoke is attached to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the hub to which the spoke is attached. It is an identifier/reference argument and cannot be generically constrained without hardcoding resource names."
     },
     "labels": {
       "description": "Optional labels in key:value format. For more information about labels, see [Requirements for labels](https://docs.cloud.google.com/resource-manager/docs/creating-managing-labels#requirements).\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides resource metadata and governance information but does not directly control connectivity, routing, access, or data protection."
     },
     "location": {
       "description": "The location for the resource",
@@ -48,15 +48,15 @@
       "description": "Immutable. The name of the spoke. Spoke names must be unique.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the spoke resource but does not directly control connectivity, routing, access, or data protection."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the owning project. It is a resource-placement identifier and requires organization-specific project values rather than a generic platform security rule."
     },
     "linked_interconnect_attachments": {
       "type": "block",
@@ -67,43 +67,43 @@
       "description": "Dynamic routes overlapped/encompassed by exclude export ranges are excluded during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-export filtering for Interconnect attachments. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_interconnect_attachments.exclude_import_ranges": {
       "description": "Hub routes overlapped/encompassed by exclude import ranges are excluded during import from hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-import filtering for Interconnect attachments. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_interconnect_attachments.include_export_ranges": {
       "description": "Dynamic routes fully encompassed by include export ranges are included during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines which routes are exported through Interconnect attachments. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_interconnect_attachments.include_import_ranges": {
       "description": "Hub routes fully encompassed by include import ranges are included during import from hub.\n\"ALL_IPV4_RANGES\" or IPv4 CIDR ranges are allowed.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines which routes are imported through Interconnect attachments. CIDR ranges and routing filters are architectural choices rather than generic platform security controls."
     },
     "linked_interconnect_attachments.site_to_site_data_transfer": {
       "description": "A value that controls whether site-to-site data transfer is enabled for these resources. Note that data transfer is available only in supported locations.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables transit routing between sites through the NCC hub. Unintended enablement can create transitive connectivity and expose networks to each other, so a platform policy should require this setting to be false unless explicitly approved."
     },
     "linked_interconnect_attachments.uris": {
       "description": "The URIs of linked interconnect attachment resources",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains references to Interconnect attachment resources. Reference identifiers fall outside generic policy scope and should not be hardcoded."
     },
     "linked_producer_vpc_network": {
       "type": "block",
@@ -114,29 +114,29 @@
       "description": "IP ranges encompassing the subnets to be excluded from peering.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-export filtering for producer VPC peering. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_producer_vpc_network.include_export_ranges": {
       "description": "IP ranges allowed to be included from peering.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-export filtering for producer VPC peering. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_producer_vpc_network.network": {
       "description": "The URI of the Service Consumer VPC that the Producer VPC is peered with.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a Service Consumer VPC network. Resource-reference arguments are outside generic policy scope and should not be constrained with hardcoded names."
     },
     "linked_producer_vpc_network.peering": {
       "description": "The name of the VPC peering between the Service Consumer VPC and the Producer VPC (defined in the Tenant project) which is added to the NCC hub. This peering must be in ACTIVE state.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a specific VPC peering relationship. It is an identifier/reference argument rather than a generic security configuration."
     },
     "linked_router_appliance_instances": {
       "type": "block",
@@ -147,36 +147,36 @@
       "description": "Dynamic routes overlapped/encompassed by exclude export ranges are excluded during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-export filtering for router appliances. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_router_appliance_instances.exclude_import_ranges": {
       "description": "Hub routes overlapped/encompassed by exclude import ranges are excluded during import from hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-import filtering for router appliances. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_router_appliance_instances.include_export_ranges": {
       "description": "Dynamic routes fully encompassed by include export ranges are included during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines which routes are exported through router appliances. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_router_appliance_instances.include_import_ranges": {
       "description": "Hub routes fully encompassed by include import ranges are included during import from hub.\n\"ALL_IPV4_RANGES\" or IPv4 CIDR ranges are allowed.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines which routes are imported through router appliances. CIDR ranges and routing filters are architectural choices rather than generic platform security controls."
     },
     "linked_router_appliance_instances.site_to_site_data_transfer": {
       "description": "A value that controls whether site-to-site data transfer is enabled for these resources. Note that data transfer is available only in supported locations.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables site-to-site transit connectivity through router appliance instances and can broaden network reachability. A platform policy should require this setting to be false unless explicitly approved to prevent unintended inter-site exposure."
     },
     "linked_router_appliance_instances.instances": {
       "type": "block",
@@ -187,15 +187,15 @@
       "description": "The IP address on the VM to use for peering.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the VM interface used for peering. It is endpoint configuration and cannot be generically allowlisted without organization-specific values."
     },
     "linked_router_appliance_instances.instances.virtual_machine": {
       "description": "The URI of the virtual machine resource",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References a specific virtual machine resource. Resource-reference arguments are outside generic policy scope and should not be hardcoded."
     },
     "linked_vpc_network": {
       "type": "block",
@@ -206,22 +206,22 @@
       "description": "IP ranges encompassing the subnets to be excluded from peering.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-export filtering for the linked VPC. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_vpc_network.include_export_ranges": {
       "description": "IP ranges allowed to be included from peering.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-export filtering for the linked VPC. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_vpc_network.uri": {
       "description": "The URI of the VPC network resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References another VPC network resource. Resource-reference arguments are outside generic policy scope and should not be constrained with hardcoded names."
     },
     "linked_vpn_tunnels": {
       "type": "block",
@@ -232,43 +232,43 @@
       "description": "Dynamic routes overlapped/encompassed by exclude export ranges are excluded during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-export filtering for VPN tunnels. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_vpn_tunnels.exclude_import_ranges": {
       "description": "Hub routes overlapped/encompassed by exclude import ranges are excluded during import from hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines route-import filtering for VPN tunnels. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_vpn_tunnels.include_export_ranges": {
       "description": "Dynamic routes fully encompassed by include export ranges are included during export to hub.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines which routes are exported through VPN tunnels. CIDR selection is an architectural routing decision rather than a generic platform security control."
     },
     "linked_vpn_tunnels.include_import_ranges": {
       "description": "Hub routes fully encompassed by include import ranges are included during import from hub.\n\"ALL_IPV4_RANGES\" or IPv4 CIDR ranges are allowed.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines which routes are imported through VPN tunnels. CIDR ranges and routing filters are architectural choices rather than generic platform security controls."
     },
     "linked_vpn_tunnels.site_to_site_data_transfer": {
       "description": "A value that controls whether site-to-site data transfer is enabled for these resources. Note that data transfer is available only in supported locations.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables an architectural connectivity mode. Whether site-to-site transfer is appropriate depends on the network design and is not inherently secure or insecure."
     },
     "linked_vpn_tunnels.uris": {
       "description": "The URIs of linked VPN tunnel resources.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains references to VPN tunnel resources. Reference identifiers fall outside generic policy scope and should not be hardcoded."
     }
   }
 }

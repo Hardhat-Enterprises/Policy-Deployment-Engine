@@ -6,64 +6,64 @@
       "description": "The name of the backup OdbSubnet associated with the VM Cluster.\nFormat:\nprojects/{project}/locations/{location}/odbNetworks/{odb_network}/odbSubnets/{odb_subnet}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference to a specific sub-resource/network segment. Under service-wide rules, references to other resources and network address structures are false because we do not constrain pointers or addressing choices."
     },
     "backup_subnet_cidr": {
       "description": "CIDR range of the backup subnet.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Network address ranges and CIDR blocks are team addressing choices and remain false; furthermore, Oracle Database @ Google Cloud subnets are already restricted by the platform to private RFC 1918 space, making a restriction policy redundant."
     },
     "cidr": {
       "description": "Network settings. CIDR to use for cluster IP allocation.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "CIDR blocks and address ranges are team addressing choices, not security policy targets. In addition, platform validation already enforces private space for these network fields."
     },
     "cloud_vm_cluster_id": {
       "description": "The ID of the VM Cluster to create. This value is restricted\nto (^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$) and must be a maximum of 63\ncharacters in length. The value must start with a letter and end with\na letter or a number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is simply the cluster’s identifier. It doesn’t affect how the system behaves or how secure it is, it’s just a naming requirement enforced by Google Cloud."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Without a deletion policy, Terraform could accidentally destroy critical clusters. Enforcing “PREVENT” or “ABANDON” avoids accidental removal of production resources."
     },
     "deletion_protection": {
       "description": "Whether Terraform will be prevented from destroying the cluster. Deleting this cluster via terraform destroy or terraform apply will only succeed if this field is false in the Terraform state.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Prevents accidental or malicious deletion of the cluster. Essential for production workloads to avoid catastrophic data loss."
     },
     "display_name": {
       "description": "User friendly name for this resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is only a user‑friendly label. It doesn’t influence access control, networking, encryption, or any security‑related configuration."
     },
     "exadata_infrastructure": {
       "description": "The name of the Exadata Infrastructure resource on which VM cluster\nresource is created, in the following format:\nprojects/{project}/locations/{region}/cloudExadataInfrastuctures/{cloud_extradata_infrastructure}",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field points to an existing Exadata infrastructure resource. It doesn’t modify any security settings; it only links the VM cluster to its underlying hardware environment."
     },
     "labels": {
       "description": "Labels or tags associated with the VM Cluster. \n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are metadata used for organising and filtering resources. They don’t control permissions, network exposure, or data protection, so they have no direct security impact."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. See documentation for resource type 'oracledatabase.googleapis.com/DbNode'.",
@@ -76,29 +76,29 @@
       "description": "The name of the VPC network.\nFormat: projects/{project}/global/networks/{network}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is a resource identifier/reference pointing to a VPC network. Under the assessment guidance, we do not constrain pointers to other resources."
     },
     "odb_network": {
       "description": "The name of the OdbNetwork associated with the VM Cluster.\nFormat:\nprojects/{project}/locations/{location}/odbNetworks/{odb_network}\nIt is optional but if specified, this should match the parent ODBNetwork of\nthe odb_subnet and backup_odb_subnet.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is a reference/identifier pointing to another Oracle Database network resource. We secure the referenced resource directly, not the pointer."
     },
     "odb_subnet": {
       "description": "The name of the OdbSubnet associated with the VM Cluster for\nIP allocation. Format:\nprojects/{project}/locations/{location}/odbNetworks/{odb_network}/odbSubnets/{odb_subnet}",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Subnet references and network address selectors are pointers to other resources and team addressing choices, which are classified as false."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies which GCP project the resource belongs to. While projects have their own IAM and boundaries, this field alone doesn’t change any security behaviour of the VM cluster."
     },
     "properties": {
       "type": "block",
@@ -109,106 +109,106 @@
       "description": "OCI Cluster name.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is an internal cluster name used by Oracle systems. It doesn’t affect authentication, networking, or data protection, it’s purely informational."
     },
     "properties.cpu_core_count": {
       "description": "Number of enabled CPU cores.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This controls how many CPU cores are allocated. It affects performance and capacity, not security controls or exposure."
     },
     "properties.data_storage_size_tb": {
       "description": "The data disk group size to be allocated in TBs.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets the size of the storage pool. It doesn’t influence encryption, access, or network exposure."
     },
     "properties.db_node_storage_size_gb": {
       "description": "Local storage per VM",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This adjusts local VM storage size. It doesn’t change any security posture; it’s a resource sizing parameter."
     },
     "properties.db_server_ocids": {
       "description": "OCID of database servers.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "These are identifiers for database servers. They don’t modify access, encryption, or network rules, they’re just references."
     },
     "properties.disk_redundancy": {
       "description": "The type of redundancy. \n Possible values:\n DISK_REDUNDANCY_UNSPECIFIED\nHIGH\nNORMAL",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Redundancy modes and storage-layout features are operational data-management choices rather than security controls, making them false."
     },
     "properties.gi_version": {
       "description": "Grid Infrastructure Version.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the Grid Infrastructure version. While versioning can matter for patching, this field itself doesn’t enforce or weaken security settings."
     },
     "properties.hostname_prefix": {
       "description": "Prefix for VM cluster host names.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets a naming pattern for VM hostnames. It doesn’t affect authentication, networking, or data protection."
     },
     "properties.license_type": {
       "description": "License type of VM Cluster. \n Possible values:\n LICENSE_TYPE_UNSPECIFIED\nLICENSE_INCLUDED\nBRING_YOUR_OWN_LICENSE",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This determines the licensing model (included vs BYOL). Licensing has no direct impact on security configuration or behaviour."
     },
     "properties.local_backup_enabled": {
       "description": "Use local backup.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Operational data-management and backup settings are team choices rather than security controls, so backup enablement is an operational choice and does not directly affect security posture."
     },
     "properties.memory_size_gb": {
       "description": "Memory allocated in GBs.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets the memory allocation for the cluster. It affects performance, not security."
     },
     "properties.node_count": {
       "description": "Number of database servers.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This defines how many database nodes exist. It doesn’t change access control, encryption, or network exposure, only cluster size."
     },
     "properties.ocpu_count": {
       "description": "OCPU count per VM. Minimum is 0.1.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This adjusts the number of Oracle CPUs. It’s a performance parameter and doesn’t influence security."
     },
     "properties.sparse_diskgroup_enabled": {
       "description": "Use exadata sparse snapshots.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sparse disk groups are a storage optimisation feature. They don’t weaken or strengthen security."
     },
     "properties.ssh_public_keys": {
       "description": "SSH public keys to be stored with cluster.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "SSH keys control administrator access. Weak or unauthorised keys can lead to compromise. Policies should enforce valid, unique keys and disallow insecure values."
     },
     "properties.diagnostics_data_collection_options": {
       "type": "block",
@@ -219,22 +219,22 @@
       "description": "Indicates whether diagnostic collection is enabled for the VM cluster",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Diagnostic events may capture sensitive metadata. If exposed, attackers could gain insights into system behaviour. Policies should restrict unnecessary collection or enforce secure handling."
     },
     "properties.diagnostics_data_collection_options.health_monitoring_enabled": {
       "description": "Indicates whether health monitoring is enabled for the VM cluster",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "according to service-wide review guidance, pure health/performance monitoring is operational rather than a security signal."
     },
     "properties.diagnostics_data_collection_options.incident_logs_enabled": {
       "description": "Indicates whether incident logs and trace collection are enabled for the VM\ncluster",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Incident logs may contain sensitive traces and error details. If exposed, attackers could gain insights into vulnerabilities. Policies should enforce secure storage and limit exposure."
     },
     "properties.time_zone": {
       "type": "block",
@@ -245,15 +245,15 @@
       "description": "IANA Time Zone Database time zone, e.g. \"America/New_York\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This sets the time zone for the system. Time zone configuration doesn’t affect access, encryption, or network security."
     },
     "properties.time_zone.version": {
       "description": "IANA Time Zone Database version number, e.g. \"2019a\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This specifies the version of the time zone database. It has no impact on security controls or behaviour."
     }
   }
 }

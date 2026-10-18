@@ -20,8 +20,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform is allowed to destroy the App Engine version. A generic policy can require PREVENT to reduce the risk of accidental or unauthorised deletion and protect service availability."
     },
     "env_variables": {
       "description": "Environment variables available to the application.",
@@ -66,7 +66,7 @@
       "rationale": "Selects the language runtime/version the version executes on. A policy should whitelist currently-supported (non-deprecated, patched) runtimes so the app is not running on an end-of-life runtime with known vulnerabilities."
     },
     "runtime_api_version": {
-      "description": "The version of the API in the given runtime environment.\nPlease see the app.yaml reference for valid values at 'https://cloud.google.com/appengine/docs/standard/<language>/config/appref'\\\nSubstitute '<language>' with 'python', 'java', 'php', 'ruby', 'go' or 'nodejs'.",
+      "description": "The version of the API in the given runtime environment.\nPlease see the app.yaml reference for valid values at 'https://cloud.google.com/appengine/docs/standard/<language>/config/appref'\\\\\nSubstitute '<language>' with 'python', 'java', 'php', 'ruby', 'go' or 'nodejs'.",
       "required": false,
       "type": "string",
       "security_impact": false,
@@ -109,36 +109,36 @@
       "description": "Number of concurrent requests an automatic scaling instance can accept before the scheduler spawns a new instance.\n\nDefaults to a runtime-specific value.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how many concurrent requests an automatically scaled instance accepts before additional instances are started. The appropriate value depends on the application's workload and performance characteristics, so there is no universal security-safe threshold for a generic policy."
     },
     "automatic_scaling.max_idle_instances": {
       "description": "Maximum number of idle instances that should be maintained for this version.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the maximum number of idle instances kept available for automatic scaling. This is primarily an availability, performance, and cost setting whose appropriate value depends on workload requirements rather than a generic security control."
     },
     "automatic_scaling.max_pending_latency": {
       "description": "Maximum amount of time that a request should wait in the pending queue before starting a new instance to handle it.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how long requests may remain pending before a new instance is started. The appropriate latency threshold is workload-specific and affects scaling behaviour and performance rather than providing a universal security control."
     },
     "automatic_scaling.min_idle_instances": {
       "description": "Minimum number of idle instances that should be maintained for this version. Only applicable for the default version of a service.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the minimum number of idle instances maintained for the version. This is a capacity and availability setting whose appropriate value depends on application demand, so a generic security policy cannot define a universally secure value."
     },
     "automatic_scaling.min_pending_latency": {
       "description": "Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls the minimum pending time before App Engine starts a new instance. This is a workload-specific scaling and performance setting rather than a generic security control."
     },
     "automatic_scaling.standard_scheduler_settings": {
       "type": "block",
@@ -149,29 +149,29 @@
       "description": "Maximum number of instances to run for this version. Set to zero to disable maxInstances configuration.\n\n**Note:** Starting from March 2025, App Engine sets the maxInstances default for standard environment deployments to 20. This change doesn't impact existing apps. To override the default, specify a new value between 0 and 2147483647, and deploy a new version or redeploy over an existing version. To disable the maxInstances default configuration setting, specify the maximum permitted value 2147483647.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Limits the maximum number of automatically scaled instances. Although it affects capacity and cost exposure, an appropriate limit depends on workload demand and availability requirements, so a generic security policy cannot define a universal value."
     },
     "automatic_scaling.standard_scheduler_settings.min_instances": {
       "description": "Minimum number of instances to run for this version. Set to zero to disable minInstances configuration.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the minimum number of automatically scaled instances. This is an availability and capacity choice that depends on workload requirements rather than a generic security control."
     },
     "automatic_scaling.standard_scheduler_settings.target_cpu_utilization": {
       "description": "Target CPU utilization ratio to maintain when scaling. Should be a value in the range [0.50, 0.95], zero, or a negative value.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the CPU utilisation target used by the autoscaler. It controls performance and scaling behaviour, and the appropriate value is workload-specific rather than a universal security requirement."
     },
     "automatic_scaling.standard_scheduler_settings.target_throughput_utilization": {
       "description": "Target throughput utilization ratio to maintain when scaling. Should be a value in the range [0.50, 0.95], zero, or a negative value.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the throughput utilisation target used by the autoscaler. This is a performance and capacity tuning value whose secure setting cannot be determined generically."
     },
     "basic_scaling": {
       "type": "block",
@@ -182,15 +182,15 @@
       "description": "Duration of time after the last request that an instance must wait before the instance is shut down.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\". Defaults to 900s.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls how long an idle basic-scaling instance remains running before shutdown. This is primarily a performance and cost setting and does not provide a generic security control."
     },
     "basic_scaling.max_instances": {
       "description": "Maximum number of instances to create for this version. Must be in the range [1.0, 200.0].",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the maximum number of instances used by basic scaling. The appropriate limit depends on application demand, resilience, and cost requirements, so there is no universal security-safe value."
     },
     "deployment": {
       "type": "block",
@@ -206,22 +206,22 @@
       "description": "N/A",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a deployment file within the application manifest. It is an application-specific file identifier and does not itself configure authentication, authorisation, encryption, or another generic security control."
     },
     "deployment.files.sha1_sum": {
       "description": "SHA1 checksum of the file",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Provides an integrity checksum for a deployment file. Because the field is optional, a generic policy can require a non-empty checksum so the deployment includes an integrity value that can be checked against the expected application artifact."
     },
     "deployment.files.source_url": {
       "description": "Source URL",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the Google Cloud Storage URL from which an application file is fetched for deployment. The App Engine API accepts both HTTP and HTTPS storage URLs, so a generic policy can reject plaintext http:// sources and require HTTPS to protect deployment artifacts in transit."
     },
     "deployment.zip": {
       "type": "block",
@@ -232,15 +232,15 @@
       "description": "files count",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides an estimated file count used to optimise zip deployment performance. It does not control access, encryption, integrity enforcement, or another generic security property."
     },
     "deployment.zip.source_url": {
       "description": "Source URL",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Specifies the Google Cloud Storage URL from which the deployment archive is fetched. The App Engine API accepts both HTTP and HTTPS storage URLs, so a generic policy can reject plaintext http:// sources and require HTTPS to protect the application archive in transit."
     },
     "entrypoint": {
       "type": "block",
@@ -263,36 +263,36 @@
       "description": "Actions to take when the user is not logged in. Possible values: [\"AUTH_FAIL_ACTION_REDIRECT\", \"AUTH_FAIL_ACTION_UNAUTHORIZED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether an unauthenticated request is redirected or receives an unauthorised response. Both behaviours can be valid depending on the application and client type, so there is no single universally secure value for a generic policy."
     },
     "handlers.login": {
       "description": "Methods to restrict access to a URL based on login status. Possible values: [\"LOGIN_OPTIONAL\", \"LOGIN_ADMIN\", \"LOGIN_REQUIRED\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether a specific URL handler is public, requires login, or requires administrator access. Access requirements are application-specific, and public endpoints can be legitimate, so a generic platform policy cannot require one login mode for every handler."
     },
     "handlers.redirect_http_response_code": {
       "description": "30x code to use when performing redirects for the secure field. Possible values: [\"REDIRECT_HTTP_RESPONSE_CODE_301\", \"REDIRECT_HTTP_RESPONSE_CODE_302\", \"REDIRECT_HTTP_RESPONSE_CODE_303\", \"REDIRECT_HTTP_RESPONSE_CODE_307\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the HTTP 30x status code used when a security-level redirect occurs. The appropriate redirect semantics depend on the application and request behaviour rather than representing a universal security control."
     },
     "handlers.security_level": {
       "description": "Security (HTTPS) enforcement for this URL. Possible values: [\"SECURE_DEFAULT\", \"SECURE_NEVER\", \"SECURE_OPTIONAL\", \"SECURE_ALWAYS\"]",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls HTTPS enforcement for matching URLs. Values such as SECURE_NEVER, SECURE_OPTIONAL, and SECURE_DEFAULT can allow plaintext HTTP, while SECURE_ALWAYS redirects HTTP requests to HTTPS. A generic policy can require SECURE_ALWAYS to protect traffic in transit."
     },
     "handlers.url_regex": {
       "description": "URL prefix. Uses regular expression syntax, which means regexp special characters must be escaped, but should not contain groupings.\nAll URLs that begin with this prefix are handled by this handler, using the portion of the URL after the prefix as part of the file path.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the application-specific URL pattern handled by this entry. Route patterns depend on application design and cannot be constrained to a universal secure expression by a generic platform policy."
     },
     "handlers.script": {
       "type": "block",
@@ -303,8 +303,8 @@
       "description": "Path to the script from the application root directory.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the application-relative script path used to handle matching requests. The correct path is specific to the deployed application and does not provide a generic security control."
     },
     "handlers.static_files": {
       "type": "block",
@@ -315,50 +315,50 @@
       "description": "Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as\nstatic data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged\nagainst both your code and static data storage resource quotas.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether static files are also uploaded as code data so the application can read them. Whether this is needed depends on application behaviour, and enabling it does not by itself define a universally insecure configuration that can be generically prohibited."
     },
     "handlers.static_files.expiration": {
       "description": "Time a static file served by this handler should be cached by web proxies and browsers.\nA duration in seconds with up to nine fractional digits, terminated by 's'. Example \"3.5s\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls browser and proxy caching duration for static files. Appropriate cache lifetimes depend on the content and application behaviour, so there is no universal security-safe duration for a generic policy."
     },
     "handlers.static_files.http_headers": {
       "description": "HTTP headers to use for all responses from these URLs.\nAn object containing a list of \"key:value\" value pairs.\".",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines application-specific HTTP response headers for static files. Different applications and content types require different headers, so a generic platform policy cannot safely prescribe a universal map of header names and values."
     },
     "handlers.static_files.mime_type": {
       "description": "MIME type used to serve all files served by this handler.\nDefaults to file-specific MIME types, which are derived from each file's filename extension.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the MIME type used to serve static content. The correct value depends on the actual file content, so a generic policy cannot define one universally secure MIME type."
     },
     "handlers.static_files.path": {
       "description": "Path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the application-relative path for static files matched by the handler. This is application-specific routing configuration rather than a generic security control."
     },
     "handlers.static_files.require_matching_file": {
       "description": "Whether this handler should match the request if the file referenced by the handler does not exist.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Controls whether the handler requires the referenced static file to exist before matching a request. The correct behaviour depends on application routing and fallback design, so it is not suitable for a universal security policy."
     },
     "handlers.static_files.upload_path_regex": {
       "description": "Regular expression that matches the file paths for all files that should be referenced by this handler.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines the application-specific regular expression used to select static files for upload. The correct expression depends on the application's directory structure and cannot be constrained generically."
     },
     "libraries": {
       "type": "block",
@@ -369,15 +369,15 @@
       "description": "Name of the library. Example \"django\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies a third-party runtime library required by the application. The appropriate library is application-specific, so a generic platform policy cannot define a universally approved library name."
     },
     "libraries.version": {
       "description": "Version of the library to select, or \"latest\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the version of a third-party runtime library and explicitly allows the floating value latest. A generic policy can forbid latest and require an explicitly pinned version to improve deployment reproducibility and reduce unexpected dependency changes."
     },
     "manual_scaling": {
       "type": "block",
@@ -388,8 +388,8 @@
       "description": "Number of instances to assign to the service at the start.\n\n**Note:** When managing the number of instances at runtime through the App Engine Admin API or the (now deprecated) Python 2\nModules API set_num_instances() you must use 'lifecycle.ignore_changes = [\"manual_scaling\"[0].instances]' to prevent drift detection.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of continuously running instances for manual scaling. The appropriate number depends on workload, resilience, and capacity requirements rather than a universal security requirement."
     },
     "vpc_access_connector": {
       "type": "block",
@@ -400,15 +400,15 @@
       "description": "The egress setting for the connector, controlling what traffic is diverted through it.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which outbound traffic is routed through the Serverless VPC Access connector. With PRIVATE_RANGES_ONLY, internet-bound traffic can bypass the VPC connector and therefore bypass network-level controls such as firewall enforcement, NAT logging, and centralised egress inspection. A policy should require ALL_TRAFFIC so outbound traffic is routed through the VPC connector and remains subject to the organisation's network security controls."
     },
     "vpc_access_connector.name": {
       "description": "Full Serverless VPC Access Connector name e.g. /projects/my-project/locations/us-central1/connectors/c1.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the Serverless VPC Access connector used by the version. The connector is an organisation-specific network resource, and its security properties are configured on the referenced connector and VPC rather than by this identifier."
     }
   }
 }

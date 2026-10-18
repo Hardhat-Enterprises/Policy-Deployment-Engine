@@ -6,43 +6,43 @@
       "description": "CEL expression for matching on L7/application level criteria.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Team-specific traffic-matching criteria (which requests this rule applies to). Both broad and narrow matchers are legitimate depending on intent; not a structural security lever."
     },
     "basic_profile": {
       "description": "Profile which tells what the primitive action should be. Possible values are: * ALLOW * DENY. Possible values: [\"BASIC_PROFILE_UNSPECIFIED\", \"ALLOW\", \"DENY\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The core ALLOW/DENY action of an individual rule. A gateway policy legitimately needs both allow-rules and deny-rules depending on intent; a generic platform policy can't force this in one direction, similar to how URL-filter actions are left to the team."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the prevent-destructive-loss archetype: a generic platform policy can require this be set to 'PREVENT' so a security-enforcing rule cannot be accidentally destroyed via terraform apply/destroy."
     },
     "description": {
       "description": "Free-text description of the resource.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Cosmetic free-text field with no bearing on rule enforcement."
     },
     "enabled": {
       "description": "Whether the rule is enforced.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether the rule is actually enforced at all. A generic policy can require this be true, since a disabled security-relevant rule (e.g. an unenforced DENY or TLS-inspection rule) is an invisible gap in protection rather than an explicit, reviewable configuration choice."
     },
     "gateway_security_policy": {
       "description": "The name of the gatewat security policy this rule belongs to.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A reference to the parent policy resource. We secure the referenced resource itself, not the pointer to it."
     },
     "location": {
       "description": "The location of the gateway security policy.",
@@ -55,36 +55,36 @@
       "description": "Name of the resource. ame is the full resource name so projects/{project}/locations/{location}/gatewaySecurityPolicies/{gateway_security_policy}/rules/{rule}\nrule should match the pattern: (^a-z?$).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifier only; naming has no security bearing."
     },
     "priority": {
       "description": "Priority of the rule. Lower number corresponds to higher precedence.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "An ordering selector with no inherently insecure value; it's an operational detail of how multiple rules interact, not a security lever itself."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies which project owns the resource. A generic platform policy cannot constrain this without hardcoding a specific project ID, which is team-specific and out of scope."
     },
     "session_matcher": {
       "description": "CEL expression for matching on session criteria.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Team-specific session-matching criteria (which traffic this rule applies to). Not a structural security control; the actual security lever is the paired action/profile field."
     },
     "tls_inspection_enabled": {
       "description": "Flag to enable TLS inspection of traffic matching on. Can only be true if the\nparent GatewaySecurityPolicy references a TLSInspectionConfig.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Matches the enable-security-feature archetype: enabling TLS inspection lets the gateway decrypt and inspect HTTPS traffic for threats rather than letting it pass uninspected."
     }
   }
 }

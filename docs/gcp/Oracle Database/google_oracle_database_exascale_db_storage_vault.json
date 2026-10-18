@@ -6,43 +6,43 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can delete the storage vault. Without restrictions, accidental terraform destroy could wipe critical storage. Policies should enforce “PREVENT” or “ABANDON” for production."
     },
     "deletion_protection": {
       "description": "Whether or not to allow Terraform to destroy the instance. Unless this field is set to false in Terraform state, a terraform destroy or terraform apply that would delete the instance will fail.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Prevents accidental or malicious deletion of the vault. Essential safeguard to avoid catastrophic data loss."
     },
     "display_name": {
       "description": "The display name for the ExascaleDbStorageVault. The name does not have to\nbe unique within your project. The name must be 1-255 characters long and\ncan only contain alphanumeric characters.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "A user‑friendly label only. It doesn’t influence access control, networking, or encryption."
     },
     "exascale_db_storage_vault_id": {
       "description": "The ID of the ExascaleDbStorageVault to create. This value is\nrestricted to (^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$) and must be a maximum of\n63 characters in length. The value must start with a letter and end with a\nletter or a number.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This is just the identifier for the vault. It enforces naming rules but does not affect security posture."
     },
     "gcp_oracle_zone": {
       "description": "The GCP Oracle zone where Oracle ExascaleDbStorageVault is hosted.\nExample: us-east4-b-r2.\nIf not specified, the system will pick a zone based on availability.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Determines the physical zone where the vault is hosted. Wrong zones may violate compliance or data residency requirements. Policies should enforce approved zones."
     },
     "labels": {
       "description": "The labels or tags associated with the ExascaleDbStorageVault.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Metadata tags for organisation. They don’t control access, networking, or data protection."
     },
     "location": {
       "description": "Resource ID segment making up resource 'name'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -55,8 +55,8 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the GCP project. While projects have IAM boundaries, this field alone doesn’t alter security posture."
     },
     "properties": {
       "type": "block",
@@ -67,8 +67,8 @@
       "description": "The size of additional flash cache in percentage of high capacity\ndatabase storage.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines cache size allocation. This is a performance optimisation, not a security control."
     },
     "properties.exascale_db_storage_details": {
       "type": "block",
@@ -79,8 +79,8 @@
       "description": "The total storage allocation for the ExascaleDbStorageVault, in gigabytes\n(GB).",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets total storage allocation. Impacts capacity only, not access or encryption."
     },
     "properties.time_zone": {
       "type": "block",
@@ -91,15 +91,15 @@
       "description": "IANA Time Zone Database time zone. For example \"America/New_York\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the time zone for the system. Time zone configuration does not affect access, encryption, or network security."
     },
     "properties.time_zone.version": {
       "description": "IANA Time Zone Database version number. For example \"2019a\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the version of the time zone database. This is informational only and has no impact on security controls."
     }
   }
 }

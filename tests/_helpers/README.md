@@ -22,30 +22,39 @@ Unit tests for policy helper functions in `policies/_helpers/`.
 
 | File | Tests | Coverage |
 |------|-------|----------|
-| `shared_test.rego` | 12 | Shared utilities (get_resource_attribute, format paths, etc.) |
+| `shared_test.rego` | 26 | Shared utilities (get_resource_attribute, format paths, every-element path lookup, wildcard matching, etc.) |
+| `helpers_test.rego` | 35 | Dispatcher and summary orchestration |
 | `blacklist_test.rego` | 10 | Blacklist policy (forbidden values) |
-| `whitelist_test.rego` | 10 | Whitelist policy (required values) |
+| `whitelist_test.rego` | 11 | Whitelist policy (required values) |
 | `range_test.rego` | 8 | Range policy (numeric bounds, simplified) |
-| `pattern_blacklist_test.rego` | 8 | Pattern blacklist (glob matching forbidden) |
-| `pattern_whitelist_test.rego` | 8 | Pattern whitelist (glob matching required) |
+| `pattern_blacklist_test.rego` | 11 | Pattern blacklist (glob matching forbidden) |
+| `pattern_whitelist_test.rego` | 11 | Pattern whitelist (glob matching required) |
 | `element_blacklist_test.rego` | 8 | Element blacklist (array elements with substrings) |
+| `element_pattern_whitelist_test.rego` | 13 | Element pattern whitelist (array elements must match a shape) |
+| `map_key_blacklist_test.rego` | 13 | Map key blacklist (prohibited map keys) |
+| `map_key_blacklist_integration_test.rego` | 14 | Map key blacklist (dispatcher integration) |
+| `element_required_test.rego` | 15 | Element required (list must contain every value, in every element) |
+| `element_required_integration_test.rego` | 14 | Element required (dispatcher integration, reality check on the http_route plan) |
+| `map_key_pattern_whitelist_test.rego` | 13 | Map key pattern whitelist (every map key must match a shape) |
+| `map_key_pattern_whitelist_integration_test.rego` | 7 | Map key pattern whitelist (dispatcher integration) |
+| `presence_test.rego` | 15 | Presence (attribute or block set or unset, in every element) |
+| `presence_integration_test.rego` | 9 | Presence and per-rule checks (dispatcher integration) |
+| `content_security_test.rego` | 6 | Content security (static-analysis findings at or above a severity threshold) |
 
-**Total:** 64 tests covering all 7 helper policies
+**Total:** 239 tests covering all 12 helper policies
 
 ## Test Structure
 
-Each test file follows an 8-test pattern:
-- **Unit tests (6):** Test individual helper functions with boundary cases
-- **Integration test (1):** Realistic mocks with multiple resources
-- **Reality check (1):** Uses real Terraform fixtures
+Test files combine unit tests, integration checks, and reality checks against real
+Terraform fixtures. Exact per-file counts are in the table above.
 
 ## Test Scripts
 
 ### unit_test_helpers.sh
-Runs all 7 test suites with fixtures. Use for comprehensive validation.
+Runs all 17 test suites, with fixtures where a suite uses them. Use for comprehensive validation.
 
 ### smoke_test_helpers.sh
-Fast integration tests (5 policies at policy level). Use for quick feedback during development.
+Fast integration tests (one policy per type, each against its committed plan). Use for quick feedback during development.
 
 ### policy_debug.sh
 Shows full policy output with `--format pretty`. Use when debugging failures.
@@ -78,9 +87,10 @@ OPA loads all JSON files recursively and merges them into a single `data` namesp
 
 | Fixture | Resource | Used By | Source |
 |---------|----------|---------|--------|
-| `gcp_storage_bucket_plan` | `google_storage_bucket` | blacklist, whitelist, range tests | `inputs/gcp/cloud_storage/google_storage_bucket/retention_period/` |
-| `gcp_project_plan` | `google_project` | pattern blacklist/whitelist tests | `inputs/gcp/cloud_platform_service/google_project/project_id/` |
-| `gcp_access_level_plan` | `google_access_context_manager_access_level` | shared tests (deep nesting) | `inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_access_level/device_policy/` |
+| `gcp_storage_bucket_plan` | `google_storage_bucket` | blacklist, whitelist, range tests | self-contained capture (`retention_period` fixture pair) |
+| `gcp_project_plan` | `google_project` | pattern blacklist/whitelist tests | self-contained capture (`project_id` fixture pair) |
+| `gcp_access_level_plan` | `google_access_context_manager_access_level` | shared tests (deep nesting) | self-contained capture (`device_policy` fixture pair) |
+| `gcp_http_route_plan` | `google_network_services_http_route` | element required integration (every-element reality check) | `policies/gcp/Network Services/google_network_services_http_route/rules.action.redirect.https_redirect/` |
 
 **Note:** `gcp_access_level_plan` has 5-level deep nesting, ideal for testing nested attribute extraction.
 
@@ -96,44 +106,26 @@ test_with_fixture if {
 
 ### Regenerating Fixtures
 
-When helper functions change or test cases need updates:
+A fixture is a committed plan (the `<sha>.json` beside a policy's fixtures) wrapped in
+its unique key. To refresh one from its source policy:
 
 ```bash
-# 1. Navigate to Terraform configuration
-cd inputs/gcp/<service>/<resource>/<scenario>
+# 1. Make sure the source policy's committed plan is current
+python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource>"
 
-# 2. Generate plan (if not already exists)
-terraform init
-terraform plan -out=plan.tfplan
-
-# 3. Export to JSON and wrap in unique namespace
-terraform show -json plan.tfplan > plan.json
-jq '{<fixture_name>_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/<fixture_name>/plan.json
-
-# 4. Cleanup
-rm plan.json plan.tfplan
+# 2. Wrap that plan in the fixture's unique key
+jq '{<fixture_name>_plan: .}' "policies/gcp/<Service>/<resource>/<argument>/<sha>.json" \
+  > tests/_helpers/fixtures/<fixture_name>/plan.json
 ```
 
-**Examples:**
+**Example:**
 
 ```bash
-# Storage Bucket
-cd inputs/gcp/cloud_storage/google_storage_bucket/retention_period
-terraform show -json plan.tfplan > plan.json
-jq '{gcp_storage_bucket_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/gcp_storage_bucket/plan.json
-rm plan.json
-
-# Project
-cd inputs/gcp/cloud_platform_service/google_project/project_id
-terraform show -json plan.tfplan > plan.json
-jq '{gcp_project_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/gcp_project/plan.json
-rm plan.json
-
-# Access Level
-cd inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_access_level/device_policy
-terraform show -json plan.tfplan > plan.json
-jq '{gcp_access_level_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/gcp_access_level/plan.json
-rm plan.json
+# HTTP Route
+python3 scripts/auto_test/auto_test.py "gcp/Network Services/google_network_services_http_route"
+jq '{gcp_http_route_plan: .}' \
+  "policies/gcp/Network Services/google_network_services_http_route/rules.action.redirect.https_redirect/"<sha>.json \
+  > tests/_helpers/fixtures/gcp_http_route/plan.json
 ```
 
 ### Creating New Fixtures
@@ -144,32 +136,23 @@ Follow this pattern for new fixtures:
 # 1. Create fixture directory (name becomes data path prefix)
 mkdir tests/_helpers/fixtures/gcp_compute_instance
 
-# 2. Navigate to relevant Terraform configuration
-cd inputs/gcp/<service>/google_compute_instance/<scenario>
+# 2. Wrap the source policy's committed plan with a unique key matching
+#    the directory name + _plan
+jq '{gcp_compute_instance_plan: .}' "policies/gcp/<Service>/google_compute_instance/<argument>/<sha>.json" \
+  > tests/_helpers/fixtures/gcp_compute_instance/plan.json
 
-# 3. Generate Terraform plan
-terraform init
-terraform plan -out=plan.tfplan
-terraform show -json plan.tfplan > plan.json
-
-# 4. Wrap with unique key matching directory name + _plan
-jq '{gcp_compute_instance_plan: .}' plan.json > ../../../../tests/_helpers/fixtures/gcp_compute_instance/plan.json
-
-# 5. Cleanup
-rm plan.json plan.tfplan
-
-# 6. Access in tests as data.gcp_compute_instance_plan
+# 3. Access in tests as data.gcp_compute_instance_plan
 ```
 
 **Key requirements:**
 - Directory name must match wrapper key prefix (e.g., `gcp_compute_instance/` → `gcp_compute_instance_plan`)
 - Always use `jq` to wrap the plan (prevents namespace conflicts)
-- Source Terraform configs from `inputs/gcp/` directory
+- Source plans are the committed `<sha>.json` files under `policies/gcp/`
 
 ## Adding New Tests
 
 1. Create `<helper_name>_test.rego` in `tests/_helpers/`
-2. Follow 8-test pattern (6 unit + 1 integration + 1 reality check)
+2. Write unit tests plus a reality check against a real Terraform fixture
 3. Use fixtures for reality checks: `data.<fixture_name>_plan`
 4. Update `unit_test_helpers.sh` to include new test file
 5. Run tests to verify: `./tests/_helpers/unit_test_helpers.sh`

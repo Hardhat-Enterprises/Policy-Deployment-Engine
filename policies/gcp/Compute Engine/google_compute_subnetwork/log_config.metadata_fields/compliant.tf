@@ -1,0 +1,24 @@
+resource "google_compute_subnetwork" "compliant_example_1" {
+  name          = "compliant-example-1"
+  project       = "pde-project"
+  network       = "default"
+  ip_cidr_range = "10.10.0.0/24"
+  region        = "australia-southeast1"
+
+  log_config {
+    metadata        = "CUSTOM_METADATA"
+    metadata_fields = ["src_instance", "dest_instance"]
+  }
+}
+
+resource "google_compute_subnetwork" "compliant_example_2" {
+  name          = "compliant-example-2"
+  project       = "pde-project"
+  network       = "default"
+  ip_cidr_range = "10.10.0.0/24"
+  region        = "australia-southeast1"
+
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+}

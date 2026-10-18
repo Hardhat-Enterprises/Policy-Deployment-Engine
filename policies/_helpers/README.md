@@ -6,7 +6,7 @@ The `_helpers` directory contains the core policy evaluation framework for the P
 
 **Key Features:**
 - Modular architecture with specialized policy modules
-- Support for 6 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist
+- Support for 12 policy types: Blacklist, Whitelist, Range, Pattern Blacklist, Pattern Whitelist, Element Blacklist, Map Key Blacklist, Element Pattern Whitelist, Element Required, Map Key Pattern Whitelist, Presence, Content Security
 - OR logic across the conditions of a situation (a resource is flagged if it fails **any** of them)
 - Standardized interfaces across all policy modules
 - Shared utility functions for common operations
@@ -29,6 +29,12 @@ The `_helpers` directory contains the core policy evaluation framework for the P
   - [4. Pattern Blacklist](#4-pattern-blacklist)
   - [5. Pattern Whitelist](#5-pattern-whitelist)
   - [6. Element Blacklist](#6-element-blacklist)
+  - [7. Map Key Blacklist](#7-map-key-blacklist)
+  - [8. Element Pattern Whitelist](#8-element-pattern-whitelist)
+  - [9. Element Required](#9-element-required)
+  - [10. Map Key Pattern Whitelist](#10-map-key-pattern-whitelist)
+  - [11. Presence](#11-presence)
+  - [12. Content Security](#12-content-security)
 - [Usage Guide](#usage-guide)
   - [Input Format](#input-format)
   - [Multi-Condition Example (OR Logic)](#multi-condition-example-or-logic)
@@ -87,7 +93,13 @@ policies/_helpers/
     ├── range.rego
     ├── pattern_blacklist.rego
     ├── pattern_whitelist.rego
-    └── element_blacklist.rego
+    ├── element_blacklist.rego
+    ├── map_key_blacklist.rego
+    ├── element_pattern_whitelist.rego
+    ├── element_required.rego
+    ├── map_key_pattern_whitelist.rego
+    ├── presence.rego
+    └── content_security.rego
 ```
 
 ### Component Responsibilities
@@ -104,7 +116,7 @@ policies/_helpers/
 **Key Functions:**
 - `get_multi_summary(conditions, tf_variables)` - Main entry point
 - `select_policy_logic(...)` - Routes to correct policy module
-- `set_intersection_all(sets)` - Set intersection. `find_failing_resources` only ever passes it **one** set (the union of every condition's violations), so the cross-condition semantics is OR
+- `set_intersection_all(sets)` - Set intersection. Which sets it receives depends on the situation's `match`: under the default `"any"`, **one** set (the union of every condition's violations), so the cross-condition semantics is OR; under `"match": "all"`, **one set per condition**, so it intersects and the semantics is AND
 
 #### **shared.rego** - Utility Library
 - **Package:** `terraform.helpers.shared`
@@ -223,6 +235,10 @@ get_violations(tf_variables, attribute_path, values) = results
 - Check each position against position-specific whitelists
 - ANY non-match = violation
 
+A value that does not fit the target shape at all extracts nothing, so the resource
+passes silently. To require a value to match a shape rather than extract parts from
+it, use **Element Pattern Whitelist** (section 8).
+
 **Example:**
 ```json
 {
@@ -250,6 +266,225 @@ get_violations(tf_variables, attribute_path, values) = results
   "policy_type": "Element Blacklist",
   "attribute_path": ["status", 0, "restricted_services"],
   "values": ["*", "0.0.0.0"]
+}
+```
+
+### 7. Map Key Blacklist
+
+**Module:** `policies/map_key_blacklist.rego`
+
+Use this type to reject specified map keys with populated values. Keys are compared
+by exact name ignoring capitalisation: `Authorization` and `AUTHORIZATION` match,
+but `X-Authorization-Mode` does not. Null and empty-string values are ignored;
+whitespace-only strings are populated values and are flagged. A missing or null
+map, or an empty object, produces no violations; the map is not required to exist.
+Through the normal `get_multi_summary` entry point, a present non-null value that
+is not a map produces `POLICY ERROR:` and refuses the whole policy. The error
+reports the path and value type, never the value itself.
+
+For example, `["generic_web_service", "request_headers"]` can make the shared
+extractor return an array of header maps. Use
+`["generic_web_service", 0, "request_headers"]` to select the map instead. This
+runtime check needs the plan data; it is not a static linter check. Paths that
+resolve to missing/null remain indistinguishable from absent optional maps.
+
+This is useful for detecting sensitive inline HTTP headers. Messages contain the
+matching key names, never the map values. The prohibited names are supplied by
+each policy, not hard-coded into the helper.
+
+Configuration must supply at least one non-empty string key name with no leading
+or trailing whitespace. A single string is accepted through the dispatcher's
+normal array conversion. Empty lists, missing/null values, non-string entries,
+and names such as `"authorization "` are configuration errors, not passing
+checks. The normal `get_multi_summary` entry point returns `POLICY ERROR:` and
+refuses the whole policy; the linter reports `invalid-map-key-blacklist` as an
+error. This is separate from `presence-only`: here `values` lists **key names**,
+not empty attribute values. Empty/null values in the resource map remain allowed.
+
+```rego
+conditions := [[
+    {
+        "situation_description": "The webhook contains sensitive inline request headers",
+        "remedies": ["Move credentials to secret_versions_for_request_headers."],
+    },
+    {
+        "condition": "Reject sensitive header names with populated values",
+        "attribute_path": ["generic_web_service", 0, "request_headers"],
+        "values": ["authorization", "proxy-authorization", "api-key", "x-api-key", "x-auth-token"],
+        "policy_type": "map key blacklist",
+    },
+]]
+
+result := helpers.get_multi_summary(conditions, vars.variables)
+message := result.message
+details := result.details
+```
+
+For Service Directory, the attribute path is
+`["service_directory", 0, "generic_web_service", 0, "request_headers"]`.
+Like the existing helpers, this checks resources under `planned_values.root_module.resources`.
+It evaluates known plan values; it cannot prove that unknown values are safe.
+
+Run the focused and integration tests from the repository root:
+
+```shell
+opa test tests/_helpers/map_key_blacklist_test.rego tests/_helpers/map_key_blacklist_integration_test.rego policies/_helpers -v
+```
+
+---
+
+### 8. Element Pattern Whitelist
+
+**Module:** `policies/element_pattern_whitelist.rego`
+**Use Case:** Require every element of a list attribute to match a wildcard resource-path shape
+
+**Logic:**
+- `values` is a list of wildcard shapes; an element passes if it matches any one of them
+- A string attribute is checked as a one-item list
+- `*` matches one path segment (one or more non-`/` characters), so it never spans a separator
+- An empty `values` list matches nothing, so every element is flagged
+- A missing attribute or an empty list produces no violations; the attribute is not required to exist
+
+**Example:**
+```json
+{
+  "policy_type": "element pattern whitelist",
+  "attribute_path": ["guardrails"],
+  "values": ["projects/*/locations/*/apps/*/guardrails/*"]
+}
+```
+
+---
+
+### 9. Element Required
+
+**Module:** `policies/element_required.rego`
+**Use Case:** Require a list attribute to contain every one of a set of values
+
+**Logic:**
+- `values` is a flat list of items the attribute must contain; every one must be present
+- Extra items in the attribute are allowed
+- A single value (string, boolean or number) is checked as a one-item list, so `values: [true]` means "must be true"
+- A missing (unset) attribute in an element that exists counts as an empty list, so every required value is missing and that element is flagged
+- Matching is **exact, including capitalisation**. Provider enum values such as `UEFI_COMPATIBLE` must be written exactly as the provider does: a disk with `uefi_compatible` is reported as missing `UEFI_COMPATIBLE`
+- The violation message names each failing element and exactly which required values it is missing
+- An empty `values` list, missing `values`, or a `null`, `""` or whitespace-padded entry (such as `"UEFI_COMPATIBLE "`) would require nothing or never match. Through `get_multi_summary` this returns `POLICY ERROR:` and refuses the whole policy, and the linter reports `invalid-element-required` as an error
+
+The path is followed through **every element of every repeated block**, so a policy covers all of them. Leave out the list indexes to check every element, for example `["disk", "guest_os_features"]` checks every disk. A numeric index still selects one element, for example `["disk", 0, "guest_os_features"]` checks the first disk only. Violation messages name the concrete path of each failing element, such as `disk.[1].guest_os_features`. When a parent block is not configured (missing or an empty list) there is no element and nothing is checked. The walk is done by `shared.attribute_entries`.
+
+**Example (every disk must enable the Shielded VM and Confidential VM features):**
+```json
+{
+  "policy_type": "element required",
+  "attribute_path": ["disk", "guest_os_features"],
+  "values": ["UEFI_COMPATIBLE", "SEV_CAPABLE"]
+}
+```
+
+**Example (every configured redirect must force HTTPS):**
+```json
+{
+  "policy_type": "element required",
+  "attribute_path": ["rules", "action", "redirect", "https_redirect"],
+  "values": [true]
+}
+```
+Rules without a redirect produce no element, so they pass. A redirect that sets `https_redirect = false` or leaves it out is flagged. Because the path follows each rule, no `"match": "all"` pairing is needed, and none should be used: `"match"` combines results per resource, so pairing "a redirect is configured" with "https_redirect is true" would combine one rule's redirect with another rule's missing value.
+
+Run the focused and integration tests from the repository root:
+
+```shell
+opa test tests/_helpers/element_required_test.rego tests/_helpers/element_required_integration_test.rego policies/_helpers -v
+```
+
+---
+
+### 10. Map Key Pattern Whitelist
+
+**Module:** `policies/map_key_pattern_whitelist.rego`
+**Use Case:** Require every key of a map attribute to match an allowed wildcard shape
+
+**Logic:**
+- `values` is a flat list of allowed key shapes; a key passes if it matches any one of them
+- Matching ignores capitalisation, because map keys such as header or tag names are compared case-insensitively by the existing `map key blacklist` too. `*` matches one path segment (one or more non-`/` characters). Matching is done by `shared.wildcard_match`, the same function `element pattern whitelist` uses
+- Every key is checked whatever its value, including empty values
+- A missing or null map, or an empty map, produces no violations
+- Violation messages name each failing element's path and its offending keys, never the map values
+- An empty `values` list would flag every key, and a blank or whitespace-padded shape is almost always a typo. Through `get_multi_summary` both return `POLICY ERROR:`, and the linter reports `invalid-map-key-pattern-whitelist` as an error
+- A path that reaches a present value that is not a map also returns `POLICY ERROR:`. This check is shared with `map key blacklist` (`map_path_problems` in `helpers.rego`)
+
+The path is followed through **every element of every repeated block**, so a policy covers all of them. Leave out the list indexes to check every element, for example `["disk", "guest_os_features"]` checks every disk. A numeric index still selects one element, for example `["disk", 0, "guest_os_features"]` checks the first disk only. Violation messages name the concrete path of each failing element, such as `disk.[1].guest_os_features`. When a parent block is not configured (missing or an empty list) there is no element and nothing is checked. The walk is done by `shared.attribute_entries`.
+
+This is the allowlist counterpart to `map key blacklist`. Use it when the good keys share one known shape but the bad ones cannot be listed in advance, for example Resource Manager tags that must use permanent tag key IDs.
+
+**Example:**
+```json
+{
+  "policy_type": "map key pattern whitelist",
+  "attribute_path": ["resource_manager_tags"],
+  "values": ["tagKeys/*"]
+}
+```
+
+Run the focused and integration tests from the repository root:
+
+```shell
+opa test tests/_helpers/map_key_pattern_whitelist_test.rego tests/_helpers/map_key_pattern_whitelist_integration_test.rego policies/_helpers -v
+```
+
+---
+
+### 11. Presence
+
+**Module:** `policies/presence.rego`
+**Use Case:** Require an attribute or nested block to be set, or to not be set, in every element, whatever its value
+
+**Logic:**
+- `values` is exactly one of `["unset"]` or `["set"]` (any capitalisation)
+- `["unset"]` flags an element whose attribute **is** set; `["set"]` flags an element whose attribute is **not** set
+- An attribute counts as unset when it is missing, `null`, `""`, `[]` or `{}`. Terraform writes an absent nested block as `[]`, so `["unset"]` on a block path detects whether the block was configured
+- `false` and `0` are real values, so they count as set
+- Violation messages name the failing paths, never the values
+- Any other `values` would check nothing. Through `get_multi_summary` this returns `POLICY ERROR:`, and the linter reports `invalid-presence` as an error
+
+The path is followed through **every element of every repeated block**, so a policy covers all of them. Leave out the list indexes to check every element, for example `["disk", "guest_os_features"]` checks every disk. A numeric index still selects one element, for example `["disk", 0, "guest_os_features"]` checks the first disk only. Violation messages name the concrete path of each failing element, such as `disk.[1].guest_os_features`. When a parent block is not configured (missing or an empty list) there is no element and nothing is checked. The walk is done by `shared.attribute_entries`.
+
+Because unconfigured parents produce no element, `["set"]` on `["service_account", "email"]` applies only to templates that configure a `service_account` block, and flags any such block without an email.
+
+**How it relates to whitelist and blacklist:** on a single element, `presence ["unset"]` gives the same results as `whitelist [null, "", [], {}]`, and `presence ["set"]` the same as `blacklist [null, "", [], {}]`. `presence` adds no new power for one element. It exists because it checks every element, and because it is harder to get wrong: the list form is easy to write without `[]` or `{}`, and it draws a `presence-only` lint warning.
+
+**Example (no network interface may have an external IP):**
+```json
+{
+  "policy_type": "presence",
+  "attribute_path": ["network_interface", "access_config"],
+  "values": ["unset"]
+}
+```
+
+Run the focused and integration tests from the repository root:
+
+```shell
+opa test tests/_helpers/presence_test.rego tests/_helpers/presence_integration_test.rego policies/_helpers -v
+```
+
+---
+
+### 12. Content Security
+**Module:** `policies/content_security.rego`
+**Use Case:** Flag resources whose embedded content (e.g. Python code) has static-analysis findings at/above a severity threshold.
+
+**Logic:**
+- Reads pre-computed findings from `input.content_security_findings` (produced by `scripts/content_analysis/`).
+- Matches findings to resources by `resource_type` + `resource_name`.
+- Any finding whose `severity` is at/above a threshold in `values` = violation.
+
+**Example:**
+```json
+{
+  "policy_type": "content security",
+  "attribute_path": ["after_agent_callbacks", 0, "python_code"],
+  "values": ["MEDIUM"]
 }
 ```
 
@@ -378,25 +613,22 @@ View full output for debugging:
 
 ### Individual Policy Tests
 
-Test specific policy modules:
+Plans live beside each argument's fixtures as `<sha>.json`. Use the shared resolver
+to obtain the path (including the selected config and provider pin):
 
 ```bash
-# Blacklist test
-opa eval --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_service_perimeter/status/plan.json \
-  "data.terraform.gcp.security.access_context_manager_vpc_service_controls.access_context_manager_service_perimeter.status.message" \
-  --format pretty
+python -c "from pathlib import Path; from scripts.auto_test.auto_test import plan_cache_path; print(plan_cache_path(Path('policies/gcp/<Service>/<resource>/<argument>'), Path.cwd()))"
+```
 
-# Whitelist test
-opa eval --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/api_hub/google_apihub_api_hub_instance/config_encryption_type/plan.json \
-  "data.terraform.gcp.security.api_hub.google_apihub_api_hub_instance.config_encryption_type.message" \
-  --format pretty
+Load the helper engine, selected policy and resource variables explicitly. Loading
+an entire production policy tree would also load committed plans as policy data.
 
-# Range test
-opa eval --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/cloud_storage/google_storage_bucket/retention_period/plan.json \
-  "data.terraform.gcp.security.cloud_storage.google_storage_bucket.message" \
+```bash
+opa eval --data policies/_helpers \
+  --data "policies/gcp/<Service>/<resource>/_vars.rego" \
+  --data "policies/gcp/<Service>/<resource>/<argument>/policy.rego" \
+  --input "policies/gcp/<Service>/<resource>/<argument>/<sha>.json" \
+  "data.terraform.gcp.security.<service_package>.<resource>.<argument_package>.message" \
   --format pretty
 ```
 
@@ -566,8 +798,9 @@ nc_resources := {
 
 **Debug command:**
 ```bash
-opa eval --explain full --data ./policies/_helpers --data ./policies/gcp \
-  --input ./inputs/gcp/.../plan.json \
+opa eval --explain full --data ./policies/_helpers --data "policies/gcp/<Service>/<resource>/_vars.rego" \
+  --data "policies/gcp/<Service>/<resource>/<argument>/policy.rego" \
+  --input "policies/gcp/<Service>/<resource>/<argument>/<sha>.json" \
   "data.terraform.gcp.security..." \
   --format pretty
 ```
@@ -600,13 +833,15 @@ opa eval --explain full --data ./policies/_helpers --data ./policies/gcp \
 ## Performance Considerations
 
 ### Set Operations
-The framework builds each situation's violations as a single set comprehension, so no
-per-condition intersection pass is needed:
+Under the default `"match": "any"` the framework builds each situation's violations as a single
+set comprehension, so no per-condition intersection pass is needed:
 ```rego
 # One set holding every condition's violations (OR logic); set_intersection_all
 # receives exactly one set and returns it unchanged.
 failing_resources := set_intersection_all(resource_sets)
 ```
+Only a situation that opts into `"match": "all"` pays for the intersection, and then the
+comprehension runs once per condition instead of once per situation.
 
 ### Resource Filtering
 Policy modules use set comprehensions for parallel evaluation:

@@ -1,0 +1,22 @@
+resource "google_securityposture_posture" "compliant_example_1" {
+  posture_id  = "compliant_example_1"
+  parent      = "organizations/1234567890"
+  location    = "australia-southeast1"
+  deletion_policy = "PREVENT"
+  state       = "ACTIVE"
+
+  policy_sets {
+    policy_set_id = "example-policy-set"
+    policies {
+      policy_id = "example-policy"
+      constraint {
+        org_policy_constraint {
+          canned_constraint_id = "storage.uniformBucketLevelAccess"
+          policy_rules {
+            enforce = true
+          }
+        }
+      }
+    }
+  }
+}

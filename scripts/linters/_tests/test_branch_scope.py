@@ -6,8 +6,11 @@ a tiny docs tree built in ``tmp_path``, and the one test that covers the git
 output parser feeds it a recorded ``git diff -z --name-status`` byte string).
 """
 
+import shlex
 import sys
 from pathlib import Path
+
+import pytest
 
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
@@ -98,9 +101,9 @@ def test_own_docs_json_is_in_scope():
         "docs/gcp/Cloud Storage/google_storage_bucket.json", PLATFORM, FOLDER, RTYPE)
 
 
-def test_own_inputs_fixture_is_in_scope():
+def test_own_fixture_is_in_scope():
     assert bs.path_in_scope(
-        "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
+        "policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
         PLATFORM, FOLDER, RTYPE)
 
 
@@ -119,7 +122,7 @@ def test_another_resource_in_the_same_service_is_out_of_scope():
 
 def test_a_resource_whose_name_merely_starts_with_ours_is_out_of_scope():
     assert not bs.path_in_scope(
-        "policies/gcp/Cloud Storage/google_storage_bucket_iam_binding/role.rego",
+        "policies/gcp/Cloud Storage/google_storage_bucket_iam_binding/role/policy.rego",
         PLATFORM, FOLDER, RTYPE)
 
 
@@ -156,12 +159,12 @@ SHA = "a" * 64
 
 
 def test_adding_your_own_files_is_allowed():
-    assert classify("A", "policies/gcp/Cloud Storage/google_storage_bucket/location.rego") is None
+    assert classify("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego") is None
     assert classify("M", "docs/gcp/Cloud Storage/google_storage_bucket.json") is None
 
 
 def test_committing_your_own_plan_is_allowed():
-    plan = f"inputs/gcp/Cloud Storage/google_storage_bucket/location/{SHA}.json"
+    plan = f"policies/gcp/Cloud Storage/google_storage_bucket/location/{SHA}.json"
     assert classify("A", plan) is None
     assert classify("M", plan) is None
 
@@ -171,36 +174,38 @@ def test_deleting_your_own_stale_plan_is_allowed():
     # previous version as it writes the new one. That deletion is the contributor
     # doing the right thing.
     assert classify(
-        "D", f"inputs/gcp/Cloud Storage/google_storage_bucket/location/{SHA}.json"
+        "D", f"policies/gcp/Cloud Storage/google_storage_bucket/location/{SHA}.json"
     ) is None
 
 
 def test_deleting_someone_elses_plan_is_still_out_of_scope():
     assert classify(
-        "D", f"inputs/gcp/Compute Engine/google_compute_image/family/{SHA}.json"
+        "D", f"policies/gcp/Compute Engine/google_compute_image/family/{SHA}.json"
     ) == "deleted-file"
-
-
-def test_reviving_the_legacy_plan_cache_is_its_own_finding():
-    # One message about a stale layout, not a thousand out-of-scope files.
-    assert classify("A", "inputs/plan_cache/gcp/abc123.json") == "legacy-plan-cache"
-    assert classify("M", "inputs/plan_cache/gcp/abc123.json") == "legacy-plan-cache"
-
-
-def test_deleting_the_legacy_plan_cache_is_allowed():
-    assert classify("D", "inputs/plan_cache/gcp/abc123.json") is None
 
 
 def test_deleting_your_own_file_is_still_a_deletion():
     assert classify(
-        "D", "policies/gcp/Cloud Storage/google_storage_bucket/location.rego"
+        "D", "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego"
     ) == "deleted-file"
 
 
 def test_a_non_plan_json_deletion_in_scope_is_still_a_deletion():
     assert classify(
-        "D", "inputs/gcp/Cloud Storage/google_storage_bucket/location/plan.json"
+        "D", "policies/gcp/Cloud Storage/google_storage_bucket/location/plan.json"
     ) == "deleted-file"
+
+
+@pytest.mark.parametrize("path", [
+    "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
+    "inputs/plan_cache/gcp/abc123.json",
+])
+def test_a_file_under_inputs_is_out_of_scope(path):
+    """A resource's scope is its docs JSON and its policies/ directory, so a
+    fixture-shaped path under any other top-level tree — even one naming the
+    branch's own service and resource type — is rejected like any stray file."""
+    assert classify("A", path) == "out-of-scope-file"
+    assert classify("M", path) == "out-of-scope-file"
 
 
 def test_editing_the_harness_is_a_shared_harness_edit():
@@ -231,9 +236,9 @@ def test_stray_junk_is_out_of_scope():
 def test_check_is_clean_for_an_honest_branch():
     entries = [
         ("M", "docs/gcp/Cloud Storage/google_storage_bucket.json"),
-        ("A", "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"),
-        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location.rego"),
-        ("A", f"inputs/gcp/Cloud Storage/google_storage_bucket/location/{SHA}.json"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego"),
+        ("A", f"policies/gcp/Cloud Storage/google_storage_bucket/location/{SHA}.json"),
     ]
     assert bs.check(entries, PLATFORM, FOLDER, RTYPE) == []
 
@@ -242,7 +247,7 @@ def test_check_reports_each_violation_once_sorted_by_rule_then_path():
     entries = [
         ("A", "opa.exe"),
         ("M", "scripts/auto_test/auto_test.py"),
-        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location.rego"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego"),
     ]
     findings = bs.check(entries, PLATFORM, FOLDER, RTYPE)
     assert [(f.rule, f.path) for f in findings] == [
@@ -254,7 +259,7 @@ def test_check_reports_each_violation_once_sorted_by_rule_then_path():
 def test_every_finding_carries_a_remedy_naming_the_file():
     entries = [("M", "docs/gcp/Compute Engine/google_compute_image.json")]
     finding = bs.check(entries, PLATFORM, FOLDER, RTYPE, base="dev")[0]
-    assert "git checkout origin/dev" in finding.message
+    assert 'git restore --source="$(git merge-base HEAD origin/dev)"' in finding.message
     assert "google_compute_image.json" in finding.message
     assert finding.severity == "error"
 
@@ -274,10 +279,10 @@ def test_changed_entries_parses_statuses_spaces_and_renames(monkeypatch):
     """
     recorded = (
         b"M\0docs/gcp/Cloud Storage/google_storage_bucket.json\0"
-        b"A\0inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf\0"
-        b"D\0policies/gcp/Cloud Storage/google_storage_bucket/old.rego\0"
-        b"R096\0inputs/gcp/Cloud Storage/google_storage_bucket/location/aaa.json\0"
-        b"inputs/gcp/Cloud Storage/google_storage_bucket/location/bbb.json\0"
+        b"A\0policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf\0"
+        b"D\0policies/gcp/Cloud Storage/google_storage_bucket/old/policy.rego\0"
+        b"R096\0policies/gcp/Cloud Storage/google_storage_bucket/location/aaa.json\0"
+        b"policies/gcp/Cloud Storage/google_storage_bucket/location/bbb.json\0"
     )
     monkeypatch.setattr(bs, "_git", lambda *args: recorded)
     monkeypatch.setattr(
@@ -286,8 +291,157 @@ def test_changed_entries_parses_statuses_spaces_and_renames(monkeypatch):
 
     assert bs.changed_entries("origin/dev") == [
         ("M", "docs/gcp/Cloud Storage/google_storage_bucket.json"),
-        ("A", "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"),
-        ("D", "policies/gcp/Cloud Storage/google_storage_bucket/old.rego"),
-        ("D", "inputs/gcp/Cloud Storage/google_storage_bucket/location/aaa.json"),
-        ("A", "inputs/gcp/Cloud Storage/google_storage_bucket/location/bbb.json"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf"),
+        ("D", "policies/gcp/Cloud Storage/google_storage_bucket/old/policy.rego"),
+        ("D", "policies/gcp/Cloud Storage/google_storage_bucket/location/aaa.json"),
+        ("A", "policies/gcp/Cloud Storage/google_storage_bucket/location/bbb.json"),
     ]
+
+
+# --------------------------------------------------------------------------- #
+# The recovery recipe
+# --------------------------------------------------------------------------- #
+# A per-rule remedy names one file because a rule is about one file. On the branch
+# this was written for (2026-09-08, an old snapshot of the whole tree re-committed
+# on top of a recent dev) that produced 2,737 findings and three example commands,
+# and it read as "run this 2,737 times": the contributor ran the three, saw nothing
+# change, and gave up. What is asserted here is not the wording but the two
+# properties that made the report unusable — the recipe is built from the *whole*
+# finding list rather than the truncated display list, and it never names the
+# contributor's own resource kit, which `git checkout origin/dev -- .` would
+# overwrite whenever that resource already has a version on dev.
+
+SIBLING = "policies/gcp/Cloud Storage/google_storage_hmac_key"
+OWN = "policies/gcp/Cloud Storage/google_storage_bucket"
+
+# Three rule kinds spread over the shared trees and a sibling resource type —
+# plus the contributor's own files, which are legitimate.
+MIXED = [
+    ("D", ".github/workflows/branch-scope.yml"),             # deleted-file
+    ("M", "Guide/Policy_writing_tutorial/branch-scope.md"),  # out-of-scope-file
+    ("M", "scripts/_tests/test_check_resource.py"),          # shared-harness-edit
+    ("M", f"{SIBLING}/main.tf"),                             # out-of-scope-file
+    ("D", f"{SIBLING}/variables.tf"),                        # deleted-file
+    ("M", f"{OWN}/location/compliant.tf"),                   # in scope
+    ("M", "docs/gcp/Cloud Storage/google_storage_bucket.json"),  # in scope
+]
+
+
+def _pathspec(line):
+    """The paths a recipe command names, unquoted the way a shell would."""
+    return shlex.split(line.split(" -- ", 1)[1])
+
+
+def _commands(lines, name):
+    return [line for line in lines if name in line]
+
+
+def test_the_whole_mess_becomes_one_merge_and_one_restore():
+    findings = bs.check(MIXED, PLATFORM, FOLDER, RTYPE)
+    recipe = bs.recovery_lines(findings, "origin/dev")
+
+    restores = _commands(recipe, "git restore")
+    assert _commands(recipe, "git merge origin/dev")
+    assert len(restores) == 1
+    # after a merge, restoring from the pre-merge base would undo it
+    assert "--source=origin/dev " in restores[0]
+    assert _pathspec(restores[0]) == [
+        ".github", "Guide", "scripts", SIBLING]
+    assert not _commands(recipe, "git rm")
+
+
+def test_the_recipe_never_names_the_branchs_own_resource():
+    recipe = bs.recovery_lines(bs.check(MIXED, PLATFORM, FOLDER, RTYPE), "origin/dev")
+    named = [p for line in recipe if " -- " in line for p in _pathspec(line)]
+
+    assert not any(p == OWN or p.startswith(OWN + "/") for p in named)
+    assert f"{RTYPE}.json" not in named
+    # nor anything wide enough to swallow the branch's own kit on the way past
+    assert not any(p in (".", "docs", "policies") for p in named)
+
+
+def test_a_deletion_in_the_branchs_own_kit_is_restored_file_by_file():
+    # Restoring the whole of OWN would revert the contributor's work — and
+    # `git restore` would delete it outright where OWN is new on the branch.
+    entries = [("D", f"{OWN}/location/compliant.tf"), ("A", f"{OWN}/location/new.tf")]
+    findings = bs.check(entries, PLATFORM, FOLDER, RTYPE)
+    scope = (PLATFORM, FOLDER, RTYPE)
+    assert bs.recovery_plan(findings, scope) == ([f"{OWN}/location/compliant.tf"], False)
+
+
+def test_the_recipe_ends_with_commit_and_push():
+    recipe = bs.recovery_lines(bs.check(MIXED, PLATFORM, FOLDER, RTYPE), "origin/dev")
+    assert _commands(recipe, "git status")
+    assert _commands(recipe, 'git commit -m "Restore shared files from dev"')
+    assert _commands(recipe, "git push")
+
+
+def test_a_clean_branch_gets_no_recipe():
+    assert bs.recovery_lines([], "origin/dev") == []
+
+
+def test_the_recipe_covers_findings_the_listing_truncated_away(capsys):
+    entries = MIXED + [("M", f"Guide/extra_{i}.md") for i in range(30)]
+    bs._report(bs.check(entries, PLATFORM, FOLDER, RTYPE), max_per_rule=2,
+               base="origin/dev")
+    printed = capsys.readouterr().out
+
+    assert "more file(s) with the same problem" in printed   # the listing truncated
+    block = printed.split("How to fix all of the above", 1)[1]
+    restores = _commands(block.splitlines(), "git restore")
+    assert len(restores) == 1
+    assert "Guide" in _pathspec(restores[0])
+
+
+@pytest.mark.parametrize("entries", [
+    [("M", f"{SIBLING}/main.tf")],
+    [("A", f"{SIBLING}/new.tf")],
+    [("D", f"{SIBLING}/variables.tf")],
+    [("M", "Guide/Policy_writing_tutorial/branch-scope.md")],
+])
+def test_another_resources_files_never_need_a_merge(entries):
+    recipe = bs.recovery_lines(bs.check(entries, PLATFORM, FOLDER, RTYPE), "origin/dev")
+    assert not _commands(recipe, "git merge origin/dev")
+    restores = _commands(recipe, "git restore")
+    assert len(restores) == 1
+    assert '--source="$(git merge-base HEAD origin/dev)"' in restores[0]
+
+
+def test_the_harness_still_needs_a_merge():
+    entries = [("M", "scripts/auto_test/auto_test.py"), ("M", f"{SIBLING}/main.tf")]
+    recipe = bs.recovery_lines(bs.check(entries, PLATFORM, FOLDER, RTYPE), "origin/dev")
+    merge = recipe.index("       git merge origin/dev")
+    restore = next(i for i, line in enumerate(recipe) if "git restore" in line)
+    assert merge < restore
+    # every flagged path comes from origin/dev, the sibling included
+    assert "--source=origin/dev " in recipe[restore]
+    assert SIBLING in _pathspec(recipe[restore])
+
+
+@pytest.mark.parametrize("path,group", [
+    (".github/workflows/branch-scope.yml", ".github"),
+    (".gitattributes", ".gitattributes"),
+    ("scripts/linters/branch_scope.py", "scripts"),
+    (f"{SIBLING}/location/{SHA}.json", SIBLING),
+    ("policies/gcp/Cloud Storage/google_storage_hmac_key/location.rego",
+     "policies/gcp/Cloud Storage/google_storage_hmac_key"),
+    ("docs/gcp/Compute Engine/google_compute_image.json",
+     "docs/gcp/Compute Engine/google_compute_image.json"),
+    ("inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf", "inputs"),
+])
+def test_a_path_is_named_at_the_width_that_is_safe(path, group):
+    assert bs.recovery_group(path) == group
+
+
+def test_an_addition_is_covered_by_restoring_its_directory():
+    # `git restore` deletes what the source lacks, so the sibling's added file
+    # goes with the directory restore and needs no `git rm` of its own.
+    findings = bs.check([("M", f"{SIBLING}/main.tf"), ("A", f"{SIBLING}/new.tf")],
+                        PLATFORM, FOLDER, RTYPE)
+    assert bs.recovery_plan(findings) == ([SIBLING], False)
+
+
+def test_a_path_with_spaces_is_quoted_and_a_plain_one_is_not():
+    assert bs._quote("scripts") == "scripts"
+    assert bs._quote("policies/gcp/Cloud Run (v2 API)/x") == (
+        '"policies/gcp/Cloud Run (v2 API)/x"')

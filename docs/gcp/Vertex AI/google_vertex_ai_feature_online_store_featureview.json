@@ -6,36 +6,36 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This parameter aligns with the prevent-destructive-loss archetype. Controlling full resource deletion is a core operational security concern aimed at preventing accidental mass data loss."
     },
     "feature_online_store": {
       "description": "The name of the FeatureOnlineStore to use for the featureview.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This parameter is strictly a resource reference linking the FeatureView to its parent FeatureOnlineStore, rather than a security configuration or access control mechanism."
     },
     "labels": {
       "description": "A set of key/value label pairs to assign to this FeatureView.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are metadata used for billing and organization, not for enforcing platform security policies."
     },
     "name": {
       "description": "Name of the FeatureView. This value may be up to 60 characters, and valid characters are [a-z0-9_]. The first character cannot be a number.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource naming conventions are operational identifiers and do not act as security boundaries."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Project placement is a fundamental architectural configuration, not an active security enforcement mechanism."
     },
     "region": {
       "description": "The region for the resource. It should be the same as the featureonlinestore region.",
@@ -53,15 +53,15 @@
       "description": "Columns to construct entityId / row keys. Start by supporting 1 only.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Entity ID columns strictly define the structural schema of the data model and do not function as security filters."
     },
     "big_query_source.uri": {
       "description": "The BigQuery view URI that will be materialized on each sync trigger based on FeatureView.SyncConfig.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This field specifies the external BigQuery URI used as the data source. It is explicitly classified as an external resource reference rather than a platform-level security policy toggle."
     },
     "feature_registry_source": {
       "type": "block",
@@ -72,8 +72,8 @@
       "description": "The project number of the parent project of the feature Groups.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Project numbers are structural identifiers for cross-project resource referencing, not security boundaries."
     },
     "feature_registry_source.feature_groups": {
       "type": "block",
@@ -84,15 +84,15 @@
       "description": "Identifier of the feature group.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource identifiers map infrastructure components together and are not security controls."
     },
     "feature_registry_source.feature_groups.feature_ids": {
       "description": "Identifiers of features under the feature group.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Resource identifiers are used for data mapping and are not security constraints."
     },
     "sync_config": {
       "type": "block",
@@ -103,15 +103,15 @@
       "description": "If true, syncs the FeatureView in a continuous manner to Online Store.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Continuous synchronization is a data pipeline operational flag, not a security or access-control toggle."
     },
     "sync_config.cron": {
       "description": "Cron schedule (https://en.wikipedia.org/wiki/Cron) to launch scheduled runs.\nTo explicitly set a timezone to the cron tab, apply a prefix in the cron tab: \"CRON_TZ=${IANA_TIME_ZONE}\" or \"TZ=${IANA_TIME_ZONE}\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Cron schedules govern operational timing for data synchronization and do not enforce security perimeters."
     }
   }
 }

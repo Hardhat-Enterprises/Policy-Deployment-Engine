@@ -13,8 +13,8 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls Terraform destruction behaviour. Protecting the deploy policy prevents accidental removal of a resource that enforces rollout restrictions."
     },
     "description": {
       "description": "Description of the 'DeployPolicy'. Max length is 255 characters.",
@@ -72,22 +72,22 @@
       "description": "Rollout actions to be restricted as part of the policy. If left empty, all actions will be restricted. Possible values: [\"ADVANCE\", \"APPROVE\", \"CANCEL\", \"CREATE\", \"IGNORE_JOB\", \"RETRY_JOB\", \"ROLLBACK\", \"TERMINATE_JOBRUN\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which rollout actions this rule restricts. The correct action set depends on the deployment workflow, so there is no generic secure list to enforce."
     },
     "rules.rollout_restriction.id": {
       "description": "ID of the rule. This id must be unique in the 'DeployPolicy' resource to which this rule belongs. The format is 'a-z{0,62}'.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Unique identifier for the rollout restriction rule only. It does not itself change policy enforcement."
     },
     "rules.rollout_restriction.invokers": {
       "description": "What invoked the action. If left empty, all invoker types will be restricted. Possible values: [\"USER\", \"DEPLOY_AUTOMATION\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether restrictions apply to user-driven actions, deploy automation, or both. This is workflow-specific and has no single generically secure value."
     },
     "rules.rollout_restriction.time_windows": {
       "type": "block",
@@ -98,8 +98,8 @@
       "description": "The time zone in IANA format IANA Time Zone Database (e.g. America/New_York).",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines how the restriction schedule is interpreted. The correct IANA time zone depends on the organisation and location, so no generic secure value can be required."
     },
     "rules.rollout_restriction.time_windows.one_time_windows": {
       "type": "block",
@@ -115,22 +115,22 @@
       "description": "Day of a month. Must be from 1 to 31 and valid for the year and month.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate date depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.end_date.month": {
       "description": "Month of a year. Must be from 1 to 12.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate date depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.end_date.year": {
       "description": "Year of the date. Must be from 1 to 9999.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate date depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.end_time": {
       "type": "block",
@@ -141,29 +141,29 @@
       "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.end_time.minutes": {
       "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.end_time.nanos": {
       "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.end_time.seconds": {
       "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.start_date": {
       "type": "block",
@@ -174,22 +174,22 @@
       "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate date depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.start_date.month": {
       "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate date depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.start_date.year": {
       "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate date depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.start_time": {
       "type": "block",
@@ -200,29 +200,29 @@
       "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.start_time.minutes": {
       "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.start_time.nanos": {
       "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.one_time_windows.start_time.seconds": {
       "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific one-time restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.weekly_windows": {
       "type": "block",
@@ -233,8 +233,8 @@
       "description": "Days of week. If left empty, all days of the week will be included. Possible values: [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\", \"SUNDAY\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Defines an organisation-specific recurring restriction schedule. Which days should be restricted depends on the team's deployment and change-control requirements."
     },
     "rules.rollout_restriction.time_windows.weekly_windows.end_time": {
       "type": "block",
@@ -245,29 +245,29 @@
       "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific recurring restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.weekly_windows.end_time.minutes": {
       "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific recurring restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.weekly_windows.end_time.nanos": {
       "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific recurring restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.weekly_windows.end_time.seconds": {
       "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific recurring restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.weekly_windows.start_time": {
       "type": "block",
@@ -278,29 +278,29 @@
       "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific recurring restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.weekly_windows.start_time.minutes": {
       "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific recurring restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.weekly_windows.start_time.nanos": {
       "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific recurring restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "rules.rollout_restriction.time_windows.weekly_windows.start_time.seconds": {
       "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Part of an organisation-specific recurring restriction window. The appropriate time depends on the deployment or change-freeze schedule."
     },
     "selectors": {
       "type": "block",
@@ -316,15 +316,15 @@
       "description": "ID of the DeliveryPipeline. The value of this field could be one of the following:\n- The last segment of a pipeline name\n- \"*\", all delivery pipelines in a location",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which delivery pipeline the deploy policy applies to. This is resource-specific scope information and cannot be generically constrained."
     },
     "selectors.delivery_pipeline.labels": {
       "description": "DeliveryPipeline labels.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Label-based delivery-pipeline matching depends on the organisation's tagging scheme and intended policy scope, so there is no generic secure value."
     },
     "selectors.target": {
       "type": "block",
@@ -335,15 +335,15 @@
       "description": "ID of the 'Target'. The value of this field could be one of the following: * The last segment of a target name. It only needs the ID to determine which target is being referred to * \"*\", all targets in a location.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects which target the deploy policy applies to. This is resource-specific scope information and cannot be generically constrained."
     },
     "selectors.target.labels": {
       "description": "Target labels.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Label-based target matching depends on the organisation's tagging scheme and intended policy scope, so there is no generic secure value."
     }
   }
 }

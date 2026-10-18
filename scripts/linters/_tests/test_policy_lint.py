@@ -1,7 +1,7 @@
 """Unit tests for scripts/linters/policy_lint.py.
 
-Each case under ``fixtures/`` is a miniature repo tree (``docs/``, ``policies/``,
-``inputs/``). The trees are copied into ``tmp_path`` before every test and the
+Each case under ``fixtures/`` is a miniature repo tree (``docs/``, ``policies/``).
+The trees are copied into ``tmp_path`` before every test and the
 committed ``expected_plan.json`` next to a fixture's ``*.tf`` files is renamed to
 the sha-named ``<sha>.json`` that ``auto_test.plan_cache_path`` derives — the same
 directory, the committed name. Renaming at copy time (instead of committing it
@@ -40,7 +40,7 @@ def build_tree(tmp_path, case):
     dst = tmp_path / case
     shutil.copytree(FIXTURES / case, dst)
     for template in sorted(dst.rglob("expected_plan.json")):
-        cache = policy_lint.plan_cache_for(template.parent)
+        cache = policy_lint.plan_cache_path(template.parent)
         # Guard rail: the plan must land inside the copied tree, never in the real
         # repo — it is derived from a path, and a path bug is silent otherwise.
         assert dst in cache.parents, f"{cache} escaped the fixture tree {dst}"
@@ -81,6 +81,10 @@ def test_policy_body_rules_fire_exactly_once_each(tmp_path):
         ("badcase", "package-case"),
         ("bogus_type", "unknown-policy-type"),
         ("no_type", "unknown-policy-type"),
+        ("dead_pattern", "pattern-values-shape"),
+        ("unset_blind", "presence-missing-null"),
+        ("unset_blind", "presence-only"),
+        ("two_conditions", "situation-match-unset"),
     }
 
 
@@ -113,11 +117,11 @@ def test_unknown_policy_type_is_an_error_not_a_warning(tmp_path):
 
 
 def test_unknown_policy_type_is_silent_on_every_valid_type(tmp_path):
-    # The rule must accept all six, including the two-word ones — flagging a
+    # The rule must accept all supported types, including multi-word ones — flagging a
     # valid type would block every pattern/element policy in the tree.
     root = build_tree(tmp_path, "policy_smells")
     template = (root / "policies" / "gcp" / "Backup for GKE"
-                / "google_gke_backup_restore_channel" / "bogus_type.rego")
+                / "google_gke_backup_restore_channel" / "bogus_type/policy.rego")
     body = template.read_text(encoding="utf-8")
     for valid in policy_lint.VALID_POLICY_TYPES:
         template.write_text(body.replace('"pattern_whitelist"', f'"{valid}"'),
@@ -128,6 +132,58 @@ def test_unknown_policy_type_is_silent_on_every_valid_type(tmp_path):
         assert not [f for f in findings
                     if f.policy == "bogus_type" and f.rule == "unknown-policy-type"], \
             f"{valid!r} is a valid policy_type and must not be flagged"
+
+
+@pytest.mark.parametrize("values", [
+    [], None, [None], [""], [" "], ["authorization "], [" authorization"],
+    ["authorization\t"], [7], [{}], [["authorization"]], ["authorization", None],
+])
+def test_invalid_map_key_blacklist_is_an_error_not_presence_warning(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type/policy.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"map key blacklist"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    own = [f for f in findings if f.policy == "bogus_type"]
+    invalid = [f for f in own if f.rule == "invalid-map-key-blacklist"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+    assert "whitespace" in invalid[0].message
+    assert not [f for f in own if f.rule == "presence-only"]
+
+
+@pytest.mark.parametrize("values", [["authorization"], ["AUTHORIZATION"], "authorization"])
+def test_valid_map_key_blacklist_has_no_configuration_finding(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type/policy.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"Map Key Blacklist"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert not [f for f in findings if f.policy == "bogus_type"
+                and f.rule in {"invalid-map-key-blacklist", "presence-only", "unknown-policy-type"}]
+
+
+def test_missing_map_key_blacklist_values_is_an_error(tmp_path):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type/policy.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"map key blacklist"')
+    body = body.replace('"values": ["approved-*", [["approved-"]]],', '')
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert any(f.policy == "bogus_type" and f.rule == "invalid-map-key-blacklist"
+               and f.severity == "error" for f in findings)
 
 
 def test_unknown_policy_type_matches_what_the_helpers_dispatch(tmp_path):
@@ -168,14 +224,18 @@ def test_hard_coded_value_message_names_the_literal(tmp_path):
 
 
 def test_only_advisory_rules_are_warnings(tmp_path):
-    # The two style conventions plus presence-only, which is a judgement about
-    # the argument's rationale that the reviewer makes, not the linter.
+    # The two style conventions, plus the three rules about a condition that
+    # under-checks rather than one that is malformed: whether that is acceptable
+    # is a judgement about the argument's rationale that the reviewer makes, not
+    # the linter.
     root = build_tree(tmp_path, "policy_smells")
     findings = policy_lint.lint_resource(
         root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
     warns = {f.rule for f in findings if f.severity == "warn"}
     errors = {f.rule for f in findings if f.severity == "error"}
-    assert warns == {"legacy-assign", "package-case", "presence-only"}
+    assert warns == {"legacy-assign", "package-case", "presence-only",
+                     "pattern-values-shape", "presence-missing-null",
+                     "situation-match-unset"}
     assert not (warns & errors), "a rule must have one severity, not both"
 
 
@@ -349,7 +409,7 @@ def test_fixture_drift_and_missing_plan(tmp_path):
         ("uniform_bucket_level_access", "fixture-missing-plan"),
     }
     missing = [f for f in findings if f.rule == "fixture-missing-plan"][0]
-    assert "no committed plan at inputs/gcp/Cloud Storage/" in missing.message
+    assert "no committed plan at policies/gcp/Cloud Storage/" in missing.message
     drift = [f for f in findings if f.rule == "fixture-drift"][0]
     # storage_class is the only attribute that differs besides name and the
     # argument under test — it must be the one named.
@@ -371,8 +431,8 @@ def test_fixture_drift_ignores_identity_and_computed_mirrors(tmp_path, resource_
     assert [f for f in findings if f.rule == "fixture-drift"] == [], \
         f"{noise} must not be read as drift"
     # And the plan really does differ on it, so the exemption is doing work.
-    plan_dir = root / "inputs" / "gcp" / "Cloud Storage" / resource_type
-    cache = policy_lint.plan_cache_for(next(plan_dir.iterdir()))
+    plan_dir = root / "policies" / "gcp" / "Cloud Storage" / resource_type
+    cache = policy_lint.plan_cache_path(next(d for d in plan_dir.iterdir() if d.is_dir()))
     plan = json.loads(cache.read_text())
     values = {r["name"]: r["values"]
               for r in plan["planned_values"]["root_module"]["resources"]}
@@ -416,24 +476,13 @@ def test_the_prefix_alone_does_not_qualify_it():
     assert policy_lint._label_polarity("complianceteam") is None
 
 
-def test_plan_cache_for_matches_auto_test_on_the_real_repo():
-    # The linter must read exactly the file auto_test writes: same directory as the
-    # fixture, same sha-derived name.
-    input_dir = (project_root / "inputs" / "gcp" / "Cloud Storage"
-                 / "google_storage_bucket" / "public_access_prevention")
-    assert input_dir.is_dir(), "real fixture moved — update this test"
-    cache = policy_lint.plan_cache_for(input_dir)
-    assert cache == auto_test.plan_cache_path(input_dir)
-    assert cache.parent == input_dir, "the committed plan lives beside its fixture"
-
-
 # --------------------------------------------------------------------------- #
 # load_conditions
 # --------------------------------------------------------------------------- #
 def test_load_conditions_returns_the_declared_conditions(tmp_path):
     root = build_tree(tmp_path, "clean")
     rego = (root / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket"
-            / "public_access_prevention.rego")
+            / "public_access_prevention/policy.rego")
     conditions = policy_lint.load_conditions(rego, root / "policies", policy_lint.HELPERS_DIR)
     assert len(conditions) == 1
     meta, check = conditions[0]
@@ -467,6 +516,10 @@ def test_cli_json_output_and_exit_code(tmp_path, capsys):
         ("badcase", "package-case"),
         ("bogus_type", "unknown-policy-type"),
         ("no_type", "unknown-policy-type"),
+        ("dead_pattern", "pattern-values-shape"),
+        ("unset_blind", "presence-missing-null"),
+        ("unset_blind", "presence-only"),
+        ("two_conditions", "situation-match-unset"),
     }
 
 
@@ -484,13 +537,15 @@ def test_cli_exits_zero_when_only_warnings_are_found(tmp_path, capsys):
     for name in ("destination_project", "members", "constraint", "brief", "short",
                  "bogus_type", "no_type"):
         (root / "policies" / "gcp" / "Backup for GKE"
-         / "google_gke_backup_restore_channel" / f"{name}.rego").unlink()
+         / "google_gke_backup_restore_channel" / f"{name}/policy.rego").unlink()
     rc = policy_lint.main([
         "--root", str(root), "--json",
         "gcp/Backup for GKE/google_gke_backup_restore_channel"])
     data = json.loads(capsys.readouterr().out)
     assert {e["severity"] for e in data} == {"warn"}
-    assert {e["rule"] for e in data} == {"legacy-assign", "package-case", "presence-only"}
+    assert {e["rule"] for e in data} == {"legacy-assign", "package-case", "presence-only",
+                                        "pattern-values-shape", "presence-missing-null",
+                                        "situation-match-unset"}
     assert rc == 0
 
 
@@ -530,7 +585,7 @@ def test_string_attribute_path_still_reaches_the_value_rules(tmp_path):
     # string path is still found.
     root = build_tree(tmp_path, "string_path")
     rego = (root / "policies" / "gcp" / "Cloud Platform" / "google_service_account"
-            / "disabled.rego")
+            / "disabled/policy.rego")
     rego.write_text(rego.read_text().replace(
         '"attribute_path": "disabled",\n     "values": [true],',
         '"attribute_path": "disabled",\n     "values": ["projects/PDE"],'))
@@ -690,7 +745,8 @@ def test_identity_exemption_only_covers_the_fixture_labels(tmp_path):
 def _break_one_policy(root):
     """Drop an unparseable .rego into a tree, so the batched eval fails."""
     broken = (root / "policies" / "gcp" / "Compute Service" / "google_a_thing"
-              / "oops.rego")
+              / "oops/policy.rego")
+    broken.parent.mkdir(parents=True, exist_ok=True)
     broken.write_text("package terraform.gcp.security.compute_service."
                       "google_a_thing.oops\n\nconditions := [[[[\n")
     return broken
@@ -735,9 +791,121 @@ def test_presence_only_is_a_warning(tmp_path):
     findings = policy_lint.lint_resource(
         root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
     presence = [f for f in findings if f.rule == "presence-only"]
-    assert len(presence) == 1
-    assert presence[0].severity == "warn"
+    # labels.rego and unset_blind.rego both check presence and nothing else.
+    assert {f.policy for f in presence} == {"labels", "unset_blind"}
+    assert {f.severity for f in presence} == {"warn"}
     assert "presence-only" in policy_lint.WARN_RULES
+
+
+# --------------------------------------------------------------------------- #
+# A pattern condition whose `values` is not [target, groups] flags nothing.
+# --------------------------------------------------------------------------- #
+def test_pattern_values_shape_names_the_shape_and_the_alternative(tmp_path):
+    # The finding has to be actionable in CI on its own: the author needs to see
+    # that the condition is dead, not merely imprecise, and which type to reach
+    # for when all they wanted was a shape check.
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    shape = [f for f in findings if f.rule == "pattern-values-shape"]
+    assert len(shape) == 1
+    assert shape[0].severity == "warn"
+    assert "can never flag anything" in shape[0].message
+    assert "element pattern whitelist" in shape[0].message
+
+
+@pytest.mark.parametrize("values", [
+    ["^projects/.+/secrets/.+"],                    # a regex, the mistake in the wild
+    [],                                             # nothing at all
+    "projects/*",                                   # a bare string, not a pair
+    ["projects/*/locations/*", ["a", "b"]],         # groups not nested
+    ["projects/*/locations/*", []],                 # no groups
+    ["projects/*", [["a"], ["b"]]],                 # a list with no '*' to apply to
+    ["projects/one/locations/two", [["a"], ["b"]]],  # a target with no wildcard
+])
+def test_pattern_values_problem_rejects_shapes_that_cannot_flag(values):
+    assert policy_lint._pattern_values_problem(values) is not None
+
+
+@pytest.mark.parametrize("values", [
+    ["projects/*", [["my-project"]]],
+    ["projects/*/locations/*", [["my-project"], ["europe-west2", "europe-west1"]]],
+    ["*://", [["https"]]],
+    # The open-tail idiom: constrain the scheme, say nothing about the host.
+    # Fewer lists than wildcards leaves the trailing positions unchecked on
+    # purpose, and 20 of the 31 conditions on dev were written this way.
+    ["*://*", [["https"]]],
+])
+def test_pattern_values_problem_accepts_the_shape_the_engine_reads(values):
+    assert policy_lint._pattern_values_problem(values) is None
+
+
+def test_pattern_values_shape_leaves_element_pattern_whitelist_alone(tmp_path):
+    # `element pattern whitelist` takes a FLAT list of wildcard shapes, so the
+    # pair rule must not be applied to it — the clean fixture would fail first,
+    # but the guard is worth pinning against a future edit to PATTERN_POLICY_TYPES.
+    assert "element pattern whitelist" not in policy_lint.PATTERN_POLICY_TYPES
+
+
+# --------------------------------------------------------------------------- #
+# A multi-condition situation must say whether it means ANY or ALL.
+# --------------------------------------------------------------------------- #
+def test_situation_match_unset_names_the_situation_and_both_options(tmp_path):
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    unset = [f for f in findings if f.rule == "situation-match-unset"]
+    assert len(unset) == 1
+    assert unset[0].policy == "two_conditions"
+    assert unset[0].severity == "warn"
+    # The author has to be able to act without reading the helper source.
+    assert "not configured for production" in unset[0].message
+    assert '"any"' in unset[0].message
+    assert '"all"' in unset[0].message
+
+
+def test_situation_match_unset_silent_on_a_single_condition(tmp_path):
+    # Every situation in the clean fixture has one condition; asking it to
+    # declare ANY vs ALL would be noise, since the two agree.
+    root = build_tree(tmp_path, "clean")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Cloud Storage", "google_storage_bucket")
+    assert findings == [], f"clean fixture must stay silent, got {findings}"
+
+
+def test_an_explicit_match_key_satisfies_the_rule_and_is_not_a_condition(tmp_path):
+    # sibling_gated.rego carries "match": "all" on its metadata entry and has
+    # two conditions. Three things must hold at once: the rule is satisfied, the
+    # metadata entry is not mistaken for a condition (which would trip
+    # unknown-policy-type, since it has no policy_type), and a condition reading
+    # a SIBLING argument does not trip wrong-argument.
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert not [f for f in findings if f.policy == "sibling_gated"]
+
+
+# --------------------------------------------------------------------------- #
+# A presence blacklist that denies "" but not null misses the unset case.
+# --------------------------------------------------------------------------- #
+def test_presence_missing_null_is_a_warning_that_names_the_fix(tmp_path):
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    missing = [f for f in findings if f.rule == "presence-missing-null"]
+    assert len(missing) == 1
+    assert missing[0].policy == "unset_blind"
+    assert missing[0].severity == "warn"
+    assert '[null, ""]' in missing[0].message
+
+
+def test_presence_missing_null_silent_when_null_is_listed(tmp_path):
+    # labels.rego blacklists [null, ""] — the correct shape. It trips
+    # presence-only and must not also trip this rule.
+    root = build_tree(tmp_path, "policy_smells")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    assert ("labels", "presence-missing-null") not in pairs(findings)
 
 
 # --------------------------------------------------------------------------- #
@@ -747,9 +915,9 @@ def test_presence_only_is_a_warning(tmp_path):
                                      '{"planned_values": {"root_module": "x"}}'])
 def test_malformed_plan_cache_is_a_lint_error(tmp_path, payload):
     root = build_tree(tmp_path, "clean")
-    input_dir = (root / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket"
+    input_dir = (root / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket"
                  / "public_access_prevention")
-    policy_lint.plan_cache_for(input_dir).write_text(payload)
+    policy_lint.plan_cache_path(input_dir).write_text(payload)
     findings = policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
     assert pairs(findings) == {("public_access_prevention", "lint-error")}
 
@@ -795,9 +963,9 @@ CLEAN_BUCKET_ARG = "public_access_prevention"
 
 def _bucket_plan(root):
     """(cache_path, plan, resources) for the clean tree's bucket fixture."""
-    input_dir = (root / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket"
+    input_dir = (root / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket"
                  / CLEAN_BUCKET_ARG)
-    cache = policy_lint.plan_cache_for(input_dir)
+    cache = policy_lint.plan_cache_path(input_dir)
     plan = json.loads(cache.read_text())
     return cache, plan, plan["planned_values"]["root_module"]["resources"]
 
@@ -977,9 +1145,335 @@ def test_every_exemption_is_still_needed(entry, monkeypatch):
     drift = [f for f in findings if f.rule == "fixture-drift" and f.policy == stem]
     assert drift, (f"{entry} no longer drifts without its exemption — the fixture was "
                    f"fixed, so remove the entry from FIXTURE_DRIFT_EXEMPT")
-    reported = set(drift[0].message.split(": ", 1)[1].split(", "))
+    # The message ends with the standing pointer at drift_exemptions.json; the keys
+    # are everything before it.
+    keys_text = drift[0].message.split(policy_lint.MUTUALLY_EXCLUSIVE_HINT)[0]
+    reported = set(keys_text.split(": ", 1)[1].rstrip(". ").split(", "))
     assert reported <= exempted, (
         f"{entry} drifts on {reported - exempted}, which its exemption does not "
         f"cover — either the fixture gained a real second difference, or the entry "
         f"needs widening with a reason")
 
+
+
+# --------------------------------------------------------------------------- #
+# The provider's write-only convention: `x`, `x_wo`, `x_wo_version` are one
+# setting, and a fixture testing one of them cannot avoid differing on another.
+# --------------------------------------------------------------------------- #
+def test_the_write_only_trio_is_one_setting():
+    assert policy_lint.write_only_partners("private_key") == {
+        "private_key_wo", "private_key_wo_version"}
+    # ...and from either write-only spelling back to the whole set.
+    assert policy_lint.write_only_partners("private_key_wo") == {
+        "private_key", "private_key_wo_version"}
+    assert policy_lint.write_only_partners("private_key_wo_version") == {
+        "private_key", "private_key_wo"}
+
+
+def _fixture_only_tree(tmp_path, stem, compliant_values, non_compliant_values,
+                       service="Compute Engine",
+                       resource_type="google_compute_region_ssl_certificate"):
+    """A fixture directory with a committed plan, and nothing else.
+
+    The fixture rules read the plan and the *.tf names only — no policies, no OPA —
+    so this exercises the real drift rule without standing up a whole resource.
+    """
+    # Fixtures sit in the argument directory under policies/, like every other
+    # tree in this file. A local config.tf stands in for the
+    # shared platform one so the hash resolver needs nothing outside this dir.
+    input_dir = tmp_path / "policies" / "gcp" / service / resource_type / stem
+    input_dir.mkdir(parents=True)
+    (input_dir / "compliant.tf").write_text("# fixture\n")
+    (input_dir / "nonCompliant.tf").write_text("# fixture\n")
+    (input_dir / "config.tf").write_text("# provider stub\n")   # local stand-in for the shared platform config
+
+    def resource(label, values):
+        return {"address": f"{resource_type}.{label}", "mode": "managed",
+                "type": resource_type, "name": label, "values": values}
+
+    plan = {"planned_values": {"root_module": {"resources": [
+        resource("compliant_example_1", compliant_values),
+        resource("non_compliant_example_1", non_compliant_values)]}}}
+    policy_lint.plan_cache_path(input_dir).write_text(json.dumps(plan))
+    return input_dir
+
+
+def _drift(tmp_path, service="Compute Engine",
+           resource_type="google_compute_region_ssl_certificate", stem="private_key"):
+    findings = policy_lint._lint_fixtures(tmp_path, "gcp", service, resource_type, stem)
+    return [f for f in findings if f.rule == "fixture-drift"]
+
+
+def test_a_write_only_partner_is_not_drift(tmp_path):
+    # The real shape: `private_key` and `private_key_wo` are mutually exclusive, so
+    # showing a non-compliant private_key forces the compliant side onto the
+    # write-only spelling. Neither the partner nor its version counter is drift.
+    _fixture_only_tree(
+        tmp_path, "private_key",
+        {"certificate": "cert", "private_key": None,
+         "private_key_wo": "secret", "private_key_wo_version": 1},
+        {"certificate": "cert", "private_key": "leaked-in-state",
+         "private_key_wo": None, "private_key_wo_version": None})
+    assert _drift(tmp_path) == []
+
+
+def test_a_real_second_difference_is_still_drift_beside_a_write_only_pair(tmp_path):
+    # The pairing must not become a blanket exemption for the whole fixture.
+    _fixture_only_tree(
+        tmp_path, "private_key",
+        {"certificate": "cert-a", "private_key": None, "private_key_wo": "secret"},
+        {"certificate": "cert-b", "private_key": "leaked-in-state",
+         "private_key_wo": None})
+    drift = _drift(tmp_path)
+    assert len(drift) == 1
+    assert "certificate" in drift[0].message
+
+
+def test_the_drift_message_points_at_the_exemptions_file(tmp_path):
+    _fixture_only_tree(tmp_path, "private_key",
+                       {"private_key": "a", "storage_class": "STANDARD"},
+                       {"private_key": "b", "storage_class": "NEARLINE"})
+    drift = _drift(tmp_path)
+    assert len(drift) == 1
+    assert policy_lint.DRIFT_EXEMPTIONS_FILE in drift[0].message
+    assert policy_lint.DRIFT_EXEMPTIONS_DOC in drift[0].message
+
+
+# --------------------------------------------------------------------------- #
+# drift_exemptions.json — the per-resource, contributor-editable list.
+# --------------------------------------------------------------------------- #
+def _with_exemptions(root, entries, service="Cloud Storage",
+                     resource_type="google_storage_bucket", raw=None):
+    """Write a drift_exemptions.json into a copied tree's resource folder."""
+    path = (root / "policies" / "gcp" / service / resource_type
+            / policy_lint.DRIFT_EXEMPTIONS_FILE)
+    path.write_text(raw if raw is not None else json.dumps(entries))
+    policy_lint.clear_caches()
+    return path
+
+
+def _document(root, arguments, service="Cloud Storage",
+              resource_type="google_storage_bucket"):
+    """Add argument keys to a copied tree's docs JSON."""
+    doc = root / "docs" / "gcp" / service / f"{resource_type}.json"
+    loaded = json.loads(doc.read_text())
+    for name in arguments:
+        loaded["arguments"][name] = {"description": "Fixture argument.", "required": False,
+                                     "type": "string", "security_impact": False,
+                                     "rationale": "Fixture."}
+    doc.write_text(json.dumps(loaded))
+
+
+def _lint_bad_tree(root):
+    policy_lint.clear_caches()
+    return policy_lint.lint_resource(root, "gcp", "Cloud Storage", "google_storage_bucket")
+
+
+def test_a_declared_exemption_clears_the_drift_it_names(tmp_path):
+    # fixtures_bad drifts on `storage_class`.
+    root = build_tree(tmp_path, "fixtures_bad")
+    _document(root, ["storage_class"])
+    assert [f for f in _lint_bad_tree(root) if f.rule == "fixture-drift"], \
+        "the fixture must drift before anything is exempted"
+
+    _with_exemptions(root, {"public_access_prevention": {
+        "keys": ["storage_class"],
+        "reason": "Terraform allows only one of these to be set."}})
+    findings = _lint_bad_tree(root)
+    assert [f for f in findings if f.rule == "fixture-drift"] == []
+    assert [f for f in findings if f.rule.startswith("drift-exemption")] == []
+
+
+def test_an_exemption_silences_only_the_argument_it_is_filed_under(tmp_path):
+    # Keyed by the argument under test, so an entry for a different fixture in the
+    # same resource must not leak into this one.
+    root = build_tree(tmp_path, "fixtures_bad")
+    _document(root, ["storage_class"])
+    _with_exemptions(root, {"uniform_bucket_level_access": {
+        "keys": ["storage_class"],
+        "reason": "Terraform allows only one of these to be set."}})
+    drift = [f for f in _lint_bad_tree(root) if f.rule == "fixture-drift"]
+    assert [f.policy for f in drift] == ["public_access_prevention"]
+
+
+@pytest.mark.parametrize("entries,raw,why", [
+    (None, "{not json", "malformed JSON"),
+    (None, '["storage_class"]', "top level is not an object"),
+    ({"public_access_prevention": ["storage_class"]}, None, "entry is not an object"),
+    ({"public_access_prevention": {"keys": [], "reason": "x" * 40}}, None, "keys empty"),
+    ({"public_access_prevention": {"keys": ["storage_class"], "reason": "  "}}, None,
+     "reason blank"),
+    ({"public_access_prevention": {"keys": ["storage_class"]}}, None, "reason missing"),
+])
+def test_a_malformed_exemptions_file_is_a_finding_and_exempts_nothing(
+        tmp_path, entries, raw, why):
+    root = build_tree(tmp_path, "fixtures_bad")
+    _document(root, ["storage_class"])
+    _with_exemptions(root, entries, raw=raw)
+    findings = _lint_bad_tree(root)
+
+    assert [f for f in findings if f.rule == "drift-exemption-invalid"], why
+    assert [f for f in findings if f.rule == "fixture-drift"], \
+        f"a file rejected for {why} must not silence the drift it claimed to explain"
+
+
+def test_an_entry_naming_an_undocumented_argument_is_a_finding(tmp_path):
+    # A typo exempts nothing while looking like it works, so it has to be said out
+    # loud. `storage_class` is deliberately left out of this tree's docs.
+    root = build_tree(tmp_path, "fixtures_bad")
+    _with_exemptions(root, {"public_access_prevention": {
+        "keys": ["storage_class"],
+        "reason": "Terraform allows only one of these to be set."}})
+    invalid = [f for f in _lint_bad_tree(root) if f.rule == "drift-exemption-invalid"]
+    assert len(invalid) == 1
+    assert "storage_class" in invalid[0].message
+    assert "not a documented argument" in invalid[0].message
+
+
+def test_an_entry_the_fixture_does_not_need_is_stale(tmp_path):
+    # The anti-rot rule: this fixture does not differ on `location`, so exempting it
+    # silences nothing today and would hide a real difference tomorrow.
+    root = build_tree(tmp_path, "fixtures_bad")
+    _document(root, ["location"])
+    _with_exemptions(root, {"public_access_prevention": {
+        "keys": ["location"],
+        "reason": "Terraform allows only one of these to be set."}})
+    stale = [f for f in _lint_bad_tree(root) if f.rule == "drift-exemption-stale"]
+    assert len(stale) == 1
+    assert "location" in stale[0].message
+
+
+def test_an_entry_duplicating_the_write_only_pairing_is_stale(tmp_path):
+    # Nothing to declare for a `_wo` pair — the linter already handles it, so an
+    # entry for one is redundant and says so.
+    tree = tmp_path / "tree"
+    _fixture_only_tree(
+        tree, "private_key",
+        {"private_key": None, "private_key_wo": "secret"},
+        {"private_key": "leaked-in-state", "private_key_wo": None})
+    resource_dir = (tree / "policies" / "gcp" / "Compute Engine"
+                    / "google_compute_region_ssl_certificate")
+    resource_dir.mkdir(parents=True, exist_ok=True)   # already made: the fixture dir sits inside it
+    (resource_dir / policy_lint.DRIFT_EXEMPTIONS_FILE).write_text(json.dumps(
+        {"private_key": {"keys": ["private_key_wo"],
+                         "reason": "One of private_key or private_key_wo can only be set."}}))
+    policy_lint.clear_caches()
+
+    findings = policy_lint._lint_drift_exemptions(
+        tree, "gcp", "Compute Engine", "google_compute_region_ssl_certificate")
+    assert [f.rule for f in findings] == ["drift-exemption-stale"]
+
+
+def test_no_exemptions_file_is_the_normal_case(tmp_path):
+    root = build_tree(tmp_path, "clean")
+    assert policy_lint.load_drift_exemptions(
+        root / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket") == ({}, None)
+    assert policy_lint.lint_resource(
+        root, "gcp", "Cloud Storage", "google_storage_bucket") == []
+
+def _element_required_findings(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type" / "policy.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"element required"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    return [f for f in findings if f.policy == "bogus_type"]
+
+
+@pytest.mark.parametrize("values", [
+    [],
+    [None],
+    [""],
+    ["UEFI_COMPATIBLE", ""],
+    ["UEFI_COMPATIBLE "],
+])
+def test_invalid_element_required_is_an_error(tmp_path, values):
+    own = _element_required_findings(tmp_path, values)
+    invalid = [f for f in own if f.rule == "invalid-element-required"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+    assert not [f for f in own if f.rule == "presence-only"]
+
+
+@pytest.mark.parametrize("values", [["UEFI_COMPATIBLE", "SEV_CAPABLE"], [True]])
+def test_valid_element_required_is_accepted(tmp_path, values):
+    own = _element_required_findings(tmp_path, values)
+    assert not [f for f in own if f.rule == "invalid-element-required"]
+    assert not [f for f in own if f.rule == "unknown-policy-type"]
+
+
+def _map_key_pattern_findings(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type" / "policy.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"map key pattern whitelist"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    return [f for f in findings if f.policy == "bogus_type"]
+
+
+@pytest.mark.parametrize("values", [
+    [],
+    [None],
+    [""],
+    [7],
+    ["tagKeys/* "],
+])
+def test_invalid_map_key_pattern_whitelist_is_an_error(tmp_path, values):
+    own = _map_key_pattern_findings(tmp_path, values)
+    invalid = [f for f in own if f.rule == "invalid-map-key-pattern-whitelist"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+    assert not [f for f in own if f.rule == "presence-only"]
+
+
+def test_valid_map_key_pattern_whitelist_is_accepted(tmp_path):
+    own = _map_key_pattern_findings(tmp_path, ["tagKeys/*"])
+    assert not [f for f in own if f.rule == "invalid-map-key-pattern-whitelist"]
+    assert not [f for f in own if f.rule == "unknown-policy-type"]
+    assert not [f for f in own if f.rule == "hard-coded-value"]
+
+
+def _presence_findings(tmp_path, values):
+    root = build_tree(tmp_path, "policy_smells")
+    policy = (root / "policies" / "gcp" / "Backup for GKE"
+              / "google_gke_backup_restore_channel" / "bogus_type" / "policy.rego")
+    body = policy.read_text(encoding="utf-8")
+    body = body.replace('"pattern_whitelist"', '"presence"')
+    body = body.replace('["approved-*", [["approved-"]]]', json.dumps(values))
+    policy.write_text(body, encoding="utf-8")
+    findings = policy_lint.lint_resource(
+        root, "gcp", "Backup for GKE", "google_gke_backup_restore_channel")
+    return [f for f in findings if f.policy == "bogus_type"]
+
+
+@pytest.mark.parametrize("values", [
+    [],
+    [None],
+    ["present"],
+    ["set", "unset"],
+    [True],
+])
+def test_invalid_presence_is_an_error(tmp_path, values):
+    own = _presence_findings(tmp_path, values)
+    invalid = [f for f in own if f.rule == "invalid-presence"]
+    assert len(invalid) == 1
+    assert invalid[0].severity == "error"
+    assert "bogus_type" in invalid[0].message
+
+
+@pytest.mark.parametrize("values", [["set"], ["unset"], ["UNSET"]])
+def test_valid_presence_is_accepted(tmp_path, values):
+    own = _presence_findings(tmp_path, values)
+    assert not [f for f in own if f.rule == "invalid-presence"]
+    assert not [f for f in own if f.rule == "unknown-policy-type"]
+    assert not [f for f in own if f.rule == "presence-only"]

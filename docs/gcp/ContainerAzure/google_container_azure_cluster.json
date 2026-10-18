@@ -6,36 +6,36 @@
       "description": "Optional. Annotations on the cluster. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Keys can have 2 segments: prefix (optional) and name (required), separated by a slash (/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between.\n\n**Note**: This field is non-authoritative, and will only manage the annotations present in your configuration.\nPlease refer to the field `effective_annotations` for all of the annotations present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Annotations are metadata and do not directly control access, encryption, network exposure, or data residency."
     },
     "azure_region": {
       "description": "The Azure region where the cluster runs. Each Google Cloud region supports a subset of nearby Azure regions. You can call to list all supported Azure regions within a given Google Cloud region.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The Azure region determines where the cluster's Azure infrastructure is deployed, so it directly affects data residency. Restricting this attribute to an approved regional whitelist helps ensure the cluster is deployed only in permitted locations."
     },
     "client": {
       "description": "Name of the AzureClient. The `AzureClient` resource must reside on the same GCP project and region as the `AzureCluster`. `AzureClient` names are formatted as `projects/<project-number>/locations/<region>/azureClients/<client-id>`. See Resource Names (https:cloud.google.com/apis/design/resource_names) for more details on Google Cloud resource names.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The client value identifies the AzureClient resource but does not itself grant permissions or contain authentication credentials."
     },
     "deletion_policy": {
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The deletion_policy controls whether Terraform is allowed to destroy the cluster, helping prevent accidental or unauthorized deletion of a critical infrastructure resource and supporting availability and resource-protection requirements."
     },
     "description": {
       "description": "Optional. A human readable description of this cluster. Cannot be longer than 255 UTF-8 encoded bytes.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The description is informational metadata and does not directly affect the security configuration of the cluster."
     },
     "location": {
       "description": "The location for the resource",
@@ -48,22 +48,22 @@
       "description": "The name of this resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource name identifies the cluster but does not directly control security, access, encryption, or network configuration."
     },
     "project": {
       "description": "The project for the resource",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The project identifies where the resource is managed, but the argument itself does not directly configure permissions or security controls."
     },
     "resource_group_id": {
       "description": "The ARM ID of the resource group where the cluster resources are deployed. For example: `/subscriptions/*/resourceGroups/*`",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource group identifies the Azure deployment scope but does not directly configure authentication, authorization, encryption, or network access."
     },
     "authorization": {
       "type": "block",
@@ -72,27 +72,27 @@
     },
     "authorization.admin_groups": {
       "type": "block",
-      "description": "Groups of users that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the groups. Up to ten admin groups can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles",
+      "description": "Groups of users that can perform operations as a cluster admin. A managed ClusterRoleBinding will be created to grant the `cluster-admin` ClusterRole to the groups. Up to ten admin groups can be provided. For more info on RBAC, see [https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)",
       "required": false
     },
     "authorization.admin_groups.group": {
       "description": "The name of the group, e.g. `my-group@domain.com`.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls which group identities receive cluster-admin privileges, so policy should restrict wildcard or overly broad group values while allowing approved group names without hardcoding specific identities."
     },
     "authorization.admin_users": {
       "type": "block",
-      "description": "Users that can perform operations as a cluster admin. A new ClusterRoleBinding will be created to grant the cluster-admin ClusterRole to the users. Up to ten admin users can be provided. For more info on RBAC, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles",
+      "description": "Users that can perform operations as a cluster admin. A new ClusterRoleBinding will be created to grant the cluster-admin ClusterRole to the users. Up to ten admin users can be provided. For more info on RBAC, see [https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)",
       "required": true
     },
     "authorization.admin_users.username": {
       "description": "The name of the user, e.g. `my-gcp-id@gmail.com`.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "This identifies users with cluster-admin privileges. Policy should prevent overly broad or external administrative accounts while avoiding hardcoded individual usernames, allowing legitimate administrators to be managed without unnecessarily restricting specific identities."
     },
     "azure_services_authentication": {
       "type": "block",
@@ -103,15 +103,15 @@
       "description": "The Azure Active Directory Application ID for Authentication configuration.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The application ID identifies an Azure application but is not itself a secret or an authorization policy; the associated credentials and permissions are managed elsewhere."
     },
     "azure_services_authentication.tenant_id": {
       "description": "The Azure Active Directory Tenant ID for Authentication configuration.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The tenant ID identifies the Azure Active Directory tenant but does not itself grant access or contain authentication credentials."
     },
     "control_plane": {
       "type": "block",
@@ -122,29 +122,29 @@
       "description": "The ARM ID of the subnet where the control plane VMs are deployed. Example: `/subscriptions//resourceGroups//providers/Microsoft.Network/virtualNetworks//subnets/default`.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The subnet determines the network placement of the control plane, but the more direct cluster-wide network boundary is represented by the virtual network configuration."
     },
     "control_plane.tags": {
       "description": "Optional. A set of tags to apply to all underlying control plane Azure resources.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Tags are metadata applied to Azure resources and do not directly control access, encryption, network connectivity, or data residency."
     },
     "control_plane.version": {
       "description": "The Kubernetes version to run on control plane replicas (e.g. `1.19.10-gke.1000`). You can list all supported versions on a given Google Cloud region by calling GetAzureServerConfig.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The Kubernetes version affects the software version running on the control plane, but this attribute is not itself a direct access-control or data-residency policy."
     },
     "control_plane.vm_size": {
-      "description": "Optional. The Azure VM size name. Example: `Standard_DS2_v2`. For available VM sizes, see https://docs.microsoft.com/en-us/azure/virtual-machines/vm-naming-conventions. When unspecified, it defaults to `Standard_DS2_v2`.",
+      "description": "Optional. The Azure VM size name. Example: `Standard_DS2_v2`. For available VM sizes, see [https://docs.microsoft.com/en-us/azure/virtual-machines/vm-naming-conventions](https://docs.microsoft.com/en-us/azure/virtual-machines/vm-naming-conventions). When unspecified, it defaults to `Standard_DS2_v2`.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The VM size controls compute capacity and does not directly configure access, encryption, network exposure, or data residency."
     },
     "control_plane.database_encryption": {
       "type": "block",
@@ -155,8 +155,8 @@
       "description": "The ARM ID of the Azure Key Vault key to encrypt / decrypt data. For example: `/subscriptions/<subscription-id>/resourceGroups/<resource-group-id>/providers/Microsoft.KeyVault/vaults/<key-vault-id>/keys/<key-name>` Encryption will always take the latest version of the key and hence specific version is not supported.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The attribute is an identifier/reference to a specific external Azure Key Vault key resource. It does not itself configure an encryption control; policy should avoid pinning or restricting a specific key resource because the referenced key may legitimately vary between deployments."
     },
     "control_plane.main_volume": {
       "type": "block",
@@ -167,8 +167,8 @@
       "description": "Optional. The size of the disk, in GiBs. When unspecified, a default value is provided. See the specific reference in the parent resource.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The disk size controls storage capacity and does not directly configure encryption, access control, network exposure, or data residency."
     },
     "control_plane.proxy_config": {
       "type": "block",
@@ -179,15 +179,15 @@
       "description": "The ARM ID the of the resource group containing proxy keyvault. Resource group ids are formatted as `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>`",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The resource group identifies where the proxy Key Vault is located but does not directly specify authentication credentials or access permissions."
     },
     "control_plane.proxy_config.secret_id": {
       "description": "The URL the of the proxy setting secret with its version. Secret ids are formatted as `https:<key-vault-name>.vault.azure.net/secrets/<secret-name>/<secret-version>`.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The value identifies the proxy secret but is a reference to a secret rather than the secret value itself."
     },
     "control_plane.replica_placements": {
       "type": "block",
@@ -198,15 +198,15 @@
       "description": "For a given replica, the Azure availability zone where to provision the control plane VM and the ETCD disk.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "The Azure availability zone controls the geographic placement of control-plane replicas and can affect deployment resilience and regional placement requirements. Policy should restrict this attribute to approved availability zones."
     },
     "control_plane.replica_placements.subnet_id": {
       "description": "For a given replica, the ARM ID of the subnet where the control plane VM is deployed. Make sure it's a subnet under the virtual network in the cluster configuration.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The subnet controls replica network placement, but it does not directly define the cluster-wide network boundary or access policy."
     },
     "control_plane.root_volume": {
       "type": "block",
@@ -217,8 +217,8 @@
       "description": "Optional. The size of the disk, in GiBs. When unspecified, a default value is provided. See the specific reference in the parent resource.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The root volume size controls storage capacity and does not directly configure security controls."
     },
     "control_plane.ssh_config": {
       "type": "block",
@@ -229,8 +229,8 @@
       "description": "The SSH public key data for VMs managed by Anthos. This accepts the authorized_keys file format used in OpenSSH according to the sshd(8) manual page.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls SSH-based administrative access to control plane machines. Policy should require valid, appropriately managed SSH keys and reject weak or improperly formatted keys without pinning a specific team's or user's key."
     },
     "fleet": {
       "type": "block",
@@ -241,8 +241,8 @@
       "description": "The number of the Fleet host project where this cluster will be registered.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The Fleet project identifies the host project for registration but does not directly configure access, encryption, network exposure, or data residency."
     },
     "networking": {
       "type": "block",
@@ -253,22 +253,22 @@
       "description": "The IP address range of the pods in this cluster, in CIDR notation (e.g. `10.96.0.0/14`). All pods in the cluster get assigned a unique RFC1918 IPv4 address from these ranges. Only a single range is supported. This field cannot be changed after creation.",
       "required": true,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The CIDR defines pod addressing but does not itself specify access-control rules or external network exposure."
     },
     "networking.service_address_cidr_blocks": {
       "description": "The IP address range for services in this cluster, in CIDR notation (e.g. `10.96.0.0/14`). All services in the cluster get assigned a unique RFC1918 IPv4 address from these ranges. Only a single range is supported. This field cannot be changed after creating a cluster.",
-      "required": true,
+      "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The CIDR defines service addressing but does not directly configure access-control or network security rules."
     },
     "networking.virtual_network_id": {
       "description": "The Azure Resource Manager (ARM) ID of the VNet associated with your cluster. All components in the cluster (i.e. control plane and node pools) run on a single VNet. Example: `/subscriptions/*/resourceGroups/*/providers/Microsoft.Network/virtualNetworks/*` This field cannot be changed after creation.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "The field is an identifier/reference to an external Azure VNet resource and does not directly configure security controls such as access, encryption, or network exposure. Policy should therefore remain agnostic to the specific referenced resource rather than pinning or restricting the VNet ID."
     }
   }
 }

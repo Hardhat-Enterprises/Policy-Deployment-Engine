@@ -6,22 +6,22 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls whether Terraform can destroy the resource. A generic policy can require PREVENT to reduce the risk of accidental or unauthorised deletion and protect resource availability."
     },
     "description": {
       "description": "A free-text description of the resource. Max length 1024 characters.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Provides human-readable metadata only and does not directly affect access control, network exposure, authentication, encryption, logging, or another security control."
     },
     "labels": {
       "description": "Set of label tags associated with the AgentGateway resource.\n\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field 'effective_labels' for all of the labels present on the resource.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Labels are primarily resource metadata used for organisation and management. Appropriate label keys and values depend on organisational conventions and do not directly secure the Agent Gateway."
     },
     "location": {
       "description": "The location of the agent gateway.",
@@ -34,29 +34,29 @@
       "description": "Name of the AgentGateway resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is only the resource identifier. The specific name does not provide a generic security control."
     },
     "project": {
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument identifies the GCP project that contains the resource. Project identifiers are resource ownership references and are not treated as generic platform-level security policy targets."
     },
     "protocols": {
       "description": "List of protocols supported by an Agent Gateway. Possible values: [\"MCP\"]",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument specifies the supported Agent Gateway protocol. The provider currently supports only MCP and the argument is deprecated, so it does not provide a meaningful generic security policy choice."
     },
     "registries": {
       "description": "A list of Agent registries containing the agents, MCP servers and tools governed by the Agent Gateway.\nNote: Currently limited to project-scoped registries Must be of format\n'//agentregistry.googleapis.com/{version}/projects/{{project}}/locations/{{location}}'",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument contains references to Agent Registry resources governed by the gateway. It identifies related resources rather than defining a generic platform-level security control."
     },
     "google_managed": {
       "type": "block",
@@ -67,8 +67,8 @@
       "description": "Operating Mode of Agent Gateway. Possible values: [\"AGENT_TO_ANYWHERE\", \"CLIENT_TO_AGENT\"]",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale":"This argument selects the functional operating mode of the Agent Gateway. It is an architectural configuration choice rather than a generic platform-level security control, and neither supported value represents an inherently insecure default."
     },
     "network_config": {
       "type": "block",
@@ -84,8 +84,8 @@
       "description": "The URI of the Network Attachment resource.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument is a reference to a Network Attachment resource used for private VPC connectivity. The security properties of that connectivity are configured on the referenced network resource rather than by the reference itself."
     },
     "self_managed": {
       "type": "block",
@@ -96,8 +96,8 @@
       "description": "A supported Google Cloud networking proxy in the Project and Location.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "This argument references an existing supported Google Cloud networking proxy for self-managed deployment. It identifies the external proxy resource rather than defining a generic security control on the Agent Gateway itself."
     }
   }
 }

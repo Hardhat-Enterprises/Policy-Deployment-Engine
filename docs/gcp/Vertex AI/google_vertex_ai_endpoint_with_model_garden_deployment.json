@@ -6,15 +6,15 @@
       "description": "Whether Terraform will be prevented from destroying the instance. Defaults to \"DELETE\".\nWhen a 'terraform destroy' or 'terraform apply' would delete the instance,\nthe command will fail if this field is set to \"PREVENT\" in Terraform state.\nWhen set to \"ABANDON\", the command will remove the resource from Terraform\nmanagement without updating or deleting the resource in the API.\nWhen set to \"DELETE\", deleting the resource is allowed.\n",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Controls Terraform destruction of the deployment. A generic policy can require PREVENT to protect deployed models and endpoints from accidental or unauthorized deletion, with removal handled through an approved change process."
     },
     "hugging_face_model_id": {
       "description": "The Hugging Face model to deploy.\nFormat: Hugging Face model ID like 'google/gemma-2-2b-it'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the Hugging Face model selected by the team. The exact model is an application-specific artifact reference; a generic platform policy should not prescribe a particular repository or model identifier."
     },
     "location": {
       "description": "Resource ID segment making up resource 'location'. It identifies the resource within its parent collection as described in https://google.aip.dev/122.",
@@ -27,15 +27,15 @@
       "description": "The ID of the project in which the resource belongs. If it is not provided, the provider project is used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the project that owns the deployment. This is a team-specific resource identifier, so a generic policy should not hardcode or prescribe a particular project."
     },
     "publisher_model_name": {
       "description": "The Model Garden model to deploy.\nFormat:\n'publishers/{publisher}/models/{publisher_model}@{version_id}', or\n'publishers/hf-{hugging-face-author}/models/{hugging-face-model-name}@001'.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the publisher model and version selected for the workload. Model selection is an architectural and functional decision, not a generic platform-level policy target."
     },
     "deploy_config": {
       "type": "block",
@@ -46,15 +46,15 @@
       "description": "If true, enable the QMT fast tryout feature for this model if possible.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Enables a fast-tryout deployment feature where supported. The description does not establish a security boundary or a generic secure value; this is an operational deployment choice."
     },
     "deploy_config.system_labels": {
       "description": "System labels for Model Garden deployments.\nThese labels are managed by Google and for tracking purposes only.",
       "required": false,
       "type": "map(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains Google-managed labels used for tracking. These metadata values are not a configurable access, isolation, encryption, or other platform security control."
     },
     "deploy_config.dedicated_resources": {
       "type": "block",
@@ -65,29 +65,29 @@
       "description": "The maximum number of replicas that may be deployed on when the traffic\nagainst it increases. If the requested value is too large, the deployment\nwill error, but if deployment succeeds then the ability to scale to that\nmany replicas is guaranteed (barring service outages). If traffic increases\nbeyond what its replicas at maximum may handle, a portion of the traffic\nwill be dropped. If this value is not provided, will use\nmin_replica_count as the default value.\n\nThe value of this field impacts the charge against Vertex CPU and GPU\nquotas. Specifically, you will be charged for (max_replica_count *\nnumber of cores in the selected machine type) and (max_replica_count *\nnumber of GPUs per replica in the selected machine type).",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the maximum autoscaling capacity and affects quota and cost. The appropriate limit depends on workload demand and budget, so a generic security policy should not prescribe a replica count."
     },
     "deploy_config.dedicated_resources.min_replica_count": {
       "description": "The minimum number of machine replicas that will be always deployed on.\nThis value must be greater than or equal to 1.\n\nIf traffic increases, it may dynamically be deployed onto more replicas,\nand as traffic decreases, some of these extra replicas may be freed.",
       "required": true,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the minimum number of deployed replicas. This is an availability and capacity choice that depends on workload requirements, not a generic security boundary."
     },
     "deploy_config.dedicated_resources.required_replica_count": {
       "description": "Number of required available replicas for the deployment to succeed.\nThis field is only needed when partial deployment/mutation is\ndesired. If set, the deploy/mutate operation will succeed once\navailable_replica_count reaches required_replica_count, and the rest of\nthe replicas will be retried. If not set, the default\nrequired_replica_count will be min_replica_count.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Determines how many replicas must be available before a deployment operation succeeds. This is a rollout and availability preference, not a generic security control."
     },
     "deploy_config.dedicated_resources.spot": {
       "description": "If true, schedule the deployment workload on [spot\nVMs](https://cloud.google.com/kubernetes-engine/docs/concepts/spot-vms).",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects Spot VM capacity. Spot instances affect cost and interruption tolerance; the choice is operational and does not itself establish a platform security boundary."
     },
     "deploy_config.dedicated_resources.autoscaling_metric_specs": {
       "type": "block",
@@ -98,15 +98,15 @@
       "description": "The resource metric name.\nSupported metrics:\n\n* For Online Prediction:\n* 'aiplatform.googleapis.com/prediction/online/accelerator/duty_cycle'\n* 'aiplatform.googleapis.com/prediction/online/cpu/utilization'",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the metric used for autoscaling. It is a functional metric identifier selected for the workload rather than a generic security policy target."
     },
     "deploy_config.dedicated_resources.autoscaling_metric_specs.target": {
       "description": "The target resource utilization in percentage (1% - 100%) for the given\nmetric; once the real usage deviates from the target by a certain\npercentage, the machine replicas change. The default value is 60\n(representing 60%) if not provided.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the utilization target for autoscaling. The appropriate percentage depends on model performance and capacity requirements, so it is an operational tuning value."
     },
     "deploy_config.dedicated_resources.machine_spec": {
       "type": "block",
@@ -117,36 +117,36 @@
       "description": "The number of accelerators to attach to the machine.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of accelerators attached to the serving machine. Hardware capacity and cost are workload-specific and do not constitute a generic platform security control."
     },
     "deploy_config.dedicated_resources.machine_spec.accelerator_type": {
       "description": "Possible values:\nACCELERATOR_TYPE_UNSPECIFIED\nNVIDIA_TESLA_K80\nNVIDIA_TESLA_P100\nNVIDIA_TESLA_V100\nNVIDIA_TESLA_P4\nNVIDIA_TESLA_T4\nNVIDIA_TESLA_A100\nNVIDIA_A100_80GB\nNVIDIA_L4\nNVIDIA_H100_80GB\nNVIDIA_H100_MEGA_80GB\nNVIDIA_H200_141GB\nNVIDIA_B200\nTPU_V2\nTPU_V3\nTPU_V4_POD\nTPU_V5_LITEPOD",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the accelerator hardware type. The choice depends on model compatibility, performance, and availability rather than a generic security requirement."
     },
     "deploy_config.dedicated_resources.machine_spec.machine_type": {
       "description": "The type of the machine.\n\nSee the [list of machine types supported for\nprediction](https://cloud.google.com/vertex-ai/docs/predictions/configure-compute#machine-types)\n\nSee the [list of machine types supported for custom\ntraining](https://cloud.google.com/vertex-ai/docs/training/configure-compute#machine-types).\n\nFor DeployedModel this field is optional, and the default\nvalue is 'n1-standard-2'. For BatchPredictionJob or as part of\nWorkerPoolSpec this field is required.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects the machine type used to serve the model. This is a workload-specific compute and cost decision, not a generic security boundary."
     },
     "deploy_config.dedicated_resources.machine_spec.multihost_gpu_node_count": {
       "description": "The number of nodes per replica for multihost GPU deployments.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of nodes per replica for multihost GPU serving. The value is a workload-specific capacity choice, not a generic security control."
     },
     "deploy_config.dedicated_resources.machine_spec.tpu_topology": {
       "description": "The topology of the TPUs. Corresponds to the TPU topologies available from\nGKE. (Example: tpu_topology: \"2x2x1\").",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the TPU hardware topology required by the workload. This is a hardware configuration choice rather than a platform security policy target."
     },
     "deploy_config.dedicated_resources.machine_spec.reservation_affinity": {
       "type": "block",
@@ -157,22 +157,22 @@
       "description": "Corresponds to the label key of a reservation resource. To target a\nSPECIFIC_RESERVATION by name, use 'compute.googleapis.com/reservation-name'\nas the key and specify the name of your reservation as its value.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the reservation label key used to select capacity. The key is an architectural reference and does not itself impose a generic security boundary."
     },
     "deploy_config.dedicated_resources.machine_spec.reservation_affinity.reservation_affinity_type": {
       "description": "Specifies the reservation affinity type.\nPossible values:\nTYPE_UNSPECIFIED\nNO_RESERVATION\nANY_RESERVATION\nSPECIFIC_RESERVATION",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether the deployment uses on-demand, any reserved, or a specific reserved capacity. This is a capacity allocation and scheduling choice, not a generic security control."
     },
     "deploy_config.dedicated_resources.machine_spec.reservation_affinity.values": {
       "description": "Corresponds to the label values of a reservation resource. This must be the\nfull resource name of the reservation or reservation block.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Contains the full names of reservations or reservation blocks. These are team-specific resource references that a generic platform policy should not prescribe."
     },
     "endpoint_config": {
       "type": "block",
@@ -183,15 +183,15 @@
       "description": "If true, the endpoint will be exposed through a dedicated\nDNS [Endpoint.dedicated_endpoint_dns]. Your request to the dedicated DNS\nwill be isolated from other users' traffic and will have better\nperformance and reliability. Note: Once you enabled dedicated endpoint,\nyou won't be able to send request to the shared DNS\n{region}-aiplatform.googleapis.com. The limitations will be removed soon.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables a dedicated DNS endpoint that isolates prediction traffic from the shared endpoint. This is a network traffic-isolation control; a platform policy can require dedicated endpoint access where the approved architecture requires traffic separation. Private connectivity is enforced separately through Private Service Connect."
     },
     "endpoint_config.endpoint_display_name": {
       "description": "The user-specified display name of the endpoint. If not set, a\ndefault name will be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets a user-facing display name. Naming is metadata and does not determine the endpoint's security posture."
     },
     "endpoint_config.private_service_connect_config": {
       "type": "block",
@@ -202,15 +202,15 @@
       "description": "Required. If true, expose the IndexEndpoint via private service connect.",
       "required": true,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Enables Private Service Connect exposure for the endpoint. This is a network-isolation control that can be required by policy to keep supported endpoint access on private connectivity rather than relying on public access paths."
     },
     "endpoint_config.private_service_connect_config.project_allowlist": {
       "description": "A list of Projects from which the forwarding rule will target the service attachment.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Defines which projects may create forwarding rules targeting the service attachment. The allowlist is a network access-boundary control; policy can require an explicitly scoped, non-wildcard set without prescribing team-specific project IDs."
     },
     "endpoint_config.private_service_connect_config.psc_automation_configs": {
       "type": "block",
@@ -221,15 +221,15 @@
       "description": "Required. The full name of the Google Compute Engine network.\nFormat: projects/{project}/global/networks/{network}.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "References the Compute Engine network in which PSC endpoints are created. The exact network is a team-specific architecture reference, not a generic value that platform policy should hardcode."
     },
     "endpoint_config.private_service_connect_config.psc_automation_configs.project_id": {
       "description": "Required. Project id used to create forwarding rule.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Identifies the project used to create the forwarding rule. This is a resource reference selected by the team, not a generic platform security setting."
     },
     "model_config": {
       "type": "block",
@@ -240,29 +240,29 @@
       "description": "Whether the user accepts the End User License Agreement (EULA)\nfor the model.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Records acceptance of the model's end-user license agreement. License acceptance is a legal and operational decision, not a platform security control, and policy should not automatically prescribe consent."
     },
     "model_config.hugging_face_access_token": {
       "description": "The Hugging Face read access token used to access the model\nartifacts of gated models.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Contains a credential used to access gated model artifacts. A generic policy can prohibit hardcoded credential values and require approved secret-handling practices without prescribing or exposing an actual token."
     },
     "model_config.hugging_face_cache_enabled": {
       "description": "If true, the model will deploy with a cached version instead of directly\ndownloading the model artifacts from Hugging Face. This is suitable for\nVPC-SC users with limited internet access.",
       "required": false,
       "type": "bool",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects whether model artifacts are obtained from a cache instead of downloaded directly from Hugging Face. This is an operational data-management and artifact-delivery choice. It does not itself enforce network isolation or a security boundary, so a generic platform policy should not prescribe the caching setting."
     },
     "model_config.model_display_name": {
       "description": "The user-specified display name of the uploaded model. If not\nset, a default name will be used.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the uploaded model's display name. It is descriptive metadata and has no generic security-enforcement function."
     },
     "model_config.container_spec": {
       "type": "block",
@@ -273,50 +273,50 @@
       "description": "Specifies arguments for the command that runs when the container starts.\nThis overrides the container's\n['CMD'](https://docs.docker.com/engine/reference/builder/#cmd). Specify\nthis field as an array of executable and arguments, similar to a Docker\n'CMD''s \"default parameters\" form.\n\nIf you don't specify this field but do specify the\ncommand field, then the command from the\n'command' field runs without any additional arguments. See the\n[Kubernetes documentation about how the\n'command' and 'args' fields interact with a container's 'ENTRYPOINT' and\n'CMD'](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes).\n\nIf you don't specify this field and don't specify the 'command' field,\nthen the container's\n['ENTRYPOINT'](https://docs.docker.com/engine/reference/builder/#cmd) and\n'CMD' determine what runs based on their default behavior. See the Docker\ndocumentation about [how 'CMD' and 'ENTRYPOINT'\ninteract](https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact).\n\nIn this field, you can reference [environment variables\nset by Vertex\nAI](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#aip-variables)\nand environment variables set in the env field.\nYou cannot reference environment variables set in the Docker image. In\norder for environment variables to be expanded, reference them by using the\nfollowing syntax:$(VARIABLE_NAME)\nNote that this differs from Bash variable expansion, which does not use\nparentheses. If a variable cannot be resolved, the reference in the input\nstring is used unchanged. To avoid variable expansion, you can escape this\nsyntax with '$$'; for example:$$(VARIABLE_NAME)\nThis field corresponds to the 'args' field of the Kubernetes Containers\n[v1 core\nAPI](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#container-v1-core).",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies workload-specific startup arguments. Although arguments can affect application behavior, the correct values depend on the container and cannot be generically constrained without knowing its implementation."
     },
     "model_config.container_spec.command": {
       "description": "Specifies the command that runs when the container starts. This overrides\nthe container's\n[ENTRYPOINT](https://docs.docker.com/engine/reference/builder/#entrypoint).\nSpecify this field as an array of executable and arguments, similar to a\nDocker 'ENTRYPOINT''s \"exec\" form, not its \"shell\" form.\n\nIf you do not specify this field, then the container's 'ENTRYPOINT' runs,\nin conjunction with the args field or the\ncontainer's ['CMD'](https://docs.docker.com/engine/reference/builder/#cmd),\nif either exists. If this field is not specified and the container does not\nhave an 'ENTRYPOINT', then refer to the Docker documentation about [how\n'CMD' and 'ENTRYPOINT'\ninteract](https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact).\n\nIf you specify this field, then you can also specify the 'args' field to\nprovide additional arguments for this command. However, if you specify this\nfield, then the container's 'CMD' is ignored. See the\n[Kubernetes documentation about how the\n'command' and 'args' fields interact with a container's 'ENTRYPOINT' and\n'CMD'](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes).\n\nIn this field, you can reference [environment variables set by Vertex\nAI](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#aip-variables)\nand environment variables set in the env field.\nYou cannot reference environment variables set in the Docker image. In\norder for environment variables to be expanded, reference them by using the\nfollowing syntax:$(VARIABLE_NAME)\nNote that this differs from Bash variable expansion, which does not use\nparentheses. If a variable cannot be resolved, the reference in the input\nstring is used unchanged. To avoid variable expansion, you can escape this\nsyntax with '$$'; for example:$$(VARIABLE_NAME)\nThis field corresponds to the 'command' field of the Kubernetes Containers\n[v1 core\nAPI](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#container-v1-core).",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Overrides the container startup command. The command is application-specific executable configuration; generic platform policy cannot determine a safe command for every model-serving image without workload context."
     },
     "model_config.container_spec.deployment_timeout": {
       "description": "Deployment timeout.\nLimit for deployment timeout is 2 hours.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the deployment timeout. This controls operational rollout timing and does not establish a generic security boundary."
     },
     "model_config.container_spec.health_route": {
       "description": "HTTP path on the container to send health checks to. Vertex AI\nintermittently sends GET requests to this path on the container's IP\naddress and port to check that the container is healthy. Read more about\n[health\nchecks](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#health).\n\nFor example, if you set this field to '/bar', then Vertex AI\nintermittently sends a GET request to the '/bar' path on the port of your\ncontainer specified by the first value of this 'ModelContainerSpec''s\nports field.\n\nIf you don't specify this field, it defaults to the following value when\nyou deploy this Model to an Endpoint:/v1/endpoints/ENDPOINT/deployedModels/DEPLOYED_MODEL:predict\nThe placeholders in this value are replaced as follows:\n\n* ENDPOINT: The last segment (following 'endpoints/')of the\nEndpoint.name][] field of the Endpoint where this Model has been\ndeployed. (Vertex AI makes this value available to your container code\nas the ['AIP_ENDPOINT_ID' environment\nvariable](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#aip-variables).)\n\n* DEPLOYED_MODEL: DeployedModel.id of the 'DeployedModel'.\n(Vertex AI makes this value available to your container code as the\n['AIP_DEPLOYED_MODEL_ID' environment\nvariable](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#aip-variables).)",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the HTTP path used for container health checks. The path is an application-specific endpoint reference and should not be prescribed by a generic policy."
     },
     "model_config.container_spec.image_uri": {
       "description": "URI of the Docker image to be used as the custom container for serving\npredictions. This URI must identify an image in Artifact Registry or\nContainer Registry. Learn more about the [container publishing\nrequirements](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#publishing),\nincluding permissions requirements for the Vertex AI Service Agent.\n\nThe container image is ingested upon ModelService.UploadModel, stored\ninternally, and this original path is afterwards not used.\n\nTo learn about the requirements for the Docker image itself, see\n[Custom container\nrequirements](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#).\n\nYou can use the URI to one of Vertex AI's [pre-built container images for\nprediction](https://cloud.google.com/vertex-ai/docs/predictions/pre-built-containers)\nin this field.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Selects the container image used to serve predictions. This is a software supply-chain control: policy can restrict images to approved registry patterns and require immutable version or digest references without pinning a team-specific image."
     },
     "model_config.container_spec.predict_route": {
       "description": "HTTP path on the container to send prediction requests to. Vertex AI\nforwards requests sent using\nprojects.locations.endpoints.predict to this\npath on the container's IP address and port. Vertex AI then returns the\ncontainer's response in the API response.\n\nFor example, if you set this field to '/foo', then when Vertex AI\nreceives a prediction request, it forwards the request body in a POST\nrequest to the '/foo' path on the port of your container specified by the\nfirst value of this 'ModelContainerSpec''s\nports field.\n\nIf you don't specify this field, it defaults to the following value when\nyou deploy this Model to an Endpoint:/v1/endpoints/ENDPOINT/deployedModels/DEPLOYED_MODEL:predict\nThe placeholders in this value are replaced as follows:\n\n* ENDPOINT: The last segment (following 'endpoints/')of the\nEndpoint.name][] field of the Endpoint where this Model has been\ndeployed. (Vertex AI makes this value available to your container code\nas the ['AIP_ENDPOINT_ID' environment\nvariable](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#aip-variables).)\n\n* DEPLOYED_MODEL: DeployedModel.id of the 'DeployedModel'.\n(Vertex AI makes this value available to your container code\nas the ['AIP_DEPLOYED_MODEL_ID' environment\nvariable](https://cloud.google.com/vertex-ai/docs/predictions/custom-container-requirements#aip-variables).)",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the application-specific HTTP path receiving prediction requests. It is a functional route reference rather than a generic platform security control."
     },
     "model_config.container_spec.shared_memory_size_mb": {
       "description": "The amount of the VM memory to reserve as the shared memory for the model\nin megabytes.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the amount of shared memory reserved for the model. This is a workload-specific resource allocation value, not a generic security control."
     },
     "model_config.container_spec.env": {
       "type": "block",
@@ -327,15 +327,15 @@
       "description": "Name of the environment variable. Must be a valid C identifier.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names an environment variable used by the application. The identifier is workload-specific and does not itself establish a generic security boundary."
     },
     "model_config.container_spec.env.value": {
       "description": "Variables that reference a $(VAR_NAME) are expanded\nusing the previous defined environment variables in the container and\nany service environment variables. If a variable cannot be resolved,\nthe reference in the input string will be unchanged. The $(VAR_NAME)\nsyntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped\nreferences will never be expanded, regardless of whether the variable\nexists or not.",
       "required": true,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": true,
+      "rationale": "Supplies environment-variable values that may contain credentials or other sensitive data. A generic policy can detect and prohibit hardcoded secrets or unsafe secret patterns without prescribing application-specific values."
     },
     "model_config.container_spec.grpc_ports": {
       "type": "block",
@@ -346,8 +346,8 @@
       "description": "The number of the port to expose on the pod's IP address.\nMust be a valid port number, between 1 and 65535 inclusive.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the internal container port used for gRPC serving. The valid serving port depends on the application and is not a public network exposure or access-control setting."
     },
     "model_config.container_spec.health_probe": {
       "type": "block",
@@ -358,36 +358,36 @@
       "description": "Number of consecutive failures before the probe is considered failed.\nDefaults to 3. Minimum value is 1.\n\nMaps to Kubernetes probe argument 'failureThreshold'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of consecutive failures for the health probe. The appropriate threshold depends on startup and recovery behavior, so it is operational availability tuning rather than a generic security control."
     },
     "model_config.container_spec.health_probe.initial_delay_seconds": {
       "description": "Number of seconds to wait before starting the probe. Defaults to 0.\nMinimum value is 0.\n\nMaps to Kubernetes probe argument 'initialDelaySeconds'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the delay before the health probe starts. This is workload-specific timing configuration, not a generic security boundary."
     },
     "model_config.container_spec.health_probe.period_seconds": {
       "description": "How often (in seconds) to perform the probe. Default to 10 seconds.\nMinimum value is 1. Must be less than timeout_seconds.\n\nMaps to Kubernetes probe argument 'periodSeconds'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how often the health probe runs. The interval depends on workload responsiveness and availability requirements rather than a generic security requirement."
     },
     "model_config.container_spec.health_probe.success_threshold": {
       "description": "Number of consecutive successes before the probe is considered successful.\nDefaults to 1. Minimum value is 1.\n\nMaps to Kubernetes probe argument 'successThreshold'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of successful checks needed for the health probe. This is application-specific health-check tuning, not a generic security control."
     },
     "model_config.container_spec.health_probe.timeout_seconds": {
       "description": "Number of seconds after which the probe times out. Defaults to 1 second.\nMinimum value is 1. Must be greater or equal to period_seconds.\n\nMaps to Kubernetes probe argument 'timeoutSeconds'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the timeout for the health probe. The value depends on the serving application's response time and is an operational setting rather than a generic security boundary."
     },
     "model_config.container_spec.health_probe.exec": {
       "type": "block",
@@ -398,8 +398,8 @@
       "description": "Command is the command line to execute inside the container, the working\ndirectory for the command is root ('/') in the container's filesystem.\nThe command is simply exec'd, it is not run inside a shell, so\ntraditional shell instructions ('|', etc) won't work. To use a shell, you\nneed to explicitly call out to that shell. Exit status of 0 is treated as\nlive/healthy and non-zero is unhealthy.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the command used by the health probe. It is an application-specific health-check implementation; a generic policy cannot prescribe the correct executable or arguments for every container."
     },
     "model_config.container_spec.health_probe.grpc": {
       "type": "block",
@@ -410,15 +410,15 @@
       "description": "Port number of the gRPC service. Number must be in the range 1 to 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the internal gRPC port used by the health probe. This is a workload-specific health-check endpoint reference, not an external access-control setting."
     },
     "model_config.container_spec.health_probe.grpc.service": {
       "description": "Service is the name of the service to place in the gRPC\nHealthCheckRequest. See\nhttps://github.com/grpc/grpc/blob/master/doc/health-checking.md.\n\nIf this is not specified, the default behavior is defined by gRPC.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the gRPC service checked by the health probe. The service name is an application-specific identifier rather than a generic platform security control."
     },
     "model_config.container_spec.health_probe.http_get": {
       "type": "block",
@@ -429,29 +429,29 @@
       "description": "Host name to connect to, defaults to the model serving container's IP.\nYou probably want to set \"Host\" in httpHeaders instead.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the host contacted by the health probe. This is a health-check endpoint reference selected for the workload, not a generic network access boundary."
     },
     "model_config.container_spec.health_probe.http_get.path": {
       "description": "Path to access on the HTTP server.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the HTTP path used by the health probe. The path is application-specific functional configuration rather than a generic security policy target."
     },
     "model_config.container_spec.health_probe.http_get.port": {
       "description": "Number of the port to access on the container.\nNumber must be in the range 1 to 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the port contacted by the health probe. The correct internal health-check port depends on the application and is not a generic security boundary."
     },
     "model_config.container_spec.health_probe.http_get.scheme": {
       "description": "Scheme to use for connecting to the host.\nDefaults to HTTP. Acceptable values are \"HTTP\" or \"HTTPS\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects HTTP or HTTPS for the health probe. The appropriate scheme depends on how the internal serving container exposes its health endpoint; requiring HTTPS generically could break legitimate health checks without securing the external endpoint."
     },
     "model_config.container_spec.health_probe.http_get.http_headers": {
       "type": "block",
@@ -462,15 +462,15 @@
       "description": "The header field name.\nThis will be canonicalized upon output, so case-variant names will be\nunderstood as the same header.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a header sent by the health probe. Header names are application-specific protocol configuration and are not generic platform security controls."
     },
     "model_config.container_spec.health_probe.http_get.http_headers.value": {
       "description": "The header field value",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies a header value for the health probe. Its meaning depends on the application; the field itself does not provide a generic access-control or secret-management mechanism."
     },
     "model_config.container_spec.health_probe.tcp_socket": {
       "type": "block",
@@ -481,15 +481,15 @@
       "description": "Optional: Host name to connect to, defaults to the model serving\ncontainer's IP.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the host contacted by the health probe TCP check. It is an internal application-specific endpoint reference rather than a generic security boundary."
     },
     "model_config.container_spec.health_probe.tcp_socket.port": {
       "description": "Number of the port to access on the container.\nNumber must be in the range 1 to 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the port contacted by the health probe TCP check. The correct port depends on the application and is not a generic platform security control."
     },
     "model_config.container_spec.liveness_probe": {
       "type": "block",
@@ -500,36 +500,36 @@
       "description": "Number of consecutive failures before the probe is considered failed.\nDefaults to 3. Minimum value is 1.\n\nMaps to Kubernetes probe argument 'failureThreshold'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of consecutive failures for the liveness probe. The appropriate threshold depends on startup and recovery behavior, so it is operational availability tuning rather than a generic security control."
     },
     "model_config.container_spec.liveness_probe.initial_delay_seconds": {
       "description": "Number of seconds to wait before starting the probe. Defaults to 0.\nMinimum value is 0.\n\nMaps to Kubernetes probe argument 'initialDelaySeconds'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the delay before the liveness probe starts. This is workload-specific timing configuration, not a generic security boundary."
     },
     "model_config.container_spec.liveness_probe.period_seconds": {
       "description": "How often (in seconds) to perform the probe. Default to 10 seconds.\nMinimum value is 1. Must be less than timeout_seconds.\n\nMaps to Kubernetes probe argument 'periodSeconds'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how often the liveness probe runs. The interval depends on workload responsiveness and availability requirements rather than a generic security requirement."
     },
     "model_config.container_spec.liveness_probe.success_threshold": {
       "description": "Number of consecutive successes before the probe is considered successful.\nDefaults to 1. Minimum value is 1.\n\nMaps to Kubernetes probe argument 'successThreshold'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of successful checks needed for the liveness probe. This is application-specific health-check tuning, not a generic security control."
     },
     "model_config.container_spec.liveness_probe.timeout_seconds": {
       "description": "Number of seconds after which the probe times out. Defaults to 1 second.\nMinimum value is 1. Must be greater or equal to period_seconds.\n\nMaps to Kubernetes probe argument 'timeoutSeconds'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the timeout for the liveness probe. The value depends on the serving application's response time and is an operational setting rather than a generic security boundary."
     },
     "model_config.container_spec.liveness_probe.exec": {
       "type": "block",
@@ -540,8 +540,8 @@
       "description": "Command is the command line to execute inside the container, the working\ndirectory for the command is root ('/') in the container's filesystem.\nThe command is simply exec'd, it is not run inside a shell, so\ntraditional shell instructions ('|', etc) won't work. To use a shell, you\nneed to explicitly call out to that shell. Exit status of 0 is treated as\nlive/healthy and non-zero is unhealthy.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the command used by the liveness probe. It is an application-specific health-check implementation; a generic policy cannot prescribe the correct executable or arguments for every container."
     },
     "model_config.container_spec.liveness_probe.grpc": {
       "type": "block",
@@ -552,15 +552,15 @@
       "description": "Port number of the gRPC service. Number must be in the range 1 to 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the internal gRPC port used by the liveness probe. This is a workload-specific health-check endpoint reference, not an external access-control setting."
     },
     "model_config.container_spec.liveness_probe.grpc.service": {
       "description": "Service is the name of the service to place in the gRPC\nHealthCheckRequest. See\nhttps://github.com/grpc/grpc/blob/master/doc/health-checking.md.\n\nIf this is not specified, the default behavior is defined by gRPC.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the gRPC service checked by the liveness probe. The service name is an application-specific identifier rather than a generic platform security control."
     },
     "model_config.container_spec.liveness_probe.http_get": {
       "type": "block",
@@ -571,29 +571,29 @@
       "description": "Host name to connect to, defaults to the model serving container's IP.\nYou probably want to set \"Host\" in httpHeaders instead.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the host contacted by the liveness probe. This is a health-check endpoint reference selected for the workload, not a generic network access boundary."
     },
     "model_config.container_spec.liveness_probe.http_get.path": {
       "description": "Path to access on the HTTP server.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the HTTP path used by the liveness probe. The path is application-specific functional configuration rather than a generic security policy target."
     },
     "model_config.container_spec.liveness_probe.http_get.port": {
       "description": "Number of the port to access on the container.\nNumber must be in the range 1 to 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the port contacted by the liveness probe. The correct internal health-check port depends on the application and is not a generic security boundary."
     },
     "model_config.container_spec.liveness_probe.http_get.scheme": {
       "description": "Scheme to use for connecting to the host.\nDefaults to HTTP. Acceptable values are \"HTTP\" or \"HTTPS\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects HTTP or HTTPS for the liveness probe. The appropriate scheme depends on how the internal serving container exposes its health endpoint; requiring HTTPS generically could break legitimate health checks without securing the external endpoint."
     },
     "model_config.container_spec.liveness_probe.http_get.http_headers": {
       "type": "block",
@@ -604,15 +604,15 @@
       "description": "The header field name.\nThis will be canonicalized upon output, so case-variant names will be\nunderstood as the same header.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a header sent by the liveness probe. Header names are application-specific protocol configuration and are not generic platform security controls."
     },
     "model_config.container_spec.liveness_probe.http_get.http_headers.value": {
       "description": "The header field value",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies a header value for the liveness probe. Its meaning depends on the application; the field itself does not provide a generic access-control or secret-management mechanism."
     },
     "model_config.container_spec.liveness_probe.tcp_socket": {
       "type": "block",
@@ -623,15 +623,15 @@
       "description": "Optional: Host name to connect to, defaults to the model serving\ncontainer's IP.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the host contacted by the liveness probe TCP check. It is an internal application-specific endpoint reference rather than a generic security boundary."
     },
     "model_config.container_spec.liveness_probe.tcp_socket.port": {
       "description": "Number of the port to access on the container.\nNumber must be in the range 1 to 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the port contacted by the liveness probe TCP check. The correct port depends on the application and is not a generic platform security control."
     },
     "model_config.container_spec.ports": {
       "type": "block",
@@ -642,8 +642,8 @@
       "description": "The number of the port to expose on the pod's IP address.\nMust be a valid port number, between 1 and 65535 inclusive.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the internal container port used for HTTP prediction requests. The value is application-specific and does not independently determine external network exposure or authentication."
     },
     "model_config.container_spec.startup_probe": {
       "type": "block",
@@ -654,36 +654,36 @@
       "description": "Number of consecutive failures before the probe is considered failed.\nDefaults to 3. Minimum value is 1.\n\nMaps to Kubernetes probe argument 'failureThreshold'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of consecutive failures for the startup probe. The appropriate threshold depends on startup and recovery behavior, so it is operational availability tuning rather than a generic security control."
     },
     "model_config.container_spec.startup_probe.initial_delay_seconds": {
       "description": "Number of seconds to wait before starting the probe. Defaults to 0.\nMinimum value is 0.\n\nMaps to Kubernetes probe argument 'initialDelaySeconds'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the delay before the startup probe starts. This is workload-specific timing configuration, not a generic security boundary."
     },
     "model_config.container_spec.startup_probe.period_seconds": {
       "description": "How often (in seconds) to perform the probe. Default to 10 seconds.\nMinimum value is 1. Must be less than timeout_seconds.\n\nMaps to Kubernetes probe argument 'periodSeconds'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets how often the startup probe runs. The interval depends on workload responsiveness and availability requirements rather than a generic security requirement."
     },
     "model_config.container_spec.startup_probe.success_threshold": {
       "description": "Number of consecutive successes before the probe is considered successful.\nDefaults to 1. Minimum value is 1.\n\nMaps to Kubernetes probe argument 'successThreshold'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the number of successful checks needed for the startup probe. This is application-specific health-check tuning, not a generic security control."
     },
     "model_config.container_spec.startup_probe.timeout_seconds": {
       "description": "Number of seconds after which the probe times out. Defaults to 1 second.\nMinimum value is 1. Must be greater or equal to period_seconds.\n\nMaps to Kubernetes probe argument 'timeoutSeconds'.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Sets the timeout for the startup probe. The value depends on the serving application's response time and is an operational setting rather than a generic security boundary."
     },
     "model_config.container_spec.startup_probe.exec": {
       "type": "block",
@@ -694,8 +694,8 @@
       "description": "Command is the command line to execute inside the container, the working\ndirectory for the command is root ('/') in the container's filesystem.\nThe command is simply exec'd, it is not run inside a shell, so\ntraditional shell instructions ('|', etc) won't work. To use a shell, you\nneed to explicitly call out to that shell. Exit status of 0 is treated as\nlive/healthy and non-zero is unhealthy.",
       "required": false,
       "type": "list(string)",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the command used by the startup probe. It is an application-specific health-check implementation; a generic policy cannot prescribe the correct executable or arguments for every container."
     },
     "model_config.container_spec.startup_probe.grpc": {
       "type": "block",
@@ -706,15 +706,15 @@
       "description": "Port number of the gRPC service. Number must be in the range 1 to 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the internal gRPC port used by the startup probe. This is a workload-specific health-check endpoint reference, not an external access-control setting."
     },
     "model_config.container_spec.startup_probe.grpc.service": {
       "description": "Service is the name of the service to place in the gRPC\nHealthCheckRequest. See\nhttps://github.com/grpc/grpc/blob/master/doc/health-checking.md.\n\nIf this is not specified, the default behavior is defined by gRPC.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names the gRPC service checked by the startup probe. The service name is an application-specific identifier rather than a generic platform security control."
     },
     "model_config.container_spec.startup_probe.http_get": {
       "type": "block",
@@ -725,29 +725,29 @@
       "description": "Host name to connect to, defaults to the model serving container's IP.\nYou probably want to set \"Host\" in httpHeaders instead.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the host contacted by the startup probe. This is a health-check endpoint reference selected for the workload, not a generic network access boundary."
     },
     "model_config.container_spec.startup_probe.http_get.path": {
       "description": "Path to access on the HTTP server.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the HTTP path used by the startup probe. The path is application-specific functional configuration rather than a generic security policy target."
     },
     "model_config.container_spec.startup_probe.http_get.port": {
       "description": "Number of the port to access on the container.\nNumber must be in the range 1 to 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the port contacted by the startup probe. The correct internal health-check port depends on the application and is not a generic security boundary."
     },
     "model_config.container_spec.startup_probe.http_get.scheme": {
       "description": "Scheme to use for connecting to the host.\nDefaults to HTTP. Acceptable values are \"HTTP\" or \"HTTPS\".",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Selects HTTP or HTTPS for the startup probe. The appropriate scheme depends on how the internal serving container exposes its health endpoint; requiring HTTPS generically could break legitimate health checks without securing the external endpoint."
     },
     "model_config.container_spec.startup_probe.http_get.http_headers": {
       "type": "block",
@@ -758,15 +758,15 @@
       "description": "The header field name.\nThis will be canonicalized upon output, so case-variant names will be\nunderstood as the same header.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Names a header sent by the startup probe. Header names are application-specific protocol configuration and are not generic platform security controls."
     },
     "model_config.container_spec.startup_probe.http_get.http_headers.value": {
       "description": "The header field value",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Supplies a header value for the startup probe. Its meaning depends on the application; the field itself does not provide a generic access-control or secret-management mechanism."
     },
     "model_config.container_spec.startup_probe.tcp_socket": {
       "type": "block",
@@ -777,15 +777,15 @@
       "description": "Optional: Host name to connect to, defaults to the model serving\ncontainer's IP.",
       "required": false,
       "type": "string",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the host contacted by the startup probe TCP check. It is an internal application-specific endpoint reference rather than a generic security boundary."
     },
     "model_config.container_spec.startup_probe.tcp_socket.port": {
       "description": "Number of the port to access on the container.\nNumber must be in the range 1 to 65535.",
       "required": false,
       "type": "number",
-      "security_impact": "true/false",
-      "rationale": ""
+      "security_impact": false,
+      "rationale": "Specifies the port contacted by the startup probe TCP check. The correct port depends on the application and is not a generic platform security control."
     }
   }
 }

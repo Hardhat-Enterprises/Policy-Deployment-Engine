@@ -73,22 +73,73 @@ def test_block_arguments_are_not_assessed():
 
 
 # --------------------------------------------------------------------------- #
+# Lost arguments: in the base branch's doc, gone from this branch's
+# --------------------------------------------------------------------------- #
+LEAF = {"security_impact": False, "rationale": "r"}
+BASE = {"arguments": {"name": LEAF, "fleet": {"type": "block"}, "fleet.project": LEAF}}
+
+
+def test_an_unchanged_doc_loses_nothing():
+    assert cr.check_no_lost_args(BASE, BASE) == []
+
+
+def test_a_deleted_leaf_is_named():
+    # A clean deletion passes the linter and check_doc_completeness alike: what is
+    # left in `arguments` is complete. Only the base branch knows it was there.
+    doc = {"arguments": {"name": LEAF, "fleet": {"type": "block"}}}
+    assert cr.check_doc_completeness(doc) == []
+    findings = cr.check_no_lost_args(doc, BASE)
+    assert len(findings) == 1
+    assert "fleet.project" in findings[0]
+
+
+def test_a_new_doc_is_not_compared():
+    assert cr.check_no_lost_args({"arguments": {"name": LEAF}}, None) == []
+
+
+def test_step_4_fails_naming_a_leaf_the_branch_deleted(monkeypatch, capsys):
+    # End to end through main(): the real doc on this checkout, against a base copy
+    # that still has one more leaf — the same as the branch having deleted it.
+    rel = Path("docs/gcp/API Hub/google_apihub_plugin.json")
+    real = json.loads((project_root / rel).read_text(encoding="utf-8"))
+    base = {**real, "arguments": {**real["arguments"], "deleted_leaf": LEAF}}
+    monkeypatch.setattr(cr, "load_base_doc", lambda ref, path: base)
+    assert cr.main(["--branch", "Service/gcp/api_hub/google_apihub_plugin",
+                    "--gate-only"]) == 1
+    out = capsys.readouterr().out
+    assert "[FAIL] Doc completeness" in out
+    assert "deleted_leaf" in out
+
+
+def test_the_base_doc_is_read_from_git():
+    base = cr.base_ref()
+    if base is None:
+        pytest.skip("no origin/dev locally")
+    rel = "docs/gcp/API Hub/google_apihub_plugin.json"
+    assert "arguments" in cr.load_base_doc(base, rel)
+    assert cr.load_base_doc(base, "docs/gcp/nope/nope.json") is None
+    assert cr.load_base_doc(None, rel) is None
+
+
+# --------------------------------------------------------------------------- #
 # True-arg coverage
 # --------------------------------------------------------------------------- #
 def _resource_tree(tmp_path, *, policy=None, fixture=None):
-    """A repo-shaped tree, optionally with a policy file and/or a fixture dir."""
+    base = tmp_path / "policies/gcp/Cloud Storage/google_storage_bucket"
     if policy:
-        p = tmp_path / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket"
-        p.mkdir(parents=True, exist_ok=True)
-        (p / policy).write_text("package x\n")
+        path = base / policy
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("package x\n")
     if fixture:
-        f = tmp_path / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket" / fixture
-        f.mkdir(parents=True, exist_ok=True)
+        directory = base / fixture
+        directory.mkdir(parents=True, exist_ok=True)
+        for name in ("compliant.tf", "nonCompliant.tf"):
+            (directory / name).write_text("# test fixture\n")
     return tmp_path
 
 
 def test_a_covered_true_argument_passes(tmp_path, monkeypatch):
-    _resource_tree(tmp_path, policy="location.rego", fixture="location")
+    _resource_tree(tmp_path, policy="location/policy.rego", fixture="location")
     monkeypatch.chdir(tmp_path)
     doc = _doc(location={"security_impact": True, "rationale": "r"})
     assert cr.check_true_arg_coverage(doc, "gcp", "Cloud Storage", "google_storage_bucket") == []
@@ -98,9 +149,9 @@ def test_a_true_argument_missing_both_reports_both(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     doc = _doc(location={"security_impact": True, "rationale": "r"})
     findings = cr.check_true_arg_coverage(doc, "gcp", "Cloud Storage", "google_storage_bucket")
-    assert len(findings) == 2
-    assert any("missing policy" in f for f in findings)
-    assert any("missing input fixture" in f for f in findings)
+    assert len(findings) == 3
+    for name in ("policy.rego", "compliant.tf", "nonCompliant.tf"):
+        assert any(name in f for f in findings)
 
 
 def test_a_false_argument_needs_no_policy_or_fixture(tmp_path, monkeypatch):
@@ -113,24 +164,30 @@ def test_a_false_argument_needs_no_policy_or_fixture(tmp_path, monkeypatch):
 # --if-cached: is every plan committed?
 # --------------------------------------------------------------------------- #
 def _fixture_dir(tmp_path, argument="location"):
-    d = (tmp_path / "inputs" / "gcp" / "Cloud Storage" / "google_storage_bucket" / argument)
+    pin = tmp_path / "scripts/auto_test/provider_version.txt"
+    pin.parent.mkdir(parents=True, exist_ok=True)
+    pin.write_text("test-provider")
+    d = (tmp_path / "policies" / "gcp" / "Cloud Storage" / "google_storage_bucket" / argument)
     d.mkdir(parents=True)
     (d / "compliant.tf").write_text('resource "google_storage_bucket" "a" {}\n')
+    (d / "nonCompliant.tf").write_text("# other fixture\n")
+    (d / "policy.rego").write_text("package test\n")
+    (tmp_path / "policies/gcp/config.tf").write_text("# shared config\n")
     return d
 
 
 def test_a_fixture_without_its_plan_is_uncached(tmp_path, monkeypatch):
     _fixture_dir(tmp_path)
     monkeypatch.setattr(cr, "REPO", tmp_path)
-    missing = cr.uncached_fixtures(Path("inputs/gcp/Cloud Storage/google_storage_bucket"))
+    missing = cr.uncached_fixtures(Path("policies/gcp/Cloud Storage/google_storage_bucket"))
     assert [d.name for d in missing] == ["location"]
 
 
 def test_a_fixture_with_its_plan_is_cached(tmp_path, monkeypatch):
     d = _fixture_dir(tmp_path)
-    cr.plan_cache_path(d).write_text("{}")
+    cr.plan_cache_path(d).write_text('{"planned_values": {}}')
     monkeypatch.setattr(cr, "REPO", tmp_path)
-    assert cr.uncached_fixtures(Path("inputs/gcp/Cloud Storage/google_storage_bucket")) == []
+    assert cr.uncached_fixtures(Path("policies/gcp/Cloud Storage/google_storage_bucket")) == []
 
 
 def test_a_stale_plan_does_not_count_as_cached(tmp_path, monkeypatch):
@@ -139,12 +196,12 @@ def test_a_stale_plan_does_not_count_as_cached(tmp_path, monkeypatch):
     d = _fixture_dir(tmp_path)
     (d / f"{'a' * 64}.json").write_text("{}")
     monkeypatch.setattr(cr, "REPO", tmp_path)
-    assert len(cr.uncached_fixtures(Path("inputs/gcp/Cloud Storage/google_storage_bucket"))) == 1
+    assert len(cr.uncached_fixtures(Path("policies/gcp/Cloud Storage/google_storage_bucket"))) == 1
 
 
 def test_a_missing_directory_is_not_an_error(tmp_path, monkeypatch):
     monkeypatch.setattr(cr, "REPO", tmp_path)
-    assert cr.uncached_fixtures(Path("inputs/gcp/nope/nope")) == []
+    assert cr.uncached_fixtures(Path("policies/gcp/nope/nope")) == []
 
 
 # --------------------------------------------------------------------------- #
@@ -155,8 +212,8 @@ ARGS = ("gcp", "Cloud Storage", "google_storage_bucket")
 
 @pytest.mark.parametrize("path", [
     "docs/gcp/Cloud Storage/google_storage_bucket.json",
-    "inputs/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
-    "policies/gcp/Cloud Storage/google_storage_bucket/location.rego",
+    "policies/gcp/Cloud Storage/google_storage_bucket/location/compliant.tf",
+    "policies/gcp/Cloud Storage/google_storage_bucket/location/policy.rego",
     "policies/gcp/Cloud Storage/google_storage_bucket/_vars.rego",
 ])
 def test_the_resources_own_files_are_recognised(path):
@@ -165,7 +222,7 @@ def test_the_resources_own_files_are_recognised(path):
 
 @pytest.mark.parametrize("path", [
     "docs/gcp/Cloud Storage/google_storage_bucket_iam_binding.json",   # neighbouring resource
-    "inputs/gcp/Compute Engine/google_compute_image/family/compliant.tf",
+    "policies/gcp/Compute Engine/google_compute_image/family/compliant.tf",
     "policies/_helpers/helpers.rego",
     "README.md",
     "scripts/auto_test/auto_test.py",
@@ -177,14 +234,14 @@ def test_everything_else_is_not_this_resource(path):
 def test_a_service_folder_with_spaces_survives_the_prefix_match():
     # Folder names carry spaces and brackets; the match is a plain string compare
     # on repo-relative paths, so nothing needs escaping — but it is worth pinning.
-    path = "inputs/gcp/Cloud Run (v2 API)/google_cloud_run_v2_service/ingress/compliant.tf"
+    path = "policies/gcp/Cloud Run (v2 API)/google_cloud_run_v2_service/ingress/compliant.tf"
     assert cr.touches_resource([path], "gcp", "Cloud Run (v2 API)",
                                "google_cloud_run_v2_service") == [path]
 
 
 @pytest.mark.parametrize("path,reads", [
-    ("inputs/gcp/S/r/a/compliant.tf", True),
-    ("policies/gcp/S/r/a.rego", True),
+    ("policies/gcp/S/r/a/compliant.tf", True),
+    ("policies/gcp/S/r/a/policy.rego", True),
     ("docs/gcp/S/r.json", False),
 ])
 def test_only_tf_and_rego_feed_the_opa_test(path, reads):
@@ -259,3 +316,182 @@ def test_the_real_repo_passes_its_own_gate(capsys):
     assert cr.main(["--branch", "Service/gcp/api_hub/google_apihub_plugin", "--gate-only"]) == 0
     out = capsys.readouterr().out
     assert "Doc completeness" in out and "True-arg coverage" in out and "OPA test" in out
+
+
+# --------------------------------------------------------------------------- #
+# --skip-coverage: docs-first commits are never blocked on coverage
+# --------------------------------------------------------------------------- #
+GAPPED = ["Service/gcp/api_hub/google_apihub_plugin", "--gate-only"]
+
+
+@pytest.fixture
+def coverage_gaps(monkeypatch):
+    """A complete doc whose true arguments have no policies or fixtures yet — the
+    state of every resource between docs approval and its first policy."""
+    monkeypatch.setattr(cr, "check_true_arg_coverage",
+                        lambda *a: ["x: missing policy", "x: missing input fixture"])
+
+    def no_opa(*a, **k):
+        raise AssertionError("the OPA test must not run")
+    monkeypatch.setattr(cr, "step_opa", no_opa)
+
+
+def test_skip_coverage_passes_a_complete_doc_with_gaps(coverage_gaps, capsys):
+    assert cr.main(["--branch", *GAPPED, "--skip-coverage"]) == 0
+    out = capsys.readouterr().out
+    assert "[OK]   Doc completeness" in out
+    assert "[skip] True-arg coverage" in out
+    assert "checked on the PR" in out
+    assert "[skip] OPA test" in out
+    assert "[FAIL]" not in out
+
+
+def test_skip_coverage_still_fails_an_incomplete_doc(coverage_gaps, monkeypatch, capsys):
+    monkeypatch.setattr(cr, "check_doc_completeness", lambda doc: ["x: no rationale"])
+    assert cr.main(["--branch", *GAPPED, "--skip-coverage"]) == 1
+    assert "[FAIL] Doc completeness" in capsys.readouterr().out
+
+
+def test_without_the_flag_the_same_gaps_still_fail(coverage_gaps, capsys):
+    # The full run and CI: nothing about the hook's exemption weakens them.
+    assert cr.main(["--branch", *GAPPED]) == 1
+    out = capsys.readouterr().out
+    assert "[FAIL] True-arg coverage" in out
+    assert "block merging the PR, not your commits" in out
+    assert "[skip] OPA test" in out
+
+
+def test_the_commit_hook_skips_coverage_and_ci_does_not():
+    import yaml  # pre-commit itself depends on PyYAML; CI installs it for this test
+    config = yaml.safe_load((project_root / ".pre-commit-config.yaml").read_text())
+    hooks = {h["id"]: h for repo in config["repos"] for h in repo["hooks"]}
+    assert "--skip-coverage" in hooks["resource-gate"]["entry"].split()
+
+    workflow = yaml.safe_load(
+        (project_root / ".github/workflows/policy_check_PR.yaml").read_text())
+    calls = [step["run"] for job in workflow["jobs"].values()
+             for step in job.get("steps", [])
+             if "check_resource.py" in step.get("run", "")]
+    assert calls, "policy_check_PR.yaml no longer calls check_resource.py"
+    assert all("--skip-coverage" not in c for c in calls)
+
+
+# --------------------------------------------------------------------------- #
+# A resource with no security-impacting arguments
+# --------------------------------------------------------------------------- #
+ALL_FALSE = "Service/gcp/apigee/google_apigee_example"
+
+
+@pytest.fixture
+def all_false_repo(tmp_path, monkeypatch):
+    """A repo holding one resource whose every leaf is security_impact: false."""
+    doc = tmp_path / "docs" / "gcp" / "Apigee" / "google_apigee_example.json"
+    doc.parent.mkdir(parents=True)
+    doc.write_text(json.dumps({"arguments": {
+        "name": {"security_impact": False, "rationale": "An identifier."},
+        "labels": {"security_impact": False, "rationale": "Metadata only."},
+    }}))
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(cr, "REPO", tmp_path)
+    monkeypatch.setattr(cr, "load_base_doc", lambda ref, path: None)
+    return tmp_path
+
+
+def test_an_all_false_resource_has_nothing_to_test_and_passes(all_false_repo, monkeypatch, capsys):
+    # auto_test finds no pairs under two missing roots and exits 1, so running it
+    # here made such a resource unmergeable (PR #805).
+    def no_opa(*a, **k):
+        raise AssertionError("auto_test must not run")
+    monkeypatch.setattr(cr, "step_opa", no_opa)
+    assert cr.main(["--branch", ALL_FALSE, "--gate-only"]) == 0
+    assert ("[OK]   OPA test  — no security-impacting arguments, so there are no "
+            "policies to test") in capsys.readouterr().out
+
+
+def test_an_all_false_resource_with_a_stray_policy_still_fails(all_false_repo, capsys):
+    # A policy with no fixture is an orphan whatever the doc says; auto_test is the
+    # thing that says so, so it must still run.
+    policy = all_false_repo / "policies" / "gcp" / "Apigee" / "google_apigee_example"
+    (policy / "labels").mkdir(parents=True)
+    (policy / "labels/policy.rego").write_text("package terraform.gcp.security.x.labels\n")
+    assert cr.main(["--branch", ALL_FALSE, "--gate-only"]) == 1
+    out = capsys.readouterr().out
+    assert "[FAIL] OPA test" in out
+    assert "missing fixture file(s): compliant.tf, nonCompliant.tf" in out
+    assert "policies/gcp/Apigee/google_apigee_example/labels" in out.replace("\\", "/")
+
+
+def test_a_true_argument_means_there_is_something_to_test():
+    doc = _doc(a={"security_impact": False, "rationale": "r"},
+               b={"security_impact": True, "rationale": "r"})
+    assert cr.has_true_args(doc)
+    assert not cr.has_true_args(_doc(a={"security_impact": False, "rationale": "r"}))
+
+
+def test_a_fixture_dir_alone_counts_as_something_to_test(tmp_path, monkeypatch):
+    monkeypatch.setattr(cr, "REPO", tmp_path)
+    assert not cr.has_policies_or_fixtures(*ARGS)
+    _fixture_dir(tmp_path)
+    assert cr.has_policies_or_fixtures(*ARGS)
+
+
+# --------------------------------------------------------------------------- #
+# OPA failures carry auto_test's own reasons
+# --------------------------------------------------------------------------- #
+def test_opa_failures_are_read_from_the_report(tmp_path):
+    report = tmp_path / "report.json"
+    report.write_text(json.dumps([
+        {"policy": "a", "passed": True},
+        {"policy": "b", "passed": False, "failure": {
+            "reason": "terraform init failed for policies/x/b:\nError: bad", "file": "policies/x/b"}},
+    ]))
+    assert cr.opa_failures(report, "google_x") == [
+        ("policies/x/b", "google_x/b", "b: terraform init failed for policies/x/b:\nError: bad")]
+
+
+def test_a_missing_report_is_no_findings(tmp_path):
+    assert cr.opa_failures(tmp_path / "nope.json", "google_x") == []
+
+
+def test_the_summary_repeats_each_finding(capsys):
+    report = cr.Report()
+    report.fail("OPA test", "1 policy check(s) did not pass",
+                [("policies/x/b", "google_x/b", "b: terraform init failed\nError: bad")])
+    report.summarise("google_x")
+    summary = capsys.readouterr().out.split("check(s) failed:")[1]
+    assert "terraform init failed" in summary and "Error: bad" in summary
+
+
+# --------------------------------------------------------------------------- #
+# GitHub Actions: an annotation per failure, and a step summary
+# --------------------------------------------------------------------------- #
+def test_every_failure_is_annotated_in_actions(tmp_path, monkeypatch, capsys):
+    summary = tmp_path / "summary.md"
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+    report = cr.Report()
+    report.fail("Doc completeness", "2 finding(s)", ["arg 'a': x", "arg 'b': y"],
+                file="docs/gcp/S/google_x.json")
+    report.fail("OPA test", "1 policy check(s) did not pass",
+                [("policies/gcp/S/google_x/c", "google_x/c", "c: terraform plan failed\nError: z")])
+    report.fail("Resource gate", "resource doc not found")
+    assert report.summarise("google_x") == 1
+
+    errors = [l for l in capsys.readouterr().out.splitlines() if l.startswith("::error ")]
+    assert len(errors) == 4
+    assert errors[0] == ("::error file=docs/gcp/S/google_x.json,"
+                         "title=google_x%3A Doc completeness::arg 'a': x")
+    assert errors[2] == ("::error file=policies/gcp/S/google_x/c,title=google_x/c::"
+                         "c: terraform plan failed%0AError: z")
+    assert errors[3] == "::error title=google_x%3A Resource gate::resource doc not found"
+    table = summary.read_text()
+    assert table.count("\n| ") == 5          # header + 4 rows
+    assert "terraform plan failed<br>Error: z" in table
+
+
+def test_nothing_is_annotated_outside_actions(monkeypatch, capsys):
+    monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+    report = cr.Report()
+    report.fail("Lint", "findings")
+    report.summarise("google_x")
+    assert "::error" not in capsys.readouterr().out
