@@ -25,7 +25,7 @@ policies/gcp/<Service>/<resource>/<arg>/           # policy.rego, compliant.tf,
                                                   # optional local config.tf override
 policies/_helpers/                               # shared Rego engine
 
-templates/<platform>/   # starter files the folder_generator copies for a new resource
+templates/<platform>/   # starter files the skeleton generator copies for a new policy
 tests/_helpers/         # Rego unit tests for the shared helpers
 scripts/                # tooling — see "Tooling" below
 ```
@@ -241,7 +241,7 @@ old hash names proven equivalent under line-ending normalization.
 | `scripts/docgen/` | Generates the `docs/` JSON (one file per resource, every argument) from the Terraform provider **schema**; `apply_canonical.py` re-applies the locked cross-cutting assessments (location/region/zone, IAM) to existing files. | [README](scripts/docgen/README.md) |
 | `scripts/linters/` | Reconciles policy directories and fixtures with `docs/` (structure + content) and checks the branch-name convention. | [README](scripts/linters/readme-linters.md) |
 | `scripts/auto_test/` | `terraform plan` + `opa eval` harness over the fixtures, with a committed plan cache and an offline project-local provider cache. | "Testing Your Policies Locally" above |
-| `scripts/folder_generator/` | Small GUI to scaffold a new resource's input + policy files from `templates/`. | [README](scripts/folder_generator/README.md) |
+| `scripts/security_impact_skeleton_generator/` | Creates the missing `policy.rego`, fixtures and `_vars.rego` from `templates/` for every argument a resource's doc marks `security_impact: true`. Never overwrites existing files. | [README](scripts/security_impact_skeleton_generator/README.md) |
 
 ## 🤖 Continuous integration
 

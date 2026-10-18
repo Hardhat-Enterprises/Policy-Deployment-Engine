@@ -13,7 +13,13 @@
    `<Service>` is the docs-taxonomy folder name (e.g. `Cloud Functions`, with spaces);
    `<resource>` and `<attribute>` are the exact Terraform resource type and argument names.
 
-4. Create and configure the fixtures (copy them from `templates/gcp`):
+4. Create and configure the fixtures. The skeleton generator creates every missing
+   file for the resource's `security_impact: true` arguments from `templates/gcp`
+   (it never overwrites existing files):
+
+    python3 scripts/security_impact_skeleton_generator/main.py "gcp/<Service>/<resource>" --generate
+
+   Then complete:
    - `compliant.tf` (compliant example)  
    - `nonCompliant.tf` (non-compliant example)  
    - Inherit `policies/gcp/config.tf`, or supply a local `config.tf` that replaces it.
