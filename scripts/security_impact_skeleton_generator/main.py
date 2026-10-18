@@ -215,10 +215,7 @@ def ensure_shared_config(cloud):
         raise FileNotFoundError(
             "Shared platform config.tf "
             "is missing.\n"
-            f"Expected: {shared_config}\n"
-            "Complete the PDE layout "
-            "migration before generating "
-            "policy skeletons."
+            f"Expected: {shared_config}"
         )
 
     return shared_config
@@ -290,7 +287,10 @@ def generate_argument_skeleton(
             paths["policy.rego"],
             service=service,
             resource=resource,
-            policy_name=argument,
+            policy_name=argument.replace(
+                ".",
+                "_",
+            ),
         )
     )
 

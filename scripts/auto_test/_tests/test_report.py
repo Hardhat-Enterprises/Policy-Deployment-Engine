@@ -51,7 +51,7 @@ def test_main_reports_malformed_dotted_argument_before_failure(tmp_path, monkeyp
     assert error.value.code == 1
     result, = json.loads(report.read_text())
     assert result == auto_test.make_failure("autoclass.enabled", "missing compliant.tf",
-                                           "Cloud Storage", "google_storage_bucket")
+                                           "Cloud Storage", "google_storage_bucket", file=directory)
 
 
 def test_no_discovered_policies_still_emits_empty_report(tmp_path, monkeypatch):

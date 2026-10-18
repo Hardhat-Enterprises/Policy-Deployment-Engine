@@ -148,6 +148,12 @@ policies/gcp/<Service>/<resource>/oidc.web_sso_config.response_type/
 
 This keeps the generated structure aligned with the documented Terraform argument name.
 
+In the Rego package name the dots become underscores, matching every existing policy:
+
+```text
+package terraform.gcp.security.<service>.<resource>.oidc_web_sso_config_response_type
+```
+
 ## Template rendering
 
 The generator automatically replaces structural placeholders such as:
@@ -195,7 +201,7 @@ The generator checks that this file exists before creating policy skeletons.
 
 If the shared configuration is missing, generation stops and reports an error.
 
-This protects the contributor from generating files against an incomplete or unmigrated repository layout.
+This protects the contributor from generating files against an incomplete repository.
 
 ## Safety
 
@@ -229,7 +235,7 @@ scripts/security_impact_skeleton_generator/_tests/test_main.py \
 -v
 ```
 
-The automated test suite currently contains 8 tests covering:
+The automated test suite currently contains 9 tests covering:
 
 - Valid target parsing.
 - Invalid target handling.
@@ -238,13 +244,14 @@ The automated test suite currently contains 8 tests covering:
 - Service slug conversion.
 - PDE policy-folder path generation.
 - Nested argument path generation.
+- Nested argument package naming (dots become underscores).
 - Template placeholder replacement.
 - No-overwrite behaviour.
 
 The test suite should complete with:
 
 ```text
-8 passed
+9 passed
 ```
 
 ## Repository validation
@@ -257,7 +264,7 @@ pre-commit run --all-files
 
 The generator has been validated against the PDE repository checks, including:
 
-- Policy / docs / inputs linter.
+- Policy / docs linter.
 - Branch naming convention.
 - Branch scope validation.
 - Resource gate validation.

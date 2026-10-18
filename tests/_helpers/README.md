@@ -22,8 +22,8 @@ Unit tests for policy helper functions in `policies/_helpers/`.
 
 | File | Tests | Coverage |
 |------|-------|----------|
-| `shared_test.rego` | 18 | Shared utilities (get_resource_attribute, format paths, etc.) |
-| `helpers_test.rego` | 32 | Dispatcher and summary orchestration |
+| `shared_test.rego` | 26 | Shared utilities (get_resource_attribute, format paths, every-element path lookup, wildcard matching, etc.) |
+| `helpers_test.rego` | 35 | Dispatcher and summary orchestration |
 | `blacklist_test.rego` | 10 | Blacklist policy (forbidden values) |
 | `whitelist_test.rego` | 11 | Whitelist policy (required values) |
 | `range_test.rego` | 8 | Range policy (numeric bounds, simplified) |
@@ -33,8 +33,15 @@ Unit tests for policy helper functions in `policies/_helpers/`.
 | `element_pattern_whitelist_test.rego` | 13 | Element pattern whitelist (array elements must match a shape) |
 | `map_key_blacklist_test.rego` | 13 | Map key blacklist (prohibited map keys) |
 | `map_key_blacklist_integration_test.rego` | 14 | Map key blacklist (dispatcher integration) |
+| `element_required_test.rego` | 15 | Element required (list must contain every value, in every element) |
+| `element_required_integration_test.rego` | 14 | Element required (dispatcher integration, reality check on the http_route plan) |
+| `map_key_pattern_whitelist_test.rego` | 13 | Map key pattern whitelist (every map key must match a shape) |
+| `map_key_pattern_whitelist_integration_test.rego` | 7 | Map key pattern whitelist (dispatcher integration) |
+| `presence_test.rego` | 15 | Presence (attribute or block set or unset, in every element) |
+| `presence_integration_test.rego` | 9 | Presence and per-rule checks (dispatcher integration) |
+| `content_security_test.rego` | 6 | Content security (static-analysis findings at or above a severity threshold) |
 
-**Total:** 149 tests covering all 8 helper policies
+**Total:** 239 tests covering all 12 helper policies
 
 ## Test Structure
 
@@ -44,7 +51,7 @@ Terraform fixtures. Exact per-file counts are in the table above.
 ## Test Scripts
 
 ### unit_test_helpers.sh
-Runs all 11 test suites with fixtures. Use for comprehensive validation.
+Runs all 17 test suites, with fixtures where a suite uses them. Use for comprehensive validation.
 
 ### smoke_test_helpers.sh
 Fast integration tests (5 policies at policy level). Use for quick feedback during development.
@@ -83,6 +90,7 @@ OPA loads all JSON files recursively and merges them into a single `data` namesp
 | `gcp_storage_bucket_plan` | `google_storage_bucket` | blacklist, whitelist, range tests | `inputs/gcp/cloud_storage/google_storage_bucket/retention_period/` |
 | `gcp_project_plan` | `google_project` | pattern blacklist/whitelist tests | `inputs/gcp/cloud_platform_service/google_project/project_id/` |
 | `gcp_access_level_plan` | `google_access_context_manager_access_level` | shared tests (deep nesting) | `inputs/gcp/access_context_manager_vpc_service_controls/access_context_manager_access_level/device_policy/` |
+| `gcp_http_route_plan` | `google_network_services_http_route` | element required integration (every-element reality check) | `inputs/gcp/Network Services/google_network_services_http_route/rules.action.redirect.https_redirect/` |
 
 **Note:** `gcp_access_level_plan` has 5-level deep nesting, ideal for testing nested attribute extraction.
 

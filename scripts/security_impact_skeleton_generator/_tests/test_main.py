@@ -252,3 +252,73 @@ def test_render_template_does_not_overwrite(
         )
         == "existing contributor work"
     )
+
+
+def test_generate_nested_argument_package_name(
+    tmp_path,
+    monkeypatch,
+):
+    from scripts.security_impact_skeleton_generator import (
+        main,
+    )
+
+    policies_dir = (
+        tmp_path
+        / "policies"
+    )
+
+    (policies_dir / "gcp").mkdir(
+        parents=True
+    )
+
+    (
+        policies_dir
+        / "gcp"
+        / "config.tf"
+    ).write_text(
+        "",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        main,
+        "POLICIES_DIR",
+        policies_dir,
+    )
+
+    created, skipped = (
+        main.generate_argument_skeleton(
+            "gcp",
+            "API Hub",
+            "google_apihub_api_hub_instance",
+            "config.cmek_key_name",
+        )
+    )
+
+    assert skipped == []
+
+    policy = (
+        policies_dir
+        / "gcp"
+        / "API Hub"
+        / "google_apihub_api_hub_instance"
+        / "config.cmek_key_name"
+        / "policy.rego"
+    )
+
+    assert policy in created
+
+    first_line = (
+        policy.read_text(
+            encoding="utf-8"
+        ).splitlines()[0]
+    )
+
+    assert first_line.startswith(
+        (
+            "package terraform.gcp."
+            "security.api_hub."
+            "google_apihub_api_hub_instance."
+            "config_cmek_key_name"
+        )
+    )

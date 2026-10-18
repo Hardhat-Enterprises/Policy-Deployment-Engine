@@ -48,7 +48,13 @@ It holds three files — `policy.rego`, `compliant.tf` and `nonCompliant.tf`.
 
 ### 1. Copy required files
 
-Copy from `templates/gcp` into your attribute folder
+The skeleton generator does this for you (it never overwrites existing files):
+
+```bash
+python3 scripts/security_impact_skeleton_generator/main.py "gcp/<Service>/<resource type>" --generate
+```
+
+To do it by hand, copy from `templates/gcp` into your attribute folder
 `policies/gcp/<Service>/<resource type>/<attribute>/`:
 - `compliant.tf`
 - `nonCompliant.tf`

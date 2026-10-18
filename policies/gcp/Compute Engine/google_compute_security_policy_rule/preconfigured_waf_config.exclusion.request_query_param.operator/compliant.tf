@@ -1,0 +1,18 @@
+# Compliant fixture: the WAF query parameter exclusion uses an explicitly scoped match operator.
+
+resource "google_compute_security_policy_rule" "compliant_example_1" {
+  security_policy = "example-security-policy"
+  priority        = 1000
+  action          = "deny(403)"
+
+  preconfigured_waf_config {
+    exclusion {
+      target_rule_set = "sqli-v33-stable"
+
+      request_query_param {
+        operator = "EQUALS"
+        value    = "trusted-value"
+      }
+    }
+  }
+}

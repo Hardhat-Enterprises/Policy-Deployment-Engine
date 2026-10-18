@@ -57,9 +57,30 @@ def test_failed_build_preserves_previous_plan(fixture, monkeypatch, output):
     (directory / "compliant.tf").write_text("# edited fixture\n")
     replacement = at.plan_cache_path(directory)
     monkeypatch.setattr(at, "run_terraform_commands", lambda *_: output)
-    assert at.get_or_build_plan(directory, replacement) is None
+    with pytest.raises(at.TerraformError, match="Invalid Terraform plan JSON"):
+        at.get_or_build_plan(directory, replacement)
     assert previous.read_text() == '{"planned_values": {}}'
     assert not replacement.exists()
+
+
+def test_terraform_failure_preserves_cache_and_cleans_workspace(fixture, monkeypatch):
+    _, directory = fixture
+    previous = at.plan_cache_path(directory)
+    previous.write_text('{"planned_values": {}}')
+    (directory / "compliant.tf").write_text("# changed fixture\n")
+    replacement = at.plan_cache_path(directory)
+    before = {p.name: p.read_bytes() for p in directory.iterdir()}
+    workspaces = []
+
+    def fail_init(command, **kwargs):
+        workspaces.append(Path(kwargs["cwd"]))
+        return SimpleNamespace(returncode=1, stdout="", stderr="Error: synthetic init failure")
+
+    monkeypatch.setattr(at.subprocess, "run", fail_init)
+    with pytest.raises(at.TerraformError, match="synthetic init failure"):
+        at.get_or_build_plan(directory, replacement)
+    assert workspaces and all(not work.exists() for work in workspaces)
+    assert {p.name: p.read_bytes() for p in directory.iterdir()} == before
 
 
 def test_atomic_publication_failure_preserves_old_plan_and_cleans_temp(fixture, monkeypatch):
