@@ -108,15 +108,39 @@ export async function updatePackage(
   return api(apiUrl, apiKey, "PATCH", `/v1/orgs/${orgId}/packages/${packageId}`, body);
 }
 
+type PolicyRef = { policy: string; resource_type?: string; argument?: string };
+
 export type CheckResult = {
   ok: boolean;
+  /** pass / fail / error (nothing evaluated, or a policy could not be). */
+  status?: "pass" | "fail" | "error";
+  message?: string;
   platform: string;
   package_id: string;
   warnings: string[];
-  failures: { policy: string; message: unknown }[];
+  failures: (PolicyRef & { message: unknown })[];
+  errors?: (PolicyRef & { error: string })[];
+  skipped?: (PolicyRef & { reason: string })[];
   evaluated: number;
   org_config?: Record<string, unknown>;
 };
+
+/** CLI exit codes: 0 pass, 1 policy failure, 2 error (including a check that evaluated nothing). */
+export const EXIT_PASS = 0;
+export const EXIT_FAIL = 1;
+export const EXIT_ERROR = 2;
+
+export function checkStatus(result: CheckResult): "pass" | "fail" | "error" {
+  if (result.status) return result.status;
+  // An API without `status`: zero evaluated is never a pass.
+  if (!result.evaluated) return "error";
+  return result.ok ? "pass" : "fail";
+}
+
+export function exitCodeFor(result: CheckResult): number {
+  const status = checkStatus(result);
+  return status === "pass" ? EXIT_PASS : status === "fail" ? EXIT_FAIL : EXIT_ERROR;
+}
 
 /** Upload plan to hosted API — Rego/OPA run on the server. */
 export async function runRemoteCheck(

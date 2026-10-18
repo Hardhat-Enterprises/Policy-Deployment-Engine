@@ -8,6 +8,7 @@ import { isPolicyFailure } from "./opa.js";
 import { discoverPolicies, readRegoPackage } from "./policy-select.js";
 import { gcpCanonicalizer } from "./plugins/gcp/canonicalizer.js";
 import { resolvePlatform } from "./plugins/index.js";
+import { exitCodeFor } from "./api-client.js";
 
 const repoPolicies = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -40,30 +41,61 @@ test("isPolicyFailure: empty / null", () => {
   assert.equal(isPolicyFailure([]), false);
 });
 
-test("discoverPolicies: filters by policy_groups basenames", () => {
-  const targets = discoverPolicies(
-    repoPolicies,
-    "gcp",
-    new Set(["google_vpc_access_connector"]),
-    { google_vpc_access_connector: ["region", "ip_cidr_range"] }
-  );
+test("discoverPolicies: policy_groups narrows to the named argument folders", () => {
+  const { targets } = discoverPolicies(repoPolicies, "gcp", ["google_vpc_access_connector"], {
+    google_vpc_access_connector: ["region", "ip_cidr_range"],
+  });
+  assert.deepEqual(targets.map((t) => t.argument).sort(), ["ip_cidr_range", "region"]);
+  for (const t of targets) {
+    assert.equal(path.basename(t.policyFile), "policy.rego");
+    assert.equal(path.basename(path.dirname(t.policyFile)), t.argument);
+  }
+});
+
+test("discoverPolicies: google_redis_instance has 9 argument policies", () => {
+  const { targets } = discoverPolicies(repoPolicies, "gcp", ["google_redis_instance"], {});
+  assert.equal(targets.length, 9);
+});
+
+test("discoverPolicies: dotted argument folder, package read from the file", () => {
+  const { targets } = discoverPolicies(repoPolicies, "gcp", ["google_storage_batch_operations_job"], {
+    google_storage_batch_operations_job: ["delete_object.permanent_object_deletion_enabled"],
+  });
   assert.equal(targets.length, 1);
-  const names = targets[0]!.policyFiles.map((f) => path.basename(f, ".rego")).sort();
-  assert.deepEqual(names, ["ip_cidr_range", "region"]);
+  assert.match(targets[0]!.packageName, /\.delete_object_permanent_object_deletion_enabled$/);
 });
 
 test("discoverPolicies: missing platform root throws", () => {
-  assert.throws(() =>
-    discoverPolicies(os.tmpdir(), "nope-platform", new Set(["x"]), {})
-  );
+  assert.throws(() => discoverPolicies(os.tmpdir(), "nope-platform", ["x"], {}));
 });
 
 test("readRegoPackage reads package line", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pde-rego-"));
-  const file = path.join(dir, "x.rego");
-  fs.writeFileSync(file, "package foo.bar.baz\n\nmessage := 1\n");
+  const file = path.join(dir, "policy.rego");
+  fs.writeFileSync(file, "package foo.bar.baz # comment\n\nmessage := 1\n");
   assert.equal(readRegoPackage(file), "foo.bar.baz");
   fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("shared engine files are identical to the API's copies", () => {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  for (const name of ["policy-select.ts", "opa.ts"]) {
+    assert.equal(
+      fs.readFileSync(path.join(here, name), "utf8"),
+      fs.readFileSync(path.join(here, "../../pde-gate-api/src/engine", name), "utf8"),
+      `${name} drifted from tools/pde-gate-api/src/engine/${name}`
+    );
+  }
+});
+
+test("exit codes: 0 pass, 1 policy failure, 2 error — zero evaluated is never a pass", () => {
+  const base = { platform: "gcp", package_id: "p", warnings: [], failures: [] };
+  assert.equal(exitCodeFor({ ...base, ok: true, status: "pass", evaluated: 3 }), 0);
+  assert.equal(exitCodeFor({ ...base, ok: false, status: "fail", evaluated: 3 }), 1);
+  assert.equal(exitCodeFor({ ...base, ok: false, status: "error", evaluated: 0 }), 2);
+  // An older API with no `status` field
+  assert.equal(exitCodeFor({ ...base, ok: true, evaluated: 0 }), 2);
+  assert.equal(exitCodeFor({ ...base, ok: false, evaluated: 2 }), 1);
 });
 
 test("canonicalizer: strict rejects unsupported terraform version", () => {

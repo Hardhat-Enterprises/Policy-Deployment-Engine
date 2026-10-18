@@ -4,7 +4,7 @@ export type PolicyPackage = {
     description?: string;
     /** gcp first; aws/azure later */
     platforms: string[];
-    /** resource type → policy basenames (e.g. region, network) */
+    /** resource type → argument names (policy folder names, e.g. region, ip_cidr_range) */
     policy_groups: Record<string, string[]>;
     variables?: {
         approved_regions?: string[];
