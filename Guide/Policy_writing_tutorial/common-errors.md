@@ -41,12 +41,10 @@ python3 scripts/auto_test/auto_test.py "gcp/<Service>/<resource type>"
 > the YB IT PDE Portal shows the exact repair commands for your branch. Don't resolve the conflicts
 > by hand, and never merge a PR from dev into your own branch on GitHub.
 
-After layout cutover, the harness uses the fixture's effective Terraform files and
-writes its committed `<sha>.json` beside `policy.rego`. Commit a regenerated plan
-and its stale predecessor's deletion together. It can adopt only historical hash
-names proven equivalent under line-ending normalization; it does not migrate a
-central cache or the old layout. During restructuring preparation, follow the
-[cutover guide](../layout-cutover.md) instead of running against unmigrated data.
+The harness plans the fixture's effective Terraform files and writes its committed
+`<sha>.json` beside `policy.rego`. Commit a regenerated plan and its stale predecessor's
+deletion together. It adopts a plan under an older hash name only when it is proven
+equivalent under line-ending normalization.
 
 ---
 
@@ -89,30 +87,24 @@ When writing a policy for a resource that has multiple credential types (for exa
 
 ### Fix
 
-Split each credential into its own attribute. Each attribute gets its own **inputs** folder
-(`compliant.tf`, `nonCompliant.tf`, `config.tf`) and its own flat `<attribute>/policy.rego` in the
-resource's **policies** folder:
+Split each credential into its own attribute. Each attribute gets its own folder holding its
+`policy.rego`, `compliant.tf` and `nonCompliant.tf`, beside the resource's one `_vars.rego`:
 
 ```
 policies/gcp/<Service>/google_monitoring_notification_channel/
-  auth_token/
-    compliant.tf
-    nonCompliant.tf
-    config.tf
-  password/
-    compliant.tf
-    nonCompliant.tf
-    config.tf
-  service_key/
-    compliant.tf
-    nonCompliant.tf
-    config.tf
-
-policies/gcp/<Service>/google_monitoring_notification_channel/
   _vars.rego
-  auth_token.rego
-  password.rego
-  service_key.rego
+  auth_token/
+    policy.rego
+    compliant.tf
+    nonCompliant.tf
+  password/
+    policy.rego
+    compliant.tf
+    nonCompliant.tf
+  service_key/
+    policy.rego
+    compliant.tf
+    nonCompliant.tf
 ```
 
 ---

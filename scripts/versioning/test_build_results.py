@@ -1,4 +1,4 @@
-"""Versioning uses migrated argument directories and preserves policy identities."""
+"""Versioning uses argument directories and preserves policy identities."""
 import json
 import sys
 

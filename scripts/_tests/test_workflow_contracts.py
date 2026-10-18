@@ -196,10 +196,9 @@ def test_engine_and_rego_checks_remain_required_on_helper_changes():
     assert "engine_check" in workflow["gate"]["body"]
 
 
-def test_ci_does_not_migrate_production_data_to_hide_layout_failures():
+def test_ci_never_skips_coverage():
     for workflow in (ALL_WORKFLOW, PR_WORKFLOW):
         body = workflow.read_text(encoding="utf-8")
-        assert "restructure_gcp.py" not in body
         assert "--skip-coverage" not in body
 
 

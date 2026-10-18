@@ -13,7 +13,7 @@ reuses the project's own test harness: pass its results in with
 --results. Where a policy applies but no test result is supplied, the entry is
 left as "pending" so we never claim a pass we did not run.
 
-Read-only: writes only the validity-map JSON. Never touches docs/, inputs/, policies/.
+Read-only: writes only the validity-map JSON. Never touches docs/ or policies/.
 
 Usage:
     python validity_check.py \

@@ -22,7 +22,7 @@ from scripts.auto_test import auto_test
 
 def _fixture(tmp_path, platform="gcp", service="Cloud Storage",
              resource="google_storage_bucket", argument="location"):
-    """A fixture dir with one *.tf, at a real inputs/<platform>/... path."""
+    """A fixture dir with one *.tf, at a real policies/<platform>/... path."""
     d = tmp_path / "policies" / platform / service / resource / argument
     d.mkdir(parents=True)
     (d / "config.tf").write_bytes(b"# test config")

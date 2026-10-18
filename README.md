@@ -2,14 +2,7 @@
 
 The Policy Deployment Engine (PDE) is designed to automate and simplify the enforcement of security policies across cloud environments, starting with Google Cloud Platform (GCP) and expanding to AWS and Azure in the future. The project focuses on developing a centralised system to efficiently deploy, manage, and update security policies, ensuring compliance and reducing manual effort. By creating a structured approach to policy implementation, the engine aims to enhance security, improve operational efficiency, and provide organisations with a scalable solution for managing cloud policies. PDE is HardHat's first ever policy-oriented project aimed at securing cloud environments, beginning in T1 2025.
 
-Last updated: 2026-09-22
-
-> **Restructuring preparation:** this branch has merged current `dev`, including its
-> policies and inputs, but has not migrated the production data. Normal tooling now
-> requires the layout below. Whole-tree layout and engine checks are expected to fail
-> until cutover; isolated tooling and helper tests must pass. Do not generate real
-> policies or run the migration as part of tooling preparation. See the
-> [preparation and cutover guide](Guide/layout-cutover.md).
+Last updated: 2026-10-18
 
 ## 📁 Repository layout
 
@@ -207,12 +200,11 @@ other plan.
 
 `fixture_sha()` and `plan_cache_path()` in `scripts/auto_test/auto_test.py` are the only
 definition of which plan belongs to which fixture. The linters and the PDE Portal import them
-rather than re-deriving a path or a hash — which is why a provider bump, or the move out of
-`inputs/plan_cache/`, changes the answer everywhere at once. Import them; don't inline them.
+rather than re-deriving a path or a hash — which is why a provider bump changes the answer
+everywhere at once. Import them; don't inline them.
 
-Historical central caches must be reconciled with `dev` before layout migration.
-Normal commands do not migrate or prune a central cache. The harness only adopts
-old hash names proven equivalent under line-ending normalization.
+The harness adopts a plan under an older hash name only when it is proven equivalent under
+line-ending normalization.
 
 ### Prerequisites
 

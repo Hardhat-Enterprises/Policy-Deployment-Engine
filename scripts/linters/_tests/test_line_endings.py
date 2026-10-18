@@ -26,49 +26,49 @@ def _git(*args, cwd):
 
 @pytest.fixture
 def repo(tmp_path):
-    """A repo with an inputs/ tree and no .gitattributes (so blobs go in verbatim)."""
+    """A repo with a policies/ tree and no .gitattributes (so blobs go in verbatim)."""
     _git("init", "--quiet", cwd=tmp_path)
     _git("config", "user.email", "t@example.com", cwd=tmp_path)
     _git("config", "user.name", "t", cwd=tmp_path)
     _git("config", "core.autocrlf", "false", cwd=tmp_path)
-    (tmp_path / "inputs").mkdir()
+    (tmp_path / "policies").mkdir()
     return tmp_path
 
 
 def _commit(repo, name, data: bytes):
-    path = repo / "inputs" / name
+    path = repo / "policies" / name
     path.write_bytes(data)
-    _git("add", "--", f"inputs/{name}", cwd=repo)
+    _git("add", "--", f"policies/{name}", cwd=repo)
     _git("commit", "--quiet", "-m", name, cwd=repo)
     return path
 
 
 def test_an_lf_blob_is_clean(repo):
     _commit(repo, "a.tf", b'resource "x" "y" {}\n')
-    assert cle.crlf_files(("inputs",), cwd=repo) == []
+    assert cle.crlf_files(("policies",), cwd=repo) == []
 
 
 def test_a_crlf_blob_is_reported(repo):
     _commit(repo, "a.tf", b'resource "x" "y" {}\r\n')
-    assert cle.crlf_files(("inputs",), cwd=repo) == ["inputs/a.tf"]
+    assert cle.crlf_files(("policies",), cwd=repo) == ["policies/a.tf"]
 
 
 def test_a_mixed_blob_is_reported(repo):
     # Half CRLF, half LF — git calls this `i/mixed`, and it is just as sticky.
     _commit(repo, "a.tf", b'a = 1\r\nb = 2\n')
-    assert cle.crlf_files(("inputs",), cwd=repo) == ["inputs/a.tf"]
+    assert cle.crlf_files(("policies",), cwd=repo) == ["policies/a.tf"]
 
 
 def test_a_file_with_no_line_endings_is_clean(repo):
     # `i/none` — a single line with no terminator. Nothing to normalise.
     _commit(repo, "a.tf", b"a = 1")
-    assert cle.crlf_files(("inputs",), cwd=repo) == []
+    assert cle.crlf_files(("policies",), cwd=repo) == []
 
 
 def test_a_binary_file_is_never_reported(repo):
     # `i/-text`. A .png full of \r\n bytes is not a line-ending problem.
     _commit(repo, "a.png", b"\x89PNG\r\n\x1a\n\x00\x01\x02\r\n")
-    assert cle.crlf_files(("inputs",), cwd=repo) == []
+    assert cle.crlf_files(("policies",), cwd=repo) == []
 
 
 def test_only_the_index_counts_not_the_working_tree(repo):
@@ -77,20 +77,20 @@ def test_only_the_index_counts_not_the_working_tree(repo):
     # the *correct* state — it must not be reported.
     path = _commit(repo, "a.tf", b"a = 1\n")
     path.write_bytes(b"a = 1\r\n")
-    assert cle.crlf_files(("inputs",), cwd=repo) == []
+    assert cle.crlf_files(("policies",), cwd=repo) == []
 
 
 def test_results_are_sorted(repo):
     for name in ("c.tf", "a.tf", "b.tf"):
         _commit(repo, name, b"x = 1\r\n")
-    assert cle.crlf_files(("inputs",), cwd=repo) == [
-        "inputs/a.tf", "inputs/b.tf", "inputs/c.tf"]
+    assert cle.crlf_files(("policies",), cwd=repo) == [
+        "policies/a.tf", "policies/b.tf", "policies/c.tf"]
 
 
 def test_untracked_files_are_invisible(repo):
     _commit(repo, "a.tf", b"a = 1\n")
-    (repo / "inputs" / "scratch.tf").write_bytes(b"junk\r\n")
-    assert cle.crlf_files(("inputs",), cwd=repo) == []
+    (repo / "policies" / "scratch.tf").write_bytes(b"junk\r\n")
+    assert cle.crlf_files(("policies",), cwd=repo) == []
 
 
 # --------------------------------------------------------------------------- #
@@ -98,13 +98,13 @@ def test_untracked_files_are_invisible(repo):
 # for its first three fields, which is easy to get wrong.
 # --------------------------------------------------------------------------- #
 @pytest.mark.parametrize("line,expected", [
-    ("i/lf    w/lf    attr/text eol=lf      \tinputs/a.tf", ("lf", "inputs/a.tf")),
-    ("i/crlf  w/crlf  attr/text eol=lf      \tinputs/a.tf", ("crlf", "inputs/a.tf")),
-    ("i/-text w/-text attr/                 \tinputs/a.png", ("-text", "inputs/a.png")),
+    ("i/lf    w/lf    attr/text eol=lf      \tpolicies/a.tf", ("lf", "policies/a.tf")),
+    ("i/crlf  w/crlf  attr/text eol=lf      \tpolicies/a.tf", ("crlf", "policies/a.tf")),
+    ("i/-text w/-text attr/                 \tpolicies/a.png", ("-text", "policies/a.png")),
     # A path containing a space must survive: the path is everything after the
     # last tab, and this repo is full of them ("Compute Engine").
-    ("i/crlf  w/crlf  attr/                 \tinputs/gcp/Compute Engine/a.tf",
-     ("crlf", "inputs/gcp/Compute Engine/a.tf")),
+    ("i/crlf  w/crlf  attr/                 \tpolicies/gcp/Compute Engine/a.tf",
+     ("crlf", "policies/gcp/Compute Engine/a.tf")),
 ])
 def test_eol_lines_parse(line, expected):
     assert cle.parse_eol_line(line) == expected
@@ -125,16 +125,16 @@ def test_main_exits_zero_on_the_real_repo(capsys):
 
 
 def test_main_exits_one_when_something_is_found(repo, monkeypatch, capsys):
-    monkeypatch.setattr(cle, "crlf_files", lambda *a, **k: ["inputs/a.tf"])
+    monkeypatch.setattr(cle, "crlf_files", lambda *a, **k: ["policies/a.tf"])
     assert cle.main([]) == 1
     out = capsys.readouterr().out
-    assert "inputs/a.tf" in out
+    assert "policies/a.tf" in out
     assert "git add --renormalize" in out, "the remedy is the point of the output"
 
 
 def test_quiet_drops_the_remedy(repo, monkeypatch, capsys):
-    monkeypatch.setattr(cle, "crlf_files", lambda *a, **k: ["inputs/a.tf"])
+    monkeypatch.setattr(cle, "crlf_files", lambda *a, **k: ["policies/a.tf"])
     assert cle.main(["--quiet"]) == 1
     out = capsys.readouterr().out
-    assert "inputs/a.tf" in out
+    assert "policies/a.tf" in out
     assert "git add --renormalize" not in out

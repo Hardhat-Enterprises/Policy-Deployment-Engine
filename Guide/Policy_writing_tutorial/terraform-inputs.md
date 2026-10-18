@@ -1,7 +1,7 @@
 <a id="top"></a>
 <h1 align="center">Terraform inputs</h1>
 
-After cutover, fixtures and `policy.rego` share the argument directory:
+Fixtures and `policy.rego` share the argument directory:
 `policies/gcp/<Service>/<resource>/<attribute>/`.
 
 ### 1. Generate the committed plan
@@ -33,8 +33,7 @@ shared config; use the harness to assemble the correct workspace.
 python scripts/auto_test/auto_test.py "gcp/<Service>/<resource>" --verify-plan-cache
 ```
 
-This is read-only and rejects missing, invalid or stale plans. During preparation,
-production data is still unmigrated; follow the [cutover guide](../layout-cutover.md).
+This is read-only and rejects missing, invalid or stale plans.
 
 <div align="center">
 

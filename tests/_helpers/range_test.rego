@@ -47,7 +47,7 @@ test_value_range_upper_boundary if {
 # numeric values to validate boundary conditions.
 #
 # Reality check (test 8) uses: tests/_helpers/fixtures/gcp_storage_bucket/plan.json
-# Source: inputs/gcp/cloud_storage/google_storage_bucket/retention_period/
+# Source: terraform plan of a google_storage_bucket retention_period fixture pair
 # Purpose: Tests numeric range validation on actual retention_period values:
 #   - c123: retention_period=604800 (7 days in seconds)
 #   - nc123: retention_period=2692000 (31 days in seconds)

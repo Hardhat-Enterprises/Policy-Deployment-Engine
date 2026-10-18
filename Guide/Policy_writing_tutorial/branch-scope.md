@@ -106,9 +106,9 @@ old file alone. If a file genuinely does need to go, ask a senior team member fi
 
 ## shared-harness-edit
 
-`scripts/**`, `policies/_helpers/**`, `tests/**` and `templates/**` are shared by every resource
-in the repo — the test harness, the Rego helper library, the helper tests, and the starter
-templates.
+`scripts/**`, `policies/_helpers/**`, `policies/<platform>/config.tf`, `tests/**` and
+`templates/**` are shared by every resource in the repo — the test harness, the Rego helper
+library, the shared Terraform configuration, the helper tests, and the starter templates.
 
 Editing them from a resource branch does not do what you want. When the PDE Portal scans your
 branch it takes `scripts/` and `policies/_helpers/` **from `dev`**, not from your branch, so your
@@ -124,24 +124,14 @@ If you think the harness or a template really is wrong — a missing rule, a bug
 `policy_lint.py` — raise it with a senior team member so it can go in on its own `feature/`
 branch, where it will be reviewed as a change to everybody's tooling.
 
-## legacy-plan-cache
-
-Historical central caches are not supported by the new-layout commands. Reconcile
-them with `dev` before the reviewed layout migration; do not delete other
-contributors' plans. See the [cutover guide](../layout-cutover.md).
-
-Within your resource, deleting a stale plan is allowed when its fixture survives.
-Deleting policies or fixtures remains restricted. Shared `policies/gcp/config.tf`
-and `policies/_helpers/` are protected from Service-branch edits.
-
 ---
 
 ## Why this is a gate and not just advice
 
 The two mistakes this catches are both **silent on the branch that causes them**. Editing the
 harness doesn't break your tests — it stops the portal scanning you, days later, with no failing
-check to point at. Wiping the plan cache doesn't break your resource — it breaks everybody
-else's next CI run. Neither one shows up in the OPA or Terraform checks, which is why the scope
+check to point at. Deleting another resource's committed plans doesn't break your resource —
+it breaks everybody else's next CI run. Neither one shows up in the OPA or Terraform checks, which is why the scope
 check runs on its own, on every push, on the branch that introduced the problem.
 
 <div align="center">

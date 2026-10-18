@@ -25,7 +25,7 @@ It holds three files — `policy.rego`, `compliant.tf` and `nonCompliant.tf`.
 
 ### Example: `runtime`
 
-![runtime-inputs-gcp-example](images/runtime-example-inputs-policy.png)
+![runtime-fixtures-gcp-example](images/runtime-example-inputs-policy.png)
 
 ![runtime-policy-gcp-example](images/runtime-policy-gcp.png)
 
@@ -75,7 +75,7 @@ policies) — it sits beside the attribute folders, not inside them.
   <img src="images/policy-vars-file-structure.PNG" width="51%" />
 </p>
 
-<p align="center"><em>Inputs/gcp(left) and policies/gcp(right)</em></p> 
+<p align="center"><em>Fixtures (left) and policy files (right)</em></p> 
 
 
 

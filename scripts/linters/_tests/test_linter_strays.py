@@ -46,12 +46,12 @@ def repo(tmp_path):
     return tmp_path, d
 
 
-def _ignored(repo_root, inputs_root):
+def _ignored(repo_root, policies_root):
     """`ignored_under` as the validator calls it: relative to the working dir."""
     cwd = os.getcwd()
     os.chdir(repo_root)
     try:
-        return linter.ignored_under(inputs_root)
+        return linter.ignored_under(policies_root)
     finally:
         os.chdir(cwd)
 
@@ -103,9 +103,7 @@ def test_outside_a_git_checkout_it_declines_to_answer(tmp_path):
         os.chdir(cwd)
 
 
-@pytest.mark.repository_data
 def test_the_real_repo_has_no_strays():
-    assert (project_root / "policies/gcp/config.tf").is_file(), "cutover is required"
     # The whole point, asserted against the tree that ships: every file in every
     # argument directory is a fixture, its committed plan, or something git ignores.
     cwd = os.getcwd()

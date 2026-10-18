@@ -6,7 +6,7 @@
 1. Get assigned a service from PDE Leadership (e.g. `Cloud Functions`).  
 2. Research the service and identify security-relevant arguments.  
 
-3. After layout cutover, create one `policies/gcp/<Service>/<resource>/<attribute>/`
+3. Create one `policies/gcp/<Service>/<resource>/<attribute>/`
    directory containing `policy.rego` and the fixtures. Keep one `_vars.rego` in
    `policies/gcp/<Service>/<resource>/` for the whole resource.
 

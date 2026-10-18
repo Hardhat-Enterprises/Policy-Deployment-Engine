@@ -37,7 +37,7 @@ import sys
 
 # Trees worth watching. scripts/ and Guide/ are included because the same merge
 # that carries a fixture can carry a helper or a doc.
-DEFAULT_PATHS = ("docs", "inputs", "policies", "scripts", "templates", "tests", "Guide")
+DEFAULT_PATHS = ("docs", "policies", "scripts", "templates", "tests", "Guide")
 
 # `git ls-files --eol` index states that mean "this blob is not LF-clean".
 # `i/none` (no line endings at all) and `i/-text` (binary) are both fine.

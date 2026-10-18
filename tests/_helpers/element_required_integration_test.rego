@@ -122,7 +122,7 @@ test_every_disk_compliant_passes if {
 
 # ==============================================================================
 # Reality check: the committed http_route plan
-# (inputs/gcp/Network Services/google_network_services_http_route/
+# (policies/gcp/Network Services/google_network_services_http_route/
 #  rules.action.redirect.https_redirect/), wrapped as data.gcp_http_route_plan.
 # attribute_entries depends on how Terraform writes nested blocks, so this runs
 # the per-rule HTTPS redirect recipe on a real plan rather than a mock.

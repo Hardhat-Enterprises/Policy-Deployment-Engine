@@ -26,7 +26,7 @@ SCRIPT = Path(__file__).resolve().parent.parent / "branch_scope.py"
 BRANCH = "Service/gcp/cloud_storage/google_storage_bucket"
 OWN = "policies/gcp/Cloud Storage/google_storage_bucket"
 SIBLING_POLICY = "policies/gcp/Cloud Storage/google_storage_hmac_key/foo/policy.rego"
-SIBLING_INPUTS = "policies/gcp/Cloud Storage/google_storage_hmac_key"
+SIBLING_FIXTURES = "policies/gcp/Cloud Storage/google_storage_hmac_key"
 
 pytestmark = pytest.mark.skipif(
     shutil.which("git") is None or shutil.which("bash") is None,
@@ -62,8 +62,8 @@ def repo(tmp_path):
     _write(repo, "docs/gcp/Cloud Storage/google_storage_bucket.json", "{}\n")
     _write(repo, "docs/gcp/Cloud Storage/google_storage_hmac_key.json", "{}\n")
     _write(repo, SIBLING_POLICY, "package foo\n")
-    _write(repo, f"{SIBLING_INPUTS}/foo/compliant.tf", "# v1\n")
-    _write(repo, f"{SIBLING_INPUTS}/foo/noncompliant.tf", "# v1\n")
+    _write(repo, f"{SIBLING_FIXTURES}/foo/compliant.tf", "# v1\n")
+    _write(repo, f"{SIBLING_FIXTURES}/foo/noncompliant.tf", "# v1\n")
     _write(repo, "scripts/tool.py", "# v1\n")
     _write(repo, "README.md", "v1\n")
     _commit(repo, "X")
@@ -126,26 +126,25 @@ def test_a_stray_edit_is_fixed_without_a_merge_after_dev_moves_on(repo):
     assert (repo / OWN / "location/compliant.tf").read_text() == "# mine\n"
 
 
-# (b) a stray addition and a stray deletion in another resource's inputs/
+# (b) a stray addition and a stray deletion in another resource's fixtures
 def test_a_stray_addition_and_deletion_are_fixed_without_a_merge(repo):
-    _write(repo, f"{SIBLING_INPUTS}/foo/extra.tf", "# stray\n")
-    (repo / SIBLING_INPUTS / "foo/noncompliant.tf").unlink()
+    _write(repo, f"{SIBLING_FIXTURES}/foo/extra.tf", "# stray\n")
+    (repo / SIBLING_FIXTURES / "foo/noncompliant.tf").unlink()
     _commit(repo, "stray add + delete")
-    _advance_dev(repo, f"{SIBLING_INPUTS}/foo/compliant.tf", "# dev v2\n")
+    _advance_dev(repo, f"{SIBLING_FIXTURES}/foo/compliant.tf", "# dev v2\n")
 
     commands, second = _fix_and_recheck(repo)
 
     assert not any(c.startswith("git merge ") for c in commands)
     assert second.returncode == 0, second.stdout + second.stderr
-    assert not (repo / SIBLING_INPUTS / "foo/extra.tf").exists()
-    assert (repo / SIBLING_INPUTS / "foo/noncompliant.tf").exists()
+    assert not (repo / SIBLING_FIXTURES / "foo/extra.tf").exists()
+    assert (repo / SIBLING_FIXTURES / "foo/noncompliant.tf").exists()
     assert (repo / OWN / "location/compliant.tf").read_text() == "# mine\n"
 
 
-# (c) the shared harness and the legacy plan cache still get the merge recipe
-@pytest.mark.parametrize("path", ["scripts/tool.py", "inputs/plan_cache/gcp/old.json"])
-def test_the_harness_and_plan_cache_still_get_the_merge_recipe(repo, path):
-    _write(repo, path, "# stray\n")
+# (c) the shared harness still gets the merge recipe
+def test_the_harness_still_gets_the_merge_recipe(repo):
+    _write(repo, "scripts/tool.py", "# stray\n")
     _write(repo, SIBLING_POLICY, "package foo\n# stray\n")
     _commit(repo, "stray edits")
     _advance_dev(repo, "README.md", "v2\n")
