@@ -32,6 +32,25 @@ export function requiredString(body: Record<string, unknown>, field: string, max
   return value.trim();
 }
 
+export const MIN_PASSWORD_LENGTH = 12;
+const MAX_PASSWORD_LENGTH = 1024;
+
+/**
+ * A password exactly as typed: never trimmed, so a leading or trailing space is part
+ * of it at register and at login alike. `minLength` applies at register only.
+ */
+export function password(body: Record<string, unknown>, minLength = 1): string {
+  const value = body.password;
+  if (typeof value !== "string" || value.length === 0) {
+    throw new HttpError(400, "password is required and must be a string");
+  }
+  if (value.length < minLength) throw new HttpError(400, `password must be at least ${minLength} characters`);
+  if (value.length > MAX_PASSWORD_LENGTH) {
+    throw new HttpError(400, `password must be at most ${MAX_PASSWORD_LENGTH} characters`);
+  }
+  return value;
+}
+
 export function optionalString(body: Record<string, unknown>, field: string, max = 10_000): string | undefined {
   const value = body[field];
   if (value === undefined) return undefined;

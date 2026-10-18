@@ -19,6 +19,9 @@ Client keeps Terraform plan locally. Rego + OPA run on the hosted API.
 Usage:
   pde-gate register --name <org> --email <email> [--password <pass>]
   pde-gate login --email <email> [--password <pass>]
+    (register needs a password of at least 12 characters; set PDE_PASSWORD
+     instead of --password to keep it out of shell history. It is used exactly
+     as given: spaces are not trimmed.)
   pde-gate api-key rotate
   pde-gate status
   pde-gate package list
@@ -38,6 +41,7 @@ logging in never changes the API key a CI pipeline uses.
 Env:
   PDE_API_URL   default http://127.0.0.1:3847
   PDE_ORG_ID / PDE_API_KEY / PDE_SESSION_TOKEN   (or ~/.pde-gate/credentials.json)
+  PDE_PASSWORD  password for register / login when --password is not given
 `);
   process.exit(EXIT_ERROR);
 }
@@ -52,6 +56,16 @@ function flag(args: string[], name: string): string | undefined {
   const i = args.indexOf(name);
   if (i >= 0 && args[i + 1] && !args[i + 1]!.startsWith("--")) return args[i + 1];
   return undefined;
+}
+
+const MIN_PASSWORD_LENGTH = 12;
+
+/** --password or PDE_PASSWORD, exactly as given (never trimmed). */
+function passwordArg(args: string[], cmd: string, minLength = 1): string {
+  const password = flag(args, "--password") ?? process.env.PDE_PASSWORD;
+  if (!password) fail(`${cmd} requires --password (or PDE_PASSWORD)`);
+  if (password.length < minLength) fail(`${cmd}: the password must be at least ${minLength} characters`);
+  return password;
 }
 
 function has(args: string[], name: string): boolean {
@@ -76,8 +90,8 @@ async function main() {
   if (cmd === "register") {
     const name = flag(args, "--name");
     const email = flag(args, "--email");
-    const password = flag(args, "--password");
     if (!name || !email) fail("register requires --name and --email");
+    const password = passwordArg(args, "register", MIN_PASSWORD_LENGTH);
     const res = await api.registerOrg(apiUrl, { org_name: name, contact_email: email, password });
     saveCredentials({
       org_id: res.org_id,
@@ -94,8 +108,8 @@ async function main() {
 
   if (cmd === "login") {
     const email = flag(args, "--email");
-    const password = flag(args, "--password");
     if (!email) fail("login requires --email");
+    const password = passwordArg(args, "login");
     const res = await api.loginOrg(apiUrl, { email, password });
     const saved = loadCredentials();
     saveCredentials({

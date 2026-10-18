@@ -41,10 +41,11 @@ export function toPolicyPackage(row: Package): PolicyPackage {
 export async function createOrg(input: {
   org_name: string;
   contact_email: string;
-  password?: string;
+  /** Required: without it the org could never log in once its first session ends. */
+  password: string;
 }): Promise<{ org: Org; api_key: string }> {
   const key = apiKey();
-  const passwordHash = hashPassword(input.password || randomBytes(16).toString("hex"));
+  const passwordHash = hashPassword(input.password);
   const org = await Org.create({
     org_id: slugId("org"),
     api_key_hash: hashApiKey(key),

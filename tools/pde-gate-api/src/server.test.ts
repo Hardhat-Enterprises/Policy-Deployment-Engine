@@ -7,11 +7,14 @@ import { issueSession } from "./session.js";
 
 process.env.GATE_SESSION_SECRET = "test-secret-0123456789abcdef0123456789";
 
+// Loose limits so this file's own requests never hit them; the limiter has its own test.
+const LOOSE = { max: 1000, windowMs: 60_000 };
+
 let server: Server;
 let base: string;
 
 before(async () => {
-  server = createApp().listen(0);
+  server = createApp({ rateLimits: { login: LOOSE, register: LOOSE } }).listen(0);
   await new Promise<void>((resolve) => server.once("listening", () => resolve()));
   const { port } = server.address() as { port: number };
   base = `http://127.0.0.1:${port}`;
@@ -107,4 +110,53 @@ test("checks need the API key: a session token is a 401", async () => {
   });
   assert.equal(res.status, 401);
   assert.match(res.body.error!, /API key/);
+});
+
+test("register: the password is required and at least 12 characters", async () => {
+  const body = (password: unknown) =>
+    JSON.stringify({ org_name: "Acme", contact_email: "a@example.com", ...(password === undefined ? {} : { password }) });
+  for (const [password, pattern] of [
+    [undefined, /password is required/],
+    [12345678901234, /password is required/],
+    ["elevenchars", /at least 12 characters/],
+    ["", /password is required/],
+  ] as const) {
+    const res = await post("/v1/orgs/register", body(password));
+    assert.equal(res.status, 400, String(password));
+    assert.match(res.body.error!, pattern);
+  }
+});
+
+test("login: a missing or non-string password is a 400", async () => {
+  assert.equal((await post("/v1/orgs/login", JSON.stringify({ email: "a@example.com" }))).status, 400);
+  assert.equal((await post("/v1/orgs/login", JSON.stringify({ email: "a@example.com", password: 7 }))).status, 400);
+});
+
+test("register and login are rate limited per client IP with a generic 429", async () => {
+  const limited = createApp({
+    rateLimits: { login: { max: 3, windowMs: 60_000 }, register: { max: 2, windowMs: 60_000 } },
+  }).listen(0);
+  await new Promise<void>((resolve) => limited.once("listening", () => resolve()));
+  const url = `http://127.0.0.1:${(limited.address() as { port: number }).port}`;
+  const send = async (path: string) => {
+    const res = await fetch(`${url}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    return { status: res.status, body: (await res.json()) as { error?: string } };
+  };
+  try {
+    // Invalid requests count too: the limit is on attempts.
+    assert.deepEqual([(await send("/v1/orgs/register")).status, (await send("/v1/orgs/register")).status], [400, 400]);
+    const blocked = await send("/v1/orgs/register");
+    assert.equal(blocked.status, 429);
+    assert.equal(blocked.body.error, "too many requests, try again later");
+    for (let i = 0; i < 3; i++) assert.equal((await send("/v1/orgs/login")).status, 400);
+    assert.equal((await send("/v1/orgs/login")).status, 429);
+    // Other routes are not limited.
+    assert.equal((await fetch(`${url}/health`)).status, 200);
+  } finally {
+    await new Promise<void>((resolve) => limited.close(() => resolve()));
+  }
 });

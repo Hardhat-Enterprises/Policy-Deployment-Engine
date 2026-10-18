@@ -30,7 +30,9 @@ type ServerHandle = {
 
 async function startServer(): Promise<ServerHandle> {
   await sequelize.authenticate();
-  const app = createApp();
+  // Loose limits: this file registers and logs in more often than the defaults allow.
+  const loose = { max: 1000, windowMs: 60_000 };
+  const app = createApp({ rateLimits: { login: loose, register: loose } });
   const server = app.listen(0);
   await new Promise<void>((resolve) => server.once("listening", () => resolve()));
   const { port } = server.address() as { port: number };
@@ -127,6 +129,27 @@ test("API: register → login → auth → package CRUD lifecycle", opts, async 
       body: { email: testEmail, password: "wrong-password" },
     });
     assert.equal(loginFail.status, 401);
+
+    // Passwords are never trimmed: surrounding spaces are part of the password.
+    const paddedEmail = `padded-${testEmail}`;
+    const padded = "  padded secret pw  ";
+    const regPadded = await json(srv.base, "POST", "/v1/orgs/register", {
+      body: { org_name: "Padded Org", contact_email: paddedEmail, password: padded },
+    });
+    assert.equal(regPadded.status, 201);
+    const loginPadded = (password: string) =>
+      json(srv.base, "POST", "/v1/orgs/login", { body: { email: paddedEmail, password } });
+    assert.equal((await loginPadded(padded)).status, 200);
+    assert.equal((await loginPadded(padded.trim())).status, 401);
+
+    const shortPassword = await json(srv.base, "POST", "/v1/orgs/register", {
+      body: { org_name: "Short", contact_email: `short-${testEmail}`, password: "elevenchars" },
+    });
+    assert.equal(shortPassword.status, 400);
+    const noPassword = await json(srv.base, "POST", "/v1/orgs/register", {
+      body: { org_name: "None", contact_email: `none-${testEmail}` },
+    });
+    assert.equal(noPassword.status, 400);
 
     const noAuth = await json(srv.base, "GET", `/v1/orgs/${org_id}`);
     assert.equal(noAuth.status, 401);

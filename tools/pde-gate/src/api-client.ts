@@ -26,7 +26,7 @@ async function api<T>(
 
 export async function registerOrg(
   apiUrl: string,
-  input: { org_name: string; contact_email: string; password?: string }
+  input: { org_name: string; contact_email: string; password: string }
 ): Promise<{ org_id: string; api_key: string } & Session> {
   return api(apiUrl, null, "POST", "/v1/orgs/register", input);
 }
@@ -36,7 +36,7 @@ export type Session = { session_token: string; session_expires_at: string };
 /** Email + password → a 12h session token. The API key is not changed. */
 export async function loginOrg(
   apiUrl: string,
-  input: { email: string; password?: string }
+  input: { email: string; password: string }
 ): Promise<{ org_id: string } & Session> {
   return api(apiUrl, null, "POST", "/v1/orgs/login", input);
 }

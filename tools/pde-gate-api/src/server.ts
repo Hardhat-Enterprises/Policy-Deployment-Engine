@@ -1,4 +1,5 @@
 import express from 'express';
+import { rateLimit } from 'express-rate-limit';
 import {
     createOrg,
     loginOrg,
@@ -19,8 +20,9 @@ import {
     bodyObject,
     optionalBoolean,
     optionalPlatform,
-    optionalString,
+    MIN_PASSWORD_LENGTH,
     packageBody,
+    password,
     requiredString,
 } from './validate.js';
 import type { CreatePackageRequest } from './types.js';
@@ -107,8 +109,66 @@ const errorHandler: express.ErrorRequestHandler = (err, _req, res, _next) => {
     res.status(500).json({ error: 'internal server error' });
 };
 
-export function createApp() {
+export type RateLimitConfig = { max: number; windowMs: number };
+export type AppOptions = {
+    /** Per client IP. Defaults: login 10 / 15 min, register 5 / hour; env overrides them. */
+    rateLimits?: { login?: RateLimitConfig; register?: RateLimitConfig };
+};
+
+const MINUTE = 60_000;
+
+function envNumber(name: string, fallback: number): number {
+    const raw = process.env[name];
+    if (raw === undefined || raw === '') return fallback;
+    const value = Number(raw);
+    if (!Number.isFinite(value) || value <= 0) throw new Error(`${name} must be a positive number`);
+    return value;
+}
+
+function defaultRateLimits(): { login: RateLimitConfig; register: RateLimitConfig } {
+    return {
+        login: {
+            max: envNumber('PDE_LOGIN_RATE_LIMIT', 10),
+            windowMs: envNumber('PDE_LOGIN_RATE_WINDOW_MINUTES', 15) * MINUTE,
+        },
+        register: {
+            max: envNumber('PDE_REGISTER_RATE_LIMIT', 5),
+            windowMs: envNumber('PDE_REGISTER_RATE_WINDOW_MINUTES', 60) * MINUTE,
+        },
+    };
+}
+
+/** 429 with a generic message once a client IP uses up its window. */
+function limiter({ max, windowMs }: RateLimitConfig): express.RequestHandler {
+    return rateLimit({
+        windowMs,
+        limit: max,
+        standardHeaders: 'draft-7',
+        legacyHeaders: false,
+        handler: (_req, res) => {
+            res.status(429).json({ error: 'too many requests, try again later' });
+        },
+    });
+}
+
+/**
+ * Behind a reverse proxy every request arrives from the proxy's address, so the rate
+ * limits would be shared by all clients. PDE_TRUST_PROXY sets Express's "trust proxy"
+ * (a hop count such as 1, or an address / subnet list) so req.ip is the real client.
+ */
+function trustProxySetting(): boolean | number | string {
+    const raw = process.env.PDE_TRUST_PROXY;
+    if (raw === undefined || raw === '' || raw === 'false') return false;
+    if (/^\d+$/.test(raw)) return Number(raw);
+    return raw;
+}
+
+export function createApp(options: AppOptions = {}) {
     const app = express();
+    app.set('trust proxy', trustProxySetting());
+    const defaults = defaultRateLimits();
+    const loginLimit = limiter(options.rateLimits?.login ?? defaults.login);
+    const registerLimit = limiter(options.rateLimits?.register ?? defaults.register);
     // Plans can be large — client uploads terraform show -json
     app.use(express.json({ limit: process.env.PDE_JSON_LIMIT || '32mb' }));
 
@@ -116,13 +176,13 @@ export function createApp() {
         res.json({ status: 'ok', service: 'pde-gate-api' });
     });
 
-    app.post('/v1/orgs/register', asyncRoute(async (req, res) => {
+    app.post('/v1/orgs/register', registerLimit, asyncRoute(async (req, res) => {
         const body = bodyObject(req.body);
         const org_name = requiredString(body, 'org_name');
         const contact_email = requiredString(body, 'contact_email');
-        const password = optionalString(body, 'password', 1024);
+        const orgPassword = password(body, MIN_PASSWORD_LENGTH);
         try {
-            const { org, api_key } = await createOrg({ org_name, contact_email, password });
+            const { org, api_key } = await createOrg({ org_name, contact_email, password: orgPassword });
             res.status(201).json({
                 org_id: org.org_id,
                 api_key,
@@ -142,17 +202,14 @@ export function createApp() {
         }
     }));
 
-    app.post('/v1/orgs/login', asyncRoute(async (req, res) => {
+    app.post('/v1/orgs/login', loginLimit, asyncRoute(async (req, res) => {
         const body = bodyObject(req.body);
         const raw = body.contact_email ?? body.email;
         if (raw !== undefined && typeof raw !== 'string') throw new HttpError(400, 'email must be a string');
-        if (body.password !== undefined && typeof body.password !== 'string') {
-            throw new HttpError(400, 'password must be a string');
-        }
         const email = (raw as string | undefined)?.trim();
-        const password = (body.password as string | undefined)?.trim();
-        if (!email || !password) throw new HttpError(400, 'email and password are required');
-        const org = await loginOrg(email, password);
+        if (!email) throw new HttpError(400, 'email and password are required');
+        // Not trimmed: the password is compared exactly as it was registered.
+        const org = await loginOrg(email, password(body));
         if (!org) throw new HttpError(401, 'Invalid email or password');
         res.json({
             org_id: org.org_id,

@@ -7,7 +7,7 @@ Express + Sequelize + MySQL config API for PDE Gate.
 | Method | Path | Auth |
 | --- | --- | --- |
 | GET | `/health` | none |
-| POST | `/v1/orgs/register` | none → `org_id`, `api_key` (shown only here) and a session token |
+| POST | `/v1/orgs/register` | `org_name`, `contact_email`, `password` (at least 12 characters) → `org_id`, `api_key` (shown only here) and a session token |
 | POST | `/v1/orgs/login` | email + password → a 12-hour `session_token`; the API key is unchanged |
 | GET | `/v1/orgs/:orgId` | Bearer session token |
 | GET/POST | `/v1/orgs/:orgId/packages` | Bearer session token |
@@ -16,7 +16,9 @@ Express + Sequelize + MySQL config API for PDE Gate.
 | POST | `/v1/orgs/:orgId/checks` | Bearer `PDE_API_KEY` → `status` pass (200) / fail (422) / error (422) |
 
 Session tokens are HMAC-signed with `GATE_SESSION_SECRET`; with `NODE_ENV=production` the server
-will not start without it (at least 32 characters). See `../pde-gate/ORG-AND-PROD.md`.
+will not start without it (at least 32 characters). Passwords are never trimmed. Register and login
+are rate limited per client IP (`PDE_LOGIN_RATE_*`, `PDE_REGISTER_RATE_*`; set `PDE_TRUST_PROXY`
+behind a proxy). See `../pde-gate/ORG-AND-PROD.md`.
 
 API keys are stored only as sha256 hashes. Error responses never carry internal error text:
 an unexpected failure is `500 {"error": "internal server error"}` (details go to the server log).
