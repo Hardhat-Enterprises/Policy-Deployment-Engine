@@ -1,212 +1,133 @@
-# pde_autoremediate.py — Setup & Usage Guide (Windows)
+# Auto-remediation (`scripts/auto_remediation`)
 
-This is the working, tested guide for running the auto-remediation engine on your
-machine, including everything that tripped us up getting here. If you followed the
-troubleshooting chat to get this far, your setup is already correct — this file is the
-clean reference version.
+Finds Terraform resources that break a PDE policy and, where the policy itself says what a
+compliant value is, patches the Terraform source and re-checks it with the same policy.
 
----
+Nothing is hard-coded per resource. For each policy the engine asks OPA for the policy's own
+conditions (`policy_type`, `attribute_path`, `values`), runs the policy against a plan to find the
+non-compliant resources, derives a fix from those conditions, patches the attribute in the `.tf`
+text, and evaluates the policy again on the patched resource.
 
-## 1. One-time setup (you've likely already done this)
+## Requirements
 
-```powershell
-cd "\Policy-Deployment-Engine"
+- Python 3.11+ (Linux, macOS or Windows).
+- [OPA](https://www.openpolicyagent.org/docs/#running-opa) on `PATH`, so that `opa version` works,
+  or pass its full path with `--opa-bin`.
+- [`python-hcl2`](https://pypi.org/project/python-hcl2/) for `validate-repo`, which reads the
+  policies' `nonCompliant.tf` fixtures. It is listed in the repo's `pyproject.toml`
+  (`uv sync`, or `pip install python-hcl2`).
 
-# Python package needed for the read-only validate-repo mode
-pip install python-hcl2
+## Commands
 
-# Confirm it actually imports
-python -c "import hcl2; print('hcl2 OK')"
+Run from the repository root (`python3` on Linux/macOS, `python` or `py` on Windows).
+
+### `discover`: what is there
+
+```bash
+python3 scripts/auto_remediation/main.py discover --repo .
 ```
 
-**OPA binary** — download it, then unblock it (Windows flags downloaded .exe files and
-silently refuses to run them otherwise — this was the cause of the `WinError 2` you hit):
+Counts the argument policies (`policies/<platform>/<Service>/<resource>/<argument>/policy.rego`)
+and their conditions by `policy_type`. Writes nothing.
 
-```powershell
-Invoke-WebRequest -Uri "https://github.com/open-policy-agent/opa/releases/latest/download/opa_windows_amd64.exe" -OutFile "opa.exe"
-Unblock-File -Path .\opa.exe
-.\opa.exe version
+### `remediate`: fix a real Terraform project (dry run by default)
+
+```bash
+terraform -chdir=my-infra plan -out=plan.tfplan
+terraform -chdir=my-infra show -json plan.tfplan > plan.json
+python3 scripts/auto_remediation/main.py remediate --repo . --plan plan.json --tf-dir my-infra
 ```
 
-That last command should print something like `Version: 1.2x.x`. If it doesn't, stop
-here and fix that first — nothing else will work.
+Prints one JSON entry per violation: the resource, policy, attribute, current value, and either
+the fix (`FIXABLE`) or why it needs a person (`NEEDS_MANUAL_REVIEW`). **Without `--apply` nothing is
+written.** With `--apply`, each fixable attribute is patched in the first `.tf` file under
+`--tf-dir` that declares the resource (`PATCHED`). Policies the engine cannot evaluate are listed as
+`UNSUPPORTED` or `EVAL_ERROR`. Review the diff and re-run `terraform plan` afterwards.
 
-**Use the full absolute path to opa.exe in every command below.** A relative path
-(`.\opa.exe`) only resolves if you happen to be standing in exactly the right folder —
-the absolute path always works regardless of where you run the command from:
+On Windows PowerShell 5, `>` writes UTF-16; write the plan with
+`terraform show -json plan.tfplan | Out-File -Encoding utf8 plan.json`.
 
-```
-C:\Users\Shreyash Dhanawade\Policy-Deployment-Engine\opa.exe
-```
+### `validate-repo`: self-test against the repo's own fixtures
 
----
-
-## 2. Always use `python`, not `python3`
-
-On your machine `python3` is a Microsoft Store stub that does nothing useful. `python`
-is your real Python 3.14 install. Every command below uses `python`.
-
----
-
-## 3. Which branch are you testing?
-
-- **`dev`** — the shared branch. Has the most policies merged (everyone's finished work),
-  so it's the best branch to run a full repo-wide validation against.
-- **Your own `Service/...` branch** — has everything `dev` had at the point you branched,
-  plus your own unmerged work. Use this if you specifically want to test *your* resources
-  before they're merged.
-
-To switch:
-
-```powershell
-git fetch origin
-git checkout dev
+```bash
+python3 scripts/auto_remediation/main.py validate-repo --repo . --log-out /tmp/ar-log.json
 ```
 
----
+For every policy with a `nonCompliant.tf` beside it: build a plan from the fixture (with
+`python-hcl2`, no `terraform` needed), find the violation, fix it, patch a copy of the text, and
+re-verify. Prints the counts below; `--log-out` writes the details (manual-review reasons, patch
+failures, unsupported policies, evaluation errors). `--write-fixed-to DIR` saves a
+`BEFORE_nonCompliant.tf` / `AFTER_fixed.tf` pair for each verified fix, mirroring the `policies/`
+tree. Nothing under `--repo` is modified. Write both outputs outside the repository.
 
-## 4. Commands
+### Options
 
-### 4a. See what's out there first (fast, always do this first)
+| Option | Commands | Meaning |
+| --- | --- | --- |
+| `--opa-bin PATH` | all (before or after the command) | OPA binary; default `opa` on `PATH` |
+| `--only TEXT` | all | Case-insensitive match on the resource type or service, e.g. `google_redis_instance` or `"Memorystore (Redis)"` |
+| `--apply` | `remediate` | Write the fixes (default: dry run) |
+| `--limit N` | `validate-repo` | Stop after N policies |
+| `--log-out FILE` | `validate-repo` | Detailed JSON log |
+| `--write-fixed-to DIR` | `validate-repo` | BEFORE/AFTER `.tf` pairs for verified fixes |
 
-```powershell
-python pde_autoremediate.py discover --repo . --opa-bin "C:\Users\Shreyash Dhanawade\Policy-Deployment-Engine\opa.exe"
-```
+## Fix rules
 
-Prints a total count and a breakdown by policy type. Takes a few seconds. No files
-written.
+| `policy_type` | Current value | Fix |
+| --- | --- | --- |
+| whitelist | scalar | the first allowed value, `values[0]` |
+| whitelist | list | keep only allowed elements; if none are left, `[values[0]]` |
+| blacklist | boolean | the other boolean |
+| blacklist | list | remove the forbidden elements |
+| blacklist | other scalar | manual review: many values could be valid, the policy names none |
+| blacklist | of an empty / absent value | manual review: a meaningful value cannot be invented |
+| range | number | clamp to the violated bound |
 
-### 4b. Run the FULL validation across every policy on the current branch
+Everything else is not auto-fixed:
 
-This is what you asked for — no `--only` filter means every service, every resource,
-every policy with a fixture:
+- other policy types (`pattern *`, `element *`, map key, presence, ...) and hand-written Rego with
+  no helper conditions count as unsupported;
+- content-security policies are unsupported (they need Bandit findings, which only
+  `scripts/auto_test` produces);
+- a policy the helpers refuse (its message carries `POLICY ERROR:`) is an evaluation error, never
+  "fixed" or "clean".
 
-```powershell
-python pde_autoremediate.py validate-repo --repo . --opa-bin "C:\Users\Shreyash Dhanawade\Policy-Deployment-Engine\opa.exe" --log-out full_dev_results.json --write-fixed-to remediated_examples
-```
+OPA is given explicit files only: `policies/_helpers`, the resource's `_vars.rego` and the one
+`policy.rego`, as `scripts/auto_test/auto_test.py` does. It is never given a resource folder, which
+would load the sibling policies and the committed `<sha>.json` plans as data.
 
-**This will take a while.** On `dev` there are roughly 1,650–1,700 policies with
-fixtures; each one needs 2–3 separate calls out to `opa.exe`. On the Linux machine I
-built this on, the full run took about 6–8 minutes; Windows subprocess launching is
-typically slower, so budget **15–25 minutes**, possibly longer if antivirus software
-scans each `opa.exe` launch. It will not hang — it's just genuinely doing ~4,000+
-individual OPA evaluations. Let it run.
-
-**If you want a quick sanity check before committing to the full run**, cap it first:
-
-```powershell
-python pde_autoremediate.py validate-repo --repo . --opa-bin "C:\Users\Shreyash Dhanawade\Policy-Deployment-Engine\opa.exe" --limit 50 --log-out sample_results.json
-```
-
-### 4c. Scope to just one service or resource (fast, minutes not seconds)
-
-```powershell
-python pde_autoremediate.py validate-repo --repo . --only "Oracle Database" --opa-bin "C:\Users\Shreyash Dhanawade\Policy-Deployment-Engine\opa.exe" --log-out oracle_results.json --write-fixed-to remediated_examples
-```
-
-`--only` does a case-insensitive substring match against either the resource type or
-the service name. `google_oracle_database_odb_subnet`, `oracle_database`, and
-`"Oracle Database"` all work.
-
----
-
-## 5. What gets created, and where
-
-Running command **4b** or **4c** creates, in your current folder
-(`Policy-Deployment-Engine\`):
-
-| File/Folder | What it is |
-|---|---|
-| `full_dev_results.json` (or whatever you named it via `--log-out`) | The complete machine-readable results: overall counts, plus full detail on every policy that needed manual review, failed to patch, or errored |
-| `remediated_examples\` (only if you passed `--write-fixed-to`) | One subfolder per successfully auto-fixed policy, mirroring the real `inputs\` folder structure, each containing `BEFORE_nonCompliant.tf` and `AFTER_fixed.tf` |
-
-**Nothing under `policies\` or `inputs\` is ever modified by `validate-repo`.** It reads
-your repo, never writes to it. The only two outputs are the ones named above, in
-whatever folder you ran the command from.
-
-Console output (also the first part of the `.json` file) looks like this:
-
-```json
-{
-  "total_policies_with_fixture": 1654,
-  "fixture_missing": 0,
-  "condition_type_unsupported": 186,
-  "no_violation_found_in_fixture": 12,
-  "auto_fixed_and_reverified_compliant": 1123,
-  "auto_fixed_but_still_noncompliant": 15,
-  "patch_failed": 13,
-  "resource_name_mismatch": 0,
-  "needs_manual_review": 301,
-  "eval_error": 0
-}
-```
-
-Your exact numbers may differ slightly depending on how many resources have been merged
-into `dev` since this was last run.
-
-### What each field means
+## `validate-repo` counts
 
 | Field | Meaning |
-|---|---|
-| `total_policies_with_fixture` | Every policy that had a matching test fixture, and was actually evaluated |
-| `auto_fixed_and_reverified_compliant` | **The headline number.** Detected, fixed, and independently re-confirmed compliant by the real OPA engine |
-| `needs_manual_review` | Correctly *not* auto-fixed — no safe value is knowable from the policy alone (e.g. a blacklist forbidding one specific string with many other valid options) |
-| `condition_type_unsupported` | Uses a policy type (`pattern_*`, `element_*`) this engine doesn't yet implement a fix rule for |
-| `patch_failed` | The fix was known, but the Terraform text patcher couldn't apply it (map-typed attributes, or a nested block that's entirely absent — see "Known limitations" below) |
-| `auto_fixed_but_still_noncompliant` | Patched, but a *different* violation in the same fixture remains (the policy only checks one thing; the fixture had two problems) |
-| `resource_name_mismatch` | Should always be 0 now — this was a bug in an earlier version of this engine, since fixed |
-| `eval_error` | Something threw an exception. Check the `"eval_errors"` list in your `--log-out` file for the exact cause of each one |
+| --- | --- |
+| `total_policies_with_fixture` | Policies with a `nonCompliant.tf` that were evaluated (or skipped as content security) |
+| `auto_fixed_and_reverified_compliant` | Fixed, and the same policy now reports no non-compliant resource |
+| `auto_fixed_but_still_noncompliant` | Patched, but the policy still flags the resource (e.g. a second problem in the fixture) |
+| `needs_manual_review` | No safe value follows from the policy (see the fix rules) |
+| `condition_type_unsupported` | Policy type without a fix rule, custom Rego, or content security |
+| `patch_failed` | Fix known, but the text patcher could not apply it (see limitations) |
+| `no_violation_found_in_fixture` | The policy flagged nothing in its own `nonCompliant.tf` |
+| `resource_name_mismatch` | OPA named a resource the engine could not find in the plan |
+| `fixture_missing` | No `nonCompliant.tf` beside the policy |
+| `eval_error` | OPA failed, the policy has no `conditions` rule, the fixture could not be read, or `POLICY ERROR:` |
 
----
+## Limitations
 
-## 6. What this actually achieves
+- The patcher is text-based, scoped to PDE-style files: one resource block per label, nested
+  *blocks* (`name { ... }`) at any depth. It does not patch map-typed attributes
+  (`name = { key = value }`), and it does not create a nested block that is missing entirely; both
+  are reported as `patch_failed` rather than guessed. Modules, `for_each` and `dynamic` blocks would
+  need a real HCL writer.
+- A policy's situations are paired with its conditions in order; a fix is computed for the first
+  situation that flags a resource.
+- `validate-repo` builds plans from `.tf` text, not with `terraform`, so values Terraform would
+  compute are absent.
 
-Every policy on `dev` was written by a different student, independently, over the whole
-trimester. This engine:
+## Tests
 
-1. **Discovers** every one of them by walking the real folder structure — no
-   hand-maintained list of resources.
-2. **Reads each policy's own compliant-value logic** straight from the real OPA engine —
-   it doesn't know in advance what "correct" looks like for any given resource; it asks
-   the policy itself.
-3. **Detects** violations by running those same real policies against a real Terraform
-   plan.
-4. **Computes a safe fix** using one of three provably-correct rules (whitelist → first
-   allowed value; blacklist → flip the boolean or strip the forbidden list elements;
-   range → clamp to the nearest bound) — confirmed by reading the actual evaluator
-   source code, not guessed.
-5. **Patches** the real `.tf` file text and **re-verifies** with the same real policy.
+```bash
+python3 -m pytest scripts/auto_remediation -q
+```
 
-The result is a single number that's hard to argue with: **roughly two-thirds of every
-security policy violation in this entire multi-contributor repository can be detected,
-fixed, and independently verified automatically, with zero resource-specific code.**
-That's the evidence for the High Distinction task — not a demo on one resource you wrote
-yourself, but a generalised engine proven at the scale of the whole project.
-
----
-
-## 7. Known limitations (so you can speak to them, not get caught by them)
-
-- **Map-typed attributes aren't patched.** Terraform allows nested data as a *block*
-  (`name { }`) or a *map-typed attribute* (`name = { "key" = val }`). Only the block form
-  is supported. Affects roughly 1% of policies; they're correctly flagged, not
-  mis-patched.
-- **A completely absent nested block won't be fabricated.** If the fix needs a block
-  that doesn't exist at all in the resource, the patcher flags it rather than guessing
-  its shape.
-- **Only whitelist, blacklist, and range policy types have fix rules.** `pattern_*` and
-  `element_*` types (about 11% of policies) are detected and safely skipped, not
-  mishandled.
-
----
-
-## 8. Troubleshooting quick reference
-
-| Symptom | Fix |
-|---|---|
-| `Python was not found...` | Use `python`, not `python3` |
-| `unrecognized arguments: --opa-bin` | Fixed in the current script version — update if you're on an older copy |
-| `FileNotFoundError: [WinError 2]` for every policy | `opa.exe` path is wrong, or it's blocked. Run `Unblock-File -Path .\opa.exe`, and use the full absolute path in `--opa-bin` |
-| `ModuleNotFoundError: hcl2` | `pip install python-hcl2` |
-| `total_policies_with_fixture: 0` with all `eval_error` | Check the printed error list — it now shows the real exception. Almost always one of the two issues above |
-| `plan.json` fails to parse (only relevant to the `remediate` command) | Use `Out-File -Encoding utf8`, not `>`, when redirecting `terraform show -json` output — plain `>` writes UTF-16 on Windows, which breaks JSON parsing |
+The fix rules, the patcher, discovery and the CLI need neither `opa` nor `python-hcl2`. The OPA
+cases skip without `opa` on `PATH`, and the `validate-repo` case also skips without `python-hcl2`.
