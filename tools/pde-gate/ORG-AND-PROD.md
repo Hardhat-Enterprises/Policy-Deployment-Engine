@@ -33,7 +33,11 @@ Hardcoded regions in Rego are **defaults**. When the package has:
 }
 ```
 
-the API rewrites, in a temporary copy of each selected policy, the `values` of any **whitelist**
+`approved_regions` must be GCP region names (`^[a-z]+-[a-z]+[0-9]+$`, e.g. `us-central1`) and
+`approved_zones` zone names (`^[a-z]+-[a-z]+[0-9]+-[a-z]$`, e.g. `us-central1-a`); anything else is
+rejected (400) when the package is created or updated.
+
+The API rewrites, in a temporary copy of each selected policy, the `values` of any **whitelist**
 condition on a single `region`, `zone` or `location` attribute before OPA evaluates it
 (`tools/pde-gate-api/src/engine/opa.ts`, `substituteOrgValues`). The Rego in `policies/` is never
 changed. Rules:
@@ -44,6 +48,7 @@ changed. Rules:
   `australia-southeast1`, a zone like `australia-southeast1-a`). A location whitelist of `global`,
   `US`/`EU` multi-regions or zones is left alone, and the check reports a warning.
 - `location` keeps the case the policy uses (`google_storage_bucket/location` is upper case).
+- `policy_type` is read case-insensitively (`"whitelist"` and `"Whitelist"` are the same).
 - Blacklists and other policy types are never rewritten.
 
 ```bash
@@ -56,13 +61,13 @@ pde-gate package set-regions pkg_xxx --regions australia-southeast1
 ```bash
 # 1) API (.env with MySQL creds)
 cd tools/pde-gate-api
-cp .env.example .env   # set PDE_DB_* 
+cp .env.example .env   # set PDE_DB_*, and GATE_SESSION_SECRET in production
 npm install && npm run db:migrate && npm start
 
-# 2) Register
+# 2) Register: prints the API key once (put it in CI as PDE_API_KEY) and starts a session
 cd ../pde-gate && npm install
 export PDE_API_URL=http://127.0.0.1:3847
-npx tsx src/cli.ts register --name "Acme" --email you@acme.com
+npx tsx src/cli.ts register --name "Acme" --email you@acme.com --password '…'
 npx tsx src/cli.ts status
 
 # 3) MySQL check
@@ -79,15 +84,32 @@ npx tsx src/cli.ts check --plan ../../samples/client-mimic/plan.json --package <
 | --- | --- | --- | --- |
 | `pass` | 200 | 0 | every selected policy evaluated and passed |
 | `fail` | 422 | 1 | at least one policy failed |
-| `error` | 422 | 2 | nothing was evaluated (no policy matches the plan), or a policy could not be evaluated (OPA error, undefined message), or a content-security policy was selected (it needs Bandit findings this check does not produce) |
+| `error` | 422 | 2 | a policy could not be evaluated (OPA error, undefined message), or nothing was evaluated (no policy matches the plan, or every selected policy was skipped) |
 
 A check that evaluated nothing is never a pass. Resource types in the plan with no PDE policies
 are listed in `warnings`.
 
-## API keys
+`policies` lists every selected policy with its own status: `pass`, `fail`, `error` or `skipped`.
+Content-security policies (on `dev`, the six `google_ces_agent` `*_callbacks.python_code` ones)
+need Bandit findings the gate does not produce. They are `skipped`, named in `warnings`, not
+counted in `evaluated`, and do not decide the result; the other policies do.
 
-Only a sha256 hash of each API key is stored. `login` (email + password) therefore cannot
-return the existing key: it issues a new one and the previous key stops working.
+## API keys and sessions
+
+Two credentials, two jobs:
+
+| Credential | Comes from | Used for |
+| --- | --- | --- |
+| API key (`pde_…`, `PDE_API_KEY`) | shown **once**, at registration (and by a rotation) | `POST /v1/orgs/:orgId/checks` only |
+| Session token (`pds.…`) | `POST /v1/orgs/login` (and registration); valid 12 hours | the org, package routes and key rotation; the portal uses it |
+
+- Logging in never changes the API key, so a portal or CLI login cannot break a CI pipeline.
+- `POST /v1/orgs/:orgId/api-key/rotate` (session required) is the only way to replace the key: it
+  returns the new key once and the old one stops working at once. CLI: `pde-gate api-key rotate`.
+- Only a sha256 hash of each API key is stored.
+- Sessions are HMAC-SHA256-signed with `GATE_SESSION_SECRET`. With `NODE_ENV=production` the server
+  refuses to start unless it is set (at least 32 characters). Elsewhere a missing secret falls back
+  to a random one per process, so sessions end when the server restarts.
 
 ## Version enforcement (GCP)
 
