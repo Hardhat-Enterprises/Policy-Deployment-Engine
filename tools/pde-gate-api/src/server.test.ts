@@ -36,11 +36,13 @@ async function post(path: string, body: string, headers: Record<string, string> 
   return { status: res.status, body: (await res.json()) as { error?: string } };
 }
 
-test("health responds without DB", async () => {
-  const res = await fetch(`${base}/health`);
-  assert.equal(res.status, 200);
-  const body = (await res.json()) as { service: string };
-  assert.equal(body.service, "pde-gate-api");
+test("health (and /) respond without DB", async () => {
+  for (const path of ["/health", "/"]) {
+    const res = await fetch(`${base}${path}`);
+    assert.equal(res.status, 200, path);
+    const body = (await res.json()) as { service: string };
+    assert.equal(body.service, "pde-gate-api");
+  }
 });
 
 test("register: a non-string org_name is a 400, and the server stays up", async () => {
@@ -86,7 +88,12 @@ async function get(path: string, bearer: string) {
 }
 
 test("management routes need a session token: an API key is a 401 before any DB work", async () => {
-  for (const path of ["/v1/orgs/org_x", "/v1/orgs/org_x/packages", "/v1/orgs/org_x/packages/pkg_1"]) {
+  for (const path of [
+    "/v1/orgs/org_x",
+    "/v1/orgs/org_x/packages",
+    "/v1/orgs/org_x/packages/pkg_1",
+    "/v1/orgs/org_x/policy-catalog",
+  ]) {
     const res = await get(path, "pde_0123456789abcdef");
     assert.equal(res.status, 401, path);
     assert.match(res.body.error!, /session token/);

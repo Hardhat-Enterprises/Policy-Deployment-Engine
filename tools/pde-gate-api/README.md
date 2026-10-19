@@ -12,6 +12,7 @@ Express + Sequelize + MySQL config API for PDE Gate.
 | GET | `/v1/orgs/:orgId` | Bearer session token |
 | GET/POST | `/v1/orgs/:orgId/packages` | Bearer session token |
 | GET/PATCH/DELETE | `/v1/orgs/:orgId/packages/:packageId` | Bearer session token |
+| GET | `/v1/orgs/:orgId/policy-catalog?platform=gcp` | Bearer session token → each resource type with its argument policies (for building `policy_groups`) |
 | POST | `/v1/orgs/:orgId/api-key/rotate` | Bearer session token → a new `api_key`, shown once; the old one stops working |
 | POST | `/v1/orgs/:orgId/checks` | Bearer `PDE_API_KEY` → `status` pass (200) / fail (422) / error (422) |
 

@@ -167,6 +167,15 @@ test("API: register → login → auth → package CRUD lifecycle", opts, async 
     assert.equal(me.status, 200);
     assert.equal((me.body as { org_name: string }).org_name, "Test Org");
 
+    // The portal's catalogue: session only, the real policies/ tree.
+    const catalog = await json(srv.base, "GET", `/v1/orgs/${org_id}/policy-catalog`, { key: session });
+    assert.equal(catalog.status, 200);
+    const cat = catalog.body as { platform: string; resource_count: number; policy_count: number };
+    assert.equal(cat.platform, "gcp");
+    assert.ok(cat.resource_count > 400 && cat.policy_count > 1800, JSON.stringify(cat).slice(0, 200));
+    assert.equal((await json(srv.base, "GET", `/v1/orgs/${org_id}/policy-catalog?platform=mainframe`, { key: session })).status, 400);
+    assert.equal((await json(srv.base, "GET", `/v1/orgs/${org_id}/policy-catalog`, { key: api_key })).status, 401);
+
     const createMissingName = await json(srv.base, "POST", `/v1/orgs/${org_id}/packages`, {
       key: session,
       body: { policy_groups: {} },

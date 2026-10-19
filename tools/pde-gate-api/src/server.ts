@@ -13,7 +13,9 @@ import {
     updatePackage,
 } from './store.js';
 import type { Org } from './db/models/index.js';
-import { runServerCheck } from './engine/run-check.js';
+import { policiesRoot, runServerCheck } from './engine/run-check.js';
+import { buildPolicyCatalog } from './engine/policy-catalog.js';
+import { getAdapter } from './engine/plugins/index.js';
 import { HttpError } from './http-error.js';
 import { isSessionToken, issueSession, verifySession } from './session.js';
 import {
@@ -172,6 +174,10 @@ export function createApp(options: AppOptions = {}) {
     // Plans can be large — client uploads terraform show -json
     app.use(express.json({ limit: process.env.PDE_JSON_LIMIT || '32mb' }));
 
+    app.get('/', (_req, res) => {
+        res.json({ status: 'ok', service: 'pde-gate-api' });
+    });
+
     app.get('/health', (_req, res) => {
         res.json({ status: 'ok', service: 'pde-gate-api' });
     });
@@ -242,6 +248,20 @@ export function createApp(options: AppOptions = {}) {
     app.get('/v1/orgs/:orgId/packages', asyncRoute(async (req, res) => {
         const org = await requireSession(req);
         res.json({ packages: await listPackages(org.org_id) });
+    }));
+
+    /** Every resource type and its argument policies, for building policy_groups (portal). */
+    app.get('/v1/orgs/:orgId/policy-catalog', asyncRoute(async (req, res) => {
+        await requireSession(req);
+        const requested = req.query.platform === undefined ? 'gcp' : req.query.platform;
+        const platform = optionalPlatform({ platform: requested }, 'platform') ?? 'gcp';
+        const resources = buildPolicyCatalog(policiesRoot(), getAdapter(platform).policiesSubdir());
+        res.json({
+            platform,
+            resources,
+            resource_count: resources.length,
+            policy_count: resources.reduce((count, resource) => count + resource.policies.length, 0),
+        });
     }));
 
     app.post('/v1/orgs/:orgId/packages', asyncRoute(async (req, res) => {

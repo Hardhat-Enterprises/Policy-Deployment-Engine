@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 # Mimic a real client: register (optional) → create package → send plan to API check.
+#
+# Credentials (~/.pde-gate/credentials.json, or PDE_CREDENTIALS_FILE):
+#   --register   new org: saves the API key (for check) and a 12-hour session (for package)
+#   --login      saves a new session; the API key already saved for that org is kept
+#   (no flag)    uses what is saved: a current session and the org's API key
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -45,11 +50,11 @@ fi
 echo "== package list =="
 npx tsx src/cli.ts package list
 
-echo "== check plan (expect FAIL: legacy-connector region) =="
+echo "== check plan (expect FAIL: legacy-connector region and ip_cidr_range) =="
 set +e
 npx tsx src/cli.ts check --plan "$DEMO/plan.json" --package "$PKG_ID" --platform gcp
 CODE=$?
 set -e
 
-echo "== done exit=$CODE (1 = policy failure expected for this demo) =="
+echo "== done exit=$CODE (0 pass, 1 policy failure — expected here, 2 error) =="
 exit "$CODE"

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDE Gate — Policy Package Builder</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="/session.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="/register">Register</a>
+    <a href="/packages">Packages</a>
+    <a href="/settings">Settings</a>
+    <a href="/check">Run check</a>
+  </nav>
+
+  <h1>Policy package builder</h1>
+  <p class="muted">
+    Discover available PDE policies, select the controls required by your
+    organisation, and create a reusable package without writing JSON.
+    The CI API key is managed on <a href="/settings">Settings</a>.
+  </p>
+
+  <section id="sign_in"></section>
+
+  <section id="workspace" class="builder-workspace" hidden>
+    <form id="builder_form">
+      <h2>2. Define the package</h2>
+
+      <label for="package_name">Package name</label>
+      <input id="package_name" required placeholder="production-gcp-baseline" />
+
+      <label for="package_description">Description</label>
+      <textarea id="package_description" rows="3" placeholder="Security controls for production infrastructure"></textarea>
+
+      <label for="platform">Cloud platform</label>
+      <select id="platform">
+        <option value="gcp">Google Cloud Platform (GCP)</option>
+        <option value="aws">Amazon Web Services (AWS)</option>
+        <option value="azure">Microsoft Azure</option>
+      </select>
+
+      <label for="approved_regions">Approved regions (comma-separated)</label>
+      <input id="approved_regions" required placeholder="australia-southeast1, australia-southeast2" />
+
+      <label for="approved_zones">Approved zones (comma-separated, optional)</label>
+      <input id="approved_zones" placeholder="australia-southeast1-a, australia-southeast1-b" />
+
+      <label for="provider_version">Provider version (optional)</label>
+      <input id="provider_version" placeholder="7.37.0" />
+
+      <fieldset class="mode-fieldset">
+        <legend>Policy selection mode</legend>
+        <label class="radio-row">
+          <input type="radio" name="selection_mode" value="all" checked />
+          <span><strong>All applicable policies</strong><small>Evaluate every available policy matching resources in the uploaded plan.</small></span>
+        </label>
+        <label class="radio-row">
+          <input type="radio" name="selection_mode" value="custom" />
+          <span><strong>Custom selection</strong><small>Choose individual resources and policy controls from the catalog.</small></span>
+        </label>
+      </fieldset>
+
+      <div id="catalog_panel" hidden>
+        <div class="catalog-toolbar">
+          <div>
+            <h2>Available policy catalog</h2>
+            <p id="catalog_summary" class="muted"></p>
+          </div>
+          <input id="catalog_search" type="search" placeholder="Search service, resource or policy" />
+        </div>
+        <div id="catalog" class="policy-catalog"></div>
+        <p id="selection_summary" class="selection-summary">No custom policies selected.</p>
+      </div>
+
+      <button id="create_button" type="submit">Create policy package</button>
+    </form>
+
+    <section class="existing-packages">
+      <div class="section-heading">
+        <div>
+          <h2>Existing packages</h2>
+          <p class="muted">Packages available to Settings and Run Check.</p>
+        </div>
+        <button id="refresh_button" type="button" class="secondary-button">Refresh</button>
+      </div>
+      <div id="package_list" class="package-list"></div>
+    </section>
+  </section>
+
+  <section id="result" class="check-result" hidden aria-live="polite"></section>
+
+  <script>
+    const builderForm = document.getElementById("builder_form");
+    const workspace = document.getElementById("workspace");
+    const createButton = document.getElementById("create_button");
+    const refreshButton = document.getElementById("refresh_button");
+    const platform = document.getElementById("platform");
+    const catalogPanel = document.getElementById("catalog_panel");
+    const catalogElement = document.getElementById("catalog");
+    const catalogSearch = document.getElementById("catalog_search");
+    const catalogSummary = document.getElementById("catalog_summary");
+    const selectionSummary = document.getElementById("selection_summary");
+    const packageList = document.getElementById("package_list");
+    const result = document.getElementById("result");
+
+    let catalogResources = [];
+    let savedPackages = [];
+    const selectedPolicyKeys = new Set();
+
+    function parseList(value) {
+      return String(value).split(",").map(item => item.trim()).filter(Boolean);
+    }
+
+    function appendText(parent, tag, text, className) {
+      const element = document.createElement(tag);
+      element.textContent = text;
+      if (className) element.className = className;
+      parent.appendChild(element);
+      return element;
+    }
+
+    function showMessage(message, error = false) {
+      result.className = error
+        ? "check-result check-result--error"
+        : "check-result check-result--pass";
+      result.replaceChildren();
+      appendText(result, "h2", error ? "Unable to complete request" : "Package workspace updated");
+      appendText(result, "p", message);
+      result.hidden = false;
+    }
+
+    function mode() {
+      return document.querySelector('input[name="selection_mode"]:checked').value;
+    }
+
+    function selectedGroups() {
+      const groups = {};
+      selectedPolicyKeys.forEach(key => {
+        const separator = key.indexOf("\u0000");
+        const resource = key.slice(0, separator);
+        const policy = key.slice(separator + 1);
+        if (!groups[resource]) groups[resource] = [];
+        groups[resource].push(policy);
+      });
+      return groups;
+    }
+
+    function policyKey(resource, policy) {
+      return `${resource}\u0000${policy}`;
+    }
+
+    function updateSelectionSummary() {
+      const groups = selectedGroups();
+      const resources = Object.keys(groups).length;
+      const policies = Object.values(groups).reduce((count, values) => count + values.length, 0);
+      selectionSummary.textContent = policies
+        ? `${policies} policies selected across ${resources} resource type${resources === 1 ? "" : "s"}.`
+        : "No custom policies selected.";
+    }
+
+    function renderCatalog(filter = "") {
+      catalogElement.replaceChildren();
+      const query = filter.trim().toLowerCase();
+      const visible = catalogResources.filter(resource => {
+        const searchable = [resource.service, resource.resource_type, ...resource.policies].join(" ").toLowerCase();
+        return !query || searchable.includes(query);
+      });
+
+      if (!visible.length) {
+        appendText(catalogElement, "p", "No policies match this search.", "muted");
+        return;
+      }
+
+      const services = new Map();
+      visible.forEach(resource => {
+        if (!services.has(resource.service)) services.set(resource.service, []);
+        services.get(resource.service).push(resource);
+      });
+
+      for (const [service, resources] of services) {
+        const group = document.createElement("details");
+        group.className = "service-group";
+        if (query || services.size === 1) group.open = true;
+        const summary = document.createElement("summary");
+        summary.textContent = `${service} (${resources.length} resources)`;
+        group.appendChild(summary);
+
+        resources.forEach(resource => {
+          const card = document.createElement("article");
+          card.className = "resource-card";
+          const heading = document.createElement("div");
+          heading.className = "resource-heading";
+          appendText(heading, "h3", resource.resource_type);
+          const selectButton = document.createElement("button");
+          selectButton.type = "button";
+          selectButton.className = "text-button";
+          selectButton.textContent = "Select all";
+          selectButton.addEventListener("click", () => {
+            const boxes = card.querySelectorAll('input[type="checkbox"]');
+            const shouldSelect = Array.from(boxes).some(box => !box.checked);
+            boxes.forEach(box => {
+              box.checked = shouldSelect;
+              const key = policyKey(box.dataset.resource, box.dataset.policy);
+              if (shouldSelect) selectedPolicyKeys.add(key);
+              else selectedPolicyKeys.delete(key);
+            });
+            selectButton.textContent = shouldSelect ? "Clear" : "Select all";
+            updateSelectionSummary();
+          });
+          heading.appendChild(selectButton);
+          card.appendChild(heading);
+
+          const grid = document.createElement("div");
+          grid.className = "policy-checkbox-grid";
+          resource.policies.forEach(policy => {
+            const label = document.createElement("label");
+            label.className = "policy-checkbox";
+            const input = document.createElement("input");
+            input.type = "checkbox";
+            input.dataset.resource = resource.resource_type;
+            input.dataset.policy = policy;
+            const key = policyKey(resource.resource_type, policy);
+            input.checked = selectedPolicyKeys.has(key);
+            input.addEventListener("change", () => {
+              if (input.checked) selectedPolicyKeys.add(key);
+              else selectedPolicyKeys.delete(key);
+              updateSelectionSummary();
+            });
+            label.appendChild(input);
+            appendText(label, "span", policy);
+            grid.appendChild(label);
+          });
+          card.appendChild(grid);
+          group.appendChild(card);
+        });
+        catalogElement.appendChild(group);
+      }
+    }
+
+    async function loadCatalog() {
+      const data = await PdeSession.api(`/policy-catalog?platform=${encodeURIComponent(platform.value)}`);
+      catalogResources = Array.isArray(data.resources) ? data.resources : [];
+      catalogSummary.textContent =
+        `${data.resource_count || 0} resource types and ${data.policy_count || 0} argument policies discovered from the repository.`;
+      renderCatalog(catalogSearch.value);
+      updateSelectionSummary();
+    }
+
+    function renderPackages() {
+      packageList.replaceChildren();
+      if (!savedPackages.length) {
+        appendText(packageList, "p", "No packages have been created yet.", "muted");
+        return;
+      }
+
+      savedPackages.forEach(policyPackage => {
+        const card = document.createElement("article");
+        card.className = "package-card";
+        const content = document.createElement("div");
+        appendText(content, "h3", policyPackage.name);
+        appendText(content, "p", policyPackage.description || "No description", "muted");
+        const groups = policyPackage.policy_groups && typeof policyPackage.policy_groups === "object"
+          ? Object.keys(policyPackage.policy_groups).length : 0;
+        appendText(
+          content,
+          "small",
+          `${(policyPackage.platforms || []).join(", ")} · ${groups ? `${groups} custom resource groups` : "all matching policies"}`
+        );
+        card.appendChild(content);
+
+        const actions = document.createElement("div");
+        actions.className = "package-actions";
+        const settingsLink = document.createElement("a");
+        settingsLink.href = "/settings";
+        settingsLink.textContent = "Edit";
+        actions.appendChild(settingsLink);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "danger-button";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => deletePackage(policyPackage));
+        actions.appendChild(deleteButton);
+        card.appendChild(actions);
+        packageList.appendChild(card);
+      });
+    }
+
+    async function loadPackages() {
+      const data = await PdeSession.api("/packages");
+      savedPackages = Array.isArray(data.packages) ? data.packages : [];
+      renderPackages();
+    }
+
+    async function deletePackage(policyPackage) {
+      if (!confirm(`Delete policy package "${policyPackage.name}"? This cannot be undone.`)) return;
+      try {
+        await PdeSession.api(`/packages/${encodeURIComponent(policyPackage.package_id)}`, { method: "DELETE" });
+        await loadPackages();
+        showMessage(`Deleted policy package "${policyPackage.name}".`);
+      } catch (error) {
+        showMessage(error instanceof Error ? error.message : "Unable to delete package.", true);
+      }
+    }
+
+    async function openWorkspace() {
+      result.hidden = true;
+      try {
+        await Promise.all([loadPackages(), loadCatalog()]);
+        workspace.hidden = false;
+      } catch (error) {
+        showMessage(error instanceof Error ? error.message : "Unable to load package workspace.", true);
+      }
+    }
+
+    PdeSession.mount(document.getElementById("sign_in"), openWorkspace, () => {
+      workspace.hidden = true;
+    });
+
+    document.querySelectorAll('input[name="selection_mode"]').forEach(input => {
+      input.addEventListener("change", () => {
+        catalogPanel.hidden = mode() !== "custom";
+      });
+    });
+
+    catalogSearch.addEventListener("input", () => renderCatalog(catalogSearch.value));
+    platform.addEventListener("change", async () => {
+      if (workspace.hidden) return;
+      selectedPolicyKeys.clear();
+      try { await loadCatalog(); }
+      catch (error) { showMessage(error instanceof Error ? error.message : "Unable to load catalog.", true); }
+    });
+    refreshButton.addEventListener("click", async () => {
+      try { await loadPackages(); showMessage("Package list refreshed."); }
+      catch (error) { showMessage(error instanceof Error ? error.message : "Unable to refresh.", true); }
+    });
+
+    builderForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const name = document.getElementById("package_name").value.trim();
+      const regions = parseList(document.getElementById("approved_regions").value);
+      const zones = parseList(document.getElementById("approved_zones").value);
+      const providerVersion = document.getElementById("provider_version").value.trim();
+      const policyGroups = mode() === "custom" ? selectedGroups() : {};
+
+      if (!name) { showMessage("Package name is required.", true); return; }
+      if (!regions.length) { showMessage("Add at least one approved region.", true); return; }
+      if (mode() === "custom" && !Object.keys(policyGroups).length) {
+        showMessage("Select at least one policy for a custom package.", true); return;
+      }
+
+      const variables = { approved_regions: regions, approved_zones: zones };
+      if (providerVersion) variables.google_provider_version = providerVersion;
+      const requestBody = {
+        name,
+        description: document.getElementById("package_description").value.trim(),
+        platforms: [platform.value],
+        policy_groups: policyGroups,
+        variables
+      };
+
+      createButton.disabled = true;
+      createButton.textContent = "Creating...";
+      try {
+        const data = await PdeSession.api("/packages", { method: "POST", body: requestBody });
+        builderForm.reset();
+        selectedPolicyKeys.clear();
+        platform.value = "gcp";
+        catalogPanel.hidden = true;
+        await loadPackages();
+        showMessage(`Created policy package "${data.name || name}". It is ready for Settings and Run Check.`);
+      } catch (error) {
+        showMessage(error instanceof Error ? error.message : "Unable to create package.", true);
+      } finally {
+        createButton.disabled = false;
+        createButton.textContent = "Create policy package";
+      }
+    });
+  </script>
+</body>
+</html>

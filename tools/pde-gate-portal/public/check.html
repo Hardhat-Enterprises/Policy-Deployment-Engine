@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDE Gate — Run Policy Check</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="/session.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="/register">Register</a>
+    <a href="/packages">Packages</a>
+    <a href="/settings">Settings</a>
+    <a href="/check">Run check</a>
+  </nav>
+
+  <h1>Run policy check</h1>
+  <p class="muted">
+    Sign in, select a saved policy package, and evaluate a Terraform
+    <code>plan.json</code> through the PDE Gate backend and OPA engine.
+  </p>
+
+  <section id="sign_in"></section>
+
+  <form id="check_form" class="check-form" hidden>
+    <h2>Configure the check</h2>
+
+    <label for="api_key">API key (<code>PDE_API_KEY</code>)</label>
+    <input id="api_key" name="api_key" type="password" autocomplete="off" required />
+    <p class="muted">
+      Paste the organisation's API key for this check: checks run with the
+      same key CI uses, and the sign-in session only manages packages. The
+      key is not stored. Lost it? Rotate it on the <a href="/settings">Settings</a> page.
+    </p>
+
+    <label for="package_select">Policy package</label>
+    <select id="package_select" required></select>
+    <p id="package_summary" class="muted"></p>
+
+    <label for="platform">Cloud platform</label>
+    <select id="platform" name="platform">
+      <option value="">Detect automatically from the plan</option>
+      <option value="gcp">Google Cloud Platform (GCP)</option>
+      <option value="aws">Amazon Web Services (AWS)</option>
+      <option value="azure">Microsoft Azure</option>
+    </select>
+
+    <label for="plan_file">Terraform plan.json</label>
+    <input
+      id="plan_file"
+      name="plan_file"
+      type="file"
+      accept=".json,application/json"
+      required
+    />
+    <p class="muted">
+      Generate this file with
+      <code>terraform show -json tfplan &gt; plan.json</code>.
+    </p>
+
+    <div id="plan_details" class="file-details" hidden aria-live="polite"></div>
+
+    <label class="checkbox-row" for="strict_versions">
+      <input id="strict_versions" name="strict_versions" type="checkbox" checked />
+      <span>Enforce provider-version compatibility</span>
+    </label>
+
+    <button id="check_button" type="submit">Run PDE check</button>
+  </form>
+
+  <section id="result" class="check-result" hidden aria-live="polite"></section>
+
+  <script>
+    const checkForm = document.getElementById("check_form");
+    const checkButton = document.getElementById("check_button");
+    const packageSelect = document.getElementById("package_select");
+    const packageSummary = document.getElementById("package_summary");
+    const planFile = document.getElementById("plan_file");
+    const planDetails = document.getElementById("plan_details");
+    const result = document.getElementById("result");
+
+    let packages = [];
+    let parsedPlan = null;
+
+    // Pasted for each check and never stored: the API key belongs in CI.
+    const apiKeyInput = document.getElementById("api_key");
+
+    function authHeaders(apiKey) {
+      return {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      };
+    }
+
+    async function readJson(response) {
+      try {
+        return await response.json();
+      } catch {
+        return {};
+      }
+    }
+
+    function clearResult() {
+      result.hidden = true;
+      result.className = "check-result";
+      result.replaceChildren();
+    }
+
+    function appendText(parent, tag, text, className) {
+      const element = document.createElement(tag);
+      element.textContent = text;
+      if (className) element.className = className;
+      parent.appendChild(element);
+      return element;
+    }
+
+    function showError(message) {
+      result.className = "check-result check-result--error";
+      result.replaceChildren();
+      appendText(result, "h2", "Unable to complete check");
+      appendText(result, "p", message);
+      result.hidden = false;
+    }
+
+    function getPackageId(policyPackage) {
+      return String(policyPackage?.package_id || policyPackage?.id || "");
+    }
+
+    function selectedPackage() {
+      return packages.find(item => getPackageId(item) === packageSelect.value);
+    }
+
+    function updatePackageSummary() {
+      const policyPackage = selectedPackage();
+      if (!policyPackage) {
+        packageSummary.textContent = "";
+        return;
+      }
+
+      const platforms = Array.isArray(policyPackage.platforms)
+        ? policyPackage.platforms.join(", ")
+        : "not specified";
+      const policyGroups = policyPackage.policy_groups &&
+        typeof policyPackage.policy_groups === "object"
+        ? Object.keys(policyPackage.policy_groups).length
+        : 0;
+
+      packageSummary.textContent =
+        `${policyPackage.description || "No description"} ` +
+        `Platform: ${platforms}. Resource policy groups: ${policyGroups}.`;
+    }
+
+    function populatePackages(items) {
+      packageSelect.replaceChildren();
+
+      for (const policyPackage of items) {
+        const option = document.createElement("option");
+        option.value = getPackageId(policyPackage);
+        option.textContent = policyPackage.name || option.value;
+        packageSelect.appendChild(option);
+      }
+
+      updatePackageSummary();
+      checkForm.hidden = false;
+    }
+
+    function validatePlan(value) {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw new Error("The selected plan must contain a JSON object.");
+      }
+
+      const looksLikeTerraformPlan =
+        typeof value.format_version === "string" ||
+        value.planned_values ||
+        Array.isArray(value.resource_changes);
+
+      if (!looksLikeTerraformPlan) {
+        throw new Error(
+          "This does not look like Terraform plan JSON. Generate it with " +
+          "terraform show -json tfplan > plan.json."
+        );
+      }
+
+      return value;
+    }
+
+    function countResources(module) {
+      if (!module || typeof module !== "object") return 0;
+      const direct = Array.isArray(module.resources) ? module.resources.length : 0;
+      const children = Array.isArray(module.child_modules) ? module.child_modules : [];
+      return direct + children.reduce((total, child) => total + countResources(child), 0);
+    }
+
+    function showPlanDetails(file, plan) {
+      const resourceCount = countResources(plan.planned_values?.root_module);
+      planDetails.textContent =
+        `Loaded ${file.name} (${resourceCount} planned resource` +
+        `${resourceCount === 1 ? "" : "s"}, Terraform ` +
+        `${plan.terraform_version || "version not reported"}).`;
+      planDetails.hidden = false;
+    }
+
+    function resultValue(value) {
+      if (typeof value === "string") return value;
+      return JSON.stringify(value, null, 2);
+    }
+
+    function renderCheck(checkResult) {
+      // pass: every evaluated policy passed; fail: a policy failed; error: the
+      // check is incomplete (nothing evaluated, or a policy could not be).
+      const status = checkResult.status || (checkResult.ok === true ? "pass" : "fail");
+      const passed = status === "pass";
+      result.className = {
+        pass: "check-result check-result--pass",
+        fail: "check-result check-result--fail",
+        error: "check-result check-result--error"
+      }[status] || "check-result check-result--fail";
+      result.replaceChildren();
+
+      appendText(
+        result,
+        "p",
+        { pass: "COMPLIANT", fail: "POLICY VIOLATIONS FOUND", error: "CHECK INCOMPLETE" }[status] || status,
+        "status-badge"
+      );
+      appendText(
+        result,
+        "h2",
+        {
+          pass: "PDE Gate check passed",
+          fail: "PDE Gate check failed",
+          error: "PDE Gate check could not be completed"
+        }[status] || "PDE Gate check failed"
+      );
+      if (checkResult.message) appendText(result, "p", checkResult.message);
+
+      const metrics = document.createElement("div");
+      metrics.className = "result-metrics";
+
+      const metricValues = [
+        ["Platform", checkResult.platform || "Unknown"],
+        ["Policies evaluated", String(checkResult.evaluated ?? 0)],
+        ["Violations", String(Array.isArray(checkResult.failures) ? checkResult.failures.length : 0)],
+        ["Errors", String(Array.isArray(checkResult.errors) ? checkResult.errors.length : 0)],
+        ["Skipped", String(Array.isArray(checkResult.skipped) ? checkResult.skipped.length : 0)]
+      ];
+
+      for (const [label, value] of metricValues) {
+        const card = document.createElement("div");
+        appendText(card, "span", label, "metric-label");
+        appendText(card, "strong", value);
+        metrics.appendChild(card);
+      }
+      result.appendChild(metrics);
+
+      const warnings = Array.isArray(checkResult.warnings) ? checkResult.warnings : [];
+      if (warnings.length) {
+        appendText(result, "h3", "Warnings");
+        const list = document.createElement("ul");
+        warnings.forEach(warning => appendText(list, "li", String(warning)));
+        result.appendChild(list);
+      }
+
+      const failures = Array.isArray(checkResult.failures) ? checkResult.failures : [];
+      if (failures.length) {
+        appendText(result, "h3", "Policy violations");
+        const failureList = document.createElement("div");
+        failureList.className = "failure-list";
+
+        failures.forEach((failure, index) => {
+          const item = document.createElement("article");
+          item.className = "failure-card";
+          appendText(item, "h4", `${index + 1}. ${failure.policy || "Unknown policy"}`);
+          appendText(item, "pre", resultValue(failure.message));
+          failureList.appendChild(item);
+        });
+        result.appendChild(failureList);
+      } else if (passed) {
+        appendText(
+          result,
+          "p",
+          "No selected policy reported a non-compliant Terraform resource."
+        );
+      }
+
+      const errors = Array.isArray(checkResult.errors) ? checkResult.errors : [];
+      if (errors.length) {
+        appendText(result, "h3", "Policies that could not be evaluated");
+        const list = document.createElement("ul");
+        errors.forEach(item => appendText(list, "li", `${item.policy || "Unknown policy"}: ${item.error}`));
+        result.appendChild(list);
+      }
+
+      const skipped = Array.isArray(checkResult.skipped) ? checkResult.skipped : [];
+      if (skipped.length) {
+        appendText(result, "h3", "Skipped policies");
+        const list = document.createElement("ul");
+        skipped.forEach(item => appendText(list, "li", `${item.policy || "Unknown policy"}: ${item.reason}`));
+        result.appendChild(list);
+      }
+
+      appendText(result, "h3", "Applied organisation configuration");
+      appendText(result, "pre", resultValue(checkResult.org_config || {}));
+      result.hidden = false;
+      result.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    PdeSession.mount(
+      document.getElementById("sign_in"),
+      async () => {
+        clearResult();
+        checkForm.hidden = true;
+        try {
+          const data = await PdeSession.api("/packages");
+          packages = Array.isArray(data.packages) ? data.packages : [];
+          if (!packages.length) {
+            throw new Error(
+              "No saved policy packages were found. Register or create a package first."
+            );
+          }
+          populatePackages(packages);
+        } catch (error) {
+          showError(error instanceof Error ? error.message : "Unable to load packages.");
+        }
+      },
+      () => {
+        checkForm.hidden = true;
+      }
+    );
+
+    packageSelect.addEventListener("change", updatePackageSummary);
+
+    planFile.addEventListener("change", async event => {
+      parsedPlan = null;
+      planDetails.hidden = true;
+      clearResult();
+
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        if (file.size > 32 * 1024 * 1024) {
+          throw new Error("The Terraform plan exceeds the 32 MB request limit.");
+        }
+        const text = await file.text();
+        parsedPlan = validatePlan(JSON.parse(text));
+        showPlanDetails(file, parsedPlan);
+      } catch (error) {
+        planFile.value = "";
+        showError(
+          error instanceof SyntaxError
+            ? "The selected plan.json contains invalid JSON."
+            : error instanceof Error
+              ? error.message
+              : "Unable to read the Terraform plan."
+        );
+      }
+    });
+
+    checkForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      clearResult();
+
+      const session = PdeSession.current();
+      const apiKey = apiKeyInput.value.trim();
+      const packageId = packageSelect.value;
+      if (!session) {
+        showError("Sign in first.");
+        return;
+      }
+      if (!apiKey) {
+        showError("Enter the organisation's API key (PDE_API_KEY).");
+        return;
+      }
+      if (!packageId) {
+        showError("Select a policy package.");
+        return;
+      }
+      if (!parsedPlan) {
+        showError("Choose a valid Terraform plan.json before running the check.");
+        return;
+      }
+
+      const platform = document.getElementById("platform").value;
+      const body = {
+        package_id: packageId,
+        plan: parsedPlan,
+        strict_versions: document.getElementById("strict_versions").checked
+      };
+      if (platform) body.platform = platform;
+
+      checkButton.disabled = true;
+      checkButton.textContent = "Evaluating policies...";
+
+      try {
+        const response = await fetch(
+          `/v1/orgs/${encodeURIComponent(session.orgId)}/checks`,
+          {
+            method: "POST",
+            headers: authHeaders(apiKey),
+            body: JSON.stringify(body)
+          }
+        );
+        const data = await readJson(response);
+
+        if (typeof data.ok === "boolean") {
+          renderCheck(data);
+        } else {
+          throw new Error(data.error || `Check request failed (${response.status}).`);
+        }
+      } catch (error) {
+        showError(error instanceof Error ? error.message : "Unable to run check.");
+      } finally {
+        checkButton.disabled = false;
+        checkButton.textContent = "Run PDE check";
+      }
+    });
+  </script>
+</body>
+</html>
