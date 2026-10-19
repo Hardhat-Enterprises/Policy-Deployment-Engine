@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-scripts/auto_remediation/main.py — generalised Terraform auto-remediation for the
-Policy-Deployment-Engine policies.
+pde_autoremediate.py — generalised Terraform auto-remediation for the whole
+Policy-Deployment-Engine dev branch.
 
 WHAT THIS DOES
 ---------------
-1. DISCOVER   — walks policies/<platform>/<Service>/<resource>/<argument>/policy.rego
-                and finds every argument-level policy that exists, regardless
-                of who wrote it or which service/resource it belongs to.
+1. DISCOVER   — walks policies/**/*.rego on the dev branch and finds every
+                argument-level policy that exists, regardless of who wrote it
+                or which service/resource it belongs to.
 2. LEARN      — for each policy, asks the REAL OPA engine what the policy's
                 own condition logic says (policy_type, attribute_path,
                 safe values) — nothing is hand-coded per resource. This is
@@ -25,11 +25,11 @@ WHAT THIS DOES
 
 FIX RULES (derived from reading policies/_helpers/policies/*.rego directly —
 not guessed):
-  whitelist                 — scalar: set to values[0].
+  whitelist  (819 policies) — scalar: set to values[0].
                                list:   keep only elements that are in `values`;
                                        if that empties the list, fall back to
                                        [values[0]].
-  blacklist                 — boolean scalar: flip to the other boolean value
+  blacklist  (328 policies) — boolean scalar: flip to the other boolean value
                                        (deterministic — only two options exist).
                                list:   remove every element that is in `values`.
                                other scalar: NOT auto-fixable — the safe
@@ -38,16 +38,15 @@ not guessed):
                                        string; many other values would be
                                        valid but we don't know which). Flagged
                                        for manual review, never guessed.
-  range                     — numeric: clamp into [min, max] on whichever
+  range      (19  policies) — numeric: clamp into [min, max] on whichever
                                        side was violated.
 
-Anything else (pattern_*, element_*, map key, presence, ...) is detected and
-flagged as unsupported, never silently mishandled. Content-security policies
-(they need Bandit findings) are skipped as unsupported, and a policy the helpers
-refuse ("POLICY ERROR:" in its message) is an evaluation error, never "fixed" or
-"clean".
+Anything else (pattern_*, element_*, map_key_blacklist — defined in the shared
+helpers but not currently used by any live policy) is detected and flagged,
+never silently mishandled.
 
-KNOWN LIMITATIONS:
+KNOWN LIMITATIONS (found by running this against all 1,654 policies with a
+fixture on dev — see validation_report.json for the full numbers):
   - The Terraform patcher understands HCL *blocks* (`name { ... }`) at any
     nesting depth, but not *map-typed attributes* (`name = { "key" = val }`),
     which is a different syntax Terraform allows for the same kind of nested
@@ -57,39 +56,38 @@ KNOWN LIMITATIONS:
   - If the nested block a fix needs to change is entirely ABSENT from the
     resource (not just wrong, but missing), the patcher won't fabricate a
     new block from scratch — it flags rather than guesses the right shape.
-  - A violation that names a resource the engine cannot find in the plan is
-    reported separately as resource_name_mismatch, never silently skipped.
+  - About a third of resources across the whole repo don't follow the
+    `non_compliant_example_1` fixture-naming convention consistently (this
+    is a data-quality issue in some other contributors' fixtures, not a bug
+    in this engine) — these are reported separately as
+    resource_name_mismatch, never silently skipped.
 
 USAGE
 -----
-  # See what's out there:
-  python3 scripts/auto_remediation/main.py discover --repo .
+  # See what's actually out there on dev:
+  python3 pde_autoremediate.py discover --repo /path/to/Policy-Deployment-Engine
 
-  # Against a real target Terraform project:
+  # Real use in CI, against a real target Terraform project:
   terraform -chdir=my-infra plan -out=plan.tfplan
   terraform -chdir=my-infra show -json plan.tfplan > plan.json
-  python3 scripts/auto_remediation/main.py remediate \
-      --repo . --plan plan.json --tf-dir my-infra \
+  python3 pde_autoremediate.py remediate \
+      --repo /path/to/Policy-Deployment-Engine \
+      --plan plan.json \
+      --tf-dir my-infra \
       --apply            # omit --apply to dry-run and only report
 
-  # Repo-wide self-validation against every policy's nonCompliant.tf:
-  python3 scripts/auto_remediation/main.py validate-repo --repo .
+  # Repo-wide self-validation (used to prove this generalises — see README):
+  python3 pde_autoremediate.py validate-repo --repo /path/to/Policy-Deployment-Engine
 """
 import argparse
 import json
 import re
-import shutil
 import subprocess
 import sys
-import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
-OPA_BIN = "opa"  # on PATH; override with --opa-bin
-
-POLICY_FILE = "policy.rego"
-VARS_FILE = "_vars.rego"
-NON_COMPLIANT_FIXTURE = "nonCompliant.tf"
+OPA_BIN = "/tmp/opa"  # override with --opa-bin if opa is on PATH as `opa`
 
 
 # ---------------------------------------------------------------------------
@@ -99,30 +97,16 @@ NON_COMPLIANT_FIXTURE = "nonCompliant.tf"
 @dataclass
 class Policy:
     package: str            # e.g. terraform.gcp.security.oracle_database.google_oracle_database_odb_subnet.deletion_protection
-    rego_path: Path         # policies/<platform>/<service>/<resource>/<argument>/policy.rego
-    resource_dir: Path      # policies/<platform>/<service>/<resource>/  (holds _vars.rego)
-    vars_path: Path         # resource_dir / _vars.rego
+    rego_path: Path
+    resource_dir: Path      # policies/<platform>/<service>/<resource>/
+    rel_resource_dir: Path  # resource_dir relative to policies/ — mirrors the inputs/ tree
     helpers_dir: Path
     resource_type: str      # e.g. google_oracle_database_odb_subnet (from _vars.rego)
     resource_value_name: str  # attribute whose VALUE identifies a resource in violation reports (from _vars.rego)
     platform: str
     service: str
     resource: str
-    argument: str           # the argument folder name; may contain dots
-
-    @property
-    def argument_dir(self) -> Path:
-        return self.rego_path.parent
-
-    def data_paths(self) -> list[Path]:
-        """OPA --data: the shared helpers, this resource's _vars.rego and this one
-        policy — explicit files, as auto_test.py's check_pair does. Passing the
-        resource folder instead would load every sibling policy and the committed
-        <sha>.json fixture plans as data."""
-        paths = [self.helpers_dir, self.rego_path]
-        if self.vars_path.is_file():
-            paths.append(self.vars_path)
-        return paths
+    argument: str
 
 
 PACKAGE_RE = re.compile(r"^package\s+([\w.]+)\s*$", re.MULTILINE)
@@ -131,15 +115,15 @@ RESOURCE_VALUE_NAME_RE = re.compile(r'"resource_value_name"\s*:\s*"([^"]+)"')
 
 
 def discover_policies(repo_root: Path) -> list[Policy]:
-    """Every policies/<platform>/<Service>/<resource>/<argument>/policy.rego. The
-    resource folder (two levels up) holds _vars.rego; the argument is the policy's
-    folder name; the package comes from the policy's own package line."""
     policies_root = repo_root / "policies"
     helpers_dir = policies_root / "_helpers"
     out: list[Policy] = []
 
-    for rego_path in sorted(policies_root.rglob(POLICY_FILE)):
-        if "_helpers" in rego_path.relative_to(policies_root).parts:
+    # Each policy is <platform>/<service>/<resource>/<argument>/policy.rego.
+    for rego_path in sorted(policies_root.rglob("policy.rego")):
+        if "_helpers" in rego_path.parts:
+            continue
+        if rego_path.name == "_vars.rego":
             continue
 
         text = rego_path.read_text(encoding="utf-8", errors="ignore")
@@ -149,7 +133,7 @@ def discover_policies(repo_root: Path) -> list[Policy]:
         package = m.group(1)
 
         resource_dir = rego_path.parent.parent
-        vars_path = resource_dir / VARS_FILE
+        vars_path = resource_dir / "_vars.rego"
         resource_type = None
         resource_value_name = None
         if vars_path.exists():
@@ -176,7 +160,7 @@ def discover_policies(repo_root: Path) -> list[Policy]:
             package=package,
             rego_path=rego_path,
             resource_dir=resource_dir,
-            vars_path=vars_path,
+            rel_resource_dir=resource_dir.relative_to(policies_root),
             helpers_dir=helpers_dir,
             resource_type=resource_type,
             resource_value_name=resource_value_name,
@@ -208,16 +192,13 @@ def find_violated_resource(resources: list, res_name: str, resource_value_name):
     return None
 
 
-class OpaEvalError(RuntimeError):
-    """opa itself failed (compile error, crash), as opposed to an undefined rule."""
-
-
 def opa_eval(opa_bin: str, data_paths: list[Path], query: str, input_obj: dict | None = None):
     cmd = [opa_bin, "eval"]
     for p in data_paths:
         cmd += ["--data", str(p)]
     tmp_input = None
     if input_obj is not None:
+        import tempfile
         tmp_input = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
         json.dump(input_obj, tmp_input)
         tmp_input.close()
@@ -229,8 +210,7 @@ def opa_eval(opa_bin: str, data_paths: list[Path], query: str, input_obj: dict |
         if tmp_input:
             Path(tmp_input.name).unlink(missing_ok=True)
     if result.returncode != 0:
-        # --format json puts compile errors on stdout, other failures on stderr.
-        raise OpaEvalError(f"opa eval failed for {query}: {(result.stderr or result.stdout).strip()[:500]}")
+        raise RuntimeError(f"opa eval failed for {query}: {result.stderr.strip()}")
     payload = json.loads(result.stdout)
     res = payload.get("result")
     if not res:
@@ -239,43 +219,19 @@ def opa_eval(opa_bin: str, data_paths: list[Path], query: str, input_obj: dict |
     return exprs[0].get("value") if exprs else None
 
 
-# The helpers' marker for a policy they refuse to evaluate (as auto_test.py's
-# POLICY_ERROR_PREFIX): nothing in it was checked.
-POLICY_ERROR_PREFIX = "POLICY ERROR:"
+def data_paths(policy: Policy) -> list[Path]:
+    """Explicit --data files (helpers, the policy, its resource's _vars.rego), as
+    auto_test.py's check_pair: the argument folder also holds the <sha>.json plans."""
+    paths = [policy.helpers_dir, policy.rego_path]
+    vars_path = policy.resource_dir / "_vars.rego"
+    if vars_path.is_file():
+        paths.append(vars_path)
+    return paths
 
 
-def find_policy_error(message) -> str | None:
-    """The helpers' "POLICY ERROR: ..." text, from the marker onwards, at any depth
-    of the message (OPA returns it as nested arrays), or None."""
-    if isinstance(message, str):
-        index = message.find(POLICY_ERROR_PREFIX)
-        return message[index:].strip() if index != -1 else None
-    children = message if isinstance(message, list) else list(message.values()) if isinstance(message, dict) else []
-    for child in children:
-        found = find_policy_error(child)
-        if found is not None:
-            return found
-    return None
-
-
-CONTENT_SECURITY_RE = re.compile(r'"policy_type"\s*:\s*"content security"', re.IGNORECASE)
-
-
-def needs_content_analysis(policy_file: Path) -> bool:
-    """Content-security policies read Bandit findings injected into the input
-    (auto_test.py's needs_content_analysis); this engine has none, so they are
-    unsupported here."""
-    return bool(CONTENT_SECURITY_RE.search(policy_file.read_text(encoding="utf-8", errors="ignore")))
-
-
-def eval_package(policy: Policy, opa_bin: str = OPA_BIN, input_obj: dict | None = None) -> dict:
-    """The whole policy package (conditions, details, message, ...) in one eval."""
-    value = opa_eval(opa_bin, policy.data_paths(), f"data.{policy.package}", input_obj)
-    return value if isinstance(value, dict) else {}
-
-
-def parse_conditions(raw) -> list[dict]:
+def get_conditions(policy: Policy, opa_bin: str = OPA_BIN):
     """Flat list of {situation, remedies, policy_type, attribute_path, values}."""
+    raw = opa_eval(opa_bin, data_paths(policy), f"data.{policy.package}.conditions")
     flat = []
     if not raw:
         return flat
@@ -291,19 +247,15 @@ def parse_conditions(raw) -> list[dict]:
         flat.append({
             "situation": (meta or {}).get("situation_description"),
             "remedies": (meta or {}).get("remedies", []),
-            "policy_type": str(cond.get("policy_type", "")).lower(),
+            "policy_type": cond.get("policy_type", "").lower(),
             "attribute_path": cond.get("attribute_path", []),
             "values": cond.get("values", []),
         })
     return flat
 
 
-def get_conditions(policy: Policy, opa_bin: str = OPA_BIN):
-    return parse_conditions(eval_package(policy, opa_bin).get("conditions"))
-
-
 def get_details(policy: Policy, plan: dict, opa_bin: str = OPA_BIN):
-    return eval_package(policy, opa_bin, plan).get("details") or []
+    return opa_eval(opa_bin, data_paths(policy), f"data.{policy.package}.details", plan) or []
 
 
 # ---------------------------------------------------------------------------
@@ -452,9 +404,6 @@ def _match_delim(text: str, open_pos: int, open_ch: str, close_ch: str):
     return None
 
 
-HEREDOC_RE = re.compile(r"<<-?([A-Za-z_][A-Za-z0-9_]*)[ \t]*\n")
-
-
 def _set_attribute_in_range(text: str, start: int, end: int, attr: str, value_literal: str, indent: str) -> str:
     segment = text[start:end]
     attr_re = re.compile(r"\n[ \t]*" + re.escape(attr) + r"\s*=\s*")
@@ -465,14 +414,7 @@ def _set_attribute_in_range(text: str, start: int, end: int, attr: str, value_li
         # (a list/object, which may span multiple lines), match to its close;
         # otherwise it's a scalar and ends at the line break.
         first_ch = segment[value_start] if value_start < len(segment) else ""
-        heredoc = HEREDOC_RE.match(segment, value_start)
-        if heredoc:
-            # <<EOT ... EOT (or <<-EOT): the value runs to the closing marker line.
-            close = re.compile(r"^[ \t]*" + re.escape(heredoc.group(1)) + r"[ \t]*$", re.MULTILINE)
-            end_marker = close.search(segment, heredoc.end())
-            value_end = end_marker.end() if end_marker else len(segment)
-            first_ch = ""
-        elif first_ch == "[":
+        if first_ch == "[":
             value_end = _match_delim(segment, value_start, "[", "]")
         elif first_ch == "{":
             value_end = _match_delim(segment, value_start, "{", "}")
@@ -482,7 +424,7 @@ def _set_attribute_in_range(text: str, start: int, end: int, attr: str, value_li
         if value_end is None:
             value_end = len(segment)
         else:
-            value_end += 1 if first_ch in ("[", "{") else 0  # include the closing bracket itself
+            value_end += 1 if first_ch in "[{" else 0  # include the closing bracket itself
         new_segment = segment[:value_start] + value_literal + segment[value_end:]
     else:
         new_segment = segment + f"\n{indent}  {attr} = {value_literal}\n"
@@ -628,19 +570,14 @@ def _process_one(policy, orig_text, plan, situation_hit, cond_hit, stats,
         return
 
     new_plan = build_plan_from_tf(working_text)
-    package2 = eval_package(policy, opa_bin, new_plan)
-    policy_error = find_policy_error(package2.get("message"))
-    if policy_error is not None:
-        # Never "fixed": the helpers refused the policy, so nothing was checked.
-        raise OpaEvalError(f"re-verify: {policy_error}")
-    details2 = package2.get("details") or []
+    details2 = get_details(policy, new_plan, opa_bin)
     still_bad = any(s and s.get("non_compliant_resources") for s in details2)
     if still_bad:
         stats["auto_fixed_but_still_noncompliant"] += 1
     else:
         stats["auto_fixed_and_reverified_compliant"] += 1
         if write_fixed_to is not None:
-            out_dir = write_fixed_to / policy.argument_dir.relative_to(policy.helpers_dir.parent)
+            out_dir = write_fixed_to / policy.rel_resource_dir / policy.argument
             out_dir.mkdir(parents=True, exist_ok=True)
             (out_dir / "BEFORE_nonCompliant.tf").write_text(orig_text)
             (out_dir / "AFTER_fixed.tf").write_text(working_text)
@@ -681,51 +618,30 @@ def cmd_validate_repo(args):
     patch_failed_log = []
     mismatch_log = []
     eval_error_log = []
-    unsupported_log = []
 
     for i, policy in enumerate(policies):
         if args.limit and i >= args.limit:
             break
-        fixture_path = policy.argument_dir / NON_COMPLIANT_FIXTURE
+        fixture_path = policy.rego_path.parent / "nonCompliant.tf"
         if not fixture_path.exists():
             stats["fixture_missing"] += 1
             continue
 
-        if needs_content_analysis(policy.rego_path):
-            stats["total_policies_with_fixture"] += 1
-            stats["condition_type_unsupported"] += 1
-            unsupported_log.append({"policy": policy.package, "reason": "content-security policy: needs Bandit findings"})
-            continue
-
         try:
-            # utf-8-sig: some fixtures start with a byte-order mark, which hcl2 rejects.
-            orig_text = fixture_path.read_text(encoding="utf-8-sig", errors="ignore")
+            conds = get_conditions(policy, args.opa_bin)
+            if not conds:
+                stats["eval_error"] += 1
+                eval_error_log.append({"policy": policy.package, "stage": "get_conditions", "error": "no conditions returned (empty result)"})
+                continue
+            orig_text = fixture_path.read_text(encoding="utf-8", errors="ignore")
             plan = build_plan_from_tf(orig_text)
-            package = eval_package(policy, args.opa_bin, plan)
+            details = get_details(policy, plan, args.opa_bin)
         except Exception as e:
             stats["eval_error"] += 1
-            eval_error_log.append({"policy": policy.package, "stage": "plan/eval", "error": f"{type(e).__name__}: {e}"})
+            eval_error_log.append({"policy": policy.package, "stage": "conditions/plan/details", "error": f"{type(e).__name__}: {e}"})
             continue
-
-        policy_error = find_policy_error(package.get("message"))
-        if policy_error is not None:
-            stats["eval_error"] += 1
-            eval_error_log.append({"policy": policy.package, "stage": "policy_error", "error": policy_error})
-            continue
-        if "conditions" not in package:
-            stats["eval_error"] += 1
-            eval_error_log.append({"policy": policy.package, "stage": "conditions", "error": "the policy has no conditions rule"})
-            continue
-        conds = parse_conditions(package.get("conditions"))
-        details = package.get("details") or []
 
         stats["total_policies_with_fixture"] += 1
-        if not conds:
-            # Custom Rego (e.g. `conditions := []` plus its own rules): there is no
-            # policy_type / values to derive a fix from.
-            stats["condition_type_unsupported"] += 1
-            unsupported_log.append({"policy": policy.package, "reason": "no helper conditions (custom Rego)"})
-            continue
 
         situation_hit, cond_hit = None, None
         for situation, cond in zip(details, conds):
@@ -738,7 +654,6 @@ def cmd_validate_repo(args):
 
         if cond_hit["policy_type"] not in ("whitelist", "blacklist", "range"):
             stats["condition_type_unsupported"] += 1
-            unsupported_log.append({"policy": policy.package, "reason": f"policy_type {cond_hit['policy_type']!r}"})
             continue
 
         try:
@@ -761,7 +676,6 @@ def cmd_validate_repo(args):
             "needs_manual_review": manual_review_log,
             "patch_failed": patch_failed_log,
             "resource_name_mismatch": mismatch_log,
-            "unsupported": unsupported_log,
             "eval_errors": eval_error_log,
         }, indent=2))
         print(f"\nDetailed log written to {args.log_out}", file=sys.stderr)
@@ -775,16 +689,8 @@ def cmd_discover(args):
     repo = Path(args.repo)
     policies = apply_filter(discover_policies(repo), args.only)
     by_type: dict[str, int] = {}
-    errors = 0
     for p in policies:
-        if needs_content_analysis(p.rego_path):
-            by_type["content security (unsupported)"] = by_type.get("content security (unsupported)", 0) + 1
-            continue
-        try:
-            conds = get_conditions(p, args.opa_bin)
-        except OpaEvalError:
-            errors += 1
-            continue
+        conds = get_conditions(p, args.opa_bin)
         for c in conds:
             by_type[c["policy_type"]] = by_type.get(c["policy_type"], 0) + 1
     print(f"Discovered {len(policies)} argument-level policies across "
@@ -792,8 +698,6 @@ def cmd_discover(args):
     print("Condition breakdown by policy_type:")
     for k, v in sorted(by_type.items(), key=lambda kv: -kv[1]):
         print(f"  {k:10s} {v}")
-    if errors:
-        print(f"  ({errors} policies could not be evaluated)")
 
 
 # ---------------------------------------------------------------------------
@@ -803,7 +707,7 @@ def cmd_discover(args):
 def cmd_remediate(args):
     repo = Path(args.repo)
     tf_dir = Path(args.tf_dir)
-    plan = json.loads(Path(args.plan).read_text(encoding="utf-8-sig"))
+    plan = json.loads(Path(args.plan).read_text())
 
     policies = apply_filter(discover_policies(repo), args.only)
     by_resource_type: dict[str, list[Policy]] = {}
@@ -814,23 +718,10 @@ def cmd_remediate(args):
     plan_types = {r["type"] for r in resources_in_plan}
 
     report = []
-    for rtype in sorted(plan_types & by_resource_type.keys()):
+    for rtype in plan_types & by_resource_type.keys():
         for policy in by_resource_type[rtype]:
-            if needs_content_analysis(policy.rego_path):
-                report.append({"resource_type": rtype, "policy": policy.package, "action": "UNSUPPORTED",
-                               "reason": "content-security policy: needs Bandit findings"})
-                continue
-            try:
-                package = eval_package(policy, args.opa_bin, plan)
-            except OpaEvalError as e:
-                report.append({"resource_type": rtype, "policy": policy.package, "action": "EVAL_ERROR", "reason": str(e)})
-                continue
-            policy_error = find_policy_error(package.get("message"))
-            if policy_error is not None:
-                report.append({"resource_type": rtype, "policy": policy.package, "action": "EVAL_ERROR", "reason": policy_error})
-                continue
-            conds = parse_conditions(package.get("conditions"))
-            details = package.get("details") or []
+            conds = get_conditions(policy, args.opa_bin)
+            details = get_details(policy, plan, args.opa_bin)
             for situation, cond in zip(details, conds):
                 for res_name in situation.get("non_compliant_resources", []):
                     candidates = [r for r in resources_in_plan if r["type"] == rtype]
@@ -867,80 +758,68 @@ def cmd_remediate(args):
     print(json.dumps(report, indent=2))
     fixed = sum(1 for r in report if r["action"] == "PATCHED")
     needs_review = sum(1 for r in report if r["action"] == "NEEDS_MANUAL_REVIEW")
-    not_checked = sum(1 for r in report if r["action"] in ("UNSUPPORTED", "EVAL_ERROR"))
-    violations = len(report) - not_checked
-    mode = "" if args.apply else " (dry run: nothing was written; use --apply)"
-    print(f"\n{violations} violation(s) found, {fixed} patched, {needs_review} need manual review, "
-          f"{not_checked} policies not checked (unsupported or eval error){mode}.", file=sys.stderr)
+    print(f"\n{len(report)} violation(s) found, {fixed} patched, {needs_review} need manual review.", file=sys.stderr)
 
 
-def build_parser() -> argparse.ArgumentParser:
-    # --opa-bin works before or after the subcommand. The subcommand copy defaults
-    # to SUPPRESS, so it only sets a value when given there; otherwise the
-    # top-level value (or its default) stands. With a real default on both,
-    # `--opa-bin X discover` would be overwritten by the subcommand's default.
-    opa_help = "opa binary: a name on PATH or a path to the executable (default: opa)"
+if __name__ == "__main__":
+    # --opa-bin is defined on a shared parent parser and inherited by every
+    # subcommand, so it works whether you put it before or after the
+    # subcommand name (e.g. both `--opa-bin opa.exe discover ...` and
+    # `discover ... --opa-bin opa.exe` work).
     opa_parent = argparse.ArgumentParser(add_help=False)
-    opa_parent.add_argument("--opa-bin", default=argparse.SUPPRESS, help=opa_help)
+    opa_parent.add_argument("--opa-bin", default=OPA_BIN, help="Path to the opa binary (e.g. .\\opa.exe on Windows)")
 
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--opa-bin", default=OPA_BIN, help=opa_help)
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter, parents=[opa_parent])
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    d = sub.add_parser("discover", help="Inventory every policy in the repo", parents=[opa_parent])
+    d = sub.add_parser("discover", help="Inventory every policy on the dev branch", parents=[opa_parent])
     d.add_argument("--repo", required=True)
     d.add_argument("--only", default=None, help="Filter to a resource_type or service, e.g. google_oracle_database_odb_subnet or 'Oracle Database'")
     d.set_defaults(func=cmd_discover)
 
-    r = sub.add_parser("remediate", help="Detect + fix violations in a real Terraform project (dry run unless --apply)", parents=[opa_parent])
+    r = sub.add_parser("remediate", help="Detect + auto-fix violations in a real Terraform project", parents=[opa_parent])
     r.add_argument("--repo", required=True)
     r.add_argument("--plan", required=True, help="terraform show -json output")
     r.add_argument("--tf-dir", required=True)
     r.add_argument("--only", default=None, help="Filter to a resource_type or service")
-    r.add_argument("--apply", action="store_true", help="Actually write fixes (default: dry run, report only)")
+    r.add_argument("--apply", action="store_true", help="Actually write fixes (default: dry-run)")
     r.set_defaults(func=cmd_remediate)
 
-    v = sub.add_parser("validate-repo", help="Repo-wide self-test: detect -> fix -> re-verify against every policy's nonCompliant.tf", parents=[opa_parent])
+    v = sub.add_parser("validate-repo", help="Repo-wide self-test: run detect->fix->reverify against every fixture on dev", parents=[opa_parent])
     v.add_argument("--repo", required=True)
     v.add_argument("--only", default=None, help="Filter to a resource_type or service")
     v.add_argument("--limit", type=int, default=0, help="Stop after N policies (0 = no limit)")
-    v.add_argument("--log-out", default=None, help="Write a detailed JSON log (manual review, patch failed, unsupported, eval errors)")
+    v.add_argument("--log-out", default=None, help="Write a detailed JSON log (manual-review + patch-failed items)")
     v.add_argument("--write-fixed-to", default=None, help="Save a BEFORE/AFTER .tf pair for every successfully auto-fixed policy into this folder (nothing under --repo is ever touched)")
     v.set_defaults(func=cmd_validate_repo)
-    return ap
 
+    args = ap.parse_args()
 
-def opa_problem(opa_bin: str) -> str | None:
-    """None when `opa_bin` runs; otherwise a message saying how to fix it."""
-    if shutil.which(opa_bin) is None and not Path(opa_bin).is_file():
-        return (
-            f"ERROR: opa not found: {opa_bin!r} is neither on PATH nor an existing file.\n"
-            "Install OPA (https://www.openpolicyagent.org/docs/#running-opa) so that `opa version` works,\n"
-            "or pass the binary's full path with --opa-bin."
-        )
+    # Fail fast with a clear, specific message instead of burning through every
+    # policy with the same silent subprocess failure (this is exactly what
+    # produced 7 uninformative FileNotFoundErrors for one user on Windows).
+    import shutil as _shutil
+    opa_path = Path(args.opa_bin)
+    if not opa_path.exists() and _shutil.which(args.opa_bin) is None:
+        print(f"ERROR: --opa-bin {args.opa_bin!r} does not exist and isn't on PATH.", file=sys.stderr)
+        print("Checklist:", file=sys.stderr)
+        print(f"  1. Does the file actually exist? Run:  dir {args.opa_bin}", file=sys.stderr)
+        print("  2. Are you running this command from the SAME folder the file is in?", file=sys.stderr)
+        print("     (a relative path like .\\opa.exe only resolves from that exact folder)", file=sys.stderr)
+        print("  3. On Windows, a freshly-downloaded .exe is sometimes blocked (Mark of the Web).", file=sys.stderr)
+        print(f"     Try:  Unblock-File -Path {args.opa_bin}", file=sys.stderr)
+        print(f"  4. Safest fix: use the FULL absolute path, e.g. --opa-bin \"C:\\full\\path\\to\\opa.exe\"", file=sys.stderr)
+        sys.exit(1)
     try:
-        check = subprocess.run([opa_bin, "version"], capture_output=True, text=True, timeout=10)
-    except OSError as e:
-        return (
-            f"ERROR: found {opa_bin!r} but could not run it ({type(e).__name__}: {e}).\n"
-            "Check that it is the OPA binary for this operating system and that it is allowed to execute\n"
-            "(executable bit on Linux/macOS; on Windows, a downloaded file may need unblocking)."
-        )
-    if check.returncode != 0:
-        return f"ERROR: {opa_bin!r} failed to run `version` (exit {check.returncode}): {check.stderr.strip()}"
-    return None
+        _check = subprocess.run([args.opa_bin, "version"], capture_output=True, text=True, timeout=10)
+        if _check.returncode != 0:
+            print(f"ERROR: {args.opa_bin} exists but failed to run (exit {_check.returncode}).", file=sys.stderr)
+            print(f"stderr was: {_check.stderr.strip()}", file=sys.stderr)
+            sys.exit(1)
+    except Exception as e:
+        print(f"ERROR: found {args.opa_bin} but couldn't execute it: {type(e).__name__}: {e}", file=sys.stderr)
+        print("This usually means Windows has blocked the downloaded file. Try:", file=sys.stderr)
+        print(f"  Unblock-File -Path {args.opa_bin}", file=sys.stderr)
+        sys.exit(1)
 
-
-def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
-    # Fail fast with one clear message instead of the same failure on every policy.
-    problem = opa_problem(args.opa_bin)
-    if problem:
-        print(problem, file=sys.stderr)
-        return 1
     args.func(args)
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

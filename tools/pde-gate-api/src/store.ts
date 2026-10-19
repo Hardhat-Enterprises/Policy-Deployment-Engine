@@ -1,6 +1,5 @@
-import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { Org, Package } from "./db/models/index.js";
-import { hashPassword, verifyPassword } from "./password.js";
 import type { CreatePackageRequest, PolicyPackage } from "./types.js";
 
 function slugId(prefix: string): string {
@@ -10,21 +9,6 @@ function slugId(prefix: string): string {
 function apiKey(): string {
   return `pde_${randomBytes(24).toString("hex")}`;
 }
-
-/** API keys are random 192-bit secrets, so a plain sha256 is enough to store them. */
-export function hashApiKey(key: string): string {
-  return createHash("sha256").update(key, "utf8").digest("hex");
-}
-
-/** Constant-time comparison of a presented key against a stored hash. */
-export function apiKeyMatches(key: string, storedHash: string): boolean {
-  const presented = Buffer.from(hashApiKey(key), "hex");
-  const stored = Buffer.from(storedHash, "hex");
-  return presented.length === stored.length && timingSafeEqual(presented, stored);
-}
-
-// Verified against when the email is unknown, so a miss costs the same scrypt as a hit.
-const DUMMY_PASSWORD_HASH = hashPassword(randomBytes(16).toString("hex"));
 
 export function toPolicyPackage(row: Package): PolicyPackage {
   return {
@@ -38,17 +22,18 @@ export function toPolicyPackage(row: Package): PolicyPackage {
   };
 }
 
+import { hashPassword, verifyPassword } from "./password.js";
+
 export async function createOrg(input: {
   org_name: string;
   contact_email: string;
-  /** Required: without it the org could never log in once its first session ends. */
-  password: string;
+  password?: string;
 }): Promise<{ org: Org; api_key: string }> {
   const key = apiKey();
-  const passwordHash = hashPassword(input.password);
+  const passwordHash = hashPassword(input.password || randomBytes(16).toString("hex"));
   const org = await Org.create({
     org_id: slugId("org"),
-    api_key_hash: hashApiKey(key),
+    token: key,
     org_name: input.org_name.trim(),
     contact_email: input.contact_email.trim(),
     registered_at: new Date(),
@@ -60,31 +45,20 @@ export async function createOrg(input: {
   return { org, api_key: key };
 }
 
-/** Email + password → the org, or null. The API key is not touched. */
-export async function loginOrg(email: string, password: string): Promise<Org | null> {
+export async function loginOrg(
+  email: string,
+  password: string
+): Promise<{ org: Org; api_key: string } | null> {
   const org = await Org.findOne({ where: { contact_email: email.trim() } });
-  if (!org || !org.password_hash) {
-    verifyPassword(password, DUMMY_PASSWORD_HASH);
-    return null;
-  }
-  return verifyPassword(password, org.password_hash) ? org : null;
-}
-
-/** Issue a new API key and revoke the old one. The only way to replace a key. */
-export async function rotateApiKey(org: Org): Promise<string> {
-  const key = apiKey();
-  org.api_key_hash = hashApiKey(key);
-  await org.save();
-  return key;
-}
-
-export async function findOrgById(orgId: string): Promise<Org | null> {
-  return Org.findOne({ where: { org_id: orgId } });
+  if (!org || !org.password_hash) return null;
+  const ok = verifyPassword(password, org.password_hash);
+  if (!ok) return null;
+  return { org, api_key: org.token };
 }
 
 export async function findOrgByKey(orgId: string, key: string): Promise<Org | null> {
-  const org = await findOrgById(orgId);
-  if (!org || !apiKeyMatches(key, org.api_key_hash)) return null;
+  const org = await Org.findOne({ where: { org_id: orgId } });
+  if (!org || org.token !== key) return null;
   return org;
 }
 

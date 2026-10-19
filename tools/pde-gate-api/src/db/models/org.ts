@@ -1,10 +1,10 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../sequelize.js";
 
-/** The `orgs` table. The API key is stored only as its sha256 hex digest. */
+/** Matches existing local `orgs` table (token + legacy org fields). */
 export type OrgAttrs = {
   org_id: string;
-  api_key_hash: string;
+  token: string;
   schema_version: string;
   org_name: string;
   registered_at: Date;
@@ -21,7 +21,7 @@ type OrgCreate = Optional<
 
 export class Org extends Model<OrgAttrs, OrgCreate> implements OrgAttrs {
   declare org_id: string;
-  declare api_key_hash: string;
+  declare token: string;
   declare schema_version: string;
   declare org_name: string;
   declare registered_at: Date;
@@ -34,13 +34,13 @@ export class Org extends Model<OrgAttrs, OrgCreate> implements OrgAttrs {
 Org.init(
   {
     org_id: { type: DataTypes.STRING(64), allowNull: false, primaryKey: true },
-    api_key_hash: { type: DataTypes.CHAR(64), allowNull: false, unique: true },
+    token: { type: DataTypes.STRING(128), allowNull: false, unique: true },
     schema_version: { type: DataTypes.STRING(16), allowNull: false, defaultValue: "1" },
     org_name: { type: DataTypes.STRING(255), allowNull: false },
     registered_at: { type: DataTypes.DATE, allowNull: false },
     approved_regions: { type: DataTypes.JSON, allowNull: false, defaultValue: [] },
     approved_zones: { type: DataTypes.JSON, allowNull: false, defaultValue: [] },
-    contact_email: { type: DataTypes.STRING(255), allowNull: false, unique: true },
+    contact_email: { type: DataTypes.STRING(255), allowNull: false },
     password_hash: { type: DataTypes.STRING(255), allowNull: true },
   },
   { sequelize, tableName: "orgs", underscored: true }

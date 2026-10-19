@@ -1,12 +1,10 @@
 import { createApp } from "./server.js";
 import { sequelize } from "./db/sequelize.js";
 import "./db/models/index.js";
-import { assertSessionSecret } from "./session.js";
 
 const PORT = Number(process.env.PDE_PORTAL_PORT ?? process.env.PDE_API_PORT ?? 3847);
 
 async function main() {
-  assertSessionSecret();
   await sequelize.authenticate();
   const app = createApp();
   app.listen(PORT, () => {

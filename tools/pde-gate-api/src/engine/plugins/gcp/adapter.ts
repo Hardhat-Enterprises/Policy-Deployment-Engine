@@ -18,8 +18,11 @@ export const gcpAdapter: PlatformAdapter = {
     return "gcp";
   },
   mergeOrgConfig(plan, variables) {
-    // Only what the package sets: an absent approved_regions / approved_zones must
-    // not become [] (that would empty every region whitelist it is substituted into).
-    return { ...plan, org_config: { ...(variables ?? {}) } };
+    const org_config = {
+      approved_regions: (variables?.approved_regions as string[]) ?? [],
+      approved_zones: (variables?.approved_zones as string[]) ?? [],
+      ...variables,
+    };
+    return { ...plan, org_config };
   },
 };

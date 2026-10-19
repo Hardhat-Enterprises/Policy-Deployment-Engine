@@ -79,7 +79,6 @@
   </style>
 
   <link rel="stylesheet" href="/styles.css" />
-  <script src="/session.js"></script>
 </head>
 
 <body>
@@ -124,14 +123,14 @@
       id="password"
       name="password"
       type="password"
-      minlength="12"
+      minlength="8"
       autocomplete="new-password"
       required
     />
 
     <p class="muted">
-      Use at least 12 characters. You sign in to the portal with this
-      email and password; it is used exactly as typed (spaces count).
+      Use at least eight characters. This password can be used for
+      organisation login.
     </p>
 
     <label for="package_json">
@@ -217,7 +216,11 @@
 
     <select id="policy_profile" name="policy_profile">
       <option value="full">
-        full — every policy for each resource type in the plan
+        full — all policies per resource
+      </option>
+
+      <option value="baseline">
+        baseline — standard policy subset
       </option>
 
       <option value="custom" selected>
@@ -232,14 +235,12 @@
         id="enabled_policies"
         name="enabled_policies"
         rows="6"
-        placeholder="google_vpc_access_connector: region, ip_cidr_range"
-      >google_vpc_access_connector: region, ip_cidr_range</textarea>
+        placeholder="google_vpc_access_connector: region, network"
+      >google_vpc_access_connector: region, network</textarea>
 
       <p class="muted">
         Enter one Terraform resource type per line, followed by its
-        argument names: the policy folder names under
-        <code>policies/gcp/&lt;Service&gt;/&lt;resource type&gt;/</code>,
-        e.g. <code>region</code>, <code>ip_cidr_range</code>.
+        argument names (the policy folder names).
       </p>
     </div>
 
@@ -251,6 +252,9 @@
   <div id="result" class="result" aria-live="polite"></div>
 
   <script>
+    const params = new URLSearchParams(location.search);
+    const callbackUrl = params.get("callback");
+
     const form =
       document.getElementById("registration_form");
 
@@ -280,6 +284,23 @@
         typeof value === "object" &&
         !Array.isArray(value)
       );
+    }
+
+    function isLocalCallback(url) {
+      try {
+        const parsedUrl = new URL(url);
+
+        return (
+          parsedUrl.protocol === "http:" &&
+          (
+            parsedUrl.hostname === "127.0.0.1" ||
+            parsedUrl.hostname === "localhost" ||
+            parsedUrl.hostname === "::1"
+          )
+        );
+      } catch {
+        return false;
+      }
     }
 
     function parseCommaSeparated(raw) {
@@ -386,6 +407,14 @@
         );
       }
 
+      if (
+        !Object.keys(packageData.policy_groups).length
+      ) {
+        throw new Error(
+          "package.json requires at least one policy group"
+        );
+      }
+
       for (
         const [resourceType, policies]
         of Object.entries(packageData.policy_groups)
@@ -478,11 +507,7 @@
       ).value =
         variables.google_provider_version || "";
 
-      // An empty policy_groups means every policy: the "full" profile.
-      profile.value =
-        Object.keys(packageData.policy_groups).length
-          ? "custom"
-          : "full";
+      profile.value = "custom";
 
       document.getElementById(
         "enabled_policies"
@@ -507,17 +532,34 @@
       apiKey,
       packageName
     ) {
+      sessionStorage.setItem("pde_org_id", orgId);
+      sessionStorage.setItem("pde_api_key", apiKey);
+
       result.className = "result";
 
       result.innerHTML = `
         <h2>Registration successful</h2>
+
+        <p
+          id="callback_message"
+          class="muted"
+          style="display: none"
+        >
+          Credentials were sent to the PDE Gate CLI.
+          You can close this tab.
+        </p>
 
         <p>
           <strong>Organisation ID:</strong><br />
           <code id="output_org_id"></code>
         </p>
 
-        <div id="output_api_key"></div>
+        <p>
+          <strong>API key</strong>
+          (save as <code>PDE_API_KEY</code> in CI — shown once):
+          <br />
+          <code id="output_api_key"></code>
+        </p>
 
         <p>
           <strong>Policy package:</strong><br />
@@ -535,10 +577,9 @@
         "output_org_id"
       ).textContent = orgId;
 
-      PdeSession.showOneTimeKey(
-        document.getElementById("output_api_key"),
-        apiKey
-      );
+      document.getElementById(
+        "output_api_key"
+      ).textContent = apiKey;
 
       document.getElementById(
         "output_package"
@@ -548,7 +589,7 @@
         "output_ci"
       ).textContent =
         `PDE_ORG_ID=${orgId}\n` +
-        `PDE_API_KEY=<the API key above>\n` +
+        `PDE_API_KEY=${apiKey}\n` +
         `PDE_API_URL=${location.origin}`;
 
       result.style.display = "block";
@@ -658,8 +699,6 @@
             formData.get("policy_profile")
           );
 
-        // "full" is an empty policy_groups: every policy of each resource
-        // type in the plan runs.
         let policyGroups = {};
 
         try {
@@ -668,6 +707,14 @@
               parseEnabledPolicies(
                 formData.get("enabled_policies")
               );
+          } else if (
+            importedPackage &&
+            isPlainObject(
+              importedPackage.policy_groups
+            )
+          ) {
+            policyGroups =
+              importedPackage.policy_groups;
           }
         } catch (error) {
           showError(
@@ -695,9 +742,9 @@
           return;
         }
 
-        if (password.length < 12) {
+        if (!Object.keys(policyGroups).length) {
           showError(
-            "The password must be at least 12 characters"
+            "Add at least one enabled policy or import package.json"
           );
 
           submitButton.disabled = false;
@@ -731,20 +778,10 @@
 
           if (!registrationResponse.ok) {
             throw new Error(
-              PdeSession.errorMessage(
-                registrationResponse,
-                registrationData,
-                "Organisation registration failed"
-              )
+              registrationData.error ||
+              "Organisation registration failed"
             );
           }
-
-          // Registration also signs the organisation in to the portal.
-          PdeSession.save(
-            registrationData.org_id,
-            registrationData.session_token,
-            registrationData.session_expires_at
-          );
 
           const packageResponse =
             await fetch(
@@ -761,7 +798,7 @@
 
                   "Authorization":
                     `Bearer ${
-                      registrationData.session_token
+                      registrationData.api_key
                     }`
                 },
                 body: JSON.stringify({
@@ -803,6 +840,45 @@
             registrationData.api_key,
             packageData.name || packageName
           );
+
+          if (
+            callbackUrl &&
+            isLocalCallback(callbackUrl)
+          ) {
+            try {
+              const callbackResponse =
+                await fetch(
+                  callbackUrl,
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type":
+                        "application/json"
+                    },
+                    body: JSON.stringify({
+                      org_id:
+                        registrationData.org_id,
+
+                      api_key:
+                        registrationData.api_key
+                    })
+                  }
+                );
+
+              if (callbackResponse.ok) {
+                const callbackMessage =
+                  document.getElementById(
+                    "callback_message"
+                  );
+
+                if (callbackMessage) {
+                  callbackMessage.style.display =
+                    "block";
+                }
+              }
+            } catch {
+            }
+          }
 
           form.style.display = "none";
         } catch (error) {
