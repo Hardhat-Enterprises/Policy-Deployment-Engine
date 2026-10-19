@@ -11,10 +11,9 @@ cd tools/pde-gate-api && npm install && npm run db:migrate && npm start
 # terminal 2
 cd tools/pde-gate && npm install
 export PDE_API_URL=http://127.0.0.1:3847
-PDE_PASSWORD='at least 12 characters' npx tsx src/cli.ts register --name "Demo Org" --email you@example.com
+npx tsx src/cli.ts register --name "Demo Org" --email you@example.com
 npx tsx src/cli.ts package create --name baseline --regions australia-southeast1,australia-southeast2
-npx tsx src/cli.ts check --plan ../../samples/client-mimic/plan.json --package <package_id>
-# exit: 0 pass, 1 policy failure, 2 error (including nothing evaluated)
+npx tsx src/cli.ts check --plan ../../samples/org-input/plan.json --package <package_id>
 ```
 
 See **[ORG-AND-PROD.md](./ORG-AND-PROD.md)** for DB verification and region whitelist.

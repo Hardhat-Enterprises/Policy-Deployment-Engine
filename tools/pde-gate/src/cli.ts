@@ -1,14 +1,13 @@
 import fs from "node:fs";
 import * as api from "./api-client.js";
-import { EXIT_ERROR, checkStatus, exitCodeFor } from "./api-client.js";
-import { loadCredentials, resolveAuth, resolveSession, saveCredentials } from "./credentials.js";
+import { loadCredentials, resolveAuth, saveCredentials } from "./credentials.js";
 
 // Global fetch needs Node 18+ (we require 20+ / .nvmrc 24).
 if (typeof fetch !== "function") {
   console.error(
     `Node ${process.version} has no global fetch. Use Node 20+ (in this folder: nvm use)`
   );
-  process.exit(EXIT_ERROR);
+  process.exit(1);
 }
 
 function usage(): never {
@@ -19,10 +18,6 @@ Client keeps Terraform plan locally. Rego + OPA run on the hosted API.
 Usage:
   pde-gate register --name <org> --email <email> [--password <pass>]
   pde-gate login --email <email> [--password <pass>]
-    (register needs a password of at least 12 characters; set PDE_PASSWORD
-     instead of --password to keep it out of shell history. It is used exactly
-     as given: spaces are not trimmed.)
-  pde-gate api-key rotate
   pde-gate status
   pde-gate package list
   pde-gate package create --name <name> [--regions r1,r2] [--zones z1,z2] [--file package.json]
@@ -31,41 +26,17 @@ Usage:
   pde-gate package delete <package_id>
   pde-gate check --plan <plan.json> --package <package_id> [--platform gcp] [--no-strict-versions]
 
-check exit codes: 0 pass, 1 policy failure, 2 error (bad input, API error,
-or a check that could not evaluate a policy, or evaluated nothing).
-
-check uses the API key (shown once, at register; replace it with api-key rotate).
-status, package and api-key use the 12-hour session from register or login;
-logging in never changes the API key a CI pipeline uses.
-
 Env:
   PDE_API_URL   default http://127.0.0.1:3847
-  PDE_ORG_ID / PDE_API_KEY / PDE_SESSION_TOKEN   (or ~/.pde-gate/credentials.json)
-  PDE_PASSWORD  password for register / login when --password is not given
+  PDE_ORG_ID / PDE_API_KEY   (or ~/.pde-gate/credentials.json)
 `);
-  process.exit(EXIT_ERROR);
-}
-
-/** A usage problem: print it and exit 2. */
-function fail(message: string): never {
-  console.error(message);
-  process.exit(EXIT_ERROR);
+  process.exit(2);
 }
 
 function flag(args: string[], name: string): string | undefined {
   const i = args.indexOf(name);
   if (i >= 0 && args[i + 1] && !args[i + 1]!.startsWith("--")) return args[i + 1];
   return undefined;
-}
-
-const MIN_PASSWORD_LENGTH = 12;
-
-/** --password or PDE_PASSWORD, exactly as given (never trimmed). */
-function passwordArg(args: string[], cmd: string, minLength = 1): string {
-  const password = flag(args, "--password") ?? process.env.PDE_PASSWORD;
-  if (!password) fail(`${cmd} requires --password (or PDE_PASSWORD)`);
-  if (password.length < minLength) fail(`${cmd}: the password must be at least ${minLength} characters`);
-  return password;
 }
 
 function has(args: string[], name: string): boolean {
@@ -90,16 +61,13 @@ async function main() {
   if (cmd === "register") {
     const name = flag(args, "--name");
     const email = flag(args, "--email");
-    if (!name || !email) fail("register requires --name and --email");
-    const password = passwordArg(args, "register", MIN_PASSWORD_LENGTH);
+    const password = flag(args, "--password");
+    if (!name || !email) {
+      console.error("register requires --name and --email");
+      process.exit(1);
+    }
     const res = await api.registerOrg(apiUrl, { org_name: name, contact_email: email, password });
-    saveCredentials({
-      org_id: res.org_id,
-      api_key: res.api_key,
-      session_token: res.session_token,
-      session_expires_at: res.session_expires_at,
-      api_url: apiUrl,
-    });
+    saveCredentials({ org_id: res.org_id, api_key: res.api_key, api_url: apiUrl });
     console.log(`PDE_GATE_REGISTERED org_id=${res.org_id}`);
     console.log(`Saved credentials. Export PDE_API_KEY for CI (shown once):`);
     console.log(res.api_key);
@@ -108,61 +76,45 @@ async function main() {
 
   if (cmd === "login") {
     const email = flag(args, "--email");
-    if (!email) fail("login requires --email");
-    const password = passwordArg(args, "login");
+    const password = flag(args, "--password");
+    if (!email) {
+      console.error("login requires --email");
+      process.exit(1);
+    }
     const res = await api.loginOrg(apiUrl, { email, password });
-    const saved = loadCredentials();
-    saveCredentials({
-      org_id: res.org_id,
-      // Keep a saved API key of the same org; login does not change it.
-      ...(saved?.org_id === res.org_id && saved.api_key ? { api_key: saved.api_key } : {}),
-      session_token: res.session_token,
-      session_expires_at: res.session_expires_at,
-      api_url: apiUrl,
-    });
-    console.log(`PDE_GATE_LOGIN ok org_id=${res.org_id} session_expires_at=${res.session_expires_at}`);
-    console.log("Saved the session. The API key is unchanged.");
-    return;
-  }
-
-  if (cmd === "api-key") {
-    if (args[1] !== "rotate") usage();
-    const auth = resolveSession();
-    const res = await api.rotateApiKey(auth.api_url, auth.org_id, auth.session_token);
-    const saved = loadCredentials();
-    saveCredentials({ ...(saved ?? { org_id: res.org_id }), org_id: res.org_id, api_key: res.api_key });
-    console.log(`PDE_GATE_API_KEY_ROTATED org_id=${res.org_id}`);
-    console.log("Saved credentials. New PDE_API_KEY for CI (shown once; the previous key no longer works):");
+    saveCredentials({ org_id: res.org_id, api_key: res.api_key, api_url: apiUrl });
+    console.log(`PDE_GATE_LOGIN ok org_id=${res.org_id}`);
+    console.log(`Saved credentials. Recovered PDE_API_KEY:`);
     console.log(res.api_key);
     return;
   }
 
   if (cmd === "status") {
-    const auth = resolveSession();
-    const org = await api.getOrg(auth.api_url, auth.org_id, auth.session_token);
+    const auth = resolveAuth();
+    const org = await api.getOrg(auth.api_url, auth.org_id, auth.api_key);
     console.log(`PDE_GATE_STATUS ok org_id=${org.org_id} name=${org.org_name} api=${auth.api_url}`);
     return;
   }
 
   if (cmd === "package") {
     const sub = args[1];
-    const auth = resolveSession();
+    const auth = resolveAuth();
     if (sub === "list") {
-      const pkgs = await api.listPackages(auth.api_url, auth.org_id, auth.session_token);
+      const pkgs = await api.listPackages(auth.api_url, auth.org_id, auth.api_key);
       console.log(JSON.stringify(pkgs, null, 2));
       return;
     }
     if (sub === "show") {
       const id = args[2];
       if (!id) usage();
-      const pkg = await api.getPackage(auth.api_url, auth.org_id, auth.session_token, id);
+      const pkg = await api.getPackage(auth.api_url, auth.org_id, auth.api_key, id);
       console.log(JSON.stringify(pkg, null, 2));
       return;
     }
     if (sub === "delete") {
       const id = args[2];
       if (!id) usage();
-      await api.deletePackage(auth.api_url, auth.org_id, auth.session_token, id);
+      await api.deletePackage(auth.api_url, auth.org_id, auth.api_key, id);
       console.log(`PDE_GATE_PACKAGE_DELETED ${id}`);
       return;
     }
@@ -170,14 +122,17 @@ async function main() {
       const id = args[2];
       const regions = csv(flag(args, "--regions"));
       const zones = csv(flag(args, "--zones"));
-      if (!id || !regions?.length) fail("package set-regions <package_id> --regions r1,r2 [--zones z1,z2]");
-      const existing = await api.getPackage(auth.api_url, auth.org_id, auth.session_token, id);
+      if (!id || !regions?.length) {
+        console.error("package set-regions <package_id> --regions r1,r2 [--zones z1,z2]");
+        process.exit(1);
+      }
+      const existing = await api.getPackage(auth.api_url, auth.org_id, auth.api_key, id);
       const variables = {
         ...(existing.variables ?? {}),
         approved_regions: regions,
         ...(zones ? { approved_zones: zones } : {}),
       };
-      const pkg = await api.updatePackage(auth.api_url, auth.org_id, auth.session_token, id, {
+      const pkg = await api.updatePackage(auth.api_url, auth.org_id, auth.api_key, id, {
         variables,
       });
       console.log(`PDE_GATE_REGIONS_SET package=${pkg.package_id}`);
@@ -210,7 +165,7 @@ async function main() {
           name,
           platforms: ["gcp"],
           policy_groups: {
-            google_vpc_access_connector: ["region", "ip_cidr_range"],
+            google_vpc_access_connector: ["region", "network"],
           },
           variables: {
             approved_regions: regions,
@@ -219,9 +174,10 @@ async function main() {
           },
         };
       } else {
-        fail("package create requires --name or --file");
+        console.error("package create requires --name or --file");
+        process.exit(1);
       }
-      const pkg = await api.createPackage(auth.api_url, auth.org_id, auth.session_token, body);
+      const pkg = await api.createPackage(auth.api_url, auth.org_id, auth.api_key, body);
       console.log(`PDE_GATE_PACKAGE_CREATED ${pkg.package_id}`);
       console.log(JSON.stringify(pkg, null, 2));
       return;
@@ -233,7 +189,10 @@ async function main() {
     const planPath = flag(args, "--plan");
     const packageId = flag(args, "--package");
     const platform = flag(args, "--platform");
-    if (!planPath || !packageId) fail("check requires --plan and --package");
+    if (!planPath || !packageId) {
+      console.error("check requires --plan and --package");
+      process.exit(1);
+    }
     const auth = resolveAuth();
     const plan = JSON.parse(fs.readFileSync(planPath, "utf8")) as Record<string, unknown>;
     const result = await api.runRemoteCheck(auth.api_url, auth.org_id, auth.api_key, {
@@ -247,18 +206,14 @@ async function main() {
     if (result.org_config) {
       console.log(`PDE_GATE_ORG_CONFIG ${JSON.stringify(result.org_config)}`);
     }
-    const status = checkStatus(result);
     console.log(
-      `PDE_GATE_RESULT status=${status} ok=${result.ok} platform=${result.platform} package=${result.package_id} evaluated=${result.evaluated} failures=${result.failures.length} errors=${result.errors?.length ?? 0} skipped=${result.skipped?.length ?? 0}`
+      `PDE_GATE_RESULT ok=${result.ok} platform=${result.platform} package=${result.package_id} evaluated=${result.evaluated} failures=${result.failures.length}`
     );
-    if (result.message) console.log(`PDE_GATE_MESSAGE ${result.message}`);
     for (const f of result.failures) {
       console.log(`PDE_GATE_FAIL policy=${f.policy}`);
       console.log(JSON.stringify(f.message));
     }
-    for (const e of result.errors ?? []) console.log(`PDE_GATE_ERROR policy=${e.policy} ${e.error}`);
-    for (const s of result.skipped ?? []) console.log(`PDE_GATE_SKIPPED policy=${s.policy} ${s.reason}`);
-    process.exit(exitCodeFor(result));
+    process.exit(result.ok ? 0 : 1);
   }
 
   usage();
@@ -266,5 +221,5 @@ async function main() {
 
 main().catch((err) => {
   console.error(err instanceof Error ? err.message : err);
-  process.exit(EXIT_ERROR);
+  process.exit(1);
 });

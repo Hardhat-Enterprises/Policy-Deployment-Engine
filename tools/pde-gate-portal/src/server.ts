@@ -2,10 +2,10 @@ import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+const API_URL = process.env.PDE_API_URL ?? "http://127.0.0.1:3847";
 const publicDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "public");
 
-export function createApp(options: { apiUrl?: string } = {}) {
-  const API_URL = options.apiUrl ?? process.env.PDE_API_URL ?? "http://127.0.0.1:3847";
+export function createApp() {
   const app = express();
   app.use(express.json({ limit: "32mb" }));
   app.use(express.static(publicDir));
@@ -46,12 +46,6 @@ export function createApp(options: { apiUrl?: string } = {}) {
       if (req.header("content-type")) {
         headers["Content-Type"] = req.header("content-type")!;
       }
-      // The API rate-limits register and login per client IP. Pass the browser's
-      // address on, so the API (with PDE_TRUST_PROXY set) does not count every
-      // request as the portal's.
-      const forwardedFor = req.header("x-forwarded-for");
-      const clientAddress = req.socket.remoteAddress ?? "";
-      headers["X-Forwarded-For"] = forwardedFor ? `${forwardedFor}, ${clientAddress}` : clientAddress;
 
       const response = await fetch(targetUrl, {
         method: req.method,

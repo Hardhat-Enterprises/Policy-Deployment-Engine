@@ -12,12 +12,8 @@
 | Run Check page served | Pass |
 | Run Check browser script syntax | Pass |
 | Package Builder browser script syntax | Pass |
-| Policy catalog lists the real `policies/gcp` tree: resource types and argument names (`policy-catalog.test.ts`) | Pass |
+| Policy catalog discovers resource types and policy filenames | Pass |
 | Missing policy directory returns an empty catalog safely | Pass |
-| Pages sign in with a session; only Run Check asks for the API key | Pass |
-| The API key is never stored: shown once (copy button) at register and on rotate, pasted for a check | Pass |
-| A 401 returns to sign-in; a 429 shows a clear message | Pass |
-| Portal proxy forwards the bearer token, body and client address (`X-Forwarded-For`) | Pass |
 
 ## End-to-end test checklist
 
@@ -29,12 +25,11 @@ Complete this table after testing against the local MySQL container, API, OPA bi
 | Import valid `package.json` | Package fields are populated without a page crash | Pending local run |
 | Import malformed JSON | Clear invalid JSON error is displayed | Pending local run |
 | Import package with missing required fields | Clear validation error is displayed | Pending local run |
-| Sign in with a wrong password | Sign-in error is displayed | Pending local run |
-| Sign in and load packages | Saved packages appear in the selector | Pending local run |
+| Authenticate with invalid API key | Authentication error is displayed | Pending local run |
+| Authenticate and load packages | Saved packages appear in the selector | Pending local run |
 | Load Package Builder | Repository resources and policies appear in the searchable catalog | Pending local run |
 | Create custom package using checkboxes | New package appears in Existing Packages and Run Check | Pending local run |
 | Delete package | Selected package is removed after confirmation | Pending local run |
-| Rotate API key on Settings | New key shown once; the old key gets 401 on Run Check | Pending local run |
 | Update region, zone or custom policy selection | Saved value remains after reload | Pending local run |
 | Upload missing or malformed `plan.json` | Clear validation error is displayed | Pending local run |
 | Upload valid Terraform plan and run check | Backend evaluates selected policies and returns a result | Pending local run |
