@@ -25,7 +25,19 @@ It holds three files — `policy.rego`, `compliant.tf` and `nonCompliant.tf`.
 
 ### Example: `runtime`
 
-![runtime-fixtures-gcp-example](images/runtime-example-inputs-policy.png)
+```text
+policies/gcp/
+├── config.tf                                  # shared provider stub for every policy
+└── Cloud Functions/
+    └── google_cloudfunctions_function/
+        ├── _vars.rego                         # one per resource, shared by its policies
+        └── runtime/
+            ├── policy.rego
+            ├── compliant.tf
+            ├── nonCompliant.tf
+            ├── <sha>.json                     # committed plan built from the .tf fixtures
+            └── config.tf                      # optional: replaces the shared config.tf
+```
 
 ![runtime-policy-gcp-example](images/runtime-policy-gcp.png)
 
@@ -70,12 +82,25 @@ policies) — it sits beside the attribute folders, not inside them.
 
 ### For example
 
+```text
+policies/gcp/
+├── config.tf                          # shared; the test harness supplies it
+└── <Service>/
+    └── <resource type>/
+        ├── _vars.rego                 # resource level, beside the attribute folders
+        └── <attribute>/
+            ├── policy.rego
+            ├── compliant.tf
+            ├── nonCompliant.tf
+            ├── <sha>.json             # committed plan
+            └── config.tf              # optional per-attribute override
+```
+
 <p align="center">
-  <img src="images/c.tf-nc.tf-file-structure.png" width="45%" style="margin-right: 40px;" />
   <img src="images/policy-vars-file-structure.PNG" width="51%" />
 </p>
 
-<p align="center"><em>Fixtures (left) and policy files (right)</em></p> 
+<p align="center"><em>Policy files</em></p> 
 
 
 
